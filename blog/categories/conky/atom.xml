@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: conky | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.github.com/blog/categories/conky/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.github.com/"/>
+  <updated>2012-03-27T12:39:46+13:00</updated>
+  <id>http://jasonwryan.github.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[dzen2 and conky-cli in dwm]]></title>
+    <link href="http://jasonwryan.github.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/"/>
+    <updated>2009-11-21T12:07:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm</id>
+    <content type="html"><![CDATA[<p>I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar.</p>
+
+<p>Here is how I sorted it.</p>
+
+<p>First, I installed <code>conky-cli</code> and <code>dzen2</code>. Conky-cli is in AUR, and dzen2 is in Community:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S dzen2 &amp;amp;&amp;amp; yaourt conky-cli
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then it was a matter of setting up the relevant files.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.xinitrc.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;~/.xinitrc&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;setxkbmap -option terminate:ctrl_alt_bksp &amp;amp;
+</span><span class='line'><span class="nb">eval</span> &lt;code&gt;cat ~/.fehbg&lt;/code&gt; &amp;amp;
+</span><span class='line'>numlockx &amp;amp;
+</span><span class='line'>xscreensaver -no-splash &amp;amp;&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Dzen &amp;amp; conky&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">(</span>sleep 15s &amp;amp;&amp;amp; conky | dzen2 -x <span class="s1">&#39;500&#39;</span> -e <span class="s1">&#39;&#39;</span> -fg <span class="s1">&#39;#dcdcdc&#39;</span> -bg <span class="s1">&#39;#3f3f3f&#39;</span> <span class="se">\</span>
+</span><span class='line'>-w <span class="s1">&#39;650&#39;</span> -ta r -fn <span class="s1">&#39;-&lt;em&gt;-terminus-&lt;/em&gt;-r-normal-&lt;em&gt;-&lt;/em&gt;-120-&lt;em&gt;-&lt;/em&gt;-&lt;em&gt;-&lt;/em&gt;-iso8859-*&#39;</span> -p <span class="o">)</span> &amp;amp;&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Start dwm&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;exec ck-launch-session ~/Scripts/dwm-start
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.conkyrc .sh </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>background no
+</span><span class='line'>out_to_console yes
+</span><span class='line'>update_interval 2
+</span><span class='line'>total_run_times 0
+</span><span class='line'>use_spacer none
+</span><span class='line'>double_buffer yes
+</span><span class='line'>TEXT
+</span><span class='line'>${if_existing /sys/class/power_supply/BAT0/present}&lt;sup>i(/home/jason/Build/dwm/dzen/bat.xbm)…&lt;/sup></span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>dwm-start .sh </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>while true; do&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>dwm &gt;/dev/null
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>done</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The key is —and it took me a while to work it out— to delay the loading of conky until <em>after</em> dwm has painted it's
+status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
+
+<p>Now, the “before” shot:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/conky-dzen.png"></p>
+
+<p>…and the finished product:</p>
+
+<p><a href="http://www.flickr.com/photos/jasonwryan/4121324068/" title="Conky-cli to dzen2 in dwm on Arch by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2666/4121324068_6ec29262d7.jpg" width="500" height="293" alt="Conky-cli to dzen2 in dwm on Arch"/></a></p>
+]]></content>
+  </entry>
+  
+</feed>

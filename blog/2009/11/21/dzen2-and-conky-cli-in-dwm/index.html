@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Changing Karmic's Login Screen - jasonwryan.com</title>
+  <title>dzen2 and conky-cli in dwm - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
-accelerate boot time. This has made for a faster boot, but a side effect &hellip;">
+  <meta name="description" content="I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar. Here is how I sorted it. First, I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@ accelerate boot time. This has made for a faster boot, but a side effect &hellip
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2009/11/07/changing-karmics-login-screen">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -69,7 +68,7 @@ accelerate boot time. This has made for a faster boot, but a side effect &hellip
   
   <header>
     
-      <h1 class="entry-title">Changing Karmic's Login Screen</h1>
+      <h1 class="entry-title">Dzen2 and Conky-cli in Dwm</h1>
     
     
       <p class="meta">
@@ -85,71 +84,94 @@ accelerate boot time. This has made for a faster boot, but a side effect &hellip
   
 
 
-<time datetime="2009-11-07T18:46:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2009</time>
+<time datetime="2009-11-21T12:07:00+13:00" pubdate data-updated="true">Nov 21<span>st</span>, 2009</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
-accelerate boot time. This has made for a faster boot, but a side effect has
-been that there is no longer a straightforward way to theme your login - and
-the default isn’t just ugly, it’s fugly…</p>
+<div class="entry-content"><p>I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar.</p>
 
-<p>Fear not. It can be fixed.</p>
+<p>Here is how I sorted it.</p>
 
-<p>The first thing you want to do is replace the background image. You can find it
-at <code>/usr/share/images/xsplash</code>.</p>
-
-<p>Before doing anything rash, make a copy of the directory:</p>
+<p>First, I installed <code>conky-cli</code> and <code>dzen2</code>. Conky-cli is in AUR, and dzen2 is in Community:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S dzen2 <span class="o">&amp;&amp;</span> yaourt conky-cli
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Then delete all of the images that begin with <code>bg_</code>:</p>
+<p>Then it was a matter of setting up the relevant files.</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo rm /usr/share/images/xsplash/bg_*
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Use the gimp to create a background image for your desktop and save it into
-this directory, and name it <code>bg_2560x1600.jpg</code> …irrespective of the resolution
-of your screen. Leave the other images as they are: the logo and the
-marvellously named throbber will sit over your new background as you boot up…</p>
-
-<p>Next you can change the colours of the login box to complement your new
-background. This is all controlled in
-<code>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc</code>.</p>
-
-<p>Again, make a copy:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>.xinitrc.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc <span class="se">\</span>
-</span><span class='line'>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc-backup
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># ~/.xinitrc</span>
+</span><span class='line'>setxkbmap -option terminate:ctrl_alt_bksp &amp;amp;
+</span><span class='line'><span class="nb">eval</span> <span class="sb">`</span>cat ~/.fehbg<span class="sb">`</span> &amp;amp;
+</span><span class='line'>numlockx &amp;amp;
+</span><span class='line'>xscreensaver -no-splash &amp;amp;
+</span><span class='line'><span class="c"># Dzen &amp;amp; conky</span>
+</span><span class='line'><span class="o">(</span>sleep 15s &amp;amp;&amp;amp; conky | dzen2 -x <span class="s1">&#39;500&#39;</span> -e <span class="s1">&#39;&#39;</span> -fg <span class="s1">&#39;#dcdcdc&#39;</span> -bg <span class="s1">&#39;#3f3f3f&#39;</span> <span class="se">\</span>
+</span><span class='line'>-w <span class="s1">&#39;650&#39;</span> -ta r -fn <span class="s1">&#39;-*-terminus-*-r-normal-*-*-120-*-*-*-*-iso8859-*&#39;</span> -p <span class="o">)</span> &amp;amp;
+</span><span class='line'><span class="c"># Start dwm</span>
+</span><span class='line'><span class="nb">exec </span>ck-launch-session ~/Scripts/dwm-start
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Then open the file and edit the relevant lines of code at the beginning of the
-file:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
-</span></code></pre></td></tr></table></div></figure>
 
 
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/karmic-text.png" title="'Screenshot of editing text'" ></p>
+<figure class='code'><figcaption><span>.conkyrc .sh </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>background no
+</span><span class='line'>out_to_console yes
+</span><span class='line'>update_interval 2
+</span><span class='line'>total_run_times 0
+</span><span class='line'>use_spacer none
+</span><span class='line'>double_buffer yes
+</span><span class='line'>TEXT
+</span><span class='line'>${if_existing /sys/class/power_supply/BAT0/present}^i(/home/jason/Build/dwm/dzen/bat.xbm)…</span></code></pre></td></tr></table></div></figure>
 
-<p>As you can see, the colour scheme I have chosen uses dark grey to match my
-desktop. Feel free to experiment, you can’t really break anything…</p>
 
-<p><a href="http://www.flickr.com/photos/jasonwryan/4081800113/" title="Customized Karmic Login Screen by jasonwryan, on Flickr"><img src="http://farm3.staticflickr.com/2536/4081800113_d4b98a9b3c.jpg" width="500" height="313" alt="Customized Karmic Login Screen"></a></p>
 
-<p>Simple, really.</p>
+
+<figure class='code'><figcaption><span>dwm-start .sh </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>while true; do 
+</span><span class='line'>    dwm >/dev/null
+</span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The key is —and it took me a while to work it out— to delay the loading of conky until <em>after</em> dwm has painted it&#8217;s
+status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
+
+<p>Now, the “before” shot:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/conky-dzen.png"></p>
+
+<p>…and the finished product:</p>
+
+<p><a href="http://www.flickr.com/photos/jasonwryan/4121324068/" title="Conky-cli to dzen2 in dwm on Arch by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2666/4121324068_6ec29262d7.jpg" width="500" height="293" alt="Conky-cli to dzen2 in dwm on Arch"/></a></p>
 </div>
 
 
@@ -172,12 +194,12 @@ desktop. Feel free to experiment, you can’t really break anything…</p>
   
 
 
-<time datetime="2009-11-07T18:46:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2009</time>
+<time datetime="2009-11-21T12:07:00+13:00" pubdate data-updated="true">Nov 21<span>st</span>, 2009</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/login/'>login</a>, <a class='category' href='/blog/categories/ubuntu/'>ubuntu</a>
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/conky/'>conky</a>, <a class='category' href='/blog/categories/dwm/'>dwm</a>, <a class='category' href='/blog/categories/dzen/'>dzen</a>
   
 </span>
 
@@ -193,10 +215,10 @@ desktop. Feel free to experiment, you can’t really break anything…</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2009/03/17/install-otf-fonts-in-openoffice/" title="Previous Post: Install .otf Fonts in OpenOffice">&laquo; Install .otf Fonts in OpenOffice</a>
+        <a class="basic-alignment left" href="/blog/2009/11/07/changing-karmics-login-screen/" title="Previous Post: Changing Karmic's Login Screen">&laquo; Changing Karmic's Login Screen</a>
       
       
-        <a class="basic-alignment right" href="/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/" title="Next Post: dzen2 and conky-cli in dwm">dzen2 and conky-cli in dwm &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Next Post: Using Dropbox to Share Dotfiles">Using Dropbox to Share Dotfiles &raquo;</a>
       
     </p>
   </footer>
@@ -290,8 +312,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2009/11/07/changing-karmics-login-screen/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2009/11/07/changing-karmics-login-screen/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/';
         var disqus_script = 'embed.js';
       
     (function () {
