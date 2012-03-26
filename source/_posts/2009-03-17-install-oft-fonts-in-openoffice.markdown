@@ -17,7 +17,7 @@ If all the .otf files are in the same folder, then you are good to go.
 
 First, you need the conversion script, which I found in [this post](url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this post[/url):
 
-{% codeblock otf2ttf.sh - otf2ttf.sh %}
+{% codeblock otf2ttf.sh %}
 #!/usr/local/bin/fontforge
 # Quick and dirty hack: converts a font to truetype (.ttf)
 Print("Opening "+$1);
