@@ -9,7 +9,9 @@ categories: [fonts,openoffice,linux,unix,hack]
 OpenOffice won’t recognize TrueType fonts with the extension .otf, so you need to convert them to .ttf
 in order to use them in that suite.
 
+{% codeblock lang:sh %}
 sudo apt-get install fontforge
+{% endcodeblock %}
 
 If all the .otf files are in the same folder, then you are good to go.
 
