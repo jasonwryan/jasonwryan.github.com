@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-27T16:43:00+13:00</updated>
+  <updated>2012-03-27T21:29:03+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -14,31 +14,381 @@
 
   
   <entry>
-    <title type="html"><![CDATA[tmux - terminal multiplexer]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/03/27/tmux-terminal-multiplexer/"/>
-    <updated>2012-03-27T13:28:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/03/27/tmux-terminal-multiplexer</id>
-    <content type="html"><![CDATA[<p>Over the last couple of days I have been familiarising myself with <a href="http://tmux.sourceforge.net/">tmux</a>.
-As it says on the homepage,</p>
+    <title type="html"><![CDATA[Console Fonts in Ubuntu]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/10/21/console-fonts-in-ubuntu/"/>
+    <updated>2010-10-21T20:38:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/10/21/console-fonts-in-ubuntu</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-fonts.png" alt="image" /></p>
 
-<blockquote><p>tmux is a terminal multiplexer: it enables a number of terminals (or windows), each running a separate program, to be created, accessed, and controlled from a single screen. tmux may be detached from a screen and continue running in the background, then later reattached.</p></blockquote>
+<p>Invariably, an <a href="http://www.ubuntu.com/" title="Ubuntu homepage">Ubuntu</a>
+upgrade only ever brings me pain in one area: the framebuffer. Granted,
+most Ubuntu users probably don’t care about the resolution of their
+framebuffer because they probably rarely venture there.</p>
 
+<p>For me, however, having the correct resolution and a decent font is
+important. Not because I spend a huge amount of time there (I don’t),
+but because in the past I have been forced to — and quickly learned that
+if the resolution is off, it makes it <em>very</em> difficult to work with.</p>
 
-<p>I was attracted to tmux after seeing a number of enthusiastic postings on the
-<a href="http://bbs.archlinux.org/viewtopic.php?id=84157">Arch forums</a>, and by the promise of
-better management of multiple terminals in a single <a href="http://dwm.suckless.org/">dwm tag</a>…</p>
+<p>So the recent, otherwise completely successful, upgrade to Maverick
+Meerkat once again left me with an almost useless console. Fortunately,
+the hack for forcing a 1680x1050 resolution worked<sup>1</sup>, so it was just a
+matter of getting
+<a href="http://fractal.csie.org/~eric/wiki/Terminus_font" title="Terminus homepage">Terminus</a>
+to stick as the default console font.</p>
 
-<p>It&#8217;s available in the community repo, so:</p>
+<p>This was one instance where Google failed me. There doesn’t seem to be
+any authoritative guide to setting your console font permanently. I
+edited <span class="file">/etc/default/console-setup</span>
+and added Terminus as the font, like so:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S tmux
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">CODESET</span><span class="o">=</span><span class="s2">&quot;Lat15&quot;</span>
+</span><span class='line'><span class="nv">FONTFACE</span><span class="o">=</span><span class="s2">&quot;Terminus&quot;</span>
+</span><span class='line'><span class="nv">FONTSIZE</span><span class="o">=</span><span class="s2">&quot;16&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Then it is just a matter of configuring it to suit your style of working,
-keyboard bindings etc. Helpfully, it comes with some example config files to
-start you off. These can be found at <span class="file">/usr/share/tmux/*.conf</span>.
-I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</a> for mine:</p>
+<p>Issuing, from the console:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo setupcon -v
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>would change the font to Terminus for that session but a reboot soon
+reverted it to the default fixed (which, given
+<a href="https://wiki.ubuntu.com/Ubuntu%20Font%20Family">Ubuntu have been working on their fonts</a>, is
+spectacularly ugly).</p>
+
+<p>I finally asked in #ubuntu and was pointed in the right direction:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo dpkg-reconfigure console-setup
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And <em>now</em> I have a workable framebuffer.</p>
+
+<div class="footnotes">
+1. Hack to force higher framebuffer resolution in <span class="file">/etc/default/grub</span>
+<br />
+<pre><code>GRUB_GFXPAYLOAD_LINUX=1680x1050</code></pre>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vimprobable]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/10/07/vimprobable/"/>
+    <updated>2010-10-07T16:23:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/10/07/vimprobable</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5055695051/" title="Vimprobable on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable.png" title="Hacked Vimprobable2" alt="image" /></a></p>
+
+<p>After just posting details of <a href="http://jasonwryan.com/post/1240576133/setup">my setup</a>,
+I have made a reasonably significant (and it goes almost without saying, unplanned)
+change: after <a href="http://www.uzbl.org/">uzbl</a> began unaccountably maxxing
+out my CPU, I decided to give <a href="http://www.vimprobable.org/">Vimprobable</a>
+a go.</p>
+
+<p>I covered it briefly in my review of <a href="http://jasonwryan.com/post/618038288/browsers">5 alternate browsers</a> and liked the
+idea of another vim-based browsing experience.</p>
+
+<p>There are two versions of Vimprobable; the differences, as described on
+the website:</p>
+
+<blockquote><p>Both versions are actively maintained. The first version can only be
+customised by editing config.h before compiling. It is pretty stable
+and very usable. Version 2 has grown fairly stable already as well,
+but it’s still seeing bigger changes, of course. It aims at allowing
+more customisation, for example through :set and :map commands.</p></blockquote>
+
+<p>I downloaded the tarball for
+<a href="http://aur.archlinux.org/packages.php?ID=33779" title="Arch User Repository: Vimprobable2">Vimprobable2 from the AUR</a>,
+extracted the files and built the package.</p>
+
+<p>Customization occurs in 3 files<sup>1</sup>: the first two,
+<span class="file">config.h</span> and <span class="file">keymap.h</span>
+both require you to recompile after editing, which is a trivial task
+given the size of the programme.</p>
+
+<p>Vimprobable2 also features a third configuration option that doesn’t
+require compiling after changes, <span class="file">vimprobablerc</span>.
+Should you wish to use it, you will need to create this file in
+<span class="file">~/.config/vimprobable/</span>.
+Helpfully, there is a man page for all of the options in this file, to
+read it issue:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>man vimprobablerc
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Despite it’s spartan appearance, Vimprobable is a full-featured browser
+— with the advantage of being driven solely from the keyboard. It
+handles bookmarks (and the tagging thereof, which is impressive and
+handy), multiple search engines, cookies, history, etc…</p>
+
+<p>I have made a number of changes to the defaults, including moving some
+of the keybindings to be closer to uzbl’s (habit, really). The other
+area where I made some minor changes was to the hinting style. Hinting
+is just the way Vimprobable (and other browsers like uzbl and
+<a href="http://conkeror.org/">Conkeror</a>) follow links; the default is, to put
+it mildly, garish<sup>2</sup>, so I hacked around in <span class="file">hinting.js</span>
+to make it more attractive.</p>
+
+<p>If you are interested, my vimprobable files are in
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/vimprobable2-git/">bitbucket</a>,
+including the modified hinting.js.</p>
+
+<h3>Update</h3>
+
+<p>I think this is a keeper. I installed
+<a href="http://tools.suckless.org/tabbed" title="suckless' tabbed">tabbed</a> and now
+open Vimprobable in tabbed for tab management. A quick addition to my
+keybinds in <a href="http://dwm.suckless.org/" title="dynamic window manager">dwm</a> and
+I have a minimalist and powerful browser…</p>
+
+<div class="footnotes">
+1. Of course, you are not limited to these files; the beauty of free
+and open-source software is that you can change any of it…
+<br />
+2. To support this claim, I searched google for an image of the default
+Vimprobable hinting style, and I could only find this 
+<a href="http://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/103/10387/10387f2.jpg">screenshot of conkeror</a>,
+which will give you an idea…
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[The Setup]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/10/04/the-setup/"/>
+    <updated>2010-10-04T17:23:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/10/04/the-setup</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/4522790892/" title="Arch Linux and dwm"><img src="http://dl.dropbox.com/u/261312/Blog-images/setup.png" alt="image" /></a></p>
+
+<p>Inspired by <a href="http://usesthis.com/">The Setup</a><sup>1</sup>, I decided to document
+the free (as in <a href="http://www.gnu.org/philosophy/free-sw.html">freedom</a>)
+and open source software tools I use daily.</p>
+
+<p>I made the move to using open-source about four years ago. At the time
+it was mostly a practical decision — the Pentium 4 laptop that I was
+using with XP on it had slowed to a crawl and I wasn’t keen to replace
+it, so I installed Ubuntu (Hardy Heron) on it and haven’t looked back.</p>
+
+<p>That same machine, incidentally, is still happily churning away, but it
+now runs a lightweight <a href="http://www.debian.org/releases/stable/">Debian Stable</a>.</p>
+
+<h3>Desktop</h3>
+
+<p>My primary home machine is a one I had built from spec two to three
+years ago. It was always intended to be a long-term investment, with
+sufficient power and storage to last for the better part of a decade.</p>
+
+<p>Centurion is an
+<a href="http://www.asus.com/Product.aspx?P_ID=cXoprTXLaShErTzI&amp;content=specifications">Asus P5E-V motherboard</a>
+with an
+<a href="http://www.intel.com/products/processor/core2quad/index.htm">Intel Core 2 Quad 6600 2.4GHz CPU</a> and
+4GB of DDR2 RAM. The sound card is an
+<a href="http://www.m-audio.com/products/en_us/Audiophile2496.html">M-Audio Audiophile 2496</a> and the
+graphics card is a
+<a href="http://www.nvidia.com/object/product_geforce_9600gt_us.html">1GB nVidia GeForce 9600GT</a>
+driving an LG 22” flat panel 1680x1050 display.</p>
+
+<h4>Software</h4>
+
+<p>I dual boot this machine, switching between the current
+<a href="http://www.ubuntu.com">Ubuntu</a> (10.04) and <a href="http://archlinux.org">Arch Linux</a>.</p>
+
+<p>There are two 1TB Seagate drives in a <a href="http://en.wikipedia.org/wiki/RAID">RAID1 array</a>,
+and a 500GB Seagate which has Arch on it as well as a couple of virtual machines.
+I back up the RAID array frequently, using <a href="http://www.samba.org/rsync/">rsync</a>, as it
+holds my <span class="file">/home</span> but don’t worry about the 500GB drive
+as I figure it is simple to reinstall Arch or a virtual machine…</p>
+
+<p>I try to use the same software across all of my machines to simplify my
+working habits, however I am experiencing some tension between Ubuntu
+and Arch insofar as Arch is a rolling release and you very quickly get
+used to the most recent builds…</p>
+
+<p>Applications specific to the Ubuntu box include:</p>
+
+<ul>
+<li><p><a href="http://www.getfirefox.net/">Firefox</a>: I also have
+<a href="http://www.google.com/chrome">Chrome</a> installed on this machine, but
+stick with the ‘fox for <a href="http://getfirebug.com/">Firebug</a> and other
+extensions</p></li>
+<li><p><a href="http://www.mozillamessaging.com/en-US/thunderbird/">Thunderbird</a>: with
+the <a href="http://enigmail.mozdev.org/home/index.php.html">Enigmail</a>
+extension. One of those areas of tension - it’s just a matter of time
+before I move to <code>mutt</code> (see EeePC)</p></li>
+<li><p><a href="http://wiki.slimdevices.com/index.php/SlimServer">Squeezeserver</a>: I
+have a Logitech Squeezebox to serve my music and it runs off this great
+open source software</p></li>
+<li><p><a href="http://www.virtualbox.org/">Virtualbox</a> (OS): for running virtual
+machines - currently <a href="http://www.slackware.com/">Slackware</a> and
+<a href="http://www.freebsd.org/">FreeBSD</a>.</p></li>
+</ul>
+
+
+<h3>EeePC 901</h3>
+
+<p>Archer is a 901 I bought two years ago – the
+<a href="http://eeepc.asus.com/au/product901-spec.html">Linux model with the 4/16GB SSD</a>, and I
+absolutely love it. I put a second GB of RAM into it and another 16GB SD
+Card (for /music) and it does everything that I need. The
+<a href="http://www.intel.com/products/processor/atom/index.htm">Atom 1.6GHz processor</a>
+handles compiling relatively smartly and the screen and keyboard, while
+small (9” at 1024x600) are not uncomfortable to use for protracted
+sessions. It is also <em>deathly quiet</em>. The only other addition is a
+second 6 cell battery so I can safely count on 8-10 hours out of it.</p>
+
+<p>One of the reasons that it works so efficiently is that it is an
+<em>extremely</em> minimal Arch Linux setup.</p>
+
+<h4>Software</h4>
+
+<p>Applications specific to this machine are:</p>
+
+<ul>
+<li><a href="http://dwm.suckless.org" title="dwm page on suckless">dwm</a>: <em>the</em>
+suckless window manager. With added functionality of some patches:
+init-pertag, cycle and push: see <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/dwm/5.8.2-2.diff">the patchset for
+details</a></li>
+<li><a href="http://tools.suckless.org/dmenu/">dmenu</a>: application launcher,
+again from suckless.org</li>
+<li><p><a href="http://www.mutt.org/">mutt</a>: the best email client I have used -
+requires some setup, but –if you want your mail client to run
+exactly as you would like– then this one repays the investment in
+spades. Mutt is just a MUA, the rest of the email cycle is handled
+by:</p>
+
+<ul>
+<li><a href="http://github.com/jgoerzen/offlineimap/wiki">offlineimap</a>: to
+fetch mail</li>
+<li><a href="http://msmtp.sourceforge.net/">msmtp</a>: to send mail</li>
+<li><a href="http://www.gnupg.org/">GnuPG</a>: for signing and encryption</li>
+<li><a href="http://abook.sourceforge.net/">abook</a>: address book</li>
+<li><a href="http://linuxcommand.org/man_pages/urlview1.html">urlview</a> and
+<a href="http://lynx.browser.org/">lynx</a>: open urls from mutt</li>
+</ul>
+</li>
+<li><p><del><a href="http://www.uzbl.org/">uzbl</a>: a lightweight webkit browser that is
+infintely extensible and
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.config/uzbl/config">configurable</a></del><sup>2^</sup></p></li>
+<li><a href="http://www.vimprobable.org/">Vimprobable</a> in
+<a href="http://tools.suckless.org/tabbed">tabbed</a>: another lightweight
+webkit browser that can be
+<a href="http://www.flickr.com/photos/jasonwryan/5063510130/" title="Screenshot on Flickr">customized</a>
+to your heart’s desire…</li>
+<li>A host of small programs that make life easy:
+
+<ul>
+<li><a href="https://derf.homelinux.org/projects/feh/">feh</a>: image viewer</li>
+<li><a href="http://www.nongnu.org/autocutsel/">autocutsel</a>: synchronize
+clipboards</li>
+<li><a href="http://sites.google.com/site/gotmor/dzen">dzen</a> and
+<a href="http://conky.sourceforge.net/">conky</a>: to print system stats to
+dwm’s status bar</li>
+<li><a href="http://surfraw.alioth.debian.org/">surfraw</a>: command line
+search client</li>
+<li><a href="http://www.ibiblio.org/pub/X11/contrib/utilities/unclutter-8.README">unclutter</a>:
+hides the mouse cursor (don’t really need a mouse with this
+setup)</li>
+<li><a href="http://www.xfree86.org/4.2.0/xmodmap.1.html">xmodmap</a>: map Caps
+Lock to Escape</li>
+</ul>
+</li>
+</ul>
+
+
+<h4>Common tools</h4>
+
+<p>Applications and utilities that I use across all of my machines include:</p>
+
+<ul>
+<li><p><a href="http://software.schmorp.de/pkg/rxvt-unicode.html">Urxvt</a>: I would’nt
+dream of using another terminal… Run as a daemon, with these
+applications:</p>
+
+<ul>
+<li>  <a href="http://tmux.sourceforge.net/">tmux</a>: for local and remote terminal
+  sessions</li>
+<li>  <a href="http://www.vim.org/">Vim</a>: with a <a href="http://jasonwryan.com/2010-09-28-command-line-notes">simple notes function</a>
+  in my .bashrc</li>
+<li>  <a href="http://vifm.sourceforge.net/">Vifm</a>: Vi-like file manager – for
+  when I am not using
+  <a href="http://www.gnu.org/software/coreutils/">coreutils</a></li>
+<li>  <a href="http://www.floodgap.com/software/ttytter/">TTYtter</a>: fantastic
+  Twitter client: if it could integrate Identi.ca into a single feed,
+  it would be perfect…</li>
+<li>  <a href="http://irssi.org/">irssi</a>: for IRC</li>
+<li>  <a href="http://www.mplayerhq.hu/design7/news.html">Mplayer</a>: for movies</li>
+<li>  <a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki">MPD</a> and
+  <a href="http://unkart.ovh.org/ncmpcpp/">ncmpcpp</a>: music player daemon and
+  ncurses player</li>
+<li>  <a href="http://code.google.com/p/mpdscribble/">mpdscribble</a>: for scrobbling
+  to Libre.fm and Last.fm</li>
+<li>  <a href="http://libtorrent.rakshasa.no/">rtorrent</a>: run inside tmux for
+remote sessions. Genius.</li>
+</ul>
+</li>
+<li><p><a href="http://www.dropbox.com/">Dropbox</a>: the daemon is closed source, but
+this is the best tool I have found for synching across machines. If the
+Ubuntu One devs ever focus on other Linux distros, I’d move across.</p></li>
+<li><a href="http://www.truecrypt.org/">Truecrypt</a>: a TC volume in Dropbox and you
+are set</li>
+<li><a href="http://www.skype.com/intl/en/home">Skype</a>.</li>
+</ul>
+
+
+<h4>Other Utilities</h4>
+
+<p>I use <a href="http://mercurial.selenic.com/">mercurial</a> and
+<a href="https://bitbucket.org/jasonwryan/">bitbucket</a> to share my dotfiles
+between Arch machines (one of my work boxes is also running Arch). I
+have two <a href="http://www.linksysbycisco.com/EU/en/products/WRT54GL">Linksys WRT54GL routers</a>, both
+running <a href="http://www.polarcloud.com/tomato">Tomato</a>, to handle my routing
+and wireless networking (thanks to
+<a href="http://twitter.com/jethrocarr" title="Jethro on Twitter">@jethrocarr</a> for
+solving that puzzle). For LAN file sharing I use
+<a href="http://nfs.sourceforge.net/">NFS</a> and I use
+<a href="http://www.openssh.com/">OpenSSH</a> to access my machines remotely. I
+have a third generation <a href="http://guides.macrumors.com/iPod_(3G">iPod</a>)
+and I run <a href="http://www.rockbox.org/">Rockbox</a> on it.</p>
+
+<p>You can see screenshot of these machines on
+<a href="http://www.flickr.com/photos/jasonwryan">flickr</a>.</p>
+
+<div class="footnotes">
+1. …and the fact that, apart from RMS, it is pretty much MacBookPros
+all the way down.
+<br />
+2. Updated 9/10/10 - <a href="http://jasonwryan.com/2010-10-07-vimprobable" title="My post on changing to Vimprobable">moved to Vimprobable</a>
+after some issues with uzbl.
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Sessions in tmux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux/"/>
+    <updated>2010-10-03T20:15:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5046091307/" title="Sessions in tmux by jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4146/5046091307_39c200f1b0.jpg" width="500" height="293" alt="Sessions in tmux"/></a></p>
+
+<p>Now that I have been using it for several months, I have become absolutely dependent upon <a href="http://tmux.sourceforge.net/" target="_blank">tmux</a>, the terminal multiplexer.
+It is both ruthlessly efficient, and can be configured to match exacting requirements. One of those options is to initialize sessions with a preloaded window configuration. After reading the <a href="http://wisconsinlinux.org/tmux-manpage-from-cvs/tmux.1.txt" target="_blank">man page</a> (which, truth be told, could be a little clearer) and some experimentation, I have worked out how to set up my tmux sessions how I want them.
+I have just updated the <a href="http://wiki.archlinux.org/index.php/Tmux">Arch Wiki tmux entry</a>,
+so thought I would share it here.</p>
+
+<p>The relevant part of my config file looks like this:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -47,182 +397,192 @@ I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># set prefix key to ctrl+t</span>
-</span><span class='line'>unbind C-b
-</span><span class='line'><span class="nb">set</span> -g prefix C-t
-</span><span class='line'>
-</span><span class='line'><span class="c"># more intuitive keybindings for splitting</span>
-</span><span class='line'>unbind %
-</span><span class='line'><span class="nb">bind </span>h split-window -h
-</span><span class='line'>unbind <span class="s1">&#39;&quot;&#39;</span>
-</span><span class='line'><span class="nb">bind </span>v split-window -v
-</span><span class='line'>
-</span><span class='line'><span class="c"># set vi keys</span>
-</span><span class='line'>unbind <span class="o">[</span>
-</span><span class='line'><span class="nb">bind </span>Escape copy-mode
-</span><span class='line'>setw -g mode-keys vi
-</span><span class='line'>
-</span><span class='line'><span class="c"># send the prefix to client inside window (ala nested sessions)</span>
-</span><span class='line'><span class="nb">bind</span>-key a send-prefix
-</span><span class='line'>
-</span><span class='line'><span class="c"># toggle last window like screen</span>
-</span><span class='line'><span class="nb">bind</span>-key C-b last-window
-</span><span class='line'>
-</span><span class='line'><span class="c"># confirm before killing a window or the server</span>
-</span><span class='line'><span class="nb">bind</span>-key k confirm <span class="nb">kill</span>-window
-</span><span class='line'><span class="nb">bind</span>-key K confirm <span class="nb">kill</span>-server
-</span><span class='line'>
-</span><span class='line'><span class="c"># toggle statusbar</span>
-</span><span class='line'><span class="nb">bind</span>-key b <span class="nb">set</span>-option status
-</span><span class='line'>
-</span><span class='line'><span class="c"># ctrl+left/right cycles thru windows</span>
-</span><span class='line'><span class="nb">bind</span>-key -n C-right next
-</span><span class='line'><span class="nb">bind</span>-key -n C-left prev
-</span><span class='line'>
-</span><span class='line'><span class="c"># open a man page in new window</span>
-</span><span class='line'><span class="nb">bind</span> / <span class="nb">command</span>-prompt <span class="s2">&quot;split-window &#39;exec man %%&#39;&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># quick view of processes</span>
-</span><span class='line'><span class="nb">bind</span> <span class="s1">&#39;~&#39;</span> split-window <span class="s2">&quot;exec htop&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># scrollback buffer n lines</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">history</span>-limit 5000
-</span><span class='line'>
-</span><span class='line'><span class="c"># on-screen time for display-panes in ms</span>
-</span><span class='line'><span class="nb">set</span> -g display-panes-time 2000
-</span><span class='line'>
-</span><span class='line'><span class="c"># start window indexing at one instead of zero</span>
-</span><span class='line'><span class="nb">set</span> -g base-index 1
-</span><span class='line'>
-</span><span class='line'><span class="c"># enable wm window titles</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles on
-</span><span class='line'>
-</span><span class='line'><span class="c"># wm window title string (uses statusbar variables)</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles-string <span class="s2">&quot;tmux:#I #W&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># session initialization</span>
-</span><span class='line'>new -s TTYtter ttytter
-</span><span class='line'>neww -t 2
-</span><span class='line'>neww -d -t 3
-</span><span class='line'>neww -d -t 5
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># session initialization</span>
+</span><span class='line'>new  -n TTYtter /home/jason/Scripts/ttytter.pl
+</span><span class='line'>neww -n irssi /home/jason/Scripts/startirssi.sh
+</span><span class='line'>neww -n ncmpcpp/vifm ncmpcpp
+</span><span class='line'>splitw -v -p 50 -t 0 vifm
+</span><span class='line'>neww -n bash bash
 </span><span class='line'>selectw -t 1
-</span><span class='line'>
-</span><span class='line'><span class="c">#### statusbar ####</span>
-</span><span class='line'><span class="nb">set</span> -g status-interval 1
-</span><span class='line'><span class="nb">set</span> -g status-justify centre <span class="c"># center align window list</span>
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="s1">&#39;#[fg=green] #H #[default]&#39;</span>
-</span><span class='line'><span class="nb">set</span> -g status-right <span class="s1">&#39;#[fg=blue,bright]Up#(uptime | cut -f 4-5 -d &quot; &quot; | cut -f 1 -d &quot;,&quot;) </span>
-</span><span class='line'><span class="s1">#[default]:: #[fg=cyan]#(cut -d &quot; &quot; -f 1-4 /proc/loadavg) &#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># default statusbar colors</span>
-</span><span class='line'><span class="nb">set</span> -g status-fg white
-</span><span class='line'><span class="nb">set</span> -g status-bg default
-</span><span class='line'><span class="nb">set</span> -g status-attr bright
-</span><span class='line'>
-</span><span class='line'><span class="c"># default window title colors</span>
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-fg white
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-bg default
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-attr dim
-</span><span class='line'>
-</span><span class='line'><span class="c"># active window title colors</span>
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-fg white
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-bg default
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-attr bright
-</span><span class='line'>
-</span><span class='line'><span class="c"># command/message line colors</span>
-</span><span class='line'><span class="nb">set</span> -g message-fg white
-</span><span class='line'><span class="nb">set</span> -g message-bg black
-</span><span class='line'><span class="nb">set</span> -g message-attr bright
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Copy this file to <span class="file">~/.tmux.conf</span>. The final result:</p>
+<p>Which, when I start tmux with the attach (or a) option, gives me the following window layout:</p>
 
-<p><a href="http://www.flickr.com/photos/jasonwryan/4252840248/" title="Archlinux:  tmux running in dwm by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2703/4252840248_01ca8e7cc1.jpg" width="500" height="293" alt="Archlinux:  tmux running in dwm"/></a></p>
+<ul>
+<li>TTYtter</li>
+<li>irssi</li>
+<li>ncmpcpp/vifm &nbsp; &nbsp; # window split vertically in half, ncmpcpp on top of vifm</li>
+<li>bash</li>
+</ul>
 
-<h3>Updated 16/11/10</h3>
 
-<p>For a current version of my <span class="file">.tmux.conf</span>, check my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.tmux.conf" title="bitbucket site" target="_blank">mercurial repository</a>.</p>
+<p>The <code>selectw</code> option means that the default view is TTYtter.</p>
+
+<p>Simple.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Command Line Notes]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/09/28/command-line-notes/"/>
+    <updated>2010-09-28T17:56:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/09/28/command-line-notes</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-1.png" alt="image" /></p>
+
+<p>A couple of weeks ago, I came across these
+<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
+written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
+notes.</p>
+
+<p>The functions as described in the article are so:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$*&quot;</span>.txt <span class="o">}</span> nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$*&quot;</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Unfortunately, the second function – for retrieving the list of files in
+the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
+and it will only list files in the top level directory. If you are an
+inverterate note taker, this plainly won’t scale.</p>
+
+<p>My first attempt at hacking a solution yielded this little beauty:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\ </span>
+</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which removes <code>ls</code> from the function and allows nested directories, but
+is needlessly complex and, with four pipes, hideously <del>inefficient</del>
+inelegant.</p>
+
+<p>After reading up on Awk, particularly
+<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
+I arrived at something marginally longer but relying solely on the
+awesome power of awk to make the various transformations I was seeking…</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
+</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>An added advantage is that it is scalable irrespective of how deep the
+directories go. I’m sure that with some more awk-foo I could write a
+more effective set of conditionals, but this seemed a pretty good start
+for a simple note taking utility.</p>
+
+<h3>Updated 3/11/10</h3>
+
+<p>To remove a little of the visual clutter, I amended the awk script to
+strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
+</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
+in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
+symlink to it from <span class="file">~/.notes</span>.</p>
+
+<div class="footnotes">
+1. See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.
+<br />
+2. Obligatory “after” screenshot:
+<br />
+<img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-2.png" title="'Screenshot of editing text'" >
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vapourware]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/04/03/vapourware/"/>
+    <updated>2010-04-03T13:18:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/04/03/vapourware</id>
+    <content type="html"><![CDATA[<p>This morning I received a heap of brochures inviting me to attend
+professional development courses, training seminars and conferences. One
+in particular stood out for reasons I’d like to share with you.</p>
+
+<p>By way of context; it’s a 2 day programme (workshops on the first,
+plenary sessions on the second) of social media for internal
+communicators. As I have a keen interest in internal communications, I
+studied their offering.</p>
+
+<p>One presentation, from an “international guest speaker,” is so striking
+I’ll reprint it in its entirety, removing the name of the company to
+prevent them any (further) embarassment, (all emphasis mine):</p>
+
+<blockquote><p>[Multi-national company] is rolling out Sharepoint this year. It
+<strong>will</strong> provide the organization with an enhanced way of
+communicating, collaborating and managing content - a dynamic platform
+on which to evolve and further improve [company’s] way or working.
+From an internal communications perspective, the Microsoft Office
+product provides an <strong>updated way</strong> to engage colleagues, in order to
+drive winning culture and business performance. This session captures
+the opportunities, benefits, <strong>and realities</strong> of implementing and
+living with Sharepoint.</p>
+
+<p>[Employee name], Internal Communications Director, [company].</p></blockquote>
+
+<p>Did I read that correctly? The company haven’t actually implemented the
+technology yet, but they are still fronting someone to sell it’s future
+virtues.</p>
+
+<p>Whether or not the technology is able to deliver these benefits (and I
+<a href="http://twitter.com/jasonwryan/status/839079414">doubt it</a> <a href="http://twitter.com/jasonwryan/status/839079197">very
+much</a>), shouldn’t the
+corporate communicator at least be talking about, oh let’s say for a
+whim, something <em>grounded in evidence?</em></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Patching dwm]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/03/02/patching-dwm/"/>
+    <updated>2010-03-02T20:16:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/03/02/patching-dwm</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/patching-dwm.png" alt="image" /></p>
+
+<p>I had posted <a href="http://jasonwryan.com/2009-12-19-patching-dwm-with-pertag-and-bstack" title="Patching dwm with pertag &amp; bstack">a while back</a>
+about my (failed) attempt to patch <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>
+with both pertag and some of the other layout patches. I had been able to get it to work with
+<a href="http://dwm.suckless.org/patches/bottom_stack" title="dwm wiki: bstack">bottomstack</a>,
+but adding another patch caused some of the chunks to fail. It seems
+pertag moves the code around to the point that – using
+<a href="http://dwm.suckless.org/patches/" title="patches: dwm wiki">the standard patching method</a> –
+any further patches won’t take.</p>
+
+<p>Further investigation, and some trial and a tolerable amount of error,
+have however demonstrated to me that it is quite possible to patch dwm
+to your heart’s content; or at least to my meagre needs. Which in the
+case of <a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="EeePC configs">my EeePC</a>
+is pertag, cycle and push, with the addition of bstack on
+<a href="https://bitbucket.org/jasonwryan/workstation/src/" title="Workstation configs">my workstation</a>.</p>
+
+<p>The solution, as I have found in almost every instance of my tinkering
+with dwm, is stunningly simple. Start with a new version of dwm and
+apply the
+<a href="http://dwm.suckless.org/patches/pertag" title="dwm wiki: pertag">pertag diff</a>. Then
+manually add all of the chunks of the subsequent patches.</p>
+
+<p>All of the changes are now in dwm.c and your config.h should only have
+the necessary keybindings to activate the functionality you have added
+to this amazing window manager.</p>
+
+<p>If you want to see what changes this makes, you can take a peek at
+<a href="https://bitbucket.org/jasonwryan/workstation/src/tip/dwm-5.7.2-2/" title="diff in mercurial repo">my .diff</a>
+(for bstack, cycle, pertag and push). You are equally welcome to apply
+it if that is the functionality that you are looking for in 5.7.2.</p>
 ]]></content>
   </entry>
   
@@ -248,7 +608,7 @@ key strokes.</p>
 
 <blockquote><p>Uzbl follows the UNIX philosophy - “Write programs that do one thing
 and do it well. Write programs to work together. Write programs to
-handle text streams, because that is a universal interface.”\
+handle text streams, because that is a universal interface.”
 <a href="http://www.uzbl.org/">uzbl homepage</a></p></blockquote>
 
 <p>Consequently, the default uzbl version is designed to do little more
@@ -477,6 +837,219 @@ as a matter of course. I had intended, at some point, to set up a
 <h4>Update</h4>
 
 <p>It seems that the symlink system does work: Dropbox will respect the latest version. YMMV.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[tmux - terminal multiplexer]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/01/07/tmux-terminal-multiplexer/"/>
+    <updated>2010-01-07T15:10:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/01/07/tmux-terminal-multiplexer</id>
+    <content type="html"><![CDATA[<p>Over the last couple of days I have been familiarising myself with <a href="http://tmux.sourceforge.net/">tmux</a>.
+As it says on the homepage,</p>
+
+<blockquote><p>tmux is a terminal multiplexer: it enables a number of terminals (or windows), each running a separate program, to be created, accessed, and controlled from a single screen. tmux may be detached from a screen and continue running in the background, then later reattached.</p></blockquote>
+
+
+<p>I was attracted to tmux after seeing a number of enthusiastic postings on the
+<a href="http://bbs.archlinux.org/viewtopic.php?id=84157">Arch forums</a>, and by the promise of
+better management of multiple terminals in a single <a href="http://dwm.suckless.org/">dwm tag</a>…</p>
+
+<p>It&#8217;s available in the community repo, so:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S tmux
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then it is just a matter of configuring it to suit your style of working,
+keyboard bindings etc. Helpfully, it comes with some example config files to
+start you off. These can be found at <span class="file">/usr/share/tmux/*.conf</span>.
+I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</a> for mine:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># set prefix key to ctrl+t</span>
+</span><span class='line'>unbind C-b
+</span><span class='line'><span class="nb">set</span> -g prefix C-t
+</span><span class='line'>
+</span><span class='line'><span class="c"># more intuitive keybindings for splitting</span>
+</span><span class='line'>unbind %
+</span><span class='line'><span class="nb">bind </span>h split-window -h
+</span><span class='line'>unbind <span class="s1">&#39;&quot;&#39;</span>
+</span><span class='line'><span class="nb">bind </span>v split-window -v
+</span><span class='line'>
+</span><span class='line'><span class="c"># set vi keys</span>
+</span><span class='line'>unbind <span class="o">[</span>
+</span><span class='line'><span class="nb">bind </span>Escape copy-mode
+</span><span class='line'>setw -g mode-keys vi
+</span><span class='line'>
+</span><span class='line'><span class="c"># send the prefix to client inside window (ala nested sessions)</span>
+</span><span class='line'><span class="nb">bind</span>-key a send-prefix
+</span><span class='line'>
+</span><span class='line'><span class="c"># toggle last window like screen</span>
+</span><span class='line'><span class="nb">bind</span>-key C-b last-window
+</span><span class='line'>
+</span><span class='line'><span class="c"># confirm before killing a window or the server</span>
+</span><span class='line'><span class="nb">bind</span>-key k confirm <span class="nb">kill</span>-window
+</span><span class='line'><span class="nb">bind</span>-key K confirm <span class="nb">kill</span>-server
+</span><span class='line'>
+</span><span class='line'><span class="c"># toggle statusbar</span>
+</span><span class='line'><span class="nb">bind</span>-key b <span class="nb">set</span>-option status
+</span><span class='line'>
+</span><span class='line'><span class="c"># ctrl+left/right cycles thru windows</span>
+</span><span class='line'><span class="nb">bind</span>-key -n C-right next
+</span><span class='line'><span class="nb">bind</span>-key -n C-left prev
+</span><span class='line'>
+</span><span class='line'><span class="c"># open a man page in new window</span>
+</span><span class='line'><span class="nb">bind</span> / <span class="nb">command</span>-prompt <span class="s2">&quot;split-window &#39;exec man %%&#39;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># quick view of processes</span>
+</span><span class='line'><span class="nb">bind</span> <span class="s1">&#39;~&#39;</span> split-window <span class="s2">&quot;exec htop&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># scrollback buffer n lines</span>
+</span><span class='line'><span class="nb">set</span> -g <span class="nb">history</span>-limit 5000
+</span><span class='line'>
+</span><span class='line'><span class="c"># on-screen time for display-panes in ms</span>
+</span><span class='line'><span class="nb">set</span> -g display-panes-time 2000
+</span><span class='line'>
+</span><span class='line'><span class="c"># start window indexing at one instead of zero</span>
+</span><span class='line'><span class="nb">set</span> -g base-index 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># enable wm window titles</span>
+</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles on
+</span><span class='line'>
+</span><span class='line'><span class="c"># wm window title string (uses statusbar variables)</span>
+</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles-string <span class="s2">&quot;tmux:#I #W&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># session initialization</span>
+</span><span class='line'>new -s TTYtter ttytter
+</span><span class='line'>neww -t 2
+</span><span class='line'>neww -d -t 3
+</span><span class='line'>neww -d -t 5
+</span><span class='line'>selectw -t 1
+</span><span class='line'>
+</span><span class='line'><span class="c">#### statusbar ####</span>
+</span><span class='line'><span class="nb">set</span> -g status-interval 1
+</span><span class='line'><span class="nb">set</span> -g status-justify centre <span class="c"># center align window list</span>
+</span><span class='line'><span class="nb">set</span> -g status-left <span class="s1">&#39;#[fg=green] #H #[default]&#39;</span>
+</span><span class='line'><span class="nb">set</span> -g status-right <span class="s1">&#39;#[fg=blue,bright]Up#(uptime | cut -f 4-5 -d &quot; &quot; | cut -f 1 -d &quot;,&quot;) </span>
+</span><span class='line'><span class="s1">#[default]:: #[fg=cyan]#(cut -d &quot; &quot; -f 1-4 /proc/loadavg) &#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># default statusbar colors</span>
+</span><span class='line'><span class="nb">set</span> -g status-fg white
+</span><span class='line'><span class="nb">set</span> -g status-bg default
+</span><span class='line'><span class="nb">set</span> -g status-attr bright
+</span><span class='line'>
+</span><span class='line'><span class="c"># default window title colors</span>
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-fg white
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-bg default
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-attr dim
+</span><span class='line'>
+</span><span class='line'><span class="c"># active window title colors</span>
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-fg white
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-bg default
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-attr bright
+</span><span class='line'>
+</span><span class='line'><span class="c"># command/message line colors</span>
+</span><span class='line'><span class="nb">set</span> -g message-fg white
+</span><span class='line'><span class="nb">set</span> -g message-bg black
+</span><span class='line'><span class="nb">set</span> -g message-attr bright
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Copy this file to <span class="file">~/.tmux.conf</span>. The final result:</p>
+
+<p><a href="http://www.flickr.com/photos/jasonwryan/4252840248/" title="Archlinux:  tmux running in dwm by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2703/4252840248_01ca8e7cc1.jpg" width="500" height="293" alt="Archlinux:  tmux running in dwm"/></a></p>
+
+<h3>Updated 16/11/10</h3>
+
+<p>For a current version of my <span class="file">.tmux.conf</span>, check my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.tmux.conf" title="bitbucket site" target="_blank">mercurial repository</a>.</p>
 ]]></content>
   </entry>
   

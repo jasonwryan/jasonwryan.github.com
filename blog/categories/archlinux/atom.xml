@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-27T16:43:00+13:00</updated>
+  <updated>2012-03-27T21:29:03+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,392 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Vimprobable]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/10/07/vimprobable/"/>
+    <updated>2010-10-07T16:23:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/10/07/vimprobable</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5055695051/" title="Vimprobable on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable.png" title="Hacked Vimprobable2" alt="image" /></a></p>
+
+<p>After just posting details of <a href="http://jasonwryan.com/post/1240576133/setup">my setup</a>,
+I have made a reasonably significant (and it goes almost without saying, unplanned)
+change: after <a href="http://www.uzbl.org/">uzbl</a> began unaccountably maxxing
+out my CPU, I decided to give <a href="http://www.vimprobable.org/">Vimprobable</a>
+a go.</p>
+
+<p>I covered it briefly in my review of <a href="http://jasonwryan.com/post/618038288/browsers">5 alternate browsers</a> and liked the
+idea of another vim-based browsing experience.</p>
+
+<p>There are two versions of Vimprobable; the differences, as described on
+the website:</p>
+
+<blockquote><p>Both versions are actively maintained. The first version can only be
+customised by editing config.h before compiling. It is pretty stable
+and very usable. Version 2 has grown fairly stable already as well,
+but it’s still seeing bigger changes, of course. It aims at allowing
+more customisation, for example through :set and :map commands.</p></blockquote>
+
+<p>I downloaded the tarball for
+<a href="http://aur.archlinux.org/packages.php?ID=33779" title="Arch User Repository: Vimprobable2">Vimprobable2 from the AUR</a>,
+extracted the files and built the package.</p>
+
+<p>Customization occurs in 3 files<sup>1</sup>: the first two,
+<span class="file">config.h</span> and <span class="file">keymap.h</span>
+both require you to recompile after editing, which is a trivial task
+given the size of the programme.</p>
+
+<p>Vimprobable2 also features a third configuration option that doesn’t
+require compiling after changes, <span class="file">vimprobablerc</span>.
+Should you wish to use it, you will need to create this file in
+<span class="file">~/.config/vimprobable/</span>.
+Helpfully, there is a man page for all of the options in this file, to
+read it issue:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>man vimprobablerc
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Despite it’s spartan appearance, Vimprobable is a full-featured browser
+— with the advantage of being driven solely from the keyboard. It
+handles bookmarks (and the tagging thereof, which is impressive and
+handy), multiple search engines, cookies, history, etc…</p>
+
+<p>I have made a number of changes to the defaults, including moving some
+of the keybindings to be closer to uzbl’s (habit, really). The other
+area where I made some minor changes was to the hinting style. Hinting
+is just the way Vimprobable (and other browsers like uzbl and
+<a href="http://conkeror.org/">Conkeror</a>) follow links; the default is, to put
+it mildly, garish<sup>2</sup>, so I hacked around in <span class="file">hinting.js</span>
+to make it more attractive.</p>
+
+<p>If you are interested, my vimprobable files are in
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/vimprobable2-git/">bitbucket</a>,
+including the modified hinting.js.</p>
+
+<h3>Update</h3>
+
+<p>I think this is a keeper. I installed
+<a href="http://tools.suckless.org/tabbed" title="suckless' tabbed">tabbed</a> and now
+open Vimprobable in tabbed for tab management. A quick addition to my
+keybinds in <a href="http://dwm.suckless.org/" title="dynamic window manager">dwm</a> and
+I have a minimalist and powerful browser…</p>
+
+<div class="footnotes">
+1. Of course, you are not limited to these files; the beauty of free
+and open-source software is that you can change any of it…
+<br />
+2. To support this claim, I searched google for an image of the default
+Vimprobable hinting style, and I could only find this 
+<a href="http://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/103/10387/10387f2.jpg">screenshot of conkeror</a>,
+which will give you an idea…
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[The Setup]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/10/04/the-setup/"/>
+    <updated>2010-10-04T17:23:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/10/04/the-setup</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/4522790892/" title="Arch Linux and dwm"><img src="http://dl.dropbox.com/u/261312/Blog-images/setup.png" alt="image" /></a></p>
+
+<p>Inspired by <a href="http://usesthis.com/">The Setup</a><sup>1</sup>, I decided to document
+the free (as in <a href="http://www.gnu.org/philosophy/free-sw.html">freedom</a>)
+and open source software tools I use daily.</p>
+
+<p>I made the move to using open-source about four years ago. At the time
+it was mostly a practical decision — the Pentium 4 laptop that I was
+using with XP on it had slowed to a crawl and I wasn’t keen to replace
+it, so I installed Ubuntu (Hardy Heron) on it and haven’t looked back.</p>
+
+<p>That same machine, incidentally, is still happily churning away, but it
+now runs a lightweight <a href="http://www.debian.org/releases/stable/">Debian Stable</a>.</p>
+
+<h3>Desktop</h3>
+
+<p>My primary home machine is a one I had built from spec two to three
+years ago. It was always intended to be a long-term investment, with
+sufficient power and storage to last for the better part of a decade.</p>
+
+<p>Centurion is an
+<a href="http://www.asus.com/Product.aspx?P_ID=cXoprTXLaShErTzI&amp;content=specifications">Asus P5E-V motherboard</a>
+with an
+<a href="http://www.intel.com/products/processor/core2quad/index.htm">Intel Core 2 Quad 6600 2.4GHz CPU</a> and
+4GB of DDR2 RAM. The sound card is an
+<a href="http://www.m-audio.com/products/en_us/Audiophile2496.html">M-Audio Audiophile 2496</a> and the
+graphics card is a
+<a href="http://www.nvidia.com/object/product_geforce_9600gt_us.html">1GB nVidia GeForce 9600GT</a>
+driving an LG 22” flat panel 1680x1050 display.</p>
+
+<h4>Software</h4>
+
+<p>I dual boot this machine, switching between the current
+<a href="http://www.ubuntu.com">Ubuntu</a> (10.04) and <a href="http://archlinux.org">Arch Linux</a>.</p>
+
+<p>There are two 1TB Seagate drives in a <a href="http://en.wikipedia.org/wiki/RAID">RAID1 array</a>,
+and a 500GB Seagate which has Arch on it as well as a couple of virtual machines.
+I back up the RAID array frequently, using <a href="http://www.samba.org/rsync/">rsync</a>, as it
+holds my <span class="file">/home</span> but don’t worry about the 500GB drive
+as I figure it is simple to reinstall Arch or a virtual machine…</p>
+
+<p>I try to use the same software across all of my machines to simplify my
+working habits, however I am experiencing some tension between Ubuntu
+and Arch insofar as Arch is a rolling release and you very quickly get
+used to the most recent builds…</p>
+
+<p>Applications specific to the Ubuntu box include:</p>
+
+<ul>
+<li><p><a href="http://www.getfirefox.net/">Firefox</a>: I also have
+<a href="http://www.google.com/chrome">Chrome</a> installed on this machine, but
+stick with the ‘fox for <a href="http://getfirebug.com/">Firebug</a> and other
+extensions</p></li>
+<li><p><a href="http://www.mozillamessaging.com/en-US/thunderbird/">Thunderbird</a>: with
+the <a href="http://enigmail.mozdev.org/home/index.php.html">Enigmail</a>
+extension. One of those areas of tension - it’s just a matter of time
+before I move to <code>mutt</code> (see EeePC)</p></li>
+<li><p><a href="http://wiki.slimdevices.com/index.php/SlimServer">Squeezeserver</a>: I
+have a Logitech Squeezebox to serve my music and it runs off this great
+open source software</p></li>
+<li><p><a href="http://www.virtualbox.org/">Virtualbox</a> (OS): for running virtual
+machines - currently <a href="http://www.slackware.com/">Slackware</a> and
+<a href="http://www.freebsd.org/">FreeBSD</a>.</p></li>
+</ul>
+
+
+<h3>EeePC 901</h3>
+
+<p>Archer is a 901 I bought two years ago – the
+<a href="http://eeepc.asus.com/au/product901-spec.html">Linux model with the 4/16GB SSD</a>, and I
+absolutely love it. I put a second GB of RAM into it and another 16GB SD
+Card (for /music) and it does everything that I need. The
+<a href="http://www.intel.com/products/processor/atom/index.htm">Atom 1.6GHz processor</a>
+handles compiling relatively smartly and the screen and keyboard, while
+small (9” at 1024x600) are not uncomfortable to use for protracted
+sessions. It is also <em>deathly quiet</em>. The only other addition is a
+second 6 cell battery so I can safely count on 8-10 hours out of it.</p>
+
+<p>One of the reasons that it works so efficiently is that it is an
+<em>extremely</em> minimal Arch Linux setup.</p>
+
+<h4>Software</h4>
+
+<p>Applications specific to this machine are:</p>
+
+<ul>
+<li><a href="http://dwm.suckless.org" title="dwm page on suckless">dwm</a>: <em>the</em>
+suckless window manager. With added functionality of some patches:
+init-pertag, cycle and push: see <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/dwm/5.8.2-2.diff">the patchset for
+details</a></li>
+<li><a href="http://tools.suckless.org/dmenu/">dmenu</a>: application launcher,
+again from suckless.org</li>
+<li><p><a href="http://www.mutt.org/">mutt</a>: the best email client I have used -
+requires some setup, but –if you want your mail client to run
+exactly as you would like– then this one repays the investment in
+spades. Mutt is just a MUA, the rest of the email cycle is handled
+by:</p>
+
+<ul>
+<li><a href="http://github.com/jgoerzen/offlineimap/wiki">offlineimap</a>: to
+fetch mail</li>
+<li><a href="http://msmtp.sourceforge.net/">msmtp</a>: to send mail</li>
+<li><a href="http://www.gnupg.org/">GnuPG</a>: for signing and encryption</li>
+<li><a href="http://abook.sourceforge.net/">abook</a>: address book</li>
+<li><a href="http://linuxcommand.org/man_pages/urlview1.html">urlview</a> and
+<a href="http://lynx.browser.org/">lynx</a>: open urls from mutt</li>
+</ul>
+</li>
+<li><p><del><a href="http://www.uzbl.org/">uzbl</a>: a lightweight webkit browser that is
+infintely extensible and
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.config/uzbl/config">configurable</a></del><sup>2^</sup></p></li>
+<li><a href="http://www.vimprobable.org/">Vimprobable</a> in
+<a href="http://tools.suckless.org/tabbed">tabbed</a>: another lightweight
+webkit browser that can be
+<a href="http://www.flickr.com/photos/jasonwryan/5063510130/" title="Screenshot on Flickr">customized</a>
+to your heart’s desire…</li>
+<li>A host of small programs that make life easy:
+
+<ul>
+<li><a href="https://derf.homelinux.org/projects/feh/">feh</a>: image viewer</li>
+<li><a href="http://www.nongnu.org/autocutsel/">autocutsel</a>: synchronize
+clipboards</li>
+<li><a href="http://sites.google.com/site/gotmor/dzen">dzen</a> and
+<a href="http://conky.sourceforge.net/">conky</a>: to print system stats to
+dwm’s status bar</li>
+<li><a href="http://surfraw.alioth.debian.org/">surfraw</a>: command line
+search client</li>
+<li><a href="http://www.ibiblio.org/pub/X11/contrib/utilities/unclutter-8.README">unclutter</a>:
+hides the mouse cursor (don’t really need a mouse with this
+setup)</li>
+<li><a href="http://www.xfree86.org/4.2.0/xmodmap.1.html">xmodmap</a>: map Caps
+Lock to Escape</li>
+</ul>
+</li>
+</ul>
+
+
+<h4>Common tools</h4>
+
+<p>Applications and utilities that I use across all of my machines include:</p>
+
+<ul>
+<li><p><a href="http://software.schmorp.de/pkg/rxvt-unicode.html">Urxvt</a>: I would’nt
+dream of using another terminal… Run as a daemon, with these
+applications:</p>
+
+<ul>
+<li>  <a href="http://tmux.sourceforge.net/">tmux</a>: for local and remote terminal
+  sessions</li>
+<li>  <a href="http://www.vim.org/">Vim</a>: with a <a href="http://jasonwryan.com/2010-09-28-command-line-notes">simple notes function</a>
+  in my .bashrc</li>
+<li>  <a href="http://vifm.sourceforge.net/">Vifm</a>: Vi-like file manager – for
+  when I am not using
+  <a href="http://www.gnu.org/software/coreutils/">coreutils</a></li>
+<li>  <a href="http://www.floodgap.com/software/ttytter/">TTYtter</a>: fantastic
+  Twitter client: if it could integrate Identi.ca into a single feed,
+  it would be perfect…</li>
+<li>  <a href="http://irssi.org/">irssi</a>: for IRC</li>
+<li>  <a href="http://www.mplayerhq.hu/design7/news.html">Mplayer</a>: for movies</li>
+<li>  <a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki">MPD</a> and
+  <a href="http://unkart.ovh.org/ncmpcpp/">ncmpcpp</a>: music player daemon and
+  ncurses player</li>
+<li>  <a href="http://code.google.com/p/mpdscribble/">mpdscribble</a>: for scrobbling
+  to Libre.fm and Last.fm</li>
+<li>  <a href="http://libtorrent.rakshasa.no/">rtorrent</a>: run inside tmux for
+remote sessions. Genius.</li>
+</ul>
+</li>
+<li><p><a href="http://www.dropbox.com/">Dropbox</a>: the daemon is closed source, but
+this is the best tool I have found for synching across machines. If the
+Ubuntu One devs ever focus on other Linux distros, I’d move across.</p></li>
+<li><a href="http://www.truecrypt.org/">Truecrypt</a>: a TC volume in Dropbox and you
+are set</li>
+<li><a href="http://www.skype.com/intl/en/home">Skype</a>.</li>
+</ul>
+
+
+<h4>Other Utilities</h4>
+
+<p>I use <a href="http://mercurial.selenic.com/">mercurial</a> and
+<a href="https://bitbucket.org/jasonwryan/">bitbucket</a> to share my dotfiles
+between Arch machines (one of my work boxes is also running Arch). I
+have two <a href="http://www.linksysbycisco.com/EU/en/products/WRT54GL">Linksys WRT54GL routers</a>, both
+running <a href="http://www.polarcloud.com/tomato">Tomato</a>, to handle my routing
+and wireless networking (thanks to
+<a href="http://twitter.com/jethrocarr" title="Jethro on Twitter">@jethrocarr</a> for
+solving that puzzle). For LAN file sharing I use
+<a href="http://nfs.sourceforge.net/">NFS</a> and I use
+<a href="http://www.openssh.com/">OpenSSH</a> to access my machines remotely. I
+have a third generation <a href="http://guides.macrumors.com/iPod_(3G">iPod</a>)
+and I run <a href="http://www.rockbox.org/">Rockbox</a> on it.</p>
+
+<p>You can see screenshot of these machines on
+<a href="http://www.flickr.com/photos/jasonwryan">flickr</a>.</p>
+
+<div class="footnotes">
+1. …and the fact that, apart from RMS, it is pretty much MacBookPros
+all the way down.
+<br />
+2. Updated 9/10/10 - <a href="http://jasonwryan.com/2010-10-07-vimprobable" title="My post on changing to Vimprobable">moved to Vimprobable</a>
+after some issues with uzbl.
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Sessions in tmux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux/"/>
+    <updated>2010-10-03T20:15:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5046091307/" title="Sessions in tmux by jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4146/5046091307_39c200f1b0.jpg" width="500" height="293" alt="Sessions in tmux"/></a></p>
+
+<p>Now that I have been using it for several months, I have become absolutely dependent upon <a href="http://tmux.sourceforge.net/" target="_blank">tmux</a>, the terminal multiplexer.
+It is both ruthlessly efficient, and can be configured to match exacting requirements. One of those options is to initialize sessions with a preloaded window configuration. After reading the <a href="http://wisconsinlinux.org/tmux-manpage-from-cvs/tmux.1.txt" target="_blank">man page</a> (which, truth be told, could be a little clearer) and some experimentation, I have worked out how to set up my tmux sessions how I want them.
+I have just updated the <a href="http://wiki.archlinux.org/index.php/Tmux">Arch Wiki tmux entry</a>,
+so thought I would share it here.</p>
+
+<p>The relevant part of my config file looks like this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;session initialization&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;new  -n TTYtter /home/jason/Scripts/ttytter.pl
+</span><span class='line'>neww -n irssi /home/jason/Scripts/startirssi.sh
+</span><span class='line'>neww -n ncmpcpp/vifm ncmpcpp
+</span><span class='line'>splitw -v -p 50 -t 0 vifm
+</span><span class='line'>neww -n bash bash
+</span><span class='line'>selectw -t 1
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Which, when I start tmux with the attach (or a) option, gives me the following window layout:</p>
+
+<ul>
+<li>TTYtter</li>
+<li>irssi</li>
+<li>ncmpcpp/vifm &nbsp; &nbsp; # window split vertically in half, ncmpcpp on top of vifm</li>
+<li>bash</li>
+</ul>
+
+
+<p>The <code>selectw</code> option means that the default view is TTYtter.</p>
+
+<p>Simple.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Patching dwm]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/03/02/patching-dwm/"/>
+    <updated>2010-03-02T20:16:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/03/02/patching-dwm</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/patching-dwm.png" alt="image" /></p>
+
+<p>I had posted <a href="http://jasonwryan.com/2009-12-19-patching-dwm-with-pertag-and-bstack" title="Patching dwm with pertag &amp; bstack">a while back</a>
+about my (failed) attempt to patch <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>
+with both pertag and some of the other layout patches. I had been able to get it to work with
+<a href="http://dwm.suckless.org/patches/bottom_stack" title="dwm wiki: bstack">bottomstack</a>,
+but adding another patch caused some of the chunks to fail. It seems
+pertag moves the code around to the point that – using
+<a href="http://dwm.suckless.org/patches/" title="patches: dwm wiki">the standard patching method</a> –
+any further patches won’t take.</p>
+
+<p>Further investigation, and some trial and a tolerable amount of error,
+have however demonstrated to me that it is quite possible to patch dwm
+to your heart’s content; or at least to my meagre needs. Which in the
+case of <a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="EeePC configs">my EeePC</a>
+is pertag, cycle and push, with the addition of bstack on
+<a href="https://bitbucket.org/jasonwryan/workstation/src/" title="Workstation configs">my workstation</a>.</p>
+
+<p>The solution, as I have found in almost every instance of my tinkering
+with dwm, is stunningly simple. Start with a new version of dwm and
+apply the
+<a href="http://dwm.suckless.org/patches/pertag" title="dwm wiki: pertag">pertag diff</a>. Then
+manually add all of the chunks of the subsequent patches.</p>
+
+<p>All of the changes are now in dwm.c and your config.h should only have
+the necessary keybindings to activate the functionality you have added
+to this amazing window manager.</p>
+
+<p>If you want to see what changes this makes, you can take a peek at
+<a href="https://bitbucket.org/jasonwryan/workstation/src/tip/dwm-5.7.2-2/" title="diff in mercurial repo">my .diff</a>
+(for bstack, cycle, pertag and push). You are equally welcome to apply
+it if that is the functionality that you are looking for in 5.7.2.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Patching dwm with pertag and bstack]]></title>
@@ -95,109 +481,6 @@ patching or using the above method. YMMV.</p>
 
 <p>So I was wrong: you can get pertag to work with all the
 other patches, and it is <a href="http://jasonwryan.com/post/421618180/patching-dwm">not that difficult</a>…</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[dzen2 and conky-cli in dwm]]></title>
-    <link href="http://jasonwryan.github.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/"/>
-    <updated>2009-11-21T12:07:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm</id>
-    <content type="html"><![CDATA[<p>I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar.</p>
-
-<p>Here is how I sorted it.</p>
-
-<p>First, I installed <code>conky-cli</code> and <code>dzen2</code>. Conky-cli is in AUR, and dzen2 is in Community:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S dzen2 &amp;amp;&amp;amp; yaourt conky-cli
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then it was a matter of setting up the relevant files.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.xinitrc.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;~/.xinitrc&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;setxkbmap -option terminate:ctrl_alt_bksp &amp;amp;
-</span><span class='line'><span class="nb">eval</span> &lt;code&gt;cat ~/.fehbg&lt;/code&gt; &amp;amp;
-</span><span class='line'>numlockx &amp;amp;
-</span><span class='line'>xscreensaver -no-splash &amp;amp;&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Dzen &amp;amp; conky&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">(</span>sleep 15s &amp;amp;&amp;amp; conky | dzen2 -x <span class="s1">&#39;500&#39;</span> -e <span class="s1">&#39;&#39;</span> -fg <span class="s1">&#39;#dcdcdc&#39;</span> -bg <span class="s1">&#39;#3f3f3f&#39;</span> <span class="se">\</span>
-</span><span class='line'>-w <span class="s1">&#39;650&#39;</span> -ta r -fn <span class="s1">&#39;-&lt;em&gt;-terminus-&lt;/em&gt;-r-normal-&lt;em&gt;-&lt;/em&gt;-120-&lt;em&gt;-&lt;/em&gt;-&lt;em&gt;-&lt;/em&gt;-iso8859-*&#39;</span> -p <span class="o">)</span> &amp;amp;&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Start dwm&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;exec ck-launch-session ~/Scripts/dwm-start
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.conkyrc .sh </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>background no
-</span><span class='line'>out_to_console yes
-</span><span class='line'>update_interval 2
-</span><span class='line'>total_run_times 0
-</span><span class='line'>use_spacer none
-</span><span class='line'>double_buffer yes
-</span><span class='line'>TEXT
-</span><span class='line'>${if_existing /sys/class/power_supply/BAT0/present}&lt;sup>i(/home/jason/Build/dwm/dzen/bat.xbm)…&lt;/sup></span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>dwm-start .sh </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>while true; do&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;pre>&lt;code>dwm &gt;/dev/null
-</span><span class='line'>&lt;/code>&lt;/pre>
-</span><span class='line'>
-</span><span class='line'>&lt;p>done</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The key is —and it took me a while to work it out— to delay the loading of conky until <em>after</em> dwm has painted it's
-status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
-
-<p>Now, the “before” shot:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/conky-dzen.png"></p>
-
-<p>…and the finished product:</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4121324068/" title="Conky-cli to dzen2 in dwm on Arch by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2666/4121324068_6ec29262d7.jpg" width="500" height="293" alt="Conky-cli to dzen2 in dwm on Arch"/></a></p>
 ]]></content>
   </entry>
   

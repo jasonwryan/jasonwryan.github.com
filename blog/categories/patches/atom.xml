@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: patches | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.github.com/blog/categories/patches/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.github.com/"/>
+  <updated>2012-03-27T21:29:03+13:00</updated>
+  <id>http://jasonwryan.github.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Patching dwm]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/03/02/patching-dwm/"/>
+    <updated>2010-03-02T20:16:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/03/02/patching-dwm</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/patching-dwm.png" alt="image" /></p>
+
+<p>I had posted <a href="http://jasonwryan.com/2009-12-19-patching-dwm-with-pertag-and-bstack" title="Patching dwm with pertag &amp; bstack">a while back</a>
+about my (failed) attempt to patch <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>
+with both pertag and some of the other layout patches. I had been able to get it to work with
+<a href="http://dwm.suckless.org/patches/bottom_stack" title="dwm wiki: bstack">bottomstack</a>,
+but adding another patch caused some of the chunks to fail. It seems
+pertag moves the code around to the point that – using
+<a href="http://dwm.suckless.org/patches/" title="patches: dwm wiki">the standard patching method</a> –
+any further patches won’t take.</p>
+
+<p>Further investigation, and some trial and a tolerable amount of error,
+have however demonstrated to me that it is quite possible to patch dwm
+to your heart’s content; or at least to my meagre needs. Which in the
+case of <a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="EeePC configs">my EeePC</a>
+is pertag, cycle and push, with the addition of bstack on
+<a href="https://bitbucket.org/jasonwryan/workstation/src/" title="Workstation configs">my workstation</a>.</p>
+
+<p>The solution, as I have found in almost every instance of my tinkering
+with dwm, is stunningly simple. Start with a new version of dwm and
+apply the
+<a href="http://dwm.suckless.org/patches/pertag" title="dwm wiki: pertag">pertag diff</a>. Then
+manually add all of the chunks of the subsequent patches.</p>
+
+<p>All of the changes are now in dwm.c and your config.h should only have
+the necessary keybindings to activate the functionality you have added
+to this amazing window manager.</p>
+
+<p>If you want to see what changes this makes, you can take a peek at
+<a href="https://bitbucket.org/jasonwryan/workstation/src/tip/dwm-5.7.2-2/" title="diff in mercurial repo">my .diff</a>
+(for bstack, cycle, pertag and push). You are equally welcome to apply
+it if that is the functionality that you are looking for in 5.7.2.</p>
+]]></content>
+  </entry>
+  
+</feed>

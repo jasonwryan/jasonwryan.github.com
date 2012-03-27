@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: awk | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.github.com/blog/categories/awk/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.github.com/"/>
+  <updated>2012-03-27T21:29:03+13:00</updated>
+  <id>http://jasonwryan.github.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Command Line Notes]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/09/28/command-line-notes/"/>
+    <updated>2010-09-28T17:56:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/09/28/command-line-notes</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-1.png" alt="image" /></p>
+
+<p>A couple of weeks ago, I came across these
+<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
+written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
+notes.</p>
+
+<p>The functions as described in the article are so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$&lt;em&gt;&quot;</span>.txt <span class="o">}</span> nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$&lt;/em&gt;&quot;</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Unfortunately, the second function – for retrieving the list of files in
+the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
+and it will only list files in the top level directory. If you are an
+inverterate note taker, this plainly won’t scale.</p>
+
+<p>My first attempt at hacking a solution yielded this little beauty:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\</span>
+</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Which removes <code>ls</code> from the function and allows nested directories, but
+is needlessly complex and, with four pipes, hideously <del>inefficient</del>
+inelegant.</p>
+
+<p>After reading up on Awk, particularly
+<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
+I arrived at something marginally longer but relying solely on the
+awesome power of awk to make the various transformations I was seeking…</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
+</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>An added advantage is that it is scalable irrespective of how deep the
+directories go. I’m sure that with some more awk-foo I could write a
+more effective set of conditionals, but this seemed a pretty good start
+for a simple note taking utility.</p>
+
+<h3>Updated 3/11/10</h3>
+
+<p>To remove a little of the visual clutter, I amended the awk script to
+strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
+</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
+in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
+symlink to it from <span class="file">~/.notes</span>.</p>
+
+<div class="footnotes">
+1. See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.
+<br />
+2. Obligatory “after” screenshot:
+<br />
+<img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-2.png" title="'Screenshot of editing text'" >
+</div>
+
+]]></content>
+  </entry>
+  
+</feed>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: tmux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/tmux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-27T16:43:00+13:00</updated>
+  <updated>2012-03-27T21:29:03+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -14,10 +14,62 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Sessions in tmux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux/"/>
+    <updated>2010-10-03T20:15:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5046091307/" title="Sessions in tmux by jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4146/5046091307_39c200f1b0.jpg" width="500" height="293" alt="Sessions in tmux"/></a></p>
+
+<p>Now that I have been using it for several months, I have become absolutely dependent upon <a href="http://tmux.sourceforge.net/" target="_blank">tmux</a>, the terminal multiplexer.
+It is both ruthlessly efficient, and can be configured to match exacting requirements. One of those options is to initialize sessions with a preloaded window configuration. After reading the <a href="http://wisconsinlinux.org/tmux-manpage-from-cvs/tmux.1.txt" target="_blank">man page</a> (which, truth be told, could be a little clearer) and some experimentation, I have worked out how to set up my tmux sessions how I want them.
+I have just updated the <a href="http://wiki.archlinux.org/index.php/Tmux">Arch Wiki tmux entry</a>,
+so thought I would share it here.</p>
+
+<p>The relevant part of my config file looks like this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;session initialization&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;new  -n TTYtter /home/jason/Scripts/ttytter.pl
+</span><span class='line'>neww -n irssi /home/jason/Scripts/startirssi.sh
+</span><span class='line'>neww -n ncmpcpp/vifm ncmpcpp
+</span><span class='line'>splitw -v -p 50 -t 0 vifm
+</span><span class='line'>neww -n bash bash
+</span><span class='line'>selectw -t 1
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Which, when I start tmux with the attach (or a) option, gives me the following window layout:</p>
+
+<ul>
+<li>TTYtter</li>
+<li>irssi</li>
+<li>ncmpcpp/vifm &nbsp; &nbsp; # window split vertically in half, ncmpcpp on top of vifm</li>
+<li>bash</li>
+</ul>
+
+
+<p>The <code>selectw</code> option means that the default view is TTYtter.</p>
+
+<p>Simple.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[tmux - terminal multiplexer]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/03/27/tmux-terminal-multiplexer/"/>
-    <updated>2012-03-27T13:28:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/03/27/tmux-terminal-multiplexer</id>
+    <link href="http://jasonwryan.github.com/blog/2010/01/07/tmux-terminal-multiplexer/"/>
+    <updated>2010-01-07T15:10:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/01/07/tmux-terminal-multiplexer</id>
     <content type="html"><![CDATA[<p>Over the last couple of days I have been familiarising myself with <a href="http://tmux.sourceforge.net/">tmux</a>.
 As it says on the homepage,</p>
 
