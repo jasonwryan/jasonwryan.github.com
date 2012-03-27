@@ -4,7 +4,7 @@
   <title><![CDATA[Category: browser | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/browser/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-27T22:24:43+13:00</updated>
+  <updated>2012-03-28T09:43:21+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -14,19 +14,109 @@
 
   
   <entry>
+    <title type="html"><![CDATA[w3m, Surfraw and Yanking URLs]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/05/05/w3m/"/>
+    <updated>2011-05-05T19:57:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/05/05/w3m</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/w3m.png" alt="image" /></p>
+
+<p>I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
+to the point of writing a couple of my own <em>elvi</em>. As part of the
+ongoing tweaking of my Surfraw experience, I have been experimenting
+with different
+<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
+to see which one best fits my workflow.</p>
+
+<p>I have previously been using both
+<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
+and it’s homonym,
+<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
+these have been perfectly acceptable, they weren’t quite providing the
+level of functionality —and integration with my vim-oriented workflow—
+that I was looking for. Enter
+<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
+
+<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
+`less’. With w3m you can browse web pages through a terminal emulator
+window (xterm, rxvt or something like that). Moreover, w3m can be used
+as a text formatting tool which typesets HTML into plain text.</p></blockquote>
+
+<p>w3m is a step up from the other two for a variety of reasons. It
+supports tables, frames, SSL connections, color and inline images. It
+also renders pages in a form as true to their original layout as
+possible. The killer features on top of that are, for me, the above
+mentioned rendering of HTML as text (meaning you can save content
+easily), and the customizable keybinds.</p>
+
+<p>There was however, one significant sticking point. After countless hours
+fruitlessly searching, I was unable to find a way to yank URLs to the
+clipboard. As I have been spending a little time of late on
+<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
+I thought I would ask the good folk there…</p>
+
+<p>Less than fourty hours later, I had an answer so simple and elegant,
+that I was literally grinning when I read it. It deserves quoting in
+full. It is that ingenious.</p>
+
+<blockquote><p>Set the “External Browser” option to
+<code>sh -c 'echo "$0" | xsel'</code></p>
+
+<p>You can use xsel -b to use the clipboard instead of the primary
+selection. An alternative to
+<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
+is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
+(xclip for the primary selection, xclip -selection CLIPBOARD for the
+clipboard).</p>
+
+<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
+Then press M to copy (yank) the URL of the current page, or ESCM to
+copy the URL of the link under the cursor.</p>
+
+<p>You can use the second or third external browser for that instead;
+then the key combination is 2M or 3M or 2ESCM or 3ESCM.
+<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
+
+<p>This simple hack means that it is now trivial to yank either the URL of
+the current page, or of the link under the cursor to primary selection.
+It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
+and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
+<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN    <span class="p">&lt;</span><span class="k">br</span>/<span class="p">&gt;</span>
+</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
+
+<h4>Updated 8/5/11</h4>
+
+<p>Gilles has edited and updated his answer with a slight change:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This prevents a new line being appended.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Vimprobable]]></title>
     <link href="http://jasonwryan.github.com/blog/2010/10/07/vimprobable/"/>
     <updated>2010-10-07T16:23:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2010/10/07/vimprobable</id>
     <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5055695051/" title="Vimprobable on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable.png" title="Hacked Vimprobable2" alt="image" /></a></p>
 
-<p>After just posting details of <a href="http://jasonwryan.com/post/1240576133/setup">my setup</a>,
+<p>After just posting details of <a href="http://jasonwryan.com/2010-10-04-the-setup">my setup</a>,
 I have made a reasonably significant (and it goes almost without saying, unplanned)
 change: after <a href="http://www.uzbl.org/">uzbl</a> began unaccountably maxxing
 out my CPU, I decided to give <a href="http://www.vimprobable.org/">Vimprobable</a>
 a go.</p>
 
-<p>I covered it briefly in my review of <a href="http://jasonwryan.com/post/618038288/browsers">5 alternate browsers</a> and liked the
+<p>I covered it briefly in my review of <a href="http://jasonwryan.com/2010-5-21-5-alternate-browsers">5 alternate browsers</a> and liked the
 idea of another vim-based browsing experience.</p>
 
 <p>There are two versions of Vimprobable; the differences, as described on
@@ -83,16 +173,85 @@ open Vimprobable in tabbed for tab management. A quick addition to my
 keybinds in <a href="http://dwm.suckless.org/" title="dynamic window manager">dwm</a> and
 I have a minimalist and powerful browser…</p>
 
-<div class="footnotes">
-1. Of course, you are not limited to these files; the beauty of free
-and open-source software is that you can change any of it…
-<br />
-2. To support this claim, I searched google for an image of the default
-Vimprobable hinting style, and I could only find this 
-<a href="http://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/103/10387/10387f2.jpg">screenshot of conkeror</a>,
-which will give you an idea…
-</div>
+<h5>Notes</h5>
 
+<ol>
+<li><p>Of course, you are not limited to these files; the beauty of free
+and open-source software is that you can change any of it…</p></li>
+<li><p>To support this claim, I searched google for an image of the default
+Vimprobable hinting style, and I could only find this
+<a href="http://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/103/10387/10387f2.jpg">screenshot of conkeror</a>,
+which will give you an idea…</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Uzbl]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/02/27/using-uzbl/"/>
+    <updated>2010-02-27T10:19:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/02/27/using-uzbl</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/4352140405/" title="Arch &amp; uzbl by jasonwryan, on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/uzbl.jpg" alt="Arch &amp;
+uzbl" /></a></p>
+
+<p>A couple of weeks ago, I switched my default browser from
+<a href="http://conkeror.org/" title="Conkeror homepage">Conkeror</a> to
+<a href="http://www.uzbl.org/" title="uzbl homepage">uzbl</a>. It wasn’t that I was
+dissatisfied with Conkeror <em>per se</em>; more that as I was almost
+exclusively using vim-like applications, it seemed almost perverse to be
+browsing with an application that used Emacs-style keybindings. Over
+time, the simplest operations seemed—in comparison to
+<a href="http://www.vim.org/" title="THE $EDITOR">Vim</a>— to demand ridiculously complex
+key strokes.</p>
+
+<p>So, I installed uzbl.</p>
+
+<blockquote><p>Uzbl follows the UNIX philosophy - “Write programs that do one thing
+and do it well. Write programs to work together. Write programs to
+handle text streams, because that is a universal interface.”
+<a href="http://www.uzbl.org/">uzbl homepage</a></p></blockquote>
+
+<p>Consequently, the default uzbl version is designed to do little more
+than browse web pages. It doesn’t handle cookies, manage downloads,
+block ads, save bookmarks, or do any of the things that you would expect
+of its WebKit kin, <del>Firefox</del> Safari and Chrome.</p>
+
+<p>This isn’t to say that it <em>can’t</em> do any of these things; like any
+well-designed
+<a href="http://en.wikipedia.org/wiki/UNIX" title="Wikipedia entry">UNIX</a> program, it
+is extensible and interoperable with programs through a range of
+scripts. The difference is that you get to choose which functionality
+matters to you, and implement it on an as-needs basis. This makes uzbl
+very light, very fast, and very powerful.</p>
+
+<p>The version I installed, uzbl-tabbed, ships with a number of default
+scripts that perform most of the functions that you will need. There is
+also a <a href="http://www.uzbl.org/wiki/scripts" title="uzbl wiki: scripts">scripts page</a>
+on the wiki that has a growing number of scripts contributed by users.</p>
+
+<p>I installed a couple of <a href="http://pbrisbin.com:8080/pages/scripts.html" title="Pat's scripts page">Pat Brisbin’s scripts</a>;
+an ingenious bash script for bookmarking that creates an HTML page of
+your bookmarks that you can serve locally or remotely (I keep mine on
+<a href="http://www.dropbox.com" title="Dropbox home">Dropbox</a> so I can access it from
+my phone as well), and a tidy little download manager.</p>
+
+<p>Like Vim, uzbl is modal; you switch between command and insert mode. By
+configuring uzbl to use Vim key bindings, you can seamless integrate it
+into your desktop environment. Here you can see the status bar showing
+uzbl in command mode, on the Arch forums home page, which has completely
+loaded (the other figure is the X root window number).</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/uzbl-bar.png" alt="image" /></p>
+
+<p>As an Arch Linux user, I’m keen to support a project that has been
+developed by the Arch community (if you want to see the history of the
+project, there is a <a href="http://bbs.archlinux.org/viewtopic.php?id=70700&amp;p=1" title="uzbl history">long thread</a>
+on the Arch boards); but ultimately this software appeals because it is
+so configurable: you can customize it to your heart’s content (see my
+config file on my <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/uzbl/" title="uzbl file on bitbucket">mercurial repo</a>).</p>
+
+<p>There are packages for most of the major distros: <a href="http://www.uzbl.org/get.php" title="Download and install details on the wiki">give it a go</a>.</p>
 ]]></content>
   </entry>
   

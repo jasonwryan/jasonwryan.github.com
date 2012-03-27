@@ -5,13 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Using Mercurial to Share Dotfiles - jasonwryan.com</title>
+  <title>w3m, Surfraw and Yanking URLs - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I posted a couple of weeks back about
-using dropbox to share dotfiles
-and while I am pleased with how well that works, I had always intended to see &hellip;">
+  <meta name="description" content="I posted a couple of weeks ago about
+how much I was enjoying Surfraw,
+to the point of writing a couple of my own elvi. As part of the
+ongoing &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +21,7 @@ and while I am pleased with how well that works, I had always intended to see &h
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2010/02/10/using-mercurial-to-share-dotfiles">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/05/05/w3m">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -70,7 +71,7 @@ and while I am pleased with how well that works, I had always intended to see &h
   
   <header>
     
-      <h1 class="entry-title">Using Mercurial to Share Dotfiles</h1>
+      <h1 class="entry-title">w3m, Surfraw and Yanking URLs</h1>
     
     
       <p class="meta">
@@ -86,102 +87,97 @@ and while I am pleased with how well that works, I had always intended to see &h
   
 
 
-<time datetime="2010-02-10T20:36:00+13:00" pubdate data-updated="true">Feb 10<span>th</span>, 2010</time>
+<time datetime="2011-05-05T19:57:00+12:00" pubdate data-updated="true">May 5<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>I posted a couple of weeks back about
-<a href="http://jasonwryan.com/2010-01-11-using-dropbox-to-share-dotfiles">using dropbox to share dotfiles</a>
-and while I am pleased with how well that works, I had always intended to see how well a
-version control system would handle that (relatively trivial) chore.</p>
+<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/w3m.png" alt="image" /></p>
 
-<p>I chose <a href="http://mercurial.selenic.com/">Mercurial</a> only because it is the
-system used by <a href="http://suckless.org/">the suckless community</a> and, as their
-<a href="http://suckless.org/manifest/">philosophy</a> and the products they
-produce are of such exceptional quality, no further investigation seemed
-necessary.</p>
+<p>I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
+to the point of writing a couple of my own <em>elvi</em>. As part of the
+ongoing tweaking of my Surfraw experience, I have been experimenting
+with different
+<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
+to see which one best fits my workflow.</p>
 
-<p>Installing mercurial, on both my Arch machines and the Ubuntu box was simple
-enough:</p>
+<p>I have previously been using both
+<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
+and it’s homonym,
+<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
+these have been perfectly acceptable, they weren’t quite providing the
+level of functionality —and integration with my vim-oriented workflow—
+that I was looking for. Enter
+<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># pacman -S mercurial</span>
-</span></code></pre></td></tr></table></div></figure>
+<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
+`less’. With w3m you can browse web pages through a terminal emulator
+window (xterm, rxvt or something like that). Moreover, w3m can be used
+as a text formatting tool which typesets HTML into plain text.</p></blockquote>
 
+<p>w3m is a step up from the other two for a variety of reasons. It
+supports tables, frames, SSL connections, color and inline images. It
+also renders pages in a form as true to their original layout as
+possible. The killer features on top of that are, for me, the above
+mentioned rendering of HTML as text (meaning you can save content
+easily), and the customizable keybinds.</p>
 
-<p>Then, rather than use my <span class="file">/home</span> directory as the local repo
-(which for some reason—probably completely irrational—seemed somewhat risky),
-I opted to create the repository in a separate directory in my home folder and
-link to the relevant files.</p>
+<p>There was however, one significant sticking point. After countless hours
+fruitlessly searching, I was unable to find a way to yank URLs to the
+clipboard. As I have been spending a little time of late on
+<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
+I thought I would ask the good folk there…</p>
 
-<p>I signed up for a free account at <a href="http://bitbucket.org">bitbucket</a> and created a repository
-called “dotfiles.”</p>
+<p>Less than fourty hours later, I had an answer so simple and elegant,
+that I was literally grinning when I read it. It deserves quoting in
+full. It is that ingenious.</p>
 
-<p>The it was just a matter of cloning the new repository to my local
-machine:</p>
+<blockquote><p>Set the “External Browser” option to
+<code>sh -c 'echo "$0" | xsel'</code></p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg clone https://jasonwryan@bitbucket.org/jasonwryan/dotfiles/
-</span></code></pre></td></tr></table></div></figure>
+<p>You can use xsel -b to use the clipboard instead of the primary
+selection. An alternative to
+<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
+is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
+(xclip for the primary selection, xclip -selection CLIPBOARD for the
+clipboard).</p>
 
+<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
+Then press M to copy (yank) the URL of the current page, or ESCM to
+copy the URL of the link under the cursor.</p>
 
-<p>and then entering the newly created directory and linking to the files that
-I wanted to share:</p>
+<p>You can use the second or third external browser for that instead;
+then the key combination is 2M or 3M or 2ESCM or 3ESCM.
+<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
+
+<p>This simple hack means that it is now trivial to yank either the URL of
+the current page, or of the link under the cursor to primary selection.
+It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
+and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
+<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd </span>dotfiles/ ln /home/jason/.Xdefaults ln /home/jason/.apvlvrc
-</span><span class='line'>…
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN
+</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Note: I initially tried symlinking, but Mercurial didn&#8217;t like that
-<em>at all</em>, hence the hard links…</p>
+<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
 
-<p>Then it was just a matter of telling Mercurial that the requisite files
-are in the folder:</p>
+<h4>Updated 8/5/11</h4>
+
+<p>Gilles has edited and updated his answer with a slight change:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg add
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Commit the changes:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg ci
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>…and then push the changes to the <a href="https://bitbucket.org/jasonwryan/">bitbucket repository</a>:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg push
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This was certainly a lot quicker to setup than the Dropbox method but, for
-all that I am using it for, it seems a little like overkill. I&#8217;ll chalk
-it up as a good way for me to get my head around <acronym title="Version
-Control Systems">vcs</acronym> more than anything else…</p>
-
-<h3>The Mercurial Book</h3>
-
-<p>For more information on Mercurial, I highly
-recommend Bryan O&#8217;Sullivan&#8217;s excellent
-<a href="http://hgbook.red-bean.com/">Mercurial: The Definitive Guide</a>.</p>
-
-<h4>Update</h4>
-
-<p>Post edited to reflect that fact that I now run two repos,
-one for the <a href="https://bitbucket.org/jasonwryan/workstation/src/"
-title="work machine repo" target="_blank">workstation</a> (as described here),
-and a second one for my <a href="https://bitbucket.org/jasonwryan/eeepc/src/"
-title="Netbook repo" target="_blank">EeePC</a> – which I did successfully
-create in <span class="file">/home</span> without any apocalyptic consequences.</p>
+<p>This prevents a new line being appended.</p>
 </div>
 
 
@@ -204,12 +200,12 @@ create in <span class="file">/home</span> without any apocalyptic consequences.<
   
 
 
-<time datetime="2010-02-10T20:36:00+13:00" pubdate data-updated="true">Feb 10<span>th</span>, 2010</time>
+<time datetime="2011-05-05T19:57:00+12:00" pubdate data-updated="true">May 5<span>th</span>, 2011</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/vcs/'>vcs</a>
+    <a class='category' href='/blog/categories/browser/'>browser</a>, <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/surfraw/'>surfraw</a>
   
 </span>
 
@@ -225,10 +221,10 @@ create in <span class="file">/home</span> without any apocalyptic consequences.<
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Previous Post: Using Dropbox to Share Dotfiles">&laquo; Using Dropbox to Share Dotfiles</a>
+        <a class="basic-alignment left" href="/blog/2011/04/13/archwiki-elvis-for-surfraw/" title="Previous Post: Archwiki elvis for Surfraw">&laquo; Archwiki elvis for Surfraw</a>
       
       
-        <a class="basic-alignment right" href="/blog/2010/02/25/wikipedia-discriminates-against-foss/" title="Next Post: Wikipedia Discriminates Against FOSS">Wikipedia Discriminates Against FOSS &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2011/05/24/tyrs-ncurses-twitter-client/" title="Next Post: Tyrs: ncurses Twitter Client">Tyrs: ncurses Twitter Client &raquo;</a>
       
     </p>
   </footer>
@@ -326,8 +322,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/05/05/w3m/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2011/05/05/w3m/';
         var disqus_script = 'embed.js';
       
     (function () {

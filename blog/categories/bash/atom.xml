@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/bash/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-27T22:24:43+13:00</updated>
+  <updated>2012-03-28T09:43:21+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,67 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Archwiki elvis for Surfraw]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/04/13/archwiki-elvis-for-surfraw/"/>
+    <updated>2011-04-13T19:29:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/04/13/archwiki-elvis-for-surfraw</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/arch-elvis.png" alt="image" /></p>
+
+<p>I have been using
+<a href="http://surfraw.alioth.debian.org/" title="Surfraw manifesto">Surfraw</a> for the
+better part of eighteen months, and I think that it is a perfect Unix
+tool: it does <em>one</em> thing, extremely well… If you haven’t come across
+it, Surfraw is a command-line interface to a couple of dozen
+repositories of knowledge. It is described thus:</p>
+
+<blockquote><p>It reclaims google, altavista, babelfish, dejanews, freshmeat,
+research index, slashdot and many others from the false-prophet,
+pox-infested heathen lands of html-forms, placing these wonders where
+they belong, deep in unix heartland, as god loving extensions to the
+shell.<sup>1</sup></p></blockquote>
+
+<p>The shell scripts that power the searches of the repositories are called
+<em>elvi</em>, the singular being <em>elvis</em>. Currently, in
+<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=summary" title="Debian Git Repo: Surfraw">the git repo</a>,
+there are
+<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=tree;f=elvi;hb=HEAD" title="elvi in the git repo">over 100 elvi</a>,
+ranging from Wikipedia through to the CIA website (yes, the project was
+founded by <a href="http://en.wikipedia.org/wiki/Julian_Assange" title="Julian's Wikipedia page">Julian Assange</a>),
+Slashdot and The Wayback Machine.</p>
+
+<p>As comprehensive as the list of elvi is, there was one glaring hole.
+Arch Linux is represented in terms of elvi to search the
+<a href="http://aur.archlinux.org/" title="Arch User Repository">AUR</a> and the
+<a href="http://www.archlinux.org/packages/" title="Arch Package Database">official package repositories</a>,
+but nothing for the
+<a href="https://wiki.archlinux.org/index.php/Main_Page" title="Definitive Arch Linux documentation">Arch Wiki</a>,
+perhaps the best GNU/Linux reference wiki on the web.</p>
+
+<p>So I thought I would rectify that.</p>
+
+<p>You can grab the archwiki elvis from my
+<a href="http://beta.intuxication.org/jasonwryan/longbow/file/tip/scripts/archwiki" title="Intuxication repo">mercurial repo</a>,
+copy it into your local directory at $XDG_CONFIG_HOME/surfraw/elvi/ or
+in the system folder at $XDG_CONFIG_DIRS/surfraw/ and you can surf the
+Arch Wiki, or any one of the nine other language wikis, from the command
+line.</p>
+
+<blockquote><p>Surfrawize the soul of your favourite internet wonder. Join the
+<strong>S</strong>hell <strong>U</strong>sers’ <strong>R</strong>evolutionary <strong>F</strong>ront <strong>A</strong>gainst the
+WW<strong>W</strong> by submitting code. Reclaim heathen lands. Bear witness to the
+truth. Its love will set you free.</p></blockquote>
+
+<h5>Notes</h5>
+
+<ol>
+<li>A bonus: all of the documentation is written like Unix
+<a href="http://en.wikipedia.org/wiki/Agitprop" title="Wikipedia entry">agitprop</a>…</li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Setting Urgent Hints in dwm]]></title>
@@ -28,7 +89,7 @@ and init pertag<sup>1</sup>) I finally added another one:
 statuscolours<sup>2</sup>…</p>
 
 <p>I have been experimenting with
-<a href="http://jasonwryan.com/post/2461350935/wmfs" title="My post on using WMFS">WMFS</a>,
+<a href="http://jasonwryan.com/2010-12-26-wmfs-window-manager-from-scratch" title="My post on using WMFS">WMFS</a>,
 which is another very nice, minimal tiling window manager and was really
 enjoying the urgency hints in the status bar, so I decided to patch that
 functionality into dwm.</p>
@@ -74,13 +135,14 @@ into dwm.c to change the tag colour when the hint was received.</p>
 <a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Build/dwm/5.8.2-2.diff" title="dwm.c patched">patched dwm.c</a>
 in my intuxication repo.</p>
 
-<div class="footnotes">
-1. These patches are from the extremely helpful Arch Forum thread: 
-<a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a>
-<br />
-2. I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
-from the suckless mailing list. It irons out the padding issues in the one on the wiki.
-</div>
+<h5>Notes</h5>
+
+<ol>
+<li>These patches are from the extremely helpful Arch Forum thread:
+<a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a></li>
+<li>I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
+from the suckless mailing list. It irons out the padding issues in the one on the wiki.</li>
+</ol>
 
 ]]></content>
   </entry>
@@ -165,6 +227,84 @@ actually.</p>
 <p>The glob (<code>*</code>) takes care of the different mail account names, and has
 the added bonus of being portable, and find returns any files (<code>-type f</code>)
 with <code>wc</code> counting the number of lines (the <code>-l</code> switch).</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Command Line Notes]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/09/28/command-line-notes/"/>
+    <updated>2010-09-28T17:56:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/09/28/command-line-notes</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-1.png" alt="image" /></p>
+
+<p>A couple of weeks ago, I came across these
+<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
+written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
+notes.</p>
+
+<p>The functions as described in the article are so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$&lt;em&gt;&quot;</span>.txt <span class="o">}</span> nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$&lt;/em&gt;&quot;</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Unfortunately, the second function – for retrieving the list of files in
+the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
+and it will only list files in the top level directory. If you are an
+inverterate note taker, this plainly won’t scale.</p>
+
+<p>My first attempt at hacking a solution yielded this little beauty:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\</span>
+</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Which removes <code>ls</code> from the function and allows nested directories, but
+is needlessly complex and, with four pipes, hideously <del>inefficient</del>
+inelegant.</p>
+
+<p>After reading up on Awk, particularly
+<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
+I arrived at something marginally longer but relying solely on the
+awesome power of awk to make the various transformations I was seeking…</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
+</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>An added advantage is that it is scalable irrespective of how deep the
+directories go. I’m sure that with some more awk-foo I could write a
+more effective set of conditionals, but this seemed a pretty good start
+for a simple note taking utility.</p>
+
+<h3>Updated 3/11/10</h3>
+
+<p>To remove a little of the visual clutter, I amended the awk script to
+strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
+</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
+in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
+symlink to it from <span class="file">~/.notes</span>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.</p></li>
+<li><p>Obligatory “after” screenshot:</p></li>
+</ol>
+
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-2.png" title="'Screenshot of editing text'" ></p>
 ]]></content>
   </entry>
   

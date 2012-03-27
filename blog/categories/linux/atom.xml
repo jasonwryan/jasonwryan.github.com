@@ -4,7 +4,7 @@
   <title><![CDATA[Category: linux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-27T22:24:43+13:00</updated>
+  <updated>2012-03-28T09:43:21+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,356 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Tyrs: ncurses Twitter Client]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/05/24/tyrs-ncurses-twitter-client/"/>
+    <updated>2011-05-24T20:17:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/05/24/tyrs-ncurses-twitter-client</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5754227102/in/photostream" title="Tyrs photo on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/tyrs.png" alt="image" /></a></p>
+
+<p>I have been a solid user of
+<a href="http://www.floodgap.com/software/ttytter/" title="TTYtter homepage">TTYtter</a>
+for a couple of years now, much preferring the speed and power of a
+command line Twitter client. And, after having tried–at one time or
+another–most of the Linux or cross-platform Twitter clients, I can
+safely say that for me TTYtter is easily the best.</p>
+
+<p>There is, however, a new
+<a href="http://www.gnu.org/software/ncurses/" title="ncurses page">ncurses</a> client
+that is showing a lot of promise:
+<a href="http://tyrs.nicosphere.net/index.html" title="Tyrs homepage">Tyrs</a>. Only at
+the 0.2.1.1 stage, and with a fraction of the functionality that TTYtter
+has, it is nevertheless a very nice client.</p>
+
+<p>Requiring little in the way of dependencies, only python-twitter and
+python-oauth2, both available in the
+<a href="http://aur.archlinux.org/" title="Arch Linux User Repository">AUR</a> or in the
+debian/Ubuntu repos (if you are using debian/Ubuntu, you will need the
+newer python-twitter-0.8.2 for it to run).</p>
+
+<p>Tyrs is easy to configure, with good documentation and a simple
+configuration file, located by default at
+$XDG_CONFIG_HOME/tyrs/tyrs.cfg. The default keybinds are
+<a href="http://www.vim.org/" title="THE editor">Vim-centric</a>, naturally…</p>
+
+<p>My config is pretty straightforward at this point:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>[keys]
+</span><span class='line'>retweet           <span class="p">=</span> <span class="k">p</span>
+</span><span class='line'>retweet_and_edit  <span class="p">=</span> <span class="k">P</span>
+</span><span class='line'>mentions          <span class="p">=</span> <span class="k">a</span>
+</span><span class='line'>reply             <span class="p">=</span> <span class="k">r</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span>[<span class="k">colors</span>]
+</span><span class='line'><span class="nb">highlight</span>         <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>header            <span class="p">=</span> <span class="m">6</span>
+</span><span class='line'>hashtag           <span class="p">=</span> <span class="m">4</span>
+</span><span class='line'>attag             <span class="p">=</span> <span class="m">2</span>
+</span><span class='line'>text              <span class="p">=</span> <span class="m">7</span>
+</span><span class='line'>warning_msg       <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>info_msg          <span class="p">=</span> <span class="m">2</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span>[params]
+</span><span class='line'>refresh           <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>tweet_border      <span class="p">=</span> <span class="m">0</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Written in Python, the code is well commented and relatively easy to
+find your way around if your are keen on hacking.</p>
+
+<p>The developer, Nicolas Paris, is both approachable and helpful and is
+actively developing Tyrs. With some more functionality in the pipeline,
+it looks to be a very nice application.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[w3m, Surfraw and Yanking URLs]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/05/05/w3m/"/>
+    <updated>2011-05-05T19:57:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/05/05/w3m</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/w3m.png" alt="image" /></p>
+
+<p>I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
+to the point of writing a couple of my own <em>elvi</em>. As part of the
+ongoing tweaking of my Surfraw experience, I have been experimenting
+with different
+<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
+to see which one best fits my workflow.</p>
+
+<p>I have previously been using both
+<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
+and it’s homonym,
+<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
+these have been perfectly acceptable, they weren’t quite providing the
+level of functionality —and integration with my vim-oriented workflow—
+that I was looking for. Enter
+<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
+
+<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
+`less’. With w3m you can browse web pages through a terminal emulator
+window (xterm, rxvt or something like that). Moreover, w3m can be used
+as a text formatting tool which typesets HTML into plain text.</p></blockquote>
+
+<p>w3m is a step up from the other two for a variety of reasons. It
+supports tables, frames, SSL connections, color and inline images. It
+also renders pages in a form as true to their original layout as
+possible. The killer features on top of that are, for me, the above
+mentioned rendering of HTML as text (meaning you can save content
+easily), and the customizable keybinds.</p>
+
+<p>There was however, one significant sticking point. After countless hours
+fruitlessly searching, I was unable to find a way to yank URLs to the
+clipboard. As I have been spending a little time of late on
+<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
+I thought I would ask the good folk there…</p>
+
+<p>Less than fourty hours later, I had an answer so simple and elegant,
+that I was literally grinning when I read it. It deserves quoting in
+full. It is that ingenious.</p>
+
+<blockquote><p>Set the “External Browser” option to
+<code>sh -c 'echo "$0" | xsel'</code></p>
+
+<p>You can use xsel -b to use the clipboard instead of the primary
+selection. An alternative to
+<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
+is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
+(xclip for the primary selection, xclip -selection CLIPBOARD for the
+clipboard).</p>
+
+<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
+Then press M to copy (yank) the URL of the current page, or ESCM to
+copy the URL of the link under the cursor.</p>
+
+<p>You can use the second or third external browser for that instead;
+then the key combination is 2M or 3M or 2ESCM or 3ESCM.
+<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
+
+<p>This simple hack means that it is now trivial to yank either the URL of
+the current page, or of the link under the cursor to primary selection.
+It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
+and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
+<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN    <span class="p">&lt;</span><span class="k">br</span>/<span class="p">&gt;</span>
+</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
+
+<h4>Updated 8/5/11</h4>
+
+<p>Gilles has edited and updated his answer with a slight change:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This prevents a new line being appended.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vim Colours in the Console]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/04/06/vim-colours-in-the-console/"/>
+    <updated>2011-04-06T21:19:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/04/06/vim-colours-in-the-console</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours1.png" alt="image" /></p>
+
+<p>I have spent the last couple of days trying to understand why I couldn’t
+get <a href="http://www.vim.org/" title="Vim: the _only_ editor">Vim</a> to display the
+correct 16 colours in the console. Not in a terminal emulator in X, like
+<a href="http://invisible-island.net/xterm/xterm.html" title="XTerm homepage">xterm</a>
+or
+<a href="http://software.schmorp.de/pkg/rxvt-unicode.html" title="Homepage for urxvt">rxvt-unicode</a>,
+but in the consoles, TTY1-6.</p>
+
+<p>After a lot of searching, more reading into the
+<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-16.html" title="The Linux terminal...">arcane documentation</a>
+of Linux terminals than I was either prepared for or keen on and some
+experimentation, I have it working. With one caveat; I wasn’t prepared
+to set the <code>TERM</code> environment in my <span class="file">.vimrc</span>. Apart from being
+<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-10.html#ss10.5" title="Console documentation">cautioned against</a>,
+as I <em>do</em> set it for tmux, I was anxious to avoid any clashes when
+running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+(which I do most of the time).</p>
+
+<p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
+colours, gave me the default:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> &amp;amp;&amp;amp; tput colors
+</span><span class='line'>linux
+</span><span class='line'>8
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Which, under my current configuration of Vim, rendered colours like so:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours2.png" alt="image" /></p>
+
+<p>Hardly satisfactory.</p>
+
+<p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
+colours:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then I had to rewrite my colourscheme to change all of the references to
+the terminal colour numbers to colour <em>names</em>, as apparently that is
+what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
+</span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
+</span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
+</span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>…to the more literal:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
+</span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
+</span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
+</span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Once I had made the necessary changes, I saved this new colourscheme as
+<span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
+have included it in an <code>if</code> condition in my original colourscheme<sup>2</sup>,
+but I was intent on keeping things compartmentalized until I had it working…</p>
+
+<p>Running Vim in the console was now starting to look promising:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours3.png" alt="image" /></p>
+
+<p>The final piece of the puzzle was to pass my
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.colours/dark" title="jwr dark colours: mercurial repo">X colours</a>
+to the console. Fortunately,
+<a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
+made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Linux console colors <span class="o">(</span>jwr dark<span class="o">)</span>&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
+</span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then it was just a case of setting the relevant colourscheme in my
+<span class="file">.vimrc</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;amp;<span class="nb">t_Co</span> &amp;<span class="k">lt</span>; <span class="m">256</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
+</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">else</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miromiro
+</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">endif</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And you can see
+<a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>
+of the finished product on Flickr.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p><a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miro8.vim" title="Mercurial repo: miro8 colourscheme">miro8.vim</a></p></li>
+<li><p><a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a></p></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Intuxication]]></title>
@@ -114,366 +464,16 @@ spectacularly ugly).</p>
 
 <p>And <em>now</em> I have a workable framebuffer.</p>
 
-<div class="footnotes">
-1. Hack to force higher framebuffer resolution in <span class="file">/etc/default/grub</span>
-<br />
-<pre><code>GRUB_GFXPAYLOAD_LINUX=1680x1050</code></pre>
-</div>
+<h5>Notes</h5>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[The Setup]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/10/04/the-setup/"/>
-    <updated>2010-10-04T17:23:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/10/04/the-setup</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/4522790892/" title="Arch Linux and dwm"><img src="http://dl.dropbox.com/u/261312/Blog-images/setup.png" alt="image" /></a></p>
+<ol>
+<li>Hack to force higher framebuffer resolution in <span class="file">/etc/default/grub</span></li>
+</ol>
 
-<p>Inspired by <a href="http://usesthis.com/">The Setup</a><sup>1</sup>, I decided to document
-the free (as in <a href="http://www.gnu.org/philosophy/free-sw.html">freedom</a>)
-and open source software tools I use daily.</p>
-
-<p>I made the move to using open-source about four years ago. At the time
-it was mostly a practical decision — the Pentium 4 laptop that I was
-using with XP on it had slowed to a crawl and I wasn’t keen to replace
-it, so I installed Ubuntu (Hardy Heron) on it and haven’t looked back.</p>
-
-<p>That same machine, incidentally, is still happily churning away, but it
-now runs a lightweight <a href="http://www.debian.org/releases/stable/">Debian Stable</a>.</p>
-
-<h3>Desktop</h3>
-
-<p>My primary home machine is a one I had built from spec two to three
-years ago. It was always intended to be a long-term investment, with
-sufficient power and storage to last for the better part of a decade.</p>
-
-<p>Centurion is an
-<a href="http://www.asus.com/Product.aspx?P_ID=cXoprTXLaShErTzI&amp;content=specifications">Asus P5E-V motherboard</a>
-with an
-<a href="http://www.intel.com/products/processor/core2quad/index.htm">Intel Core 2 Quad 6600 2.4GHz CPU</a> and
-4GB of DDR2 RAM. The sound card is an
-<a href="http://www.m-audio.com/products/en_us/Audiophile2496.html">M-Audio Audiophile 2496</a> and the
-graphics card is a
-<a href="http://www.nvidia.com/object/product_geforce_9600gt_us.html">1GB nVidia GeForce 9600GT</a>
-driving an LG 22” flat panel 1680x1050 display.</p>
-
-<h4>Software</h4>
-
-<p>I dual boot this machine, switching between the current
-<a href="http://www.ubuntu.com">Ubuntu</a> (10.04) and <a href="http://archlinux.org">Arch Linux</a>.</p>
-
-<p>There are two 1TB Seagate drives in a <a href="http://en.wikipedia.org/wiki/RAID">RAID1 array</a>,
-and a 500GB Seagate which has Arch on it as well as a couple of virtual machines.
-I back up the RAID array frequently, using <a href="http://www.samba.org/rsync/">rsync</a>, as it
-holds my <span class="file">/home</span> but don’t worry about the 500GB drive
-as I figure it is simple to reinstall Arch or a virtual machine…</p>
-
-<p>I try to use the same software across all of my machines to simplify my
-working habits, however I am experiencing some tension between Ubuntu
-and Arch insofar as Arch is a rolling release and you very quickly get
-used to the most recent builds…</p>
-
-<p>Applications specific to the Ubuntu box include:</p>
-
-<ul>
-<li><p><a href="http://www.getfirefox.net/">Firefox</a>: I also have
-<a href="http://www.google.com/chrome">Chrome</a> installed on this machine, but
-stick with the ‘fox for <a href="http://getfirebug.com/">Firebug</a> and other
-extensions</p></li>
-<li><p><a href="http://www.mozillamessaging.com/en-US/thunderbird/">Thunderbird</a>: with
-the <a href="http://enigmail.mozdev.org/home/index.php.html">Enigmail</a>
-extension. One of those areas of tension - it’s just a matter of time
-before I move to <code>mutt</code> (see EeePC)</p></li>
-<li><p><a href="http://wiki.slimdevices.com/index.php/SlimServer">Squeezeserver</a>: I
-have a Logitech Squeezebox to serve my music and it runs off this great
-open source software</p></li>
-<li><p><a href="http://www.virtualbox.org/">Virtualbox</a> (OS): for running virtual
-machines - currently <a href="http://www.slackware.com/">Slackware</a> and
-<a href="http://www.freebsd.org/">FreeBSD</a>.</p></li>
-</ul>
-
-
-<h3>EeePC 901</h3>
-
-<p>Archer is a 901 I bought two years ago – the
-<a href="http://eeepc.asus.com/au/product901-spec.html">Linux model with the 4/16GB SSD</a>, and I
-absolutely love it. I put a second GB of RAM into it and another 16GB SD
-Card (for /music) and it does everything that I need. The
-<a href="http://www.intel.com/products/processor/atom/index.htm">Atom 1.6GHz processor</a>
-handles compiling relatively smartly and the screen and keyboard, while
-small (9” at 1024x600) are not uncomfortable to use for protracted
-sessions. It is also <em>deathly quiet</em>. The only other addition is a
-second 6 cell battery so I can safely count on 8-10 hours out of it.</p>
-
-<p>One of the reasons that it works so efficiently is that it is an
-<em>extremely</em> minimal Arch Linux setup.</p>
-
-<h4>Software</h4>
-
-<p>Applications specific to this machine are:</p>
-
-<ul>
-<li><a href="http://dwm.suckless.org" title="dwm page on suckless">dwm</a>: <em>the</em>
-suckless window manager. With added functionality of some patches:
-init-pertag, cycle and push: see <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/dwm/5.8.2-2.diff">the patchset for
-details</a></li>
-<li><a href="http://tools.suckless.org/dmenu/">dmenu</a>: application launcher,
-again from suckless.org</li>
-<li><p><a href="http://www.mutt.org/">mutt</a>: the best email client I have used -
-requires some setup, but –if you want your mail client to run
-exactly as you would like– then this one repays the investment in
-spades. Mutt is just a MUA, the rest of the email cycle is handled
-by:</p>
-
-<ul>
-<li><a href="http://github.com/jgoerzen/offlineimap/wiki">offlineimap</a>: to
-fetch mail</li>
-<li><a href="http://msmtp.sourceforge.net/">msmtp</a>: to send mail</li>
-<li><a href="http://www.gnupg.org/">GnuPG</a>: for signing and encryption</li>
-<li><a href="http://abook.sourceforge.net/">abook</a>: address book</li>
-<li><a href="http://linuxcommand.org/man_pages/urlview1.html">urlview</a> and
-<a href="http://lynx.browser.org/">lynx</a>: open urls from mutt</li>
-</ul>
-</li>
-<li><p><del><a href="http://www.uzbl.org/">uzbl</a>: a lightweight webkit browser that is
-infintely extensible and
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.config/uzbl/config">configurable</a></del><sup>2^</sup></p></li>
-<li><a href="http://www.vimprobable.org/">Vimprobable</a> in
-<a href="http://tools.suckless.org/tabbed">tabbed</a>: another lightweight
-webkit browser that can be
-<a href="http://www.flickr.com/photos/jasonwryan/5063510130/" title="Screenshot on Flickr">customized</a>
-to your heart’s desire…</li>
-<li>A host of small programs that make life easy:
-
-<ul>
-<li><a href="https://derf.homelinux.org/projects/feh/">feh</a>: image viewer</li>
-<li><a href="http://www.nongnu.org/autocutsel/">autocutsel</a>: synchronize
-clipboards</li>
-<li><a href="http://sites.google.com/site/gotmor/dzen">dzen</a> and
-<a href="http://conky.sourceforge.net/">conky</a>: to print system stats to
-dwm’s status bar</li>
-<li><a href="http://surfraw.alioth.debian.org/">surfraw</a>: command line
-search client</li>
-<li><a href="http://www.ibiblio.org/pub/X11/contrib/utilities/unclutter-8.README">unclutter</a>:
-hides the mouse cursor (don’t really need a mouse with this
-setup)</li>
-<li><a href="http://www.xfree86.org/4.2.0/xmodmap.1.html">xmodmap</a>: map Caps
-Lock to Escape</li>
-</ul>
-</li>
-</ul>
-
-
-<h4>Common tools</h4>
-
-<p>Applications and utilities that I use across all of my machines include:</p>
-
-<ul>
-<li><p><a href="http://software.schmorp.de/pkg/rxvt-unicode.html">Urxvt</a>: I would’nt
-dream of using another terminal… Run as a daemon, with these
-applications:</p>
-
-<ul>
-<li>  <a href="http://tmux.sourceforge.net/">tmux</a>: for local and remote terminal
-  sessions</li>
-<li>  <a href="http://www.vim.org/">Vim</a>: with a <a href="http://jasonwryan.com/2010-09-28-command-line-notes">simple notes function</a>
-  in my .bashrc</li>
-<li>  <a href="http://vifm.sourceforge.net/">Vifm</a>: Vi-like file manager – for
-  when I am not using
-  <a href="http://www.gnu.org/software/coreutils/">coreutils</a></li>
-<li>  <a href="http://www.floodgap.com/software/ttytter/">TTYtter</a>: fantastic
-  Twitter client: if it could integrate Identi.ca into a single feed,
-  it would be perfect…</li>
-<li>  <a href="http://irssi.org/">irssi</a>: for IRC</li>
-<li>  <a href="http://www.mplayerhq.hu/design7/news.html">Mplayer</a>: for movies</li>
-<li>  <a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki">MPD</a> and
-  <a href="http://unkart.ovh.org/ncmpcpp/">ncmpcpp</a>: music player daemon and
-  ncurses player</li>
-<li>  <a href="http://code.google.com/p/mpdscribble/">mpdscribble</a>: for scrobbling
-  to Libre.fm and Last.fm</li>
-<li>  <a href="http://libtorrent.rakshasa.no/">rtorrent</a>: run inside tmux for
-remote sessions. Genius.</li>
-</ul>
-</li>
-<li><p><a href="http://www.dropbox.com/">Dropbox</a>: the daemon is closed source, but
-this is the best tool I have found for synching across machines. If the
-Ubuntu One devs ever focus on other Linux distros, I’d move across.</p></li>
-<li><a href="http://www.truecrypt.org/">Truecrypt</a>: a TC volume in Dropbox and you
-are set</li>
-<li><a href="http://www.skype.com/intl/en/home">Skype</a>.</li>
-</ul>
-
-
-<h4>Other Utilities</h4>
-
-<p>I use <a href="http://mercurial.selenic.com/">mercurial</a> and
-<a href="https://bitbucket.org/jasonwryan/">bitbucket</a> to share my dotfiles
-between Arch machines (one of my work boxes is also running Arch). I
-have two <a href="http://www.linksysbycisco.com/EU/en/products/WRT54GL">Linksys WRT54GL routers</a>, both
-running <a href="http://www.polarcloud.com/tomato">Tomato</a>, to handle my routing
-and wireless networking (thanks to
-<a href="http://twitter.com/jethrocarr" title="Jethro on Twitter">@jethrocarr</a> for
-solving that puzzle). For LAN file sharing I use
-<a href="http://nfs.sourceforge.net/">NFS</a> and I use
-<a href="http://www.openssh.com/">OpenSSH</a> to access my machines remotely. I
-have a third generation <a href="http://guides.macrumors.com/iPod_(3G">iPod</a>)
-and I run <a href="http://www.rockbox.org/">Rockbox</a> on it.</p>
-
-<p>You can see screenshot of these machines on
-<a href="http://www.flickr.com/photos/jasonwryan">flickr</a>.</p>
-
-<div class="footnotes">
-1. …and the fact that, apart from RMS, it is pretty much MacBookPros
-all the way down.
-<br />
-2. Updated 9/10/10 - <a href="http://jasonwryan.com/2010-10-07-vimprobable" title="My post on changing to Vimprobable">moved to Vimprobable</a>
-after some issues with uzbl.
-</div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Mercurial to Share Dotfiles]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/"/>
-    <updated>2010-02-10T20:36:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/02/10/using-mercurial-to-share-dotfiles</id>
-    <content type="html"><![CDATA[<p>I posted a couple of weeks back about
-<a href="http://jasonwryan.com/post/327549146/dotfiles">using dropbox to share dotfiles</a>
-and while I am pleased with how well that works, I had always intended to see how well a
-version control system would handle that (relatively trivial) chore.</p>
-
-<p>I chose <a href="http://mercurial.selenic.com/">Mercurial</a> only because it is the
-system used by <a href="http://suckless.org/">the suckless community</a> and, as their
-<a href="http://suckless.org/manifest/">philosophy</a> and the products they
-produce are of such exceptional quality, no further investigation seemed
-necessary.</p>
-
-<p>Installing mercurial, on both my Arch machines and the Ubuntu box was simple
-enough:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;pacman -S mercurial&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">GRUB_GFXPAYLOAD_LINUX</span><span class="o">=</span>1680x1050
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then, rather than use my <span class="file">/home</span> directory as the local repo
-(which for some reason—probably completely irrational—seemed somewhat risky),
-I opted to create the repository in a separate directory in my home folder and
-link to the relevant files.</p>
-
-<p>I signed up for a free account at <a href="http://bitbucket.org">bitbucket</a> and created a repository
-called “dotfiles.”</p>
-
-<p>The it was just a matter of cloning the new repository to my local
-machine:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg clone https://jasonwryan@bitbucket.org/jasonwryan/dotfiles/
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>and then entering the newly created directory and linking to the files that
-I wanted to share:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd </span>dotfiles/ ln /home/jason/.Xdefaults ln /home/jason/.apvlvrc
-</span><span class='line'>…
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Note: I initially tried symlinking, but Mercurial didn't like that
-<em>at all</em>, hence the hard links…</p>
-
-<p>Then it was just a matter of telling Mercurial that the requisite files
-are in the folder:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg add
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Commit the changes:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg ci
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>…and then push the changes to the <a href="https://bitbucket.org/jasonwryan/">bitbucket repository</a>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg push
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>This was certainly a lot quicker to setup than the Dropbox method but, for
-all that I am using it for, it seems a little like overkill. I'll chalk
-it up as a good way for me to get my head around <acronym title="Version
-Control Systems">vcs</acronym> more than anything else…</p>
-
-<h3>The Mercurial Book</h3>
-
-<p>For more information on Mercurial, I highly
-recommend Bryan O'Sullivan's excellent
-<a href="http://hgbook.red-bean.com/">Mercurial: The Definitive Guide</a>.</p>
-
-<h4>Update</h4>
-
-<p>Post edited to reflect that fact that I now run two repos,
-one for the <a href="https://bitbucket.org/jasonwryan/workstation/src/"
-title="work machine repo" target="_blank">workstation</a> (as described here),
-and a second one for my <a href="https://bitbucket.org/jasonwryan/eeepc/src/"
-title="Netbook repo" target="_blank">EeePC</a> – which I did successfully
-create in <span class="file">/home</span> without any apocalyptic consequences.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Dropbox to Share Dotfiles]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/"/>
-    <updated>2010-01-11T11:10:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/01/11/using-dropbox-to-share-dotfiles</id>
-    <content type="html"><![CDATA[<p>I regularly back up all my dotfiles to <a href="http://www.dropbox.com/" title="Synch your computers securely...">Dropbox</a>
-as a matter of course. I had intended, at some point, to set up a
-<a href="http://git-scm.com/" title="Online version control system">Git repo</a> to automate the process and to make it easier to share these files with others.</p>
-
-<p>However, best intentions etc., in the end it was far easier to simply extend what I was already doing using Dropbox.</p>
-
-<p>First, I created a directory in my <span class="file">Dropbox/Public</span> that would contain the dotfiles I wanted to share:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>mkdir Dropbox/Public/Configs
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then it was just a matter of creating links to the files I wanted to host there:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">cd </span>Dropbox/Public/Configs
-</span><span class='line'><span class="nv">$ </span>ln -s ../../path/to/dotfile
-</span><span class='line'>…
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The next step was to create a simple <acronym title="HyperText Markup Language">HTML</acronym> page
-(and a stylesheet to make it look presentable) and drop them into the same directory.</p>
-
-<p><a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="jason's dotfile repo"><img src="http://dl.dropbox.com/u/261312/Blog-images/dropbox-repo.png"></a></p>
-
-<h3>Caveat</h3>
-
-<p>Dropbox has the very handy feature of retaining versions of all the files you upload. Unfortunately, in this case, that means that the symlinks will always point to the file that you originally set them at — <em>irrespective of any updates you overwrite them with</em>.</p>
-
-<p>So, if you change any of the files significantly, you will need to recreate the symlink…</p>
-
-<h4>Update</h4>
-
-<p>It seems that the symlink system does work: Dropbox will respect the latest version. YMMV.</p>
 ]]></content>
   </entry>
   

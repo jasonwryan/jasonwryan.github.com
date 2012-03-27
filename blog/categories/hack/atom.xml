@@ -4,7 +4,7 @@
   <title><![CDATA[Category: hack | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/hack/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-27T22:24:43+13:00</updated>
+  <updated>2012-03-28T09:43:21+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,96 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[w3m, Surfraw and Yanking URLs]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/05/05/w3m/"/>
+    <updated>2011-05-05T19:57:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/05/05/w3m</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/w3m.png" alt="image" /></p>
+
+<p>I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
+to the point of writing a couple of my own <em>elvi</em>. As part of the
+ongoing tweaking of my Surfraw experience, I have been experimenting
+with different
+<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
+to see which one best fits my workflow.</p>
+
+<p>I have previously been using both
+<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
+and it’s homonym,
+<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
+these have been perfectly acceptable, they weren’t quite providing the
+level of functionality —and integration with my vim-oriented workflow—
+that I was looking for. Enter
+<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
+
+<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
+`less’. With w3m you can browse web pages through a terminal emulator
+window (xterm, rxvt or something like that). Moreover, w3m can be used
+as a text formatting tool which typesets HTML into plain text.</p></blockquote>
+
+<p>w3m is a step up from the other two for a variety of reasons. It
+supports tables, frames, SSL connections, color and inline images. It
+also renders pages in a form as true to their original layout as
+possible. The killer features on top of that are, for me, the above
+mentioned rendering of HTML as text (meaning you can save content
+easily), and the customizable keybinds.</p>
+
+<p>There was however, one significant sticking point. After countless hours
+fruitlessly searching, I was unable to find a way to yank URLs to the
+clipboard. As I have been spending a little time of late on
+<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
+I thought I would ask the good folk there…</p>
+
+<p>Less than fourty hours later, I had an answer so simple and elegant,
+that I was literally grinning when I read it. It deserves quoting in
+full. It is that ingenious.</p>
+
+<blockquote><p>Set the “External Browser” option to
+<code>sh -c 'echo "$0" | xsel'</code></p>
+
+<p>You can use xsel -b to use the clipboard instead of the primary
+selection. An alternative to
+<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
+is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
+(xclip for the primary selection, xclip -selection CLIPBOARD for the
+clipboard).</p>
+
+<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
+Then press M to copy (yank) the URL of the current page, or ESCM to
+copy the URL of the link under the cursor.</p>
+
+<p>You can use the second or third external browser for that instead;
+then the key combination is 2M or 3M or 2ESCM or 3ESCM.
+<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
+
+<p>This simple hack means that it is now trivial to yank either the URL of
+the current page, or of the link under the cursor to primary selection.
+It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
+and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
+<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN    <span class="p">&lt;</span><span class="k">br</span>/<span class="p">&gt;</span>
+</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
+
+<h4>Updated 8/5/11</h4>
+
+<p>Gilles has edited and updated his answer with a slight change:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This prevents a new line being appended.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Sessions in tmux]]></title>
@@ -62,6 +152,84 @@ so thought I would share it here.</p>
 <p>The <code>selectw</code> option means that the default view is TTYtter.</p>
 
 <p>Simple.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Command Line Notes]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/09/28/command-line-notes/"/>
+    <updated>2010-09-28T17:56:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/09/28/command-line-notes</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-1.png" alt="image" /></p>
+
+<p>A couple of weeks ago, I came across these
+<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
+written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
+notes.</p>
+
+<p>The functions as described in the article are so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$&lt;em&gt;&quot;</span>.txt <span class="o">}</span> nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$&lt;/em&gt;&quot;</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Unfortunately, the second function – for retrieving the list of files in
+the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
+and it will only list files in the top level directory. If you are an
+inverterate note taker, this plainly won’t scale.</p>
+
+<p>My first attempt at hacking a solution yielded this little beauty:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\</span>
+</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Which removes <code>ls</code> from the function and allows nested directories, but
+is needlessly complex and, with four pipes, hideously <del>inefficient</del>
+inelegant.</p>
+
+<p>After reading up on Awk, particularly
+<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
+I arrived at something marginally longer but relying solely on the
+awesome power of awk to make the various transformations I was seeking…</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
+</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>An added advantage is that it is scalable irrespective of how deep the
+directories go. I’m sure that with some more awk-foo I could write a
+more effective set of conditionals, but this seemed a pretty good start
+for a simple note taking utility.</p>
+
+<h3>Updated 3/11/10</h3>
+
+<p>To remove a little of the visual clutter, I amended the awk script to
+strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
+</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
+in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
+symlink to it from <span class="file">~/.notes</span>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.</p></li>
+<li><p>Obligatory “after” screenshot:</p></li>
+</ol>
+
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-2.png" title="'Screenshot of editing text'" ></p>
 ]]></content>
   </entry>
   
@@ -167,137 +335,6 @@ in my case <kbd>;</kbd> — and save and quit.</p>
 
 <p>Vifm has now been moved to Community, so you can use
 <a href="http://wiki.archlinux.org/index.php/Arch_Build_System%22">ABS</a> to build the package.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Changing Karmic's Login Screen]]></title>
-    <link href="http://jasonwryan.github.com/blog/2009/11/07/changing-karmics-login-screen/"/>
-    <updated>2009-11-07T18:46:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2009/11/07/changing-karmics-login-screen</id>
-    <content type="html"><![CDATA[<p>With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
-accelerate boot time. This has made for a faster boot, but a side effect has
-been that there is no longer a straightforward way to theme your login - and
-the default isn’t just ugly, it’s fugly…</p>
-
-<p>Fear not. It can be fixed.</p>
-
-<p>The first thing you want to do is replace the background image. You can find it
-at <code>/usr/share/images/xsplash</code>.</p>
-
-<p>Before doing anything rash, make a copy of the directory:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then delete all of the images that begin with <code>bg_</code>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo rm /usr/share/images/xsplash/bg_*
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Use the gimp to create a background image for your desktop and save it into
-this directory, and name it <code>bg_2560x1600.jpg</code> …irrespective of the resolution
-of your screen. Leave the other images as they are: the logo and the
-marvellously named throbber will sit over your new background as you boot up…</p>
-
-<p>Next you can change the colours of the login box to complement your new
-background. This is all controlled in
-<code>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc</code>.</p>
-
-<p>Again, make a copy:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc <span class="se">\</span>
-</span><span class='line'>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc-backup
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then open the file and edit the relevant lines of code at the beginning of the
-file:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/karmic-text.png" title="'Screenshot of editing text'" ></p>
-
-<p>As you can see, the colour scheme I have chosen uses dark grey to match my
-desktop. Feel free to experiment, you can’t really break anything…</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4081800113/" title="Customized Karmic Login Screen by jasonwryan, on Flickr"><img src="http://farm3.staticflickr.com/2536/4081800113_d4b98a9b3c.jpg" width="500" height="313" alt="Customized Karmic Login Screen"></a></p>
-
-<p>Simple, really.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Install .otf Fonts in OpenOffice]]></title>
-    <link href="http://jasonwryan.github.com/blog/2009/03/17/install-otf-fonts-in-openoffice/"/>
-    <updated>2009-03-17T19:51:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2009/03/17/install-otf-fonts-in-openoffice</id>
-    <content type="html"><![CDATA[<p>OpenOffice won’t recognize TrueType fonts with the extension <code>.otf</code>, so you need to convert them to <code>.ttf</code>
-in order to use them in that suite.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install fontforge
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>If all the <code>.otf</code> files are in the same folder, then you are good to go.</p>
-
-<p>First, you need the conversion script, which I found in <a href="url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this%20post[/url">this post</a>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>otf2ttf.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/usr/local/bin/fontforge&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Quick and dirty hack: converts a font to truetype <span class="o">(</span>.ttf<span class="o">)</span>&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;Print<span class="o">(</span><span class="s2">&quot;Opening &quot;</span>+<span class="nv">$1</span><span class="o">)</span>;
-</span><span class='line'>Open<span class="o">(</span><span class="nv">$1</span><span class="o">)</span>;
-</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Saving &quot;</span>+<span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
-</span><span class='line'>Generate<span class="o">(</span><span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
-</span><span class='line'>Quit<span class="o">(</span>0<span class="o">)</span>;
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Save it as <code>otf2ttf.sh</code> into the folder with the <code>.otf</code> files.</p>
-
-<p>Then run:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">for </span>i in *.otf; <span class="k">do </span>fontforge -script otf2ttf.sh <span class="nv">$i</span>; <span class="k">done</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Move all the converted fonts to your your shared directory:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo mv *ttf /usr/share/fonts/truetype/myfonts/
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>And then change the permissions and reload the cache:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/
-</span><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/*.ttf
-</span><span class='line'>sudo <span class="nb">fc</span>-cache -f -v
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>And the fonts will now appear in OpenOffice. Easy.</p>
 ]]></content>
   </entry>
   
