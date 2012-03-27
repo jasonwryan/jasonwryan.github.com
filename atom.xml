@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-27T12:39:46+13:00</updated>
+  <updated>2012-03-27T13:42:00+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,219 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[tmux - terminal multiplexer]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/03/27/tmux-terminal-multiplexer/"/>
+    <updated>2012-03-27T13:28:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/03/27/tmux-terminal-multiplexer</id>
+    <content type="html"><![CDATA[<p>Over the last couple of days I have been familiarising myself with <a href="http://tmux.sourceforge.net/">tmux</a>.
+As it says on the homepage,</p>
+
+<blockquote><p>tmux is a terminal multiplexer: it enables a number of terminals (or windows), each running a separate program, to be created, accessed, and controlled from a single screen. tmux may be detached from a screen and continue running in the background, then later reattached.</p></blockquote>
+
+
+<p>I was attracted to tmux after seeing a number of enthusiastic postings on the
+<a href="http://bbs.archlinux.org/viewtopic.php?id=84157">Arch forums</a>, and by the promise of
+better management of multiple terminals in a single <a href="http://dwm.suckless.org/">dwm tag</a>…</p>
+
+<p>It&#8217;s available in the community repo, so:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S tmux
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then it is just a matter of configuring it to suit your style of working,
+keyboard bindings etc. Helpfully, it comes with some example config files to
+start you off. These can be found at <span class="file">/usr/share/tmux/*.conf</span>.
+I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</a> for mine:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># set prefix key to ctrl+t</span>
+</span><span class='line'>unbind C-b
+</span><span class='line'><span class="nb">set</span> -g prefix C-t
+</span><span class='line'>
+</span><span class='line'><span class="c"># more intuitive keybindings for splitting</span>
+</span><span class='line'>unbind %
+</span><span class='line'><span class="nb">bind </span>h split-window -h
+</span><span class='line'>unbind <span class="s1">&#39;&quot;&#39;</span>
+</span><span class='line'><span class="nb">bind </span>v split-window -v
+</span><span class='line'>
+</span><span class='line'><span class="c"># set vi keys</span>
+</span><span class='line'>unbind <span class="o">[</span>
+</span><span class='line'><span class="nb">bind </span>Escape copy-mode
+</span><span class='line'>setw -g mode-keys vi
+</span><span class='line'>
+</span><span class='line'><span class="c"># send the prefix to client inside window (ala nested sessions)</span>
+</span><span class='line'><span class="nb">bind</span>-key a send-prefix
+</span><span class='line'>
+</span><span class='line'><span class="c"># toggle last window like screen</span>
+</span><span class='line'><span class="nb">bind</span>-key C-b last-window
+</span><span class='line'>
+</span><span class='line'><span class="c"># confirm before killing a window or the server</span>
+</span><span class='line'><span class="nb">bind</span>-key k confirm <span class="nb">kill</span>-window
+</span><span class='line'><span class="nb">bind</span>-key K confirm <span class="nb">kill</span>-server
+</span><span class='line'>
+</span><span class='line'><span class="c"># toggle statusbar</span>
+</span><span class='line'><span class="nb">bind</span>-key b <span class="nb">set</span>-option status
+</span><span class='line'>
+</span><span class='line'><span class="c"># ctrl+left/right cycles thru windows</span>
+</span><span class='line'><span class="nb">bind</span>-key -n C-right next
+</span><span class='line'><span class="nb">bind</span>-key -n C-left prev
+</span><span class='line'>
+</span><span class='line'><span class="c"># open a man page in new window</span>
+</span><span class='line'><span class="nb">bind</span> / <span class="nb">command</span>-prompt <span class="s2">&quot;split-window &#39;exec man %%&#39;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># quick view of processes</span>
+</span><span class='line'><span class="nb">bind</span> <span class="s1">&#39;~&#39;</span> split-window <span class="s2">&quot;exec htop&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># scrollback buffer n lines</span>
+</span><span class='line'><span class="nb">set</span> -g <span class="nb">history</span>-limit 5000
+</span><span class='line'>
+</span><span class='line'><span class="c"># on-screen time for display-panes in ms</span>
+</span><span class='line'><span class="nb">set</span> -g display-panes-time 2000
+</span><span class='line'>
+</span><span class='line'><span class="c"># start window indexing at one instead of zero</span>
+</span><span class='line'><span class="nb">set</span> -g base-index 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># enable wm window titles</span>
+</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles on
+</span><span class='line'>
+</span><span class='line'><span class="c"># wm window title string (uses statusbar variables)</span>
+</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles-string <span class="s2">&quot;tmux:#I #W&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># session initialization</span>
+</span><span class='line'>new -s TTYtter ttytter
+</span><span class='line'>neww -t 2
+</span><span class='line'>neww -d -t 3
+</span><span class='line'>neww -d -t 5
+</span><span class='line'>selectw -t 1
+</span><span class='line'>
+</span><span class='line'><span class="c">#### statusbar ####</span>
+</span><span class='line'><span class="nb">set</span> -g status-interval 1
+</span><span class='line'><span class="nb">set</span> -g status-justify centre <span class="c"># center align window list</span>
+</span><span class='line'><span class="nb">set</span> -g status-left <span class="s1">&#39;#[fg=green] #H #[default]&#39;</span>
+</span><span class='line'><span class="nb">set</span> -g status-right <span class="s1">&#39;#[fg=blue,bright]Up#(uptime | cut -f 4-5 -d &quot; &quot; | cut -f 1 -d &quot;,&quot;) </span>
+</span><span class='line'><span class="s1">#[default]:: #[fg=cyan]#(cut -d &quot; &quot; -f 1-4 /proc/loadavg) &#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># default statusbar colors</span>
+</span><span class='line'><span class="nb">set</span> -g status-fg white
+</span><span class='line'><span class="nb">set</span> -g status-bg default
+</span><span class='line'><span class="nb">set</span> -g status-attr bright
+</span><span class='line'>
+</span><span class='line'><span class="c"># default window title colors</span>
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-fg white
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-bg default
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-attr dim
+</span><span class='line'>
+</span><span class='line'><span class="c"># active window title colors</span>
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-fg white
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-bg default
+</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-attr bright
+</span><span class='line'>
+</span><span class='line'><span class="c"># command/message line colors</span>
+</span><span class='line'><span class="nb">set</span> -g message-fg white
+</span><span class='line'><span class="nb">set</span> -g message-bg black
+</span><span class='line'><span class="nb">set</span> -g message-attr bright
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Copy this file to <span class="file">~/.tmux.conf</span>. The final result:</p>
+
+<p><a href="http://www.flickr.com/photos/jasonwryan/4252840248/" title="Archlinux:  tmux running in dwm by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2703/4252840248_01ca8e7cc1.jpg" width="500" height="293" alt="Archlinux:  tmux running in dwm"/></a></p>
+
+<h3>Updated 16/11/10</h3>
+
+<p>For a current version of my <span class="file">.tmux.conf</span>, check my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.tmux.conf" title="bitbucket site" target="_blank">mercurial repository</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Dropbox to Share Dotfiles]]></title>

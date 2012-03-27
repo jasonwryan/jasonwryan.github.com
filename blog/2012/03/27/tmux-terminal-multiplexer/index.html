@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>jasonwryan.com</title>
+  <title>tmux - terminal multiplexer - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
@@ -19,7 +19,7 @@ As it says on the homepage, tmux is a terminal multiplexer: it enables a &hellip
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/03/27/tmux-terminal-multiplexer">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -64,15 +64,12 @@ As it says on the homepage, tmux is a terminal multiplexer: it enables a &hellip
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/03/27/tmux-terminal-multiplexer/">Tmux - Terminal Multiplexer</a></h1>
+      <h1 class="entry-title">Tmux - Terminal Multiplexer</h1>
     
     
       <p class="meta">
@@ -95,7 +92,7 @@ As it says on the homepage, tmux is a terminal multiplexer: it enables a &hellip
   </header>
 
 
-  <div class="entry-content"><p>Over the last couple of days I have been familiarising myself with <a href="http://tmux.sourceforge.net/">tmux</a>.
+<div class="entry-content"><p>Over the last couple of days I have been familiarising myself with <a href="http://tmux.sourceforge.net/">tmux</a>.
 As it says on the homepage,</p>
 
 <blockquote><p>tmux is a terminal multiplexer: it enables a number of terminals (or windows), each running a separate program, to be created, accessed, and controlled from a single screen. tmux may be detached from a screen and continue running in the background, then later reattached.</p></blockquote>
@@ -301,95 +298,16 @@ I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</
 <p>For a current version of my <span class="file">.tmux.conf</span>, check my
 <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.tmux.conf" title="bitbucket site" target="_blank">mercurial repository</a>.</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/01/11/using-dropbox-to-share-dotfiles/">Using Dropbox to Share Dotfiles</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
 
-<time datetime="2010-01-11T11:10:00+13:00" pubdate data-updated="true">Jan 11<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I regularly back up all my dotfiles to <a href="http://www.dropbox.com/" title="Synch your computers securely...">Dropbox</a>
-as a matter of course. I had intended, at some point, to set up a
-<a href="http://git-scm.com/" title="Online version control system">Git repo</a> to automate the process and to make it easier to share these files with others.</p>
-
-<p>However, best intentions etc., in the end it was far easier to simply extend what I was already doing using Dropbox.</p>
-
-<p>First, I created a directory in my <span class="file">Dropbox/Public</span> that would contain the dotfiles I wanted to share:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>mkdir Dropbox/Public/Configs
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then it was just a matter of creating links to the files I wanted to host there:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">cd </span>Dropbox/Public/Configs
-</span><span class='line'><span class="nv">$ </span>ln -s ../../path/to/dotfile
-</span><span class='line'>…
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The next step was to create a simple <acronym title="HyperText Markup Language">HTML</acronym> page
-(and a stylesheet to make it look presentable) and drop them into the same directory.</p>
-
-<p><a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="jason's dotfile repo"><img src="http://dl.dropbox.com/u/261312/Blog-images/dropbox-repo.png"></a></p>
-
-<h3>Caveat</h3>
-
-<p>Dropbox has the very handy feature of retaining versions of all the files you upload. Unfortunately, in this case, that means that the symlinks will always point to the file that you originally set them at — <em>irrespective of any updates you overwrite them with</em>.</p>
-
-<p>So, if you change any of the files significantly, you will need to recreate the symlink…</p>
-
-<h4>Update</h4>
-
-<p>It seems that the symlink system does work: Dropbox will respect the latest version. YMMV.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/">Dzen2 and Conky-cli in Dwm</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -401,293 +319,42 @@ as a matter of course. I had intended, at some point, to set up a
   
 
 
-<time datetime="2009-11-21T12:07:00+13:00" pubdate data-updated="true">Nov 21<span>st</span>, 2009</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar.</p>
-
-<p>Here is how I sorted it.</p>
-
-<p>First, I installed <code>conky-cli</code> and <code>dzen2</code>. Conky-cli is in AUR, and dzen2 is in Community:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S dzen2 <span class="o">&amp;&amp;</span> yaourt conky-cli
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then it was a matter of setting up the relevant files.</p>
-
-<figure class='code'><figcaption><span>.xinitrc.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># ~/.xinitrc</span>
-</span><span class='line'>setxkbmap -option terminate:ctrl_alt_bksp &amp;amp;
-</span><span class='line'><span class="nb">eval</span> <span class="sb">`</span>cat ~/.fehbg<span class="sb">`</span> &amp;amp;
-</span><span class='line'>numlockx &amp;amp;
-</span><span class='line'>xscreensaver -no-splash &amp;amp;
-</span><span class='line'><span class="c"># Dzen &amp;amp; conky</span>
-</span><span class='line'><span class="o">(</span>sleep 15s &amp;amp;&amp;amp; conky | dzen2 -x <span class="s1">&#39;500&#39;</span> -e <span class="s1">&#39;&#39;</span> -fg <span class="s1">&#39;#dcdcdc&#39;</span> -bg <span class="s1">&#39;#3f3f3f&#39;</span> <span class="se">\</span>
-</span><span class='line'>-w <span class="s1">&#39;650&#39;</span> -ta r -fn <span class="s1">&#39;-*-terminus-*-r-normal-*-*-120-*-*-*-*-iso8859-*&#39;</span> -p <span class="o">)</span> &amp;amp;
-</span><span class='line'><span class="c"># Start dwm</span>
-</span><span class='line'><span class="nb">exec </span>ck-launch-session ~/Scripts/dwm-start
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>.conkyrc .sh </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>background no
-</span><span class='line'>out_to_console yes
-</span><span class='line'>update_interval 2
-</span><span class='line'>total_run_times 0
-</span><span class='line'>use_spacer none
-</span><span class='line'>double_buffer yes
-</span><span class='line'>TEXT
-</span><span class='line'>${if_existing /sys/class/power_supply/BAT0/present}^i(/home/jason/Build/dwm/dzen/bat.xbm)…</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>dwm-start .sh </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>while true; do 
-</span><span class='line'>    dwm >/dev/null
-</span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The key is —and it took me a while to work it out— to delay the loading of conky until <em>after</em> dwm has painted it&#8217;s
-status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
-
-<p>Now, the “before” shot:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/conky-dzen.png"></p>
-
-<p>…and the finished product:</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4121324068/" title="Conky-cli to dzen2 in dwm on Arch by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2666/4121324068_6ec29262d7.jpg" width="500" height="293" alt="Conky-cli to dzen2 in dwm on Arch"/></a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2012-03-27T13:28:00+13:00" pubdate data-updated="true">Mar 27<span>th</span>, 2012</time>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/11/07/changing-karmics-login-screen/">Changing Karmic&#8217;s Login Screen</a></h1>
-    
-    
-      <p class="meta">
-        
 
-
-
-
-
-
-
-
+<span class="categories">
   
+    <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/terminal/'>terminal</a>, <a class='category' href='/blog/categories/tmux/'>tmux</a>, <a class='category' href='/blog/categories/unix/'>unix</a>
+  
+</span>
 
 
-<time datetime="2009-11-07T18:46:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2009</time>
-        
-      </p>
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
-accelerate boot time. This has made for a faster boot, but a side effect has
-been that there is no longer a straightforward way to theme your login - and
-the default isn’t just ugly, it’s fugly…</p>
-
-<p>Fear not. It can be fixed.</p>
-
-<p>The first thing you want to do is replace the background image. You can find it
-at <code>/usr/share/images/xsplash</code>.</p>
-
-<p>Before doing anything rash, make a copy of the directory:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then delete all of the images that begin with <code>bg_</code>:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo rm /usr/share/images/xsplash/bg_*
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Use the gimp to create a background image for your desktop and save it into
-this directory, and name it <code>bg_2560x1600.jpg</code> …irrespective of the resolution
-of your screen. Leave the other images as they are: the logo and the
-marvellously named throbber will sit over your new background as you boot up…</p>
-
-<p>Next you can change the colours of the login box to complement your new
-background. This is all controlled in
-<code>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc</code>.</p>
-
-<p>Again, make a copy:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc <span class="se">\</span>
-</span><span class='line'>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc-backup
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then open the file and edit the relevant lines of code at the beginning of the
-file:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/karmic-text.png" title="'Screenshot of editing text'" ></p>
-
-<p>As you can see, the colour scheme I have chosen uses dark grey to match my
-desktop. Feel free to experiment, you can’t really break anything…</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4081800113/" title="Customized Karmic Login Screen by jasonwryan, on Flickr"><img src="http://farm3.staticflickr.com/2536/4081800113_d4b98a9b3c.jpg" width="500" height="313" alt="Customized Karmic Login Screen"></a></p>
-
-<p>Simple, really.</p>
+      <div class="sharing">
+  
+  
+  
 </div>
-  
-  
 
-
-    </article>
-  
-  
-    <article>
+    
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/03/17/install-otf-fonts-in-openoffice/">Install .otf Fonts in OpenOffice</a></h1>
-    
-    
-      <p class="meta">
-        
+        <a class="basic-alignment left" href="/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Previous Post: Using Dropbox to Share Dotfiles">&laquo; Using Dropbox to Share Dotfiles</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2009-03-17T19:51:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2009</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>OpenOffice won’t recognize TrueType fonts with the extension <code>.otf</code>, so you need to convert them to <code>.ttf</code>
-in order to use them in that suite.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install fontforge
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If all the <code>.otf</code> files are in the same folder, then you are good to go.</p>
-
-<p>First, you need the conversion script, which I found in <a href="url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this%20post[/url">this post</a>:</p>
-
-<figure class='code'><figcaption><span>otf2ttf.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/usr/local/bin/fontforge</span>
-</span><span class='line'><span class="c"># Quick and dirty hack: converts a font to truetype (.ttf)</span>
-</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Opening &quot;</span>+<span class="nv">$1</span><span class="o">)</span>;
-</span><span class='line'>Open<span class="o">(</span><span class="nv">$1</span><span class="o">)</span>;
-</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Saving &quot;</span>+<span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
-</span><span class='line'>Generate<span class="o">(</span><span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
-</span><span class='line'>Quit<span class="o">(</span>0<span class="o">)</span>;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Save it as <code>otf2ttf.sh</code> into the folder with the <code>.otf</code> files.</p>
-
-<p>Then run:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">for </span>i in *.otf; <span class="k">do </span>fontforge -script otf2ttf.sh <span class="nv">$i</span>; <span class="k">done</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Move all the converted fonts to your your shared directory:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo mv *ttf /usr/share/fonts/truetype/myfonts/
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And then change the permissions and reload the cache:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/
-</span><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/*.ttf
-</span><span class='line'>sudo <span class="nb">fc</span>-cache -f -v
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And the fonts will now appear in OpenOffice. Easy.</p>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
-  
-  
+  </section>
 
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -707,7 +374,7 @@ in order to use them in that suite.</p>
       </li>
     
       <li class="post">
-        <a href="/blog/2009/11/07/changing-karmics-login-screen/">Changing Karmic&#8217;s Login Screen</a>
+        <a href="/blog/2009/11/07/changing-karmics-login-screen/">Changing Karmic's Login Screen</a>
       </li>
     
       <li class="post">
@@ -720,7 +387,7 @@ in order to use them in that suite.</p>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -736,7 +403,7 @@ in order to use them in that suite.</p>
 
 <section>
   <h1>My Pinboard</h1>
-  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
   <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
 </section>
 <script type="text/javascript">
@@ -756,6 +423,7 @@ in order to use them in that suite.</p>
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -770,7 +438,10 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       var disqus_shortname = 'jasonwryan';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/03/27/tmux-terminal-multiplexer/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2012/03/27/tmux-terminal-multiplexer/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
