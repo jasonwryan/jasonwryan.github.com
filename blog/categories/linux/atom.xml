@@ -4,7 +4,7 @@
   <title><![CDATA[Category: linux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T11:24:01+13:00</updated>
+  <updated>2012-03-28T12:34:25+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,332 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Script to Edit Config Files]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/07/19/script-to-edit-config-files/"/>
+    <updated>2011-07-19T19:34:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/07/19/script-to-edit-config-files</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/xdg-script.png" alt="image" /></p>
+
+<p>Even with bash completion, endlessly typing and tabbing through the
+directory tree to make a simple change to a config file quickly becomes
+tedious, so I concocted this script to make it somewhat more
+straightforward.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>xdg.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;for f in <span class="nv">$dir</span>/* ; <span class="k">do</span>
+</span><span class='line'><span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nv">$file</span> in
+</span><span class='line'>    conf | config | *.cfg | *rc<span class="o">)</span>  <span class="nv">$EDITOR</span> <span class="s2">&quot;$f&quot;</span> ;;
+</span><span class='line'>    *<span class="o">)</span>  :  ;;
+</span><span class='line'>    <span class="k">esac</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>A relatively simple script, with a nice feature or two, it does a couple
+of things. First, it
+<a href="http://wiki.bash-hackers.org/commands/classictest" title="Bash Hackers: test">tests</a>
+that the directory actually exists:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;if <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>and then loops through all of the files in the directory using a
+<a href="http://mywiki.wooledge.org/glob" title="Entry on Greg's Wiki">glob</a> and
+checks for a pattern match.</p>
+
+<p>In order for the
+<a href="http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_03.html" title="Cases on Bash Guide">case statement</a>
+to work, however, the directory path has to be stripped from the file
+name.</p>
+
+<p>Rather than run another process with
+<a href="http://www.gnu.org/software/coreutils/manual/html_node/basename-invocation.html" title="GNU basename in coreutils">basename</a>,
+I used
+<a href="http://wiki.bash-hackers.org/syntax/pe#substring_removal" title="Bash Hackers Wiki">parameter expansion</a>
+to remove the substring:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;file<span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>which turns, for example, <span class="file">$XDG_CONGIG_HOME/newsbeuter/conf</span> into a
+simple conf. This can then be evaluated for a match with the file names
+in the case statement and passed to the <code>$EDITOR</code>.</p>
+
+<p>If no match is found, nothing (<code>:</code>) is done.</p>
+
+<p>Now, it is simply a matter of entering <code>xdg vimprobable</code> and
+<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span> is opened in Vim.</p>
+
+<h4>Updated 19/10/11</h4>
+
+<p>After using this script for a while it became clear to me that it has a
+significant drawback: too many applications place their config files in
+directories other than <span class="file">$XDG_CONFIG_HOME</span>. So,
+<a href="https://bbs.archlinux.org/viewtopic.php?id=128585" title="Post on the Arch boards">with some help</a>,
+I updated the script. It now covers all of the directories where you are
+likely to find dotfiles.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>xdg.sh v2 </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;dirs<span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
+</span><span class='line'><span class="nv">IFS</span><span class="o">=</span><span class="s1">$&#39;\n&#39;</span>
+</span><span class='line'><span class="nb">read</span> -r -d <span class="s1">&#39;&#39;</span> -a files &amp;lt; <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;&amp;lt;<span class="o">(</span>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
+</span><span class='line'>       -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> 2&amp;gt;/dev/null<span class="o">)</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">((</span> <span class="k">${#</span><span class="nv">files</span><span class="p">[*]</span><span class="k">}</span> <span class="o">))</span> &amp;amp;&amp;amp; <span class="s2">&quot;$EDITOR&quot;</span> <span class="s2">&quot;${files}&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>If you would prefer a more portable version—which still relies on GNU
+find—then you could simplify it like so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>xdg.sh v3 </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;dirs<span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="o">(</span> <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;   -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>-o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>-o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
+</span><span class='line'>-o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
+</span><span class='line'>-o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> <span class="se">\</span>
+</span><span class='line'>-exec <span class="s2">&quot;$EDITOR&quot;</span> <span class="o">{}</span> +
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Vimprobable]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/06/26/using-vimprobable/"/>
+    <updated>2011-06-26T14:08:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/06/26/using-vimprobable</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable2.png" alt="image" /></p>
+
+<p>I <a href="http://jasonwryan.com/2010-10-07-vimprobable" title="Post on using Vimprobable">posted last year about Vimprobable</a>
+a <a href="http://www.webkit.org/" title="Webkit site">webkit browser</a> that uses
+Vim-like keybinds and can be run completely without the rodent.</p>
+
+<p>Over the last couple of months I have become increasingly comfortable
+with it, and with the addition of
+<a href="http://vimprobable.org/pipermail/vimprobable-users/2011-June/000800.html" title="External handlers patch on ML">some great recent functionality</a>,
+it has become my default browser.</p>
+
+<p>The project has good documentation, in the form of two man pages:
+<code>vimprobable</code> and <code>vimprobablerc</code>, but I thought I’d share some of my
+customizations and working methods.</p>
+
+<h3>Copy &amp; Paste</h3>
+
+<p>The only time I have been tempted to take my hand off the keyboard was
+to insert the cursor at the correct character to begin a selection to
+copy and paste. This is unnecessary. With the right options in
+<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span>,
+you can do it all from the keyboard.</p>
+
+<p>Map the keys you would like to use to enter and exit caret mode. I use
+<kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
+return to normal mode:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
+</span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then, it is just a matter of identifying the text that you wish to copy
+(in the photo above I was copying a script to launch <code>tabbed</code>), and
+highlighting it via search. So the sequence is:</p>
+
+<pre>
+1.  <kbd>/</kbd> - to enter search mode
+2.  <kbd>#</kbd><kbd>!</kbd> <kbd>Enter</kbd> - the shebang and then enter to highlight the correct
+    sequence
+3.  <kbd>Ctrl</kbd><kbd>c</kbd> to enter caret mode
+4.  and then <kbd>Shift</kbd><kbd>Up</kbd> or <kbd>Shift</kbd><kbd>Down</kbd> to highlight the following or
+    preceding lines
+5.  yanking the selected text is <kbd>Shift</kbd><kbd>y</kbd>, and the text is now stored in
+    your clipboard.
+</pre>
+
+
+<h3>Opening new instances in tabbed</h3>
+
+<p>I highlighted the section on tabbed from the
+<a href="http://www.vimprobable.org/" title="Vimprobable website">Vimprobable site</a> for a reason.
+The second tip is how to set up
+<a href="http://tools.suckless.org/tabbed" title="tabbed on suckless.org">tabbed</a> to
+work well with other applications.</p>
+
+<p>By default, any new windows (ie., instances of Vimprobable) opened from
+within Vimprobable are “caught”—and managed— by <code>tabbed</code>. However, if you
+open a link from, say
+<a href="http://newsbeuter.org/" title="ncurses rss reader">newsbeuter</a> or
+<a href="http://tyrs.nicosphere.net/index.html" title="ncurses twitter/identi.ca client">Tyrs</a>,
+this will open an instance outside <code>tabbed</code> which, if you are using a
+tiling window manager like
+<a href="http://dwm.suckless.org/" title="THE titling wm">dwm</a>, means this window gets
+pushed to master in your stack. This is not entirely satisfactory.</p>
+
+<p>Thanks to
+<a href="http://lists.suckless.org/dev/1106/8761.html" title="Tabbed thread on suckless ML">Connor Lane Smith on the suckless ML</a>,
+I have a solution to have all new instances of Vimprobable sent to
+<code>tabbed</code>, whether opened in another application, or if I click on a link
+in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
+
+<p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
+<psan class="file">/tmp</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&amp;lt;/tmp/tabbed.xid)&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then it is just a matter of setting up other applications to pass links
+to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
+<span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> %s
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The workaround for Urxvtc was a little trickier. I finally got there
+with some help from
+<a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
+In my <span class="file">~/.Xdefaults</span> I have:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
+</span><span class='line'>URxvt.perl-ext-common: default,matcher
+</span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
+</span><span class='line'>URxvt.matcher.button: 1
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Script to open Vimprobable instances in tabbed&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;exec vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now whenever I open a link in an application or by clicking a link in
+the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
+it is passed to Vimprobable in <code>tabbed</code>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Setting tmux statusbar if in X]]></title>
@@ -260,177 +586,6 @@ here and, with my international traffic capped to 30Kb/s until last
 month, I wasn’t prepared to try and run a distro on that sort of
 bandwidth. Now that has changed, I suspect that Ubuntu’s days are
 numbered on this box.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Tyrs: ncurses Twitter Client]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/05/24/tyrs-ncurses-twitter-client/"/>
-    <updated>2011-05-24T20:17:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/05/24/tyrs-ncurses-twitter-client</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5754227102/in/photostream" title="Tyrs photo on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/tyrs.png" alt="image" /></a></p>
-
-<p>I have been a solid user of
-<a href="http://www.floodgap.com/software/ttytter/" title="TTYtter homepage">TTYtter</a>
-for a couple of years now, much preferring the speed and power of a
-command line Twitter client. And, after having tried–at one time or
-another–most of the Linux or cross-platform Twitter clients, I can
-safely say that for me TTYtter is easily the best.</p>
-
-<p>There is, however, a new
-<a href="http://www.gnu.org/software/ncurses/" title="ncurses page">ncurses</a> client
-that is showing a lot of promise:
-<a href="http://tyrs.nicosphere.net/index.html" title="Tyrs homepage">Tyrs</a>. Only at
-the 0.2.1.1 stage, and with a fraction of the functionality that TTYtter
-has, it is nevertheless a very nice client.</p>
-
-<p>Requiring little in the way of dependencies, only python-twitter and
-python-oauth2, both available in the
-<a href="http://aur.archlinux.org/" title="Arch Linux User Repository">AUR</a> or in the
-debian/Ubuntu repos (if you are using debian/Ubuntu, you will need the
-newer python-twitter-0.8.2 for it to run).</p>
-
-<p>Tyrs is easy to configure, with good documentation and a simple
-configuration file, located by default at
-$XDG_CONFIG_HOME/tyrs/tyrs.cfg. The default keybinds are
-<a href="http://www.vim.org/" title="THE editor">Vim-centric</a>, naturally…</p>
-
-<p>My config is pretty straightforward at this point:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'>[keys]
-</span><span class='line'>retweet           <span class="p">=</span> <span class="k">p</span>
-</span><span class='line'>retweet_and_edit  <span class="p">=</span> <span class="k">P</span>
-</span><span class='line'>mentions          <span class="p">=</span> <span class="k">a</span>
-</span><span class='line'>reply             <span class="p">=</span> <span class="k">r</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span>[<span class="k">colors</span>]
-</span><span class='line'><span class="nb">highlight</span>         <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>header            <span class="p">=</span> <span class="m">6</span>
-</span><span class='line'>hashtag           <span class="p">=</span> <span class="m">4</span>
-</span><span class='line'>attag             <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'>text              <span class="p">=</span> <span class="m">7</span>
-</span><span class='line'>warning_msg       <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>info_msg          <span class="p">=</span> <span class="m">2</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span>[params]
-</span><span class='line'>refresh           <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>tweet_border      <span class="p">=</span> <span class="m">0</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Written in Python, the code is well commented and relatively easy to
-find your way around if your are keen on hacking.</p>
-
-<p>The developer, Nicolas Paris, is both approachable and helpful and is
-actively developing Tyrs. With some more functionality in the pipeline,
-it looks to be a very nice application.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[w3m, Surfraw and Yanking URLs]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/05/05/w3m/"/>
-    <updated>2011-05-05T19:57:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/05/05/w3m</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/w3m.png" alt="image" /></p>
-
-<p>I posted a couple of weeks ago about
-<a href="http://jasonwryan.com/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
-to the point of writing a couple of my own <em>elvi</em>. As part of the
-ongoing tweaking of my Surfraw experience, I have been experimenting
-with different
-<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
-to see which one best fits my workflow.</p>
-
-<p>I have previously been using both
-<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
-and it’s homonym,
-<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
-these have been perfectly acceptable, they weren’t quite providing the
-level of functionality —and integration with my vim-oriented workflow—
-that I was looking for. Enter
-<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
-
-<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
-`less’. With w3m you can browse web pages through a terminal emulator
-window (xterm, rxvt or something like that). Moreover, w3m can be used
-as a text formatting tool which typesets HTML into plain text.</p></blockquote>
-
-<p>w3m is a step up from the other two for a variety of reasons. It
-supports tables, frames, SSL connections, color and inline images. It
-also renders pages in a form as true to their original layout as
-possible. The killer features on top of that are, for me, the above
-mentioned rendering of HTML as text (meaning you can save content
-easily), and the customizable keybinds.</p>
-
-<p>There was however, one significant sticking point. After countless hours
-fruitlessly searching, I was unable to find a way to yank URLs to the
-clipboard. As I have been spending a little time of late on
-<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
-I thought I would ask the good folk there…</p>
-
-<p>Less than fourty hours later, I had an answer so simple and elegant,
-that I was literally grinning when I read it. It deserves quoting in
-full. It is that ingenious.</p>
-
-<blockquote><p>Set the “External Browser” option to
-<code>sh -c 'echo "$0" | xsel'</code></p>
-
-<p>You can use xsel -b to use the clipboard instead of the primary
-selection. An alternative to
-<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
-is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
-(xclip for the primary selection, xclip -selection CLIPBOARD for the
-clipboard).</p>
-
-<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
-Then press M to copy (yank) the URL of the current page, or ESCM to
-copy the URL of the link under the cursor.</p>
-
-<p>You can use the second or third external browser for that instead;
-then the key combination is 2M or 3M or 2ESCM or 3ESCM.
-<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
-
-<p>This simple hack means that it is now trivial to yank either the URL of
-the current page, or of the link under the cursor to primary selection.
-It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
-and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
-<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN    <span class="p">&lt;</span><span class="k">br</span>/<span class="p">&gt;</span>
-</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
-
-<h4>Updated 8/5/11</h4>
-
-<p>Gilles has edited and updated his answer with a slight change:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>This prevents a new line being appended.</p>
 ]]></content>
   </entry>
   

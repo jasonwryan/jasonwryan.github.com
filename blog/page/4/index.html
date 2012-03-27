@@ -5,11 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: tmux - jasonwryan.com</title>
+  <title>jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Category: tmux">
+  <meta name="description" content="OpenOffice won’t recognize TrueType fonts with the extension .otf, so you need to convert them to .ttf
+in order to use them in that suite. 1
+sudo apt &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.comblog/categories/tmux">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/4">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -63,99 +65,110 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div>
-<article role="article">
+      <div class="blog-index">
   
+  
+  
+    <article>
+      
   <header>
-    <h1 class="entry-title">Category: tmux</h1>
+    
+      <h1 class="entry-title"><a href="/blog/2009/03/17/install-otf-fonts-in-openoffice/">Install .otf Fonts in OpenOffice</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-03-17T19:51:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2009</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+  <div class="entry-content"><p>OpenOffice won’t recognize TrueType fonts with the extension <code>.otf</code>, so you need to convert them to <code>.ttf</code>
+in order to use them in that suite.</p>
 
-  
-  <h2>2011</h2>
-
-<article>
-  
-<h1><a href="/blog/2011/06/10/setting-tmux-statusbar-if-in-x/">Setting tmux statusbar if in X</a></h1>
-<time datetime="2011-06-10T22:56:00+12:00" pubdate><span class='month'>Jun</span> <span class='day'>10</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/tmux/'>tmux</a></span>
-</footer>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install fontforge
+</span></code></pre></td></tr></table></div></figure>
 
 
-</article>
+<p>If all the <code>.otf</code> files are in the same folder, then you are good to go.</p>
+
+<p>First, you need the conversion script, which I found in <a href="url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this%20post[/url">this post</a>:</p>
+
+<figure class='code'><figcaption><span>otf2ttf.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/usr/local/bin/fontforge</span>
+</span><span class='line'><span class="c"># Quick and dirty hack: converts a font to truetype (.ttf)</span>
+</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Opening &quot;</span>+<span class="nv">$1</span><span class="o">)</span>;
+</span><span class='line'>Open<span class="o">(</span><span class="nv">$1</span><span class="o">)</span>;
+</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Saving &quot;</span>+<span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
+</span><span class='line'>Generate<span class="o">(</span><span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
+</span><span class='line'>Quit<span class="o">(</span>0<span class="o">)</span>;
+</span></code></pre></td></tr></table></div></figure>
 
 
+<p>Save it as <code>otf2ttf.sh</code> into the folder with the <code>.otf</code> files.</p>
 
-<article>
-  
-<h1><a href="/blog/2011/06/07/copy-and-paste-in-tmux/">Copy &amp; Paste in tmux</a></h1>
-<time datetime="2011-06-07T19:54:00+12:00" pubdate><span class='month'>Jun</span> <span class='day'>07</span> <span class='year'>2011</span></time>
+<p>Then run:</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/tmux/'>tmux</a></span>
-</footer>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">for </span>i in *.otf; <span class="k">do </span>fontforge -script otf2ttf.sh <span class="nv">$i</span>; <span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-</article>
+<p>Move all the converted fonts to your your shared directory:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo mv *ttf /usr/share/fonts/truetype/myfonts/
+</span></code></pre></td></tr></table></div></figure>
 
 
+<p>And then change the permissions and reload the cache:</p>
 
-<article>
-  
-<h1><a href="/blog/2011/04/06/vim-colours-in-the-console/">Vim Colours in the Console</a></h1>
-<time datetime="2011-04-06T21:19:00+12:00" pubdate><span class='month'>Apr</span> <span class='day'>06</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/tmux/'>tmux</a>, <a class='category' href='/blog/categories/vim/'>vim</a></span>
-</footer>
-
-
-</article>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/
+</span><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/*.ttf
+</span><span class='line'>sudo <span class="nb">fc</span>-cache -f -v
+</span></code></pre></td></tr></table></div></figure>
 
 
-
-  
-  <h2>2010</h2>
-
-<article>
-  
-<h1><a href="/blog/2010/10/03/sessions-in-tmux/">Sessions in tmux</a></h1>
-<time datetime="2010-10-03T20:15:00+13:00" pubdate><span class='month'>Oct</span> <span class='day'>03</span> <span class='year'>2010</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/tmux/'>tmux</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2010/01/07/tmux-terminal-multiplexer/">tmux - terminal multiplexer</a></h1>
-<time datetime="2010-01-07T15:10:00+13:00" pubdate><span class='month'>Jan</span> <span class='day'>07</span> <span class='year'>2010</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/tmux/'>tmux</a></span>
-</footer>
-
-
-</article>
-
+<p>And the fonts will now appear in OpenOffice. Easy.</p>
 </div>
-
   
-</article>
+  
 
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/3/">Newer &rarr;</a>
+    
+  </div>
 </div>
-
 <aside class="sidebar">
   
     <section>
@@ -188,7 +201,7 @@
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating...</li>
+    <li class="loading">Status updating&#8230;</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -204,7 +217,7 @@
 
 <section>
   <h1>My Pinboard</h1>
-  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
   <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
 </section>
 <script type="text/javascript">
@@ -223,7 +236,6 @@
 
   
 </aside>
-
 
     </div>
   </div>
