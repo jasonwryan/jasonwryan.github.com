@@ -385,6 +385,215 @@ as a matter of course. I had intended, at some point, to set up a
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2009/12/28/changing-keybinds-in-vifm/">Changing Keybinds in Vifm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-12-28T13:50:00+13:00" pubdate data-updated="true">Dec 28<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://vifm.sourceforge.net/">Vifm</a> is a ncurses based file manager with vi-like
+keybindings; it gives you complete keyboard control over your files without
+having to learn a new set of commands.</p>
+
+<p><a href="http://www.flickr.com/photos/jasonwryan/4220632362/" title="Vifm by
+jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4039/4220632362_ea980811e1.jpg" width="500"
+height="227" alt="Vifm"/></a></p>
+
+<p>The only drawback, for me, is that as of the current version (0.5-1) you
+can&#8217;t map keys. While the developer has indicated it is on the todo list,
+he also flagged that it is some way off. If, like me, you <code>map : ;</code>
+in <a href="http://www.vim.org/">Vim</a>, then not having this functionality is a minor
+irritant. Fortunately, it is also easily fixed. Ken Steen, the Vifm developer,
+was kind enough to point me in the right direction…</p>
+
+<p>Download <a href="http://aur.archlinux.org/packages.php?ID=6011">the tarball</a> from
+<acronym title="Arch User Repository">AUR</acronym> and untar it etc.,</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>tar -xzf vifm.tar.gz <span class="nb">cd </span>vifm/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Build the package</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>makepkg -s
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then you will need to edit the file, keys.c</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>vim src/vifm-0.5/src/keys.c
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Search for the command key</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/case <span class="s1">&#39;:&#39;</span>:
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this version it is at line 982. Change the entry to your key of choice —
+in my case <kbd>;</kbd> — and save and quit.</p>
+
+<p>Recompile Vifm and you are done&#8230;</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>makepkg -efi
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Update 18/2/10</h3>
+
+<p>Vifm has now been moved to Community, so you can use
+<a href="http://wiki.archlinux.org/index.php/Arch_Build_System%22">ABS</a> to build the package.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/">Patching Dwm With Pertag and Bstack</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-12-19T17:40:00+13:00" pubdate data-updated="true">Dec 19<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Over the last several months I have been using <a href="http://dwm.suckless.org/">dwm</a>
+as my window manager on two <a href="http://www.archlinux.org/">Arch Linux</a>
+machines:  my <a href="http://www.flickr.com/photos/jasonwryan/4196530478/" title="Flickr image"
+target="_blank">EeePC 901</a> and an <a href="http://www.flickr.com/photos/jasonwryan/4193384965/" title="Flickr image"
+target="_blank">old Dell</a> at work.</p>
+
+<p>There is a lot to like about dwm, but the most attractive qualities for me
+are the fact that it is <a href="http://en.wikipedia.org/wiki/Source_lines_of_code">under 2000 SLOC</a>
+and is very configurable.</p>
+
+<p>The most recent version, 5.7.2, included some changes that meant that some
+of the patches wouldn&#8217;t play nicely together anymore; trying to combine
+any of the layout patches with <a href="http://dwm.suckless.org/patches/pertag">pertag</a>
+would result in the code failing to compile.</p>
+
+<p>Fortunately, there is a fix described on <a href="http://lists.suckless.org/dev/0911/2317.html">the mailing list</a>.
+Essentially, it involves manually applying the patch to the source code.</p>
+
+<p>Start with a vanilla version of the code. Move to the source directory and
+apply the pertag patch:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> <span class="nv">$BUILD</span>/dwm/src/dwm-5.7.2/ patch -p1 &lt; dwm-5.7.2-pertag.diff
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then manually add the <a href="http://dwm.suckless.org/patches/bottom_stack">bstack</a>
+(or any of the other layout patches) to <span class="file">dwm.c</span>:</p>
+
+<p>Include the <code>bstack</code> declaring function with the others, beginning line 153. I
+inserted it alphabetically…</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">attachstack</span><span class="p">(</span><span class="n">Client</span> <span class="o">*</span><span class="n">c</span><span class="p">);</span>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">*</span><span class="n">m</span><span class="p">);</span>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">buttonpress</span><span class="p">(</span><span class="n">XEvent</span> <span class="o">*</span><span class="n">e</span><span class="p">);</span>
+</span><span class='line'><span class="err">…</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And then, <em>after</em> the <code>#include “config.h”</code> declaration at
+275, add in the rest of the patch. For consistency&#8217;s sake, I included it
+at line 415:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">void</span> <span class="nf">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">*</span><span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">mh</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">Client</span> <span class="o">*</span><span class="n">c</span><span class="p">;</span> <span class="k">for</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">m</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">clients</span><span class="p">);</span> <span class="n">c</span><span class="p">;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">c</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">next</span><span class="p">),</span> <span class="n">n</span><span class="o">++</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'><span class="k">return</span><span class="p">;</span>
+</span><span class='line'><span class="err">…</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Add you keybindings into your header file (<span class="file">config.h</span>) and recompile:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>makepkg -efi
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Done.</p>
+
+<p>The only fly in the ointment is that, for me anyway, I have been unable to
+get any of the other layout patches to work with this setup; either by regular
+patching or using the above method. YMMV.</p>
+
+<h3>Update ###</h3>
+
+<p>So I was wrong: you can get pertag to work with all the
+other patches, and it is <a href="http://jasonwryan.com/post/421618180/patching-dwm">not that difficult</a>…</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/">Dzen2 and Conky-cli in Dwm</a></h1>
     
     
@@ -703,15 +912,15 @@ in order to use them in that suite.</p>
       </li>
     
       <li class="post">
+        <a href="/blog/2009/12/28/changing-keybinds-in-vifm/">Changing Keybinds in vifm</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/">Patching dwm with pertag and bstack</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/">dzen2 and conky-cli in dwm</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2009/11/07/changing-karmics-login-screen/">Changing Karmic&#8217;s Login Screen</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2009/03/17/install-otf-fonts-in-openoffice/">Install .otf Fonts in OpenOffice</a>
       </li>
     
   </ul>
