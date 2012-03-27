@@ -5,11 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>dzen2 and conky-cli in dwm - jasonwryan.com</title>
+  <title>Network Flooding on Ubuntu - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar. Here is how I sorted it. First, I &hellip;">
+  <meta name="description" content="I have been experiencing problems with my wifi LAN when playing music
+through
+mpd
+or watching movies. My upload speeds would climb to around 120- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +21,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -68,7 +71,7 @@
   
   <header>
     
-      <h1 class="entry-title">dzen2 and conky-cli in dwm</h1>
+      <h1 class="entry-title">Network Flooding on Ubuntu</h1>
     
     
       <p class="meta">
@@ -84,94 +87,74 @@
   
 
 
-<time datetime="2009-11-21T12:07:00+13:00" pubdate data-updated="true">Nov 21<span>st</span>, 2009</time>
+<time datetime="2011-06-06T13:40:00+12:00" pubdate data-updated="true">Jun 6<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar.</p>
+<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-logo.png" alt="image" /></p>
 
-<p>Here is how I sorted it.</p>
+<p>I have been experiencing problems with my wifi LAN when playing music
+through
+<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
+or watching movies. My upload speeds would climb to around 120-130Kb/s
+and my wifi would just go down.</p>
 
-<p>First, I installed <code>conky-cli</code> and <code>dzen2</code>. Conky-cli is in AUR, and dzen2 is in Community:</p>
+<p>Apart from being frustrating, this was inconvenient as it meant that if
+I was doing either of those things, my stereo in the living room
+couldn’t stream music from my
+<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
+other members of the family (or guests) couldn’t connect to the access
+point to get online.</p>
+
+<p>After asking on
+<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
+(which, like many of the Ubuntu-related fora is populated with people
+who are more well-intentioned than they are knowledgeable - which seems
+to me one of the fundamental problems the distro has; but I’ll save that
+rant for another day), one helpful user suggested I use
+<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
+the network traffic.</p>
+
+<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
+immediately instructive. Wireshark quickly identified that, as soon as I
+started mpd, one of my ports was being flooded: 46560</p>
+
+<p><code>lsof</code> showed that pulse audio was the culprit:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S dzen2 <span class="o">&amp;&amp;</span> yaourt conky-cli
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Then it was a matter of setting up the relevant files.</p>
+<p>Quelle surprise… When software engineers want a case study of opacity
+and abstraction from the user, this should be their first port of call.</p>
 
-<figure class='code'><figcaption><span>.xinitrc.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># ~/.xinitrc</span>
-</span><span class='line'>setxkbmap -option terminate:ctrl_alt_bksp &amp;amp;
-</span><span class='line'><span class="nb">eval</span> <span class="sb">`</span>cat ~/.fehbg<span class="sb">`</span> &amp;amp;
-</span><span class='line'>numlockx &amp;amp;
-</span><span class='line'>xscreensaver -no-splash &amp;amp;
-</span><span class='line'><span class="c"># Dzen &amp;amp; conky</span>
-</span><span class='line'><span class="o">(</span>sleep 15s &amp;amp;&amp;amp; conky | dzen2 -x <span class="s1">&#39;500&#39;</span> -e <span class="s1">&#39;&#39;</span> -fg <span class="s1">&#39;#dcdcdc&#39;</span> -bg <span class="s1">&#39;#3f3f3f&#39;</span> <span class="se">\</span>
-</span><span class='line'>-w <span class="s1">&#39;650&#39;</span> -ta r -fn <span class="s1">&#39;-*-terminus-*-r-normal-*-*-120-*-*-*-*-iso8859-*&#39;</span> -p <span class="o">)</span> &amp;amp;
-</span><span class='line'><span class="c"># Start dwm</span>
-</span><span class='line'><span class="nb">exec </span>ck-launch-session ~/Scripts/dwm-start
+<p>Worse, it is a known bug.
+<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
+And apparently insufficiently serious to warrant any attention. Fair
+enough, I suppose, given the fix is easy enough <em>if you know what you
+are trying to fix…</em></p>
+
+<p>Install the Pulse audio preferences tool:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install papref
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>…and disable Multicast/RTP.</p>
 
-
-<figure class='code'><figcaption><span>.conkyrc .sh </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>background no
-</span><span class='line'>out_to_console yes
-</span><span class='line'>update_interval 2
-</span><span class='line'>total_run_times 0
-</span><span class='line'>use_spacer none
-</span><span class='line'>double_buffer yes
-</span><span class='line'>TEXT
-</span><span class='line'>${if_existing /sys/class/power_supply/BAT0/present}^i(/home/jason/Build/dwm/dzen/bat.xbm)…</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>dwm-start .sh </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>while true; do 
-</span><span class='line'>    dwm >/dev/null
-</span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The key is —and it took me a while to work it out— to delay the loading of conky until <em>after</em> dwm has painted it&#8217;s
-status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
-
-<p>Now, the “before” shot:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/conky-dzen.png"></p>
-
-<p>…and the finished product:</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4121324068/" title="Conky-cli to dzen2 in dwm on Arch by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2666/4121324068_6ec29262d7.jpg" width="500" height="293" alt="Conky-cli to dzen2 in dwm on Arch"/></a></p>
+<p>Another example for me of Ubuntu’s fast waning utility as a distribution
+for people that want to be able to exercize some control over their
+system. It is only still installed on this machine because there isn’t
+an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
+here and, with my international traffic capped to 30Kb/s until last
+month, I wasn’t prepared to try and run a distro on that sort of
+bandwidth. Now that has changed, I suspect that Ubuntu’s days are
+numbered on this box.</p>
 </div>
 
 
@@ -194,12 +177,12 @@ status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
   
 
 
-<time datetime="2009-11-21T12:07:00+13:00" pubdate data-updated="true">Nov 21<span>st</span>, 2009</time>
+<time datetime="2011-06-06T13:40:00+12:00" pubdate data-updated="true">Jun 6<span>th</span>, 2011</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/dwm/'>dwm</a>
+    <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/ubuntu/'>ubuntu</a>
   
 </span>
 
@@ -215,10 +198,10 @@ status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2009/11/07/changing-karmics-login-screen/" title="Previous Post: Changing Karmic's Login Screen">&laquo; Changing Karmic's Login Screen</a>
+        <a class="basic-alignment left" href="/blog/2011/05/28/quoras-quandary/" title="Previous Post: Quora's Quandary">&laquo; Quora's Quandary</a>
       
       
-        <a class="basic-alignment right" href="/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/" title="Next Post: Patching dwm with pertag and bstack">Patching dwm with pertag and bstack &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2011/06/07/copy-and-paste-in-tmux/" title="Next Post: Copy &amp; Paste in tmux">Copy &amp; Paste in tmux &raquo;</a>
       
     </p>
   </footer>
@@ -316,8 +299,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu/';
         var disqus_script = 'embed.js';
       
     (function () {

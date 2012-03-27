@@ -4,7 +4,7 @@
   <title><![CDATA[Category: tmux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/tmux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T10:06:23+13:00</updated>
+  <updated>2012-03-28T11:24:01+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,189 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Setting tmux statusbar if in X]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x/"/>
+    <updated>2011-06-10T22:56:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5636783883/" title="Arch Linux: dwm, tmux &amp; scratchpad by jasonwryan, on Flickr"><img src="http://farm6.static.flickr.com/5303/5636783883_5b7272453b.jpg" alt="Arch Linux: dwm, tmux &amp; scratchpad" /></a></p>
+
+<p>I have been posting quite a bit about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a> of late<sup>1</sup>.
+It is a marvellous application and lends itself to all sorts of interesting
+uses. When you first install it, you will find a number of user config
+files in <span class="file">/usr/share/tmux/</span>. I started with tmux by copying
+<a href="http://cinderwick.ca/" title="Thayer Williams' site">Thayer’s</a> config across
+and then working up from there. There is a section
+<a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
+that has always puzzled me, and so I decided to get to the bottom of it.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;show some useful stats but only when tmux is started&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;outside of Xorg, otherwise dwm statusbar shows these already&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>It is a great idea. If you are running tmux in X, then you have
+<a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
+what the time is,
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="dwm status bar in my mercurial repo">how much battery you have left</a>
+etc,. You don’t need to replicate that functionality in tmux. If,
+however, you are in the console, you don’t have that information, unless
+you print it in tmux’s statusbar.</p>
+
+<p>I had tried to get this to work once or twice over the last couple of
+years, but never persevered with it. However, as I have been doing a bit
+of work making the console as functional as possible<sup>2</sup>, I thought I
+would revisit it.</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status1.png" alt="image" /></p>
+
+<p>The insight that I had that got it working for me was to use the
+source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
+depending if X was running or not. I just adapted Thayer’s code, like
+so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Statusbar starting in X or not&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
+</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And then created those files with the desired statusbar options. So, for
+example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
+loaded:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Statusbar <span class="k">if </span>tmux run in console&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;information normally in dwm bar&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;set -g status-right-length 50
+</span><span class='line'><span class="nb">set</span> -g status-left-length 50
+</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png" alt="image" /></p>
+
+<p>All the relevant files are in
+<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/.tmux" title="My intuxication repository">my mercurial repo</a>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p><a href="http://jasonwryan.com/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
+<a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
+&amp; <a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
+<li><p><a href="http://jasonwryan.com/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
+<li><p>Image squashed to fit the requirements of this blog…</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Copy &amp; Paste in tmux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/06/07/copy-and-paste-in-tmux/"/>
+    <updated>2011-06-07T19:54:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/06/07/copy-and-paste-in-tmux</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-copy.png" alt="image" /></p>
+
+<p>I’ve posted a couple of times<sup>1</sup> about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
+terminal mutliplexer. One question I see raised a lot in #tmux is how
+to copy and paste.</p>
+
+<p>The documentation for tmux is excellent: the
+<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
+one of the most clear and thorough I have read. And while it is
+explained there, I thought I would share my approach anyway.</p>
+
+<p>First, I set tmux to use vi keys:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>setw -g mode-keys vi
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then I change the default keybinds to suit my workflow. As explained in
+the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
+and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
+to more intuitive and Vim-like keys:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
+</span><span class='line'><span class="nb">bind </span>Escape copy-mode
+</span><span class='line'>unbind p
+</span><span class='line'><span class="nb">bind </span>p paste-buffer
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This seems a lot closer to all of the other Vim-like apps that I run -
+where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
+<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
+
+<p>So, to string it all together, the command sequence necessary to copy
+some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
+
+<pre>
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
+# move cursor to the start or end of the desired text string
+<kbd>v</kbd>                        # to activate highlighting
+# move cursor to cover the requisite string
+<kbd>y</kbd>                        # to capture the string
+<kbd>q</kbd>                        # exit copy mode
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
+</pre>
+
+
+<p>Simple.</p>
+
+<p>This means that you can scroll back through the output of <em>anything</em> in
+your terminal, and copy and paste it anywhere. Once you set it up, it is
+a very powerful tool…</p>
+
+<h5>Notes</h5>
+
+<p>1.<a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux">Sessions in tmux</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Vim Colours in the Console]]></title>

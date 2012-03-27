@@ -5,12 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Changing Karmic's Login Screen - jasonwryan.com</title>
+  <title>Setting tmux statusbar if in X - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
-accelerate boot time. This has made for a faster boot, but a side effect &hellip;">
+  <meta name="description" content="I have been posting quite a bit about
+tmux of late1.
+It is a marvellous application and lends itself to all sorts of interesting
+uses. When you &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +21,7 @@ accelerate boot time. This has made for a faster boot, but a side effect &hellip
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2009/11/07/changing-karmics-login-screen">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -69,7 +71,7 @@ accelerate boot time. This has made for a faster boot, but a side effect &hellip
   
   <header>
     
-      <h1 class="entry-title">Changing Karmic's Login Screen</h1>
+      <h1 class="entry-title">Setting tmux statusbar if in X</h1>
     
     
       <p class="meta">
@@ -85,71 +87,95 @@ accelerate boot time. This has made for a faster boot, but a side effect &hellip
   
 
 
-<time datetime="2009-11-07T18:46:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2009</time>
+<time datetime="2011-06-10T22:56:00+12:00" pubdate data-updated="true">Jun 10<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
-accelerate boot time. This has made for a faster boot, but a side effect has
-been that there is no longer a straightforward way to theme your login - and
-the default isn’t just ugly, it’s fugly…</p>
+<div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5636783883/" title="Arch Linux: dwm, tmux &amp; scratchpad by jasonwryan, on Flickr"><img src="http://farm6.static.flickr.com/5303/5636783883_5b7272453b.jpg" alt="Arch Linux: dwm, tmux &amp; scratchpad" /></a></p>
 
-<p>Fear not. It can be fixed.</p>
-
-<p>The first thing you want to do is replace the background image. You can find it
-at <code>/usr/share/images/xsplash</code>.</p>
-
-<p>Before doing anything rash, make a copy of the directory:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then delete all of the images that begin with <code>bg_</code>:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo rm /usr/share/images/xsplash/bg_*
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Use the gimp to create a background image for your desktop and save it into
-this directory, and name it <code>bg_2560x1600.jpg</code> …irrespective of the resolution
-of your screen. Leave the other images as they are: the logo and the
-marvellously named throbber will sit over your new background as you boot up…</p>
-
-<p>Next you can change the colours of the login box to complement your new
-background. This is all controlled in
-<code>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc</code>.</p>
-
-<p>Again, make a copy:</p>
+<p>I have been posting quite a bit about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a> of late<sup>1</sup>.
+It is a marvellous application and lends itself to all sorts of interesting
+uses. When you first install it, you will find a number of user config
+files in <span class="file">/usr/share/tmux/</span>. I started with tmux by copying
+<a href="http://cinderwick.ca/" title="Thayer Williams' site">Thayer’s</a> config across
+and then working up from there. There is a section
+<a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
+that has always puzzled me, and so I decided to get to the bottom of it.</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc <span class="se">\</span>
-</span><span class='line'>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc-backup
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># show some useful stats but only when tmux is started</span>
+</span><span class='line'><span class="c"># outside of Xorg, otherwise dwm statusbar shows these already </span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Then open the file and edit the relevant lines of code at the beginning of the
-file:</p>
+<p>It is a great idea. If you are running tmux in X, then you have
+<a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
+what the time is,
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="dwm status bar in my mercurial repo">how much battery you have left</a>
+etc,. You don’t need to replicate that functionality in tmux. If,
+however, you are in the console, you don’t have that information, unless
+you print it in tmux’s statusbar.</p>
+
+<p>I had tried to get this to work once or twice over the last couple of
+years, but never persevered with it. However, as I have been doing a bit
+of work making the console as functional as possible<sup>2</sup>, I thought I
+would revisit it.</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status1.png" alt="image" /></p>
+
+<p>The insight that I had that got it working for me was to use the
+source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
+depending if X was running or not. I just adapted Thayer’s code, like
+so:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Statusbar starting in X or not</span>
+</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
+</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/karmic-text.png" title="'Screenshot of editing text'" ></p>
+<p>And then created those files with the desired statusbar options. So, for
+example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
+loaded:</p>
 
-<p>As you can see, the colour scheme I have chosen uses dark grey to match my
-desktop. Feel free to experiment, you can’t really break anything…</p>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Statusbar if tmux run in console</span>
+</span><span class='line'><span class="c"># information normally in dwm bar</span>
+</span><span class='line'><span class="nb">set</span> -g status-right-length 50
+</span><span class='line'><span class="nb">set</span> -g status-left-length 50
+</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p><a href="http://www.flickr.com/photos/jasonwryan/4081800113/" title="Customized Karmic Login Screen by jasonwryan, on Flickr"><img src="http://farm3.staticflickr.com/2536/4081800113_d4b98a9b3c.jpg" width="500" height="313" alt="Customized Karmic Login Screen"></a></p>
 
-<p>Simple, really.</p>
+<p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png" alt="image" /></p>
+
+<p>All the relevant files are in
+<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/.tmux" title="My intuxication repository">my mercurial repo</a>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p><a href="http://jasonwryan.com/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
+<a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
+&amp; <a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
+<li><p><a href="http://jasonwryan.com/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
+<li><p>Image squashed to fit the requirements of this blog…</p></li>
+</ol>
+
 </div>
 
 
@@ -172,12 +198,12 @@ desktop. Feel free to experiment, you can’t really break anything…</p>
   
 
 
-<time datetime="2009-11-07T18:46:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2009</time>
+<time datetime="2011-06-10T22:56:00+12:00" pubdate data-updated="true">Jun 10<span>th</span>, 2011</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/ubuntu/'>ubuntu</a>
+    <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/tmux/'>tmux</a>
   
 </span>
 
@@ -193,10 +219,8 @@ desktop. Feel free to experiment, you can’t really break anything…</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2009/03/17/install-otf-fonts-in-openoffice/" title="Previous Post: Install .otf Fonts in OpenOffice">&laquo; Install .otf Fonts in OpenOffice</a>
+        <a class="basic-alignment left" href="/blog/2011/06/07/copy-and-paste-in-tmux/" title="Previous Post: Copy &amp; Paste in tmux">&laquo; Copy &amp; Paste in tmux</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/" title="Next Post: dzen2 and conky-cli in dwm">dzen2 and conky-cli in dwm &raquo;</a>
       
     </p>
   </footer>
@@ -294,8 +318,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2009/11/07/changing-karmics-login-screen/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2009/11/07/changing-karmics-login-screen/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x/';
         var disqus_script = 'embed.js';
       
     (function () {

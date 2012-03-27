@@ -9,10 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have been a solid user of
-TTYtter
-for a couple of years now, much preferring the speed and power of a
-command line Twitter client. And, after &hellip;">
+  <meta name="description" content="I have been posting quite a bit about
+tmux of late1.
+It is a marvellous application and lends itself to all sorts of interesting
+uses. When you &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -68,6 +68,451 @@ command line Twitter client. And, after &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/10/setting-tmux-statusbar-if-in-x/">Setting tmux statusbar if in X</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-10T22:56:00+12:00" pubdate data-updated="true">Jun 10<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5636783883/" title="Arch Linux: dwm, tmux &amp; scratchpad by jasonwryan, on Flickr"><img src="http://farm6.static.flickr.com/5303/5636783883_5b7272453b.jpg" alt="Arch Linux: dwm, tmux &amp; scratchpad" /></a></p>
+
+<p>I have been posting quite a bit about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a> of late<sup>1</sup>.
+It is a marvellous application and lends itself to all sorts of interesting
+uses. When you first install it, you will find a number of user config
+files in <span class="file">/usr/share/tmux/</span>. I started with tmux by copying
+<a href="http://cinderwick.ca/" title="Thayer Williams' site">Thayer’s</a> config across
+and then working up from there. There is a section
+<a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
+that has always puzzled me, and so I decided to get to the bottom of it.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># show some useful stats but only when tmux is started</span>
+</span><span class='line'><span class="c"># outside of Xorg, otherwise dwm statusbar shows these already </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It is a great idea. If you are running tmux in X, then you have
+<a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
+what the time is,
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="dwm status bar in my mercurial repo">how much battery you have left</a>
+etc,. You don’t need to replicate that functionality in tmux. If,
+however, you are in the console, you don’t have that information, unless
+you print it in tmux’s statusbar.</p>
+
+<p>I had tried to get this to work once or twice over the last couple of
+years, but never persevered with it. However, as I have been doing a bit
+of work making the console as functional as possible<sup>2</sup>, I thought I
+would revisit it.</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status1.png" alt="image" /></p>
+
+<p>The insight that I had that got it working for me was to use the
+source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
+depending if X was running or not. I just adapted Thayer’s code, like
+so:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Statusbar starting in X or not</span>
+</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
+</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And then created those files with the desired statusbar options. So, for
+example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
+loaded:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Statusbar if tmux run in console</span>
+</span><span class='line'><span class="c"># information normally in dwm bar</span>
+</span><span class='line'><span class="nb">set</span> -g status-right-length 50
+</span><span class='line'><span class="nb">set</span> -g status-left-length 50
+</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png" alt="image" /></p>
+
+<p>All the relevant files are in
+<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/.tmux" title="My intuxication repository">my mercurial repo</a>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p><a href="http://jasonwryan.com/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
+<a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
+&amp; <a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
+<li><p><a href="http://jasonwryan.com/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
+<li><p>Image squashed to fit the requirements of this blog…</p></li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/07/copy-and-paste-in-tmux/">Copy &amp; Paste in tmux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-07T19:54:00+12:00" pubdate data-updated="true">Jun 7<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-copy.png" alt="image" /></p>
+
+<p>I’ve posted a couple of times<sup>1</sup> about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
+terminal mutliplexer. One question I see raised a lot in #tmux is how
+to copy and paste.</p>
+
+<p>The documentation for tmux is excellent: the
+<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
+one of the most clear and thorough I have read. And while it is
+explained there, I thought I would share my approach anyway.</p>
+
+<p>First, I set tmux to use vi keys:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>setw -g mode-keys vi
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then I change the default keybinds to suit my workflow. As explained in
+the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
+and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
+to more intuitive and Vim-like keys:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
+</span><span class='line'><span class="nb">bind </span>Escape copy-mode
+</span><span class='line'>unbind p
+</span><span class='line'><span class="nb">bind </span>p paste-buffer
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This seems a lot closer to all of the other Vim-like apps that I run -
+where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
+<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
+
+<p>So, to string it all together, the command sequence necessary to copy
+some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
+
+<pre>
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
+# move cursor to the start or end of the desired text string
+<kbd>v</kbd>                        # to activate highlighting
+# move cursor to cover the requisite string
+<kbd>y</kbd>                        # to capture the string
+<kbd>q</kbd>                        # exit copy mode
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
+</pre>
+
+
+<p>Simple.</p>
+
+<p>This means that you can scroll back through the output of <em>anything</em> in
+your terminal, and copy and paste it anywhere. Once you set it up, it is
+a very powerful tool…</p>
+
+<h5>Notes</h5>
+
+<p>1.<a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux">Sessions in tmux</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/06/network-flooding-on-ubuntu/">Network Flooding on Ubuntu</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-06T13:40:00+12:00" pubdate data-updated="true">Jun 6<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-logo.png" alt="image" /></p>
+
+<p>I have been experiencing problems with my wifi LAN when playing music
+through
+<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
+or watching movies. My upload speeds would climb to around 120-130Kb/s
+and my wifi would just go down.</p>
+
+<p>Apart from being frustrating, this was inconvenient as it meant that if
+I was doing either of those things, my stereo in the living room
+couldn’t stream music from my
+<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
+other members of the family (or guests) couldn’t connect to the access
+point to get online.</p>
+
+<p>After asking on
+<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
+(which, like many of the Ubuntu-related fora is populated with people
+who are more well-intentioned than they are knowledgeable - which seems
+to me one of the fundamental problems the distro has; but I’ll save that
+rant for another day), one helpful user suggested I use
+<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
+the network traffic.</p>
+
+<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
+immediately instructive. Wireshark quickly identified that, as soon as I
+started mpd, one of my ports was being flooded: 46560</p>
+
+<p><code>lsof</code> showed that pulse audio was the culprit:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Quelle surprise… When software engineers want a case study of opacity
+and abstraction from the user, this should be their first port of call.</p>
+
+<p>Worse, it is a known bug.
+<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
+And apparently insufficiently serious to warrant any attention. Fair
+enough, I suppose, given the fix is easy enough <em>if you know what you
+are trying to fix…</em></p>
+
+<p>Install the Pulse audio preferences tool:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install papref
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>…and disable Multicast/RTP.</p>
+
+<p>Another example for me of Ubuntu’s fast waning utility as a distribution
+for people that want to be able to exercize some control over their
+system. It is only still installed on this machine because there isn’t
+an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
+here and, with my international traffic capped to 30Kb/s until last
+month, I wasn’t prepared to try and run a distro on that sort of
+bandwidth. Now that has changed, I suspect that Ubuntu’s days are
+numbered on this box.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/05/28/quoras-quandary/">Quora&#8217;s Quandary</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-28T10:05:00+12:00" pubdate data-updated="true">May 28<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora1.png" alt="image" /></p>
+
+<p>I joined <a href="http://www.quora.com/" title="Quora: Q&amp;A site">Quora</a> early in the
+new year and, while
+<a href="http://techcrunch.com/2011/01/23/why-i-don%E2%80%99t-buy-the-quora-hype/" title="TC article on the hype">the hype has in no way abated</a>,
+I have found that increasingly over the months that I have been
+visiting, there is less and less reason for me to return on any regular
+basis. And this puzzles me as I think the concept is, for me, an
+attractive one.</p>
+
+<p>In the five-odd months I have been visiting the site, I have managed to
+<a href="http://www.quora.com/Jason-Ryan" title="My Quora profile">contribute 58 answers</a>
+and over one hundred edits (more on that below); this strikes me as a reasonable
+commitment on my part and one that should return some dividend to me –
+at least in terms of satisfaction with the site. Alas, no.</p>
+
+<p>And why not? For several reasons. And reasons that have only really
+become apparent over the last month as I started to spend time on the
+<a href="http://unix.stackexchange.com/" title="Unix and Linux Stack Exchange">Unix &amp; Linux Stack Exchange site</a>.
+The contrast between the <em>experience</em> of the two sites, that are in
+essence very similar, couldn’t be more striking.</p>
+
+<p>The primary difference between the two is that Unix.SE isn’t a social
+site: you don’t follow anyone. Which, when you think about Q&amp;A sites,
+makes a lot more sense than Quora’s model. I still don’t understand the
+point of following people on Quora. Perhaps I am not following enough
+people, or the wrong ones, but I have yet to see <em>any benefit</em> in
+following on the site.</p>
+
+<p>One other area of seeming similarity between the sites is the ability to
+vote up (or down) questions and answers. On Unix.SE, this is implemented
+as a real strength as these votes determine contributor’s reputation,
+described thus:</p>
+
+<blockquote><p>Reputation is a rough measurement of how much the community trusts
+you. Reputation is never given, it is earned by convincing fellow
+users that you know what you’re talking about.</p></blockquote>
+
+<p>This has a twofold effect: it motivates contributors to provide quality
+answers (and
+<a href="http://unix.stackexchange.com/badges" title="StackExchange badges">rewards</a>
+them when they do), and more importantly, gives you a heuristic for how
+credible an answer may be. Quora doesn’t have this concept and, for me,
+is much the poorer for it.</p>
+
+<p>Reputation has consequences on Unix.SE: the more you accrue, the more
+privileges on the site you are granted. Again, this builds the
+community’s capability while encouraging individual contributors.</p>
+
+<p>Some of the other areas where Quora is really left wanting in comparison
+to Unix.SE are around the design of the site. The text box where you
+enter your answers or edits is a case in point:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora2.png" alt="image" /></p>
+
+<p>On Quora, it is like trying to change a car battery through a letterbox.
+The single, overriding impression is that entering information into the
+site is neither a priority nor pleasurable which, for a site aspiring to
+be a knowledge repository is incredibly perverse.</p>
+
+<p>This is compounded by the fact that the tools for presenting the
+information that you want to add to the site can charitably be described
+as rudimentary (one of the reasons that I have 100-odd edits is that it
+takes at least two to three attempts to present information in a
+semi-acceptable fashion). Searching for
+“<a href="http://www.quora.com/Quora-product/Are-there-any-markup-tags-when-writing-a-question?q=quora+markup+tools" title="Recursion alert">quora markup tools</a>”
+is as disappointing as it is frustrating.</p>
+
+<p>Being able to present information appropriately is critical. The
+StackExchange sites
+<a href="http://unix.stackexchange.com/editing-help" title="Unix.SE editing guidleines">allow all sorts</a>
+of HTML tags and
+<a href="http://daringfireball.net/projects/markdown/syntax" title="markdown syntax">markdown</a>,
+without apparently any additional
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting" title="Wikipedia page on Cross site scripting">XSS risk</a><sup>1</sup>.
+The result is questions and answers that are formatted in a way that
+enhances their legibility, rather than detracting from it.</p>
+
+<p>There are some other areas where Quora is not measuring up for me:
+opaque editorial and moderation policies and practices and an
+unwillingness to more actively curate the questions – and no, those two
+statements are not contradictory.</p>
+
+<p>The overall impression I am left with is that while both sites have
+similar aims (albeit Unix.SE’s is much more specific in terms of the
+subject matter), Quora seems to me to be really failing at building a
+community around it. Unless, of course, you count social media experts…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>God knows if that is actually the reason they refuse to allow
+potential contributors the ability to adequately format their
+information, but it seems plausible enough.</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -361,8 +806,8 @@ perhaps the best GNU/Linux reference wiki on the web.</p>
 
 <p>You can grab the archwiki elvis from my
 <a href="http://beta.intuxication.org/jasonwryan/longbow/file/tip/scripts/archwiki" title="Intuxication repo">mercurial repo</a>,
-copy it into your local directory at $XDG_CONFIG_HOME/surfraw/elvi/ or
-in the system folder at $XDG_CONFIG_DIRS/surfraw/ and you can surf the
+copy it into your local directory at <span class="file">$XDG_CONFIG_HOME/surfraw/elvi/</span> or
+in the system folder at <span class="file">$XDG_CONFIG_DIRS/surfraw/</span> and you can surf the
 Arch Wiki, or any one of the nine other language wikis, from the command
 line.</p>
 
@@ -755,442 +1200,6 @@ there.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/01/08/mail-checking-script/">Mail Checking Script</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-01-08T11:04:00+13:00" pubdate data-updated="true">Jan 8<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/mailcheck.png" alt="image" /></p>
-
-<p>I use <a href="http://www.mutt.org/" title="Mutt homepage">mutt</a> and
-<a href="https://github.com/jgoerzen/offlineimap/wiki" title="Offlineimap on github">offlineimap</a>
-to manage email on my Arch Linux machines. I like the simplicity and the
-power that this approach offers; that’s power in the sense of
-extensibility and customization, by the way…</p>
-
-<p>Using <a href="http://dwm.suckless.org/" title="dwm homepage">dwm</a> as my window
-manager, I had relied on
-<a href="http://jasonwryan.com/2009-11-21-dzen2-and-conky-cli-in-dwm" title="My post on setting this up">conky and dzen2</a>
-to pipe system information into my status bar. Unfortunately, conky only
-supports one mail spool so if, like me, you use offlineimap to
-synchronize multiple mailboxes, conky would only show new mail in your
-primary box. I had asked in #conky about multiple mail spools, but it
-doesn’t seem to be supported.</p>
-
-<p>When I recently started using
-<a href="http://jasonwryan.com/2010-12-26-wmfs-window-manager-from-scratch" title="My post on Window Manager From Scratch">WMFS</a>
-I decided to move to a
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/wmfs-status" title="Script in intuxication repo">bash script for my status information</a>.
-So I approached the problem afresh and decided to write a script to poll
-the new mail directories and update my status bar when mail arrived.</p>
-
-<p>Offlineimap creates a directory structure like so:</p>
-
-<pre><code>   Mail/ -------
-      |         |
-      |     Mail_Account_1
-      |         |
-      |         | --  INBOX 
-      |         |       | -- cur
-      |         |       | -- new
-      |         |       | -- temp
-      |         |
-      |         | -- INBOX.Drafts
-      |         |       | -- cur
-</code></pre>
-
-<p>As I was only interested in checking the <span class="file">INBOX/new</span>
-directory of each account, I had imagined that it would be necessary to set up some
-elaborate array to effectively check each of the requisite sub-directories…</p>
-
-<p>No, it was pretty simple. Just
-<a href="http://www.faqs.org/docs/abs/HTML/globbingref.html" title="ABS entry on globing">globbing</a>
-and
-<a href="http://linuxmanpages.com/man1/find.1.php" title="man page for find">find</a>,
-actually.</p>
-
-<figure class='code'><figcaption><span>mailcheck.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="c"># Set maildirs</span>
-</span><span class='line'><span class="nv">maildirs</span><span class="o">=</span><span class="s2">&quot;$HOME/Mail/*/INBOX/new/&quot;</span>
-</span><span class='line'>
-</span><span class='line'>find <span class="nv">$maildirs</span> -type f | wc -l
-</span><span class='line'><span class="nb">exit </span>0
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The glob (<code>*</code>) takes care of the different mail account names, and has
-the added bonus of being portable, and find returns any files (<code>-type f</code>)
-with <code>wc</code> counting the number of lines (the <code>-l</code> switch).</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/12/26/wmfs-window-manager-from-scratch/">WMFS - Window Manager From Scratch</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-12-26T11:08:00+13:00" pubdate data-updated="true">Dec 26<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5289976238/lightbox/" title="Screenshot on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/wmfs.png" alt="image" /></a></p>
-
-<p>I have been experimenting with a couple of new window managers over the
-last week or so. Not that I am in any way dissatisfied with
-<a href="http://dwm.suckless.org/" title="suckless page for dwm">dwm</a> — far from it; I
-do from time to time, however, like to see what else is on offer.</p>
-
-<p><a href="http://wmfs.info/projects/wmfs" title="WMFS homepage">WMFS</a> is a fairly new
-entrant in the window manager marketplace. The developers describe it
-as:</p>
-
-<blockquote><p>a lightweight and highly configurable tiling window manager for X… It
-supports Xft (Freetype) fonts and is compliant with the Extended
-Window Manager Hints (EWMH) specifications, Xinerama and Xrandr.</p></blockquote>
-
-<p>The <a href="http://aur.archlinux.org/packages.php?ID=26924" title="AUR page">git version is available</a> in
-AUR, and is straightforward to build and install. The fun, as always,
-comes with customization…</p>
-
-<p>As is says on the box, WMFS is highly configurable. The configuration is
-all done (initially) in one file, which you will need to copy to your
-<span class="file">~/.config/wmfs/directory</span>:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cp /etc/xdg/wmfs/wmfsrc ~/.config/wmfs/
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Even the default config is relatively fully featured. There are nine
-default layouts (about five more than I usually need, but it is always
-better to over cater). The <span class="file">wmfsrc</span> is quite well
-commented, so most of the options are self explanatory.</p>
-
-<p>One thing I did note about editing this file, which is probably more a
-reflection of my haste rather than the wm itself, is that it seemed
-<em>very</em> unforgiving of any errors. More than once I had to copy the
-default wmfsrc back across and start again. My advice is to make any
-changes cumulatively, and test by reloading before continuing.</p>
-
-<p>You can see my config file in my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/.config/wmfs/wmfsrc" title="Mercurial repository for EeePC">bitbucket repo</a>.
-Most of the changes have been made in setting up my preferred tags and
-keybindings – so they are consistent with my dwm and
-<a href="http://plhk.ru/" title="Echinus window manager home">echinus</a> setups.</p>
-
-<p>One of the great features of WMFS is the status bar. You can pipe all
-sorts of information into it with a bash script, and you can use colours
-and icons (if that is your thing). Simply sourcing the bash script from
-within wmfsrc will see it up and running:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">background_command</span> <span class="o">=</span> <span class="s2">&quot;$HOME/.config/wmfs/autostart.sh&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Or, if you prefer to use conky:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>conky | <span class="k">while </span><span class="nb">read</span> -r; <span class="k">do </span>wmfs -s -name <span class="s2">&quot;$REPLY&quot;</span>; <span class="k">done</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I use the status bar to display some basic system information. You can
-see from
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/Scripts/wmfs-status" title="Script in bitbucket repo">my status script</a>
-that most of it is simply piping commands through the awesomeness that
-is <a href="http://awk.info/" title="Awk Community Portal">awk</a>.</p>
-
-<p>I hadn’t thought that I would find a replacement for dwm, but WMFS is a
-serious contender. It has all of the functionality out-of-the-box,
-including:</p>
-
-<ul>
-<li>pre-set layout per tag</li>
-<li>rules to send applications to specific tags</li>
-<li>completely customizable keybinds, and – as a bonus,</li>
-<li><a href="http://en.wikipedia.org/wiki/Vi" title="Wikipedia page">Vi</a>-driven
-command interface</li>
-</ul>
-
-
-<p>Unlike dwm, it requires no patching for any of this. It has been
-completely stable while I have been using it and, while not as light as
-dwm, it is still in the minimalist camp in terms of size.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/10/21/console-fonts-in-ubuntu/">Console Fonts in Ubuntu</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-10-21T20:38:00+13:00" pubdate data-updated="true">Oct 21<span>st</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-fonts.png" alt="image" /></p>
-
-<p>Invariably, an <a href="http://www.ubuntu.com/" title="Ubuntu homepage">Ubuntu</a>
-upgrade only ever brings me pain in one area: the framebuffer. Granted,
-most Ubuntu users probably don’t care about the resolution of their
-framebuffer because they probably rarely venture there.</p>
-
-<p>For me, however, having the correct resolution and a decent font is
-important. Not because I spend a huge amount of time there (I don’t),
-but because in the past I have been forced to — and quickly learned that
-if the resolution is off, it makes it <em>very</em> difficult to work with.</p>
-
-<p>So the recent, otherwise completely successful, upgrade to Maverick
-Meerkat once again left me with an almost useless console. Fortunately,
-the hack for forcing a 1680x1050 resolution worked<sup>1</sup>, so it was just a
-matter of getting
-<a href="http://fractal.csie.org/~eric/wiki/Terminus_font" title="Terminus homepage">Terminus</a>
-to stick as the default console font.</p>
-
-<p>This was one instance where Google failed me. There doesn’t seem to be
-any authoritative guide to setting your console font permanently. I
-edited <span class="file">/etc/default/console-setup</span>
-and added Terminus as the font, like so:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">CODESET</span><span class="o">=</span><span class="s2">&quot;Lat15&quot;</span>
-</span><span class='line'><span class="nv">FONTFACE</span><span class="o">=</span><span class="s2">&quot;Terminus&quot;</span>
-</span><span class='line'><span class="nv">FONTSIZE</span><span class="o">=</span><span class="s2">&quot;16&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Issuing, from the console:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo setupcon -v
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>would change the font to Terminus for that session but a reboot soon
-reverted it to the default fixed (which, given
-<a href="https://wiki.ubuntu.com/Ubuntu%20Font%20Family">Ubuntu have been working on their fonts</a>, is
-spectacularly ugly).</p>
-
-<p>I finally asked in #ubuntu and was pointed in the right direction:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo dpkg-reconfigure console-setup
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And <em>now</em> I have a workable framebuffer.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Hack to force higher framebuffer resolution in <span class="file">/etc/default/grub</span></li>
-</ol>
-
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">GRUB_GFXPAYLOAD_LINUX</span><span class="o">=</span>1680x1050
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/10/07/vimprobable/">Vimprobable</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-10-07T16:23:00+13:00" pubdate data-updated="true">Oct 7<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5055695051/" title="Vimprobable on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable.png" title="Hacked Vimprobable2" alt="image" /></a></p>
-
-<p>After just posting details of <a href="http://jasonwryan.com/2010-10-04-the-setup">my setup</a>,
-I have made a reasonably significant (and it goes almost without saying, unplanned)
-change: after <a href="http://www.uzbl.org/">uzbl</a> began unaccountably maxxing
-out my CPU, I decided to give <a href="http://www.vimprobable.org/">Vimprobable</a>
-a go.</p>
-
-<p>I covered it briefly in my review of <a href="http://jasonwryan.com/2010-5-21-5-alternate-browsers">5 alternate browsers</a> and liked the
-idea of another vim-based browsing experience.</p>
-
-<p>There are two versions of Vimprobable; the differences, as described on
-the website:</p>
-
-<blockquote><p>Both versions are actively maintained. The first version can only be
-customised by editing config.h before compiling. It is pretty stable
-and very usable. Version 2 has grown fairly stable already as well,
-but it’s still seeing bigger changes, of course. It aims at allowing
-more customisation, for example through :set and :map commands.</p></blockquote>
-
-<p>I downloaded the tarball for
-<a href="http://aur.archlinux.org/packages.php?ID=33779" title="Arch User Repository: Vimprobable2">Vimprobable2 from the AUR</a>,
-extracted the files and built the package.</p>
-
-<p>Customization occurs in 3 files<sup>1</sup>: the first two,
-<span class="file">config.h</span> and <span class="file">keymap.h</span>
-both require you to recompile after editing, which is a trivial task
-given the size of the programme.</p>
-
-<p>Vimprobable2 also features a third configuration option that doesn’t
-require compiling after changes, <span class="file">vimprobablerc</span>.
-Should you wish to use it, you will need to create this file in
-<span class="file">~/.config/vimprobable/</span>.
-Helpfully, there is a man page for all of the options in this file, to
-read it issue:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>man vimprobablerc
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Despite it’s spartan appearance, Vimprobable is a full-featured browser
-— with the advantage of being driven solely from the keyboard. It
-handles bookmarks (and the tagging thereof, which is impressive and
-handy), multiple search engines, cookies, history, etc…</p>
-
-<p>I have made a number of changes to the defaults, including moving some
-of the keybindings to be closer to uzbl’s (habit, really). The other
-area where I made some minor changes was to the hinting style. Hinting
-is just the way Vimprobable (and other browsers like uzbl and
-<a href="http://conkeror.org/">Conkeror</a>) follow links; the default is, to put
-it mildly, garish<sup>2</sup>, so I hacked around in <span class="file">hinting.js</span>
-to make it more attractive.</p>
-
-<p>If you are interested, my vimprobable files are in
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/vimprobable2-git/">bitbucket</a>,
-including the modified hinting.js.</p>
-
-<h3>Update</h3>
-
-<p>I think this is a keeper. I installed
-<a href="http://tools.suckless.org/tabbed" title="suckless' tabbed">tabbed</a> and now
-open Vimprobable in tabbed for tab management. A quick addition to my
-keybinds in <a href="http://dwm.suckless.org/" title="dynamic window manager">dwm</a> and
-I have a minimalist and powerful browser…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>Of course, you are not limited to these files; the beauty of free
-and open-source software is that you can change any of it…</p></li>
-<li><p>To support this claim, I searched google for an image of the default
-Vimprobable hinting style, and I could only find this
-<a href="http://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/103/10387/10387f2.jpg">screenshot of conkeror</a>,
-which will give you an idea…</p></li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -1206,23 +1215,23 @@ which will give you an idea…</p></li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/06/10/setting-tmux-statusbar-if-in-x/">Setting tmux statusbar if in X</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/06/07/copy-and-paste-in-tmux/">Copy &amp; Paste in tmux</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/06/06/network-flooding-on-ubuntu/">Network Flooding on Ubuntu</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/05/28/quoras-quandary/">Quora&#8217;s Quandary</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/05/24/tyrs-ncurses-twitter-client/">Tyrs: ncurses Twitter Client</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/05/05/w3m/">w3m, Surfraw and Yanking URLs</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/04/13/archwiki-elvis-for-surfraw/">Archwiki elvis for Surfraw</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/04/06/vim-colours-in-the-console/">Vim Colours in the Console</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/01/25/setting-urgent-hints-in-dwm/">Setting Urgent Hints in dwm</a>
       </li>
     
   </ul>

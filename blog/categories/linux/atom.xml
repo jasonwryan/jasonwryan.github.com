@@ -4,7 +4,7 @@
   <title><![CDATA[Category: linux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T10:06:23+13:00</updated>
+  <updated>2012-03-28T11:24:01+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,256 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Setting tmux statusbar if in X]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x/"/>
+    <updated>2011-06-10T22:56:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5636783883/" title="Arch Linux: dwm, tmux &amp; scratchpad by jasonwryan, on Flickr"><img src="http://farm6.static.flickr.com/5303/5636783883_5b7272453b.jpg" alt="Arch Linux: dwm, tmux &amp; scratchpad" /></a></p>
+
+<p>I have been posting quite a bit about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a> of late<sup>1</sup>.
+It is a marvellous application and lends itself to all sorts of interesting
+uses. When you first install it, you will find a number of user config
+files in <span class="file">/usr/share/tmux/</span>. I started with tmux by copying
+<a href="http://cinderwick.ca/" title="Thayer Williams' site">Thayer’s</a> config across
+and then working up from there. There is a section
+<a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
+that has always puzzled me, and so I decided to get to the bottom of it.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;show some useful stats but only when tmux is started&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;outside of Xorg, otherwise dwm statusbar shows these already&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>It is a great idea. If you are running tmux in X, then you have
+<a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
+what the time is,
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="dwm status bar in my mercurial repo">how much battery you have left</a>
+etc,. You don’t need to replicate that functionality in tmux. If,
+however, you are in the console, you don’t have that information, unless
+you print it in tmux’s statusbar.</p>
+
+<p>I had tried to get this to work once or twice over the last couple of
+years, but never persevered with it. However, as I have been doing a bit
+of work making the console as functional as possible<sup>2</sup>, I thought I
+would revisit it.</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status1.png" alt="image" /></p>
+
+<p>The insight that I had that got it working for me was to use the
+source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
+depending if X was running or not. I just adapted Thayer’s code, like
+so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Statusbar starting in X or not&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
+</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And then created those files with the desired statusbar options. So, for
+example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
+loaded:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Statusbar <span class="k">if </span>tmux run in console&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;information normally in dwm bar&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;set -g status-right-length 50
+</span><span class='line'><span class="nb">set</span> -g status-left-length 50
+</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png" alt="image" /></p>
+
+<p>All the relevant files are in
+<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/.tmux" title="My intuxication repository">my mercurial repo</a>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p><a href="http://jasonwryan.com/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
+<a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
+&amp; <a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
+<li><p><a href="http://jasonwryan.com/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
+<li><p>Image squashed to fit the requirements of this blog…</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Copy &amp; Paste in tmux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/06/07/copy-and-paste-in-tmux/"/>
+    <updated>2011-06-07T19:54:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/06/07/copy-and-paste-in-tmux</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-copy.png" alt="image" /></p>
+
+<p>I’ve posted a couple of times<sup>1</sup> about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
+terminal mutliplexer. One question I see raised a lot in #tmux is how
+to copy and paste.</p>
+
+<p>The documentation for tmux is excellent: the
+<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
+one of the most clear and thorough I have read. And while it is
+explained there, I thought I would share my approach anyway.</p>
+
+<p>First, I set tmux to use vi keys:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>setw -g mode-keys vi
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then I change the default keybinds to suit my workflow. As explained in
+the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
+and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
+to more intuitive and Vim-like keys:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
+</span><span class='line'><span class="nb">bind </span>Escape copy-mode
+</span><span class='line'>unbind p
+</span><span class='line'><span class="nb">bind </span>p paste-buffer
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This seems a lot closer to all of the other Vim-like apps that I run -
+where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
+<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
+
+<p>So, to string it all together, the command sequence necessary to copy
+some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
+
+<pre>
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
+# move cursor to the start or end of the desired text string
+<kbd>v</kbd>                        # to activate highlighting
+# move cursor to cover the requisite string
+<kbd>y</kbd>                        # to capture the string
+<kbd>q</kbd>                        # exit copy mode
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
+</pre>
+
+
+<p>Simple.</p>
+
+<p>This means that you can scroll back through the output of <em>anything</em> in
+your terminal, and copy and paste it anywhere. Once you set it up, it is
+a very powerful tool…</p>
+
+<h5>Notes</h5>
+
+<p>1.<a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux">Sessions in tmux</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Network Flooding on Ubuntu]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu/"/>
+    <updated>2011-06-06T13:40:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-logo.png" alt="image" /></p>
+
+<p>I have been experiencing problems with my wifi LAN when playing music
+through
+<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
+or watching movies. My upload speeds would climb to around 120-130Kb/s
+and my wifi would just go down.</p>
+
+<p>Apart from being frustrating, this was inconvenient as it meant that if
+I was doing either of those things, my stereo in the living room
+couldn’t stream music from my
+<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
+other members of the family (or guests) couldn’t connect to the access
+point to get online.</p>
+
+<p>After asking on
+<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
+(which, like many of the Ubuntu-related fora is populated with people
+who are more well-intentioned than they are knowledgeable - which seems
+to me one of the fundamental problems the distro has; but I’ll save that
+rant for another day), one helpful user suggested I use
+<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
+the network traffic.</p>
+
+<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
+immediately instructive. Wireshark quickly identified that, as soon as I
+started mpd, one of my ports was being flooded: 46560</p>
+
+<p><code>lsof</code> showed that pulse audio was the culprit:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Quelle surprise… When software engineers want a case study of opacity
+and abstraction from the user, this should be their first port of call.</p>
+
+<p>Worse, it is a known bug.
+<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
+And apparently insufficiently serious to warrant any attention. Fair
+enough, I suppose, given the fix is easy enough <em>if you know what you
+are trying to fix…</em></p>
+
+<p>Install the Pulse audio preferences tool:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install papref
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>…and disable Multicast/RTP.</p>
+
+<p>Another example for me of Ubuntu’s fast waning utility as a distribution
+for people that want to be able to exercize some control over their
+system. It is only still installed on this machine because there isn’t
+an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
+here and, with my international traffic capped to 30Kb/s until last
+month, I wasn’t prepared to try and run a distro on that sort of
+bandwidth. Now that has changed, I suspect that Ubuntu’s days are
+numbered on this box.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Tyrs: ncurses Twitter Client]]></title>
@@ -181,299 +431,6 @@ and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>This prevents a new line being appended.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Vim Colours in the Console]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/04/06/vim-colours-in-the-console/"/>
-    <updated>2011-04-06T21:19:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/04/06/vim-colours-in-the-console</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours1.png" alt="image" /></p>
-
-<p>I have spent the last couple of days trying to understand why I couldn’t
-get <a href="http://www.vim.org/" title="Vim: the _only_ editor">Vim</a> to display the
-correct 16 colours in the console. Not in a terminal emulator in X, like
-<a href="http://invisible-island.net/xterm/xterm.html" title="XTerm homepage">xterm</a>
-or
-<a href="http://software.schmorp.de/pkg/rxvt-unicode.html" title="Homepage for urxvt">rxvt-unicode</a>,
-but in the consoles, TTY1-6.</p>
-
-<p>After a lot of searching, more reading into the
-<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-16.html" title="The Linux terminal...">arcane documentation</a>
-of Linux terminals than I was either prepared for or keen on and some
-experimentation, I have it working. With one caveat; I wasn’t prepared
-to set the <code>TERM</code> environment in my <span class="file">.vimrc</span>. Apart from being
-<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-10.html#ss10.5" title="Console documentation">cautioned against</a>,
-as I <em>do</em> set it for tmux, I was anxious to avoid any clashes when
-running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
-(which I do most of the time).</p>
-
-<p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
-colours, gave me the default:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> &amp;amp;&amp;amp; tput colors
-</span><span class='line'>linux
-</span><span class='line'>8
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Which, under my current configuration of Vim, rendered colours like so:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours2.png" alt="image" /></p>
-
-<p>Hardly satisfactory.</p>
-
-<p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
-colours:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then I had to rewrite my colourscheme to change all of the references to
-the terminal colour numbers to colour <em>names</em>, as apparently that is
-what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
-</span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
-</span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
-</span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>…to the more literal:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
-</span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
-</span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Once I had made the necessary changes, I saved this new colourscheme as
-<span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
-have included it in an <code>if</code> condition in my original colourscheme<sup>2</sup>,
-but I was intent on keeping things compartmentalized until I had it working…</p>
-
-<p>Running Vim in the console was now starting to look promising:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours3.png" alt="image" /></p>
-
-<p>The final piece of the puzzle was to pass my
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.colours/dark" title="jwr dark colours: mercurial repo">X colours</a>
-to the console. Fortunately,
-<a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
-made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Linux console colors <span class="o">(</span>jwr dark<span class="o">)</span>&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
-</span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then it was just a case of setting the relevant colourscheme in my
-<span class="file">.vimrc</span>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;amp;<span class="nb">t_Co</span> &amp;<span class="k">lt</span>; <span class="m">256</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
-</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">else</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miromiro
-</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">endif</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>And you can see
-<a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>
-of the finished product on Flickr.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p><a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miro8.vim" title="Mercurial repo: miro8 colourscheme">miro8.vim</a></p></li>
-<li><p><a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a></p></li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Intuxication]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/01/13/intuxication/"/>
-    <updated>2011-01-13T10:00:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/01/13/intuxication</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/intuxication.png" alt="image" /></p>
-
-<p>I have previously posted about using
-<a href="http://jasonwryan.com/2010-02-10-using-mercurial-to-share-dotfiles" title="Mu post on using mercurial">Mercurial to share dotfiles</a>,
-and how I have been using
-<a href="http://bitbucket.org/" title="bitbucket homepage">bitbucket</a> as a free host
-for that service.</p>
-
-<p>Recently, I came across
-<a href="http://beta.intuxication.org/" title="Free mercurial hosting">Intuxication</a>,
-who describe themselves thus:</p>
-
-<blockquote><p>Intuxication provides a free, fast and lightweight platform to host
-your Mercurial repositories.</p></blockquote>
-
-<p>You will see from their URL that they are only in beta, but the service—while
-undeniably rough around the edges—looks quite promising.</p>
-
-<p>For small projects, the limit is 1GB disk space, Intuxication provides
-all of the basic features you need to maintain a mercurial repository.</p>
-
-<p>One of the advantages it has over bitbucket is that the default
-stylesheet makes it much easier to read the files that you host. And
-while there are obviously plans to introduce more styles (from the
-Configure menu you can select a dropdown of five different styles),
-currently only one works.</p>
-
-<p>If I had any criticism at all, it would be that the unfinished nature of
-the website (like the broken styles and the fact that quite a few of the
-other features like that don’t work) means that it feels a lot more like
-an alpha than a beta.</p>
-
-<p>However, I’m sure that with time and some support (there is a donate
-button on every page), Intuxication will continue to develop. I think it
-is a site with potential, and I’m currently pushing my
-<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/" title="EeePC tip">EeePC dotfiles</a>
-there.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Console Fonts in Ubuntu]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/10/21/console-fonts-in-ubuntu/"/>
-    <updated>2010-10-21T20:38:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/10/21/console-fonts-in-ubuntu</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-fonts.png" alt="image" /></p>
-
-<p>Invariably, an <a href="http://www.ubuntu.com/" title="Ubuntu homepage">Ubuntu</a>
-upgrade only ever brings me pain in one area: the framebuffer. Granted,
-most Ubuntu users probably don’t care about the resolution of their
-framebuffer because they probably rarely venture there.</p>
-
-<p>For me, however, having the correct resolution and a decent font is
-important. Not because I spend a huge amount of time there (I don’t),
-but because in the past I have been forced to — and quickly learned that
-if the resolution is off, it makes it <em>very</em> difficult to work with.</p>
-
-<p>So the recent, otherwise completely successful, upgrade to Maverick
-Meerkat once again left me with an almost useless console. Fortunately,
-the hack for forcing a 1680x1050 resolution worked<sup>1</sup>, so it was just a
-matter of getting
-<a href="http://fractal.csie.org/~eric/wiki/Terminus_font" title="Terminus homepage">Terminus</a>
-to stick as the default console font.</p>
-
-<p>This was one instance where Google failed me. There doesn’t seem to be
-any authoritative guide to setting your console font permanently. I
-edited <span class="file">/etc/default/console-setup</span>
-and added Terminus as the font, like so:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">CODESET</span><span class="o">=</span><span class="s2">&quot;Lat15&quot;</span>
-</span><span class='line'><span class="nv">FONTFACE</span><span class="o">=</span><span class="s2">&quot;Terminus&quot;</span>
-</span><span class='line'><span class="nv">FONTSIZE</span><span class="o">=</span><span class="s2">&quot;16&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Issuing, from the console:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo setupcon -v
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>would change the font to Terminus for that session but a reboot soon
-reverted it to the default fixed (which, given
-<a href="https://wiki.ubuntu.com/Ubuntu%20Font%20Family">Ubuntu have been working on their fonts</a>, is
-spectacularly ugly).</p>
-
-<p>I finally asked in #ubuntu and was pointed in the right direction:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo dpkg-reconfigure console-setup
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>And <em>now</em> I have a workable framebuffer.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Hack to force higher framebuffer resolution in <span class="file">/etc/default/grub</span></li>
-</ol>
-
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">GRUB_GFXPAYLOAD_LINUX</span><span class="o">=</span>1680x1050
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 ]]></content>
   </entry>
   

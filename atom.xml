@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T10:06:23+13:00</updated>
+  <updated>2012-03-28T11:24:01+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,343 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Setting tmux statusbar if in X]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x/"/>
+    <updated>2011-06-10T22:56:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5636783883/" title="Arch Linux: dwm, tmux &amp; scratchpad by jasonwryan, on Flickr"><img src="http://farm6.static.flickr.com/5303/5636783883_5b7272453b.jpg" alt="Arch Linux: dwm, tmux &amp; scratchpad" /></a></p>
+
+<p>I have been posting quite a bit about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a> of late<sup>1</sup>.
+It is a marvellous application and lends itself to all sorts of interesting
+uses. When you first install it, you will find a number of user config
+files in <span class="file">/usr/share/tmux/</span>. I started with tmux by copying
+<a href="http://cinderwick.ca/" title="Thayer Williams' site">Thayer’s</a> config across
+and then working up from there. There is a section
+<a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
+that has always puzzled me, and so I decided to get to the bottom of it.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># show some useful stats but only when tmux is started</span>
+</span><span class='line'><span class="c"># outside of Xorg, otherwise dwm statusbar shows these already </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It is a great idea. If you are running tmux in X, then you have
+<a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
+what the time is,
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="dwm status bar in my mercurial repo">how much battery you have left</a>
+etc,. You don’t need to replicate that functionality in tmux. If,
+however, you are in the console, you don’t have that information, unless
+you print it in tmux’s statusbar.</p>
+
+<p>I had tried to get this to work once or twice over the last couple of
+years, but never persevered with it. However, as I have been doing a bit
+of work making the console as functional as possible<sup>2</sup>, I thought I
+would revisit it.</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status1.png" alt="image" /></p>
+
+<p>The insight that I had that got it working for me was to use the
+source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
+depending if X was running or not. I just adapted Thayer’s code, like
+so:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Statusbar starting in X or not</span>
+</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
+</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And then created those files with the desired statusbar options. So, for
+example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
+loaded:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Statusbar if tmux run in console</span>
+</span><span class='line'><span class="c"># information normally in dwm bar</span>
+</span><span class='line'><span class="nb">set</span> -g status-right-length 50
+</span><span class='line'><span class="nb">set</span> -g status-left-length 50
+</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png" alt="image" /></p>
+
+<p>All the relevant files are in
+<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/.tmux" title="My intuxication repository">my mercurial repo</a>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p><a href="http://jasonwryan.com/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
+<a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
+&amp; <a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
+<li><p><a href="http://jasonwryan.com/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
+<li><p>Image squashed to fit the requirements of this blog…</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Copy &amp; Paste in tmux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/06/07/copy-and-paste-in-tmux/"/>
+    <updated>2011-06-07T19:54:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/06/07/copy-and-paste-in-tmux</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-copy.png" alt="image" /></p>
+
+<p>I’ve posted a couple of times<sup>1</sup> about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
+terminal mutliplexer. One question I see raised a lot in #tmux is how
+to copy and paste.</p>
+
+<p>The documentation for tmux is excellent: the
+<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
+one of the most clear and thorough I have read. And while it is
+explained there, I thought I would share my approach anyway.</p>
+
+<p>First, I set tmux to use vi keys:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>setw -g mode-keys vi
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then I change the default keybinds to suit my workflow. As explained in
+the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
+and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
+to more intuitive and Vim-like keys:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
+</span><span class='line'><span class="nb">bind </span>Escape copy-mode
+</span><span class='line'>unbind p
+</span><span class='line'><span class="nb">bind </span>p paste-buffer
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This seems a lot closer to all of the other Vim-like apps that I run -
+where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
+<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
+
+<p>So, to string it all together, the command sequence necessary to copy
+some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
+
+<pre>
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
+# move cursor to the start or end of the desired text string
+<kbd>v</kbd>                        # to activate highlighting
+# move cursor to cover the requisite string
+<kbd>y</kbd>                        # to capture the string
+<kbd>q</kbd>                        # exit copy mode
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
+</pre>
+
+
+<p>Simple.</p>
+
+<p>This means that you can scroll back through the output of <em>anything</em> in
+your terminal, and copy and paste it anywhere. Once you set it up, it is
+a very powerful tool…</p>
+
+<h5>Notes</h5>
+
+<p>1.<a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux">Sessions in tmux</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Network Flooding on Ubuntu]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu/"/>
+    <updated>2011-06-06T13:40:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-logo.png" alt="image" /></p>
+
+<p>I have been experiencing problems with my wifi LAN when playing music
+through
+<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
+or watching movies. My upload speeds would climb to around 120-130Kb/s
+and my wifi would just go down.</p>
+
+<p>Apart from being frustrating, this was inconvenient as it meant that if
+I was doing either of those things, my stereo in the living room
+couldn’t stream music from my
+<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
+other members of the family (or guests) couldn’t connect to the access
+point to get online.</p>
+
+<p>After asking on
+<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
+(which, like many of the Ubuntu-related fora is populated with people
+who are more well-intentioned than they are knowledgeable - which seems
+to me one of the fundamental problems the distro has; but I’ll save that
+rant for another day), one helpful user suggested I use
+<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
+the network traffic.</p>
+
+<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
+immediately instructive. Wireshark quickly identified that, as soon as I
+started mpd, one of my ports was being flooded: 46560</p>
+
+<p><code>lsof</code> showed that pulse audio was the culprit:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Quelle surprise… When software engineers want a case study of opacity
+and abstraction from the user, this should be their first port of call.</p>
+
+<p>Worse, it is a known bug.
+<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
+And apparently insufficiently serious to warrant any attention. Fair
+enough, I suppose, given the fix is easy enough <em>if you know what you
+are trying to fix…</em></p>
+
+<p>Install the Pulse audio preferences tool:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install papref
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>…and disable Multicast/RTP.</p>
+
+<p>Another example for me of Ubuntu’s fast waning utility as a distribution
+for people that want to be able to exercize some control over their
+system. It is only still installed on this machine because there isn’t
+an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
+here and, with my international traffic capped to 30Kb/s until last
+month, I wasn’t prepared to try and run a distro on that sort of
+bandwidth. Now that has changed, I suspect that Ubuntu’s days are
+numbered on this box.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Quora's Quandary]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/05/28/quoras-quandary/"/>
+    <updated>2011-05-28T10:05:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/05/28/quoras-quandary</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora1.png" alt="image" /></p>
+
+<p>I joined <a href="http://www.quora.com/" title="Quora: Q&amp;A site">Quora</a> early in the
+new year and, while
+<a href="http://techcrunch.com/2011/01/23/why-i-don%E2%80%99t-buy-the-quora-hype/" title="TC article on the hype">the hype has in no way abated</a>,
+I have found that increasingly over the months that I have been
+visiting, there is less and less reason for me to return on any regular
+basis. And this puzzles me as I think the concept is, for me, an
+attractive one.</p>
+
+<p>In the five-odd months I have been visiting the site, I have managed to
+<a href="http://www.quora.com/Jason-Ryan" title="My Quora profile">contribute 58 answers</a>
+and over one hundred edits (more on that below); this strikes me as a reasonable
+commitment on my part and one that should return some dividend to me –
+at least in terms of satisfaction with the site. Alas, no.</p>
+
+<p>And why not? For several reasons. And reasons that have only really
+become apparent over the last month as I started to spend time on the
+<a href="http://unix.stackexchange.com/" title="Unix and Linux Stack Exchange">Unix &amp; Linux Stack Exchange site</a>.
+The contrast between the <em>experience</em> of the two sites, that are in
+essence very similar, couldn’t be more striking.</p>
+
+<p>The primary difference between the two is that Unix.SE isn’t a social
+site: you don’t follow anyone. Which, when you think about Q&amp;A sites,
+makes a lot more sense than Quora’s model. I still don’t understand the
+point of following people on Quora. Perhaps I am not following enough
+people, or the wrong ones, but I have yet to see <em>any benefit</em> in
+following on the site.</p>
+
+<p>One other area of seeming similarity between the sites is the ability to
+vote up (or down) questions and answers. On Unix.SE, this is implemented
+as a real strength as these votes determine contributor’s reputation,
+described thus:</p>
+
+<blockquote><p>Reputation is a rough measurement of how much the community trusts
+you. Reputation is never given, it is earned by convincing fellow
+users that you know what you’re talking about.</p></blockquote>
+
+<p>This has a twofold effect: it motivates contributors to provide quality
+answers (and
+<a href="http://unix.stackexchange.com/badges" title="StackExchange badges">rewards</a>
+them when they do), and more importantly, gives you a heuristic for how
+credible an answer may be. Quora doesn’t have this concept and, for me,
+is much the poorer for it.</p>
+
+<p>Reputation has consequences on Unix.SE: the more you accrue, the more
+privileges on the site you are granted. Again, this builds the
+community’s capability while encouraging individual contributors.</p>
+
+<p>Some of the other areas where Quora is really left wanting in comparison
+to Unix.SE are around the design of the site. The text box where you
+enter your answers or edits is a case in point:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora2.png" alt="image" /></p>
+
+<p>On Quora, it is like trying to change a car battery through a letterbox.
+The single, overriding impression is that entering information into the
+site is neither a priority nor pleasurable which, for a site aspiring to
+be a knowledge repository is incredibly perverse.</p>
+
+<p>This is compounded by the fact that the tools for presenting the
+information that you want to add to the site can charitably be described
+as rudimentary (one of the reasons that I have 100-odd edits is that it
+takes at least two to three attempts to present information in a
+semi-acceptable fashion). Searching for
+“<a href="http://www.quora.com/Quora-product/Are-there-any-markup-tags-when-writing-a-question?q=quora+markup+tools" title="Recursion alert">quora markup tools</a>”
+is as disappointing as it is frustrating.</p>
+
+<p>Being able to present information appropriately is critical. The
+StackExchange sites
+<a href="http://unix.stackexchange.com/editing-help" title="Unix.SE editing guidleines">allow all sorts</a>
+of HTML tags and
+<a href="http://daringfireball.net/projects/markdown/syntax" title="markdown syntax">markdown</a>,
+without apparently any additional
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting" title="Wikipedia page on Cross site scripting">XSS risk</a><sup>1</sup>.
+The result is questions and answers that are formatted in a way that
+enhances their legibility, rather than detracting from it.</p>
+
+<p>There are some other areas where Quora is not measuring up for me:
+opaque editorial and moderation policies and practices and an
+unwillingness to more actively curate the questions – and no, those two
+statements are not contradictory.</p>
+
+<p>The overall impression I am left with is that while both sites have
+similar aims (albeit Unix.SE’s is much more specific in terms of the
+subject matter), Quora seems to me to be really failing at building a
+community around it. Unless, of course, you count social media experts…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>God knows if that is actually the reason they refuse to allow
+potential contributors the ability to adequately format their
+information, but it seems plausible enough.</li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Tyrs: ncurses Twitter Client]]></title>
@@ -228,8 +565,8 @@ perhaps the best GNU/Linux reference wiki on the web.</p>
 
 <p>You can grab the archwiki elvis from my
 <a href="http://beta.intuxication.org/jasonwryan/longbow/file/tip/scripts/archwiki" title="Intuxication repo">mercurial repo</a>,
-copy it into your local directory at $XDG_CONFIG_HOME/surfraw/elvi/ or
-in the system folder at $XDG_CONFIG_DIRS/surfraw/ and you can surf the
+copy it into your local directory at <span class="file">$XDG_CONFIG_HOME/surfraw/elvi/</span> or
+in the system folder at <span class="file">$XDG_CONFIG_DIRS/surfraw/</span> and you can surf the
 Arch Wiki, or any one of the nine other language wikis, from the command
 line.</p>
 
@@ -1353,405 +1690,6 @@ so configurable: you can customize it to your heart’s content (see my
 config file on my <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/uzbl/" title="uzbl file on bitbucket">mercurial repo</a>).</p>
 
 <p>There are packages for most of the major distros: <a href="http://www.uzbl.org/get.php" title="Download and install details on the wiki">give it a go</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Wikipedia Discriminates Against FOSS]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/02/25/wikipedia-discriminates-against-foss/"/>
-    <updated>2010-02-25T06:59:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/02/25/wikipedia-discriminates-against-foss</id>
-    <content type="html"><![CDATA[<p>There is currently an interesting debate on Wikipedia about <a href="http://en.wikipedia.org/wiki/Wikipedia:Articles_for_deletion/Dwm" title="Wikipedia page">deleting the article on dwm.</a></p>
-
-<p>According to the Wikipedia <a href="http://en.wikipedia.org/wiki/Wikipedia:Notability" title="Wikipedia page">notability guidelines</a>,
-only</p>
-
-<blockquote><p>significant coverage in reliable sources that are independent of the
-subject</p></blockquote>
-
-<p>constitutes notability.</p>
-
-<p>So 300 words by the likes of <a href="http://blogs.zdnet.com/BTL/?p=31024" title="ZDNet article exposing corrupt practice in Tech reporting">Randall Kennedy</a>
-counts for more in terms of “notability” than the hundreds of thousands
-of lines of code contributed to
-<a href="http://dwm.suckless.org/" title="dwm wiki">dwm</a> and its forks
-(<a href="http://awesome.naquadah.org/" title="awesome home page">awesome</a> and
-<a href="http://www.rootshell.be/~polachok/code/" title="echinus page">echinus</a>) and
-clones (<a href="http://www.xmonad.org/" title="xmonad homepage">xmonad</a>,
-<a href="http://aerosuidae.net/musca.html" title="musca homepage">musca</a>,
-<a href="http://www.peereboom.us/scrotwm/html/scrotwm.html">scrotwm</a> <em>et al</em>)?</p>
-
-<p>The notion that, in the free/libre and open source software world, a
-project’s notability is measured in terms of the <em>prose</em> that appears in
-journals, books etc is myopic and—in terms of Wikipedia’s status as a
-FOSS project—quite disappointing. The real measure of notability of
-projects like this is the <strong>code they generate</strong>.</p>
-
-<p>Wikipedia’s criteria actively discriminates against free and open source
-projects where the measure of notability is not the column inches in
-trade magazines sponsored by advertising and advertorial, but by the
-passion and commitment of large communities of contributors who believe
-in the project enough to devote their code, time and money.</p>
-
-<p>Wikipedians need to review their criteria to reflect this reality;
-otherwise the “free encyclopedia” will continue to exclude exactly those
-free/libre projects…</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Mercurial to Share Dotfiles]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/"/>
-    <updated>2010-02-10T20:36:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/02/10/using-mercurial-to-share-dotfiles</id>
-    <content type="html"><![CDATA[<p>I posted a couple of weeks back about
-<a href="http://jasonwryan.com/2010-01-11-using-dropbox-to-share-dotfiles">using dropbox to share dotfiles</a>
-and while I am pleased with how well that works, I had always intended to see how well a
-version control system would handle that (relatively trivial) chore.</p>
-
-<p>I chose <a href="http://mercurial.selenic.com/">Mercurial</a> only because it is the
-system used by <a href="http://suckless.org/">the suckless community</a> and, as their
-<a href="http://suckless.org/manifest/">philosophy</a> and the products they
-produce are of such exceptional quality, no further investigation seemed
-necessary.</p>
-
-<p>Installing mercurial, on both my Arch machines and the Ubuntu box was simple
-enough:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># pacman -S mercurial</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then, rather than use my <span class="file">/home</span> directory as the local repo
-(which for some reason—probably completely irrational—seemed somewhat risky),
-I opted to create the repository in a separate directory in my home folder and
-link to the relevant files.</p>
-
-<p>I signed up for a free account at <a href="http://bitbucket.org">bitbucket</a> and created a repository
-called “dotfiles.”</p>
-
-<p>The it was just a matter of cloning the new repository to my local
-machine:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg clone https://jasonwryan@bitbucket.org/jasonwryan/dotfiles/
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>and then entering the newly created directory and linking to the files that
-I wanted to share:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd </span>dotfiles/ ln /home/jason/.Xdefaults ln /home/jason/.apvlvrc
-</span><span class='line'>…
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Note: I initially tried symlinking, but Mercurial didn&#8217;t like that
-<em>at all</em>, hence the hard links…</p>
-
-<p>Then it was just a matter of telling Mercurial that the requisite files
-are in the folder:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg add
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Commit the changes:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg ci
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>…and then push the changes to the <a href="https://bitbucket.org/jasonwryan/">bitbucket repository</a>:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg push
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This was certainly a lot quicker to setup than the Dropbox method but, for
-all that I am using it for, it seems a little like overkill. I&#8217;ll chalk
-it up as a good way for me to get my head around <acronym title="Version
-Control Systems">vcs</acronym> more than anything else…</p>
-
-<h3>The Mercurial Book</h3>
-
-<p>For more information on Mercurial, I highly
-recommend Bryan O&#8217;Sullivan&#8217;s excellent
-<a href="http://hgbook.red-bean.com/">Mercurial: The Definitive Guide</a>.</p>
-
-<h4>Update</h4>
-
-<p>Post edited to reflect that fact that I now run two repos,
-one for the <a href="https://bitbucket.org/jasonwryan/workstation/src/"
-title="work machine repo" target="_blank">workstation</a> (as described here),
-and a second one for my <a href="https://bitbucket.org/jasonwryan/eeepc/src/"
-title="Netbook repo" target="_blank">EeePC</a> – which I did successfully
-create in <span class="file">/home</span> without any apocalyptic consequences.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Dropbox to Share Dotfiles]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/"/>
-    <updated>2010-01-11T11:10:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/01/11/using-dropbox-to-share-dotfiles</id>
-    <content type="html"><![CDATA[<p>I regularly back up all my dotfiles to <a href="http://www.dropbox.com/" title="Synch your computers securely...">Dropbox</a>
-as a matter of course. I had intended, at some point, to set up a
-<a href="http://git-scm.com/" title="Online version control system">Git repo</a> to automate the process and to make it easier to share these files with others.</p>
-
-<p>However, best intentions etc., in the end it was far easier to simply extend what I was already doing using Dropbox.</p>
-
-<p>First, I created a directory in my <span class="file">Dropbox/Public</span> that would contain the dotfiles I wanted to share:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>mkdir Dropbox/Public/Configs
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then it was just a matter of creating links to the files I wanted to host there:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">cd </span>Dropbox/Public/Configs
-</span><span class='line'><span class="nv">$ </span>ln -s ../../path/to/dotfile
-</span><span class='line'>…
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The next step was to create a simple <acronym title="HyperText Markup Language">HTML</acronym> page
-(and a stylesheet to make it look presentable) and drop them into the same directory.</p>
-
-<p><a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="jason's dotfile repo"><img src="http://dl.dropbox.com/u/261312/Blog-images/dropbox-repo.png"></a></p>
-
-<h3>Caveat</h3>
-
-<p>Dropbox has the very handy feature of retaining versions of all the files you upload. Unfortunately, in this case, that means that the symlinks will always point to the file that you originally set them at — <em>irrespective of any updates you overwrite them with</em>.</p>
-
-<p>So, if you change any of the files significantly, you will need to recreate the symlink…</p>
-
-<h4>Update</h4>
-
-<p>It seems that the symlink system does work: Dropbox will respect the latest version. YMMV.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[tmux - terminal multiplexer]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/01/07/tmux-terminal-multiplexer/"/>
-    <updated>2010-01-07T15:10:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/01/07/tmux-terminal-multiplexer</id>
-    <content type="html"><![CDATA[<p>Over the last couple of days I have been familiarising myself with <a href="http://tmux.sourceforge.net/">tmux</a>.
-As it says on the homepage,</p>
-
-<blockquote><p>tmux is a terminal multiplexer: it enables a number of terminals (or windows), each running a separate program, to be created, accessed, and controlled from a single screen. tmux may be detached from a screen and continue running in the background, then later reattached.</p></blockquote>
-
-
-<p>I was attracted to tmux after seeing a number of enthusiastic postings on the
-<a href="http://bbs.archlinux.org/viewtopic.php?id=84157">Arch forums</a>, and by the promise of
-better management of multiple terminals in a single <a href="http://dwm.suckless.org/">dwm tag</a>…</p>
-
-<p>It&#8217;s available in the community repo, so:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S tmux
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then it is just a matter of configuring it to suit your style of working,
-keyboard bindings etc. Helpfully, it comes with some example config files to
-start you off. These can be found at <span class="file">/usr/share/tmux/*.conf</span>.
-I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</a> for mine:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># set prefix key to ctrl+t</span>
-</span><span class='line'>unbind C-b
-</span><span class='line'><span class="nb">set</span> -g prefix C-t
-</span><span class='line'>
-</span><span class='line'><span class="c"># more intuitive keybindings for splitting</span>
-</span><span class='line'>unbind %
-</span><span class='line'><span class="nb">bind </span>h split-window -h
-</span><span class='line'>unbind <span class="s1">&#39;&quot;&#39;</span>
-</span><span class='line'><span class="nb">bind </span>v split-window -v
-</span><span class='line'>
-</span><span class='line'><span class="c"># set vi keys</span>
-</span><span class='line'>unbind <span class="o">[</span>
-</span><span class='line'><span class="nb">bind </span>Escape copy-mode
-</span><span class='line'>setw -g mode-keys vi
-</span><span class='line'>
-</span><span class='line'><span class="c"># send the prefix to client inside window (ala nested sessions)</span>
-</span><span class='line'><span class="nb">bind</span>-key a send-prefix
-</span><span class='line'>
-</span><span class='line'><span class="c"># toggle last window like screen</span>
-</span><span class='line'><span class="nb">bind</span>-key C-b last-window
-</span><span class='line'>
-</span><span class='line'><span class="c"># confirm before killing a window or the server</span>
-</span><span class='line'><span class="nb">bind</span>-key k confirm <span class="nb">kill</span>-window
-</span><span class='line'><span class="nb">bind</span>-key K confirm <span class="nb">kill</span>-server
-</span><span class='line'>
-</span><span class='line'><span class="c"># toggle statusbar</span>
-</span><span class='line'><span class="nb">bind</span>-key b <span class="nb">set</span>-option status
-</span><span class='line'>
-</span><span class='line'><span class="c"># ctrl+left/right cycles thru windows</span>
-</span><span class='line'><span class="nb">bind</span>-key -n C-right next
-</span><span class='line'><span class="nb">bind</span>-key -n C-left prev
-</span><span class='line'>
-</span><span class='line'><span class="c"># open a man page in new window</span>
-</span><span class='line'><span class="nb">bind</span> / <span class="nb">command</span>-prompt <span class="s2">&quot;split-window &#39;exec man %%&#39;&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># quick view of processes</span>
-</span><span class='line'><span class="nb">bind</span> <span class="s1">&#39;~&#39;</span> split-window <span class="s2">&quot;exec htop&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># scrollback buffer n lines</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">history</span>-limit 5000
-</span><span class='line'>
-</span><span class='line'><span class="c"># on-screen time for display-panes in ms</span>
-</span><span class='line'><span class="nb">set</span> -g display-panes-time 2000
-</span><span class='line'>
-</span><span class='line'><span class="c"># start window indexing at one instead of zero</span>
-</span><span class='line'><span class="nb">set</span> -g base-index 1
-</span><span class='line'>
-</span><span class='line'><span class="c"># enable wm window titles</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles on
-</span><span class='line'>
-</span><span class='line'><span class="c"># wm window title string (uses statusbar variables)</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles-string <span class="s2">&quot;tmux:#I #W&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># session initialization</span>
-</span><span class='line'>new -s TTYtter ttytter
-</span><span class='line'>neww -t 2
-</span><span class='line'>neww -d -t 3
-</span><span class='line'>neww -d -t 5
-</span><span class='line'>selectw -t 1
-</span><span class='line'>
-</span><span class='line'><span class="c">#### statusbar ####</span>
-</span><span class='line'><span class="nb">set</span> -g status-interval 1
-</span><span class='line'><span class="nb">set</span> -g status-justify centre <span class="c"># center align window list</span>
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="s1">&#39;#[fg=green] #H #[default]&#39;</span>
-</span><span class='line'><span class="nb">set</span> -g status-right <span class="s1">&#39;#[fg=blue,bright]Up#(uptime | cut -f 4-5 -d &quot; &quot; | cut -f 1 -d &quot;,&quot;) </span>
-</span><span class='line'><span class="s1">#[default]:: #[fg=cyan]#(cut -d &quot; &quot; -f 1-4 /proc/loadavg) &#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># default statusbar colors</span>
-</span><span class='line'><span class="nb">set</span> -g status-fg white
-</span><span class='line'><span class="nb">set</span> -g status-bg default
-</span><span class='line'><span class="nb">set</span> -g status-attr bright
-</span><span class='line'>
-</span><span class='line'><span class="c"># default window title colors</span>
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-fg white
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-bg default
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-attr dim
-</span><span class='line'>
-</span><span class='line'><span class="c"># active window title colors</span>
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-fg white
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-bg default
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-attr bright
-</span><span class='line'>
-</span><span class='line'><span class="c"># command/message line colors</span>
-</span><span class='line'><span class="nb">set</span> -g message-fg white
-</span><span class='line'><span class="nb">set</span> -g message-bg black
-</span><span class='line'><span class="nb">set</span> -g message-attr bright
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Copy this file to <span class="file">~/.tmux.conf</span>. The final result:</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4252840248/" title="Archlinux:  tmux running in dwm by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2703/4252840248_01ca8e7cc1.jpg" width="500" height="293" alt="Archlinux:  tmux running in dwm"/></a></p>
-
-<h3>Updated 16/11/10</h3>
-
-<p>For a current version of my <span class="file">.tmux.conf</span>, check my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.tmux.conf" title="bitbucket site" target="_blank">mercurial repository</a>.</p>
 ]]></content>
   </entry>
   
