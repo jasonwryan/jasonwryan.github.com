@@ -3,7 +3,7 @@ layout: post
 title: "Intuxication"
 date: 2011-01-13 10:00
 comments: true
-categories: [vcs, intuxication, linux]
+categories: [vcs, linux]
 ---
 ![image](http://dl.dropbox.com/u/261312/Blog-images/intuxication.png)
 

@@ -3,7 +3,7 @@ layout: post
 title: "WMFS - Window Manager From Scratch"
 date: 2010-12-26 11:08
 comments: true
-categories: [wmfs, archlinux]
+categories: [archlinux]
 ---
 [![image](http://dl.dropbox.com/u/261312/Blog-images/wmfs.png)](http://www.flickr.com/photos/jasonwryan/5289976238/lightbox/ "Screenshot on Flickr")
 

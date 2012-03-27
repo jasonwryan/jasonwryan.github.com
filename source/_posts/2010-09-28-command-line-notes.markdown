@@ -3,7 +3,7 @@ layout: post
 title: "Command Line Notes"
 date: 2010-09-28 17:56
 comments: true
-categories: [cli, awk, gtd, otw]
+categories: [linux, hack, bash]
 ---
 ![image](http://dl.dropbox.com/u/261312/Blog-images/cli-notes-1.png)
 
@@ -62,10 +62,9 @@ And if you really want this to work well, create your <span class="file">.notes<
 in a [dropbox folder](http://dropbox.com/ "File synching utility") and
 symlink to it from <span class="file">~/.notes</span>.
 
-<div class="footnotes">
+##### Notes
 1. See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.
-<br />
+      
 2. Obligatory “after” screenshot:
-<br />
+      
 {% img http://dl.dropbox.com/u/261312/Blog-images/cli-notes-2.png 'Screenshot of editing text' %}
-</div>

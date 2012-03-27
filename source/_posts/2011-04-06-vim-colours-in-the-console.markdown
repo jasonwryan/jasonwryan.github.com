@@ -3,7 +3,7 @@ layout: post
 title: "Vim Colours in the Console"
 date: 2011-04-06 21:19
 comments: true
-categories: [vim, console, tmux]
+categories: [vim, linux, tmux]
 ---
 ![image](http://dl.dropbox.com/u/261312/Blog-images/vim-colours1.png)
 
@@ -120,8 +120,7 @@ And you can see
 [a screenshot](http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/ "Vim colours in console")
 of the finished product on Flickr.
 
-<div class="footnotes">
+##### Notes
 1. <a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miro8.vim" title="Mercurial repo: miro8 colourscheme">miro8.vim</a>
-<br />
+      
 2. <a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a>
-</div>

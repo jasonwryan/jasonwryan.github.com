@@ -3,7 +3,7 @@ layout: post
 title: "Console Fonts in Ubuntu"
 date: 2010-10-21 20:38
 comments: true
-categories: [ubuntu, linux, fonts, console, tty]
+categories: [ubuntu, linux]
 ---
 ![image](http://dl.dropbox.com/u/261312/Blog-images/ubuntu-fonts.png)
 
@@ -54,8 +54,9 @@ sudo dpkg-reconfigure console-setup
 
 And *now* I have a workable framebuffer.
 
-<div class="footnotes">
+##### Notes
 1. Hack to force higher framebuffer resolution in <span class="file">/etc/default/grub</span>
-<br />
-<pre><code>GRUB_GFXPAYLOAD_LINUX=1680x1050</code></pre>
-</div>
+
+{% codeblock lang:sh %}
+GRUB_GFXPAYLOAD_LINUX=1680x1050
+{% endcodeblock %}

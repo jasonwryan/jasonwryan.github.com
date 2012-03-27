@@ -3,17 +3,17 @@ layout: post
 title: "Vimprobable"
 date: 2010-10-07 16:23
 comments: true
-categories: [vimprobable, webkit, browser, archlinux]
+categories: [browser, archlinux]
 ---
 [![image](http://dl.dropbox.com/u/261312/Blog-images/vimprobable.png "Hacked Vimprobable2")](http://www.flickr.com/photos/jasonwryan/5055695051/ "Vimprobable on Flickr")
 
-After just posting details of [my setup](http://jasonwryan.com/post/1240576133/setup), 
+After just posting details of [my setup](http://jasonwryan.com/2010-10-04-the-setup), 
 I have made a reasonably significant (and it goes almost without saying, unplanned)
 change: after [uzbl](http://www.uzbl.org/) began unaccountably maxxing
 out my CPU, I decided to give [Vimprobable](http://www.vimprobable.org/)
 a go.
 
-I covered it briefly in my review of [5 alternate browsers](http://jasonwryan.com/post/618038288/browsers) and liked the
+I covered it briefly in my review of [5 alternate browsers](http://jasonwryan.com/2010-5-21-5-alternate-browsers) and liked the
 idea of another vim-based browsing experience.
 
 There are two versions of Vimprobable; the differences, as described on
@@ -70,12 +70,11 @@ open Vimprobable in tabbed for tab management. A quick addition to my
 keybinds in [dwm](http://dwm.suckless.org/ "dynamic window manager") and
 I have a minimalist and powerful browser…
 
-<div class="footnotes">
+##### Notes
 1. Of course, you are not limited to these files; the beauty of free
 and open-source software is that you can change any of it…
-<br />
+      
 2. To support this claim, I searched google for an image of the default
 Vimprobable hinting style, and I could only find this 
 <a href="http://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/103/10387/10387f2.jpg">screenshot of conkeror</a>,
 which will give you an idea…
-</div>

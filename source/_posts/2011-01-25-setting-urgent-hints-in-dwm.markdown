@@ -15,7 +15,7 @@ and init pertag<sup>1</sup>) I finally added another one:
 statuscolours<sup>2</sup>…
 
 I have been experimenting with
-[WMFS](http://jasonwryan.com/post/2461350935/wmfs "My post on using WMFS"),
+[WMFS](http://jasonwryan.com/2010-12-26-wmfs-window-manager-from-scratch "My post on using WMFS"),
 which is another very nice, minimal tiling window manager and was really
 enjoying the urgency hints in the status bar, so I decided to patch that
 functionality into dwm.
@@ -61,10 +61,8 @@ You can see my
 [patched dwm.c](http://beta.intuxication.org/jasonwryan/archer/file/tip/Build/dwm/5.8.2-2.diff "dwm.c patched")
 in my intuxication repo.
 
-<div class="footnotes">
+##### Notes
 1. These patches are from the extremely helpful Arch Forum thread: 
 <a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a>
-<br />
 2. I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
 from the suckless mailing list. It irons out the padding issues in the one on the wiki.
-</div>

@@ -3,7 +3,7 @@ layout: post
 title: "Patching dwm with pertag and bstack"
 date: 2009-12-19 17:40
 comments: true
-categories: [dwm, archlinux, patch, bstack, pertag]
+categories: [dwm, archlinux]
 ---
 Over the last several months I have been using [dwm](http://dwm.suckless.org/) 
 as my window manager on two [Arch Linux](http://www.archlinux.org/)
@@ -71,5 +71,5 @@ patching or using the above method. YMMV.
 
 ### Update
 So I was wrong: you can get pertag to work with all the
-other patches, and it is [not that difficult](http://jasonwryan.com/post/421618180/patching-dwm)…
+other patches, and it is [not that difficult](http://jasonwryan.com/2010-03-02-patching-dwm)…
 

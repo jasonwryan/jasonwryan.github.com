@@ -3,7 +3,7 @@ layout: post
 title: "Changing Karmic's Login Screen"
 date: 2009-11-07 18:46
 comments: true
-categories: [ubuntu,login,linux,hack]
+categories: [ubuntu,linux,hack]
 ---
 With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
 accelerate boot time. This has made for a faster boot, but a side effect has

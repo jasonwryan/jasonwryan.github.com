@@ -3,7 +3,7 @@ layout: post
 title: "dzen2 and conky-cli in dwm"
 date: 2009-11-21 12:07
 comments: true
-categories: [dwm, conky, dzen, archlinux] 
+categories: [dwm, archlinux] 
 ---
 I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar.
 

@@ -3,7 +3,7 @@ layout: post
 title: "Changing Keybinds in vifm"
 date: 2009-12-28 13:50
 comments: true
-categories: [vifm, linux, unix, filemanager, hack]
+categories: [linux, hack]
 ---
 [Vifm](http://vifm.sourceforge.net/) is a ncurses based file manager with vi-like
 keybindings; it gives you complete keyboard control over your files without

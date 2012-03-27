@@ -3,7 +3,7 @@ layout: post
 title: "Using Uzbl"
 date: 2010-02-27 10:19
 comments: true
-categories: 
+categories: [archlinux, browser]
 ---
 [![Arch &
 uzbl](http://dl.dropbox.com/u/261312/Blog-images/uzbl.jpg)](http://www.flickr.com/photos/jasonwryan/4352140405/ "Arch & uzbl by jasonwryan, on Flickr")

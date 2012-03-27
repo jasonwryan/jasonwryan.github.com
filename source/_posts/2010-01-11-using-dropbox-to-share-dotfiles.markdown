@@ -3,7 +3,7 @@ layout: post
 title: "Using Dropbox to Share Dotfiles"
 date: 2010-01-11 11:10
 comments: true
-categories: [dropbox, dotfile, linux, hack]
+categories: [linux, hack]
 ---
 I regularly back up all my dotfiles to <a href="http://www.dropbox.com/" title="Synch your computers securely...">Dropbox</a> 
 as a matter of course. I had intended, at some point, to set up a 

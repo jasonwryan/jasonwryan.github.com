@@ -3,7 +3,7 @@ layout: post
 title: "Patching dwm"
 date: 2010-03-02 20:16
 comments: true
-categories: [dwm, archlinux, patches]
+categories: [dwm, archlinux]
 ---
 ![image](http://dl.dropbox.com/u/261312/Blog-images/patching-dwm.png)
 

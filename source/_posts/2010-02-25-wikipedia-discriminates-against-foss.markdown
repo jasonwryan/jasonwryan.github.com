@@ -3,7 +3,7 @@ layout: post
 title: "Wikipedia Discriminates Against FOSS"
 date: 2010-02-25 06:59
 comments: true
-categories: [wikipedia, dwm, foss, opensource]
+categories: [linux, dwm]
 ---
 There is currently an interesting debate on Wikipedia about [deleting the article on dwm.](http://en.wikipedia.org/wiki/Wikipedia:Articles_for_deletion/Dwm "Wikipedia page")
 

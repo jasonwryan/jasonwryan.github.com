@@ -3,7 +3,7 @@ layout: post
 title: "tmux - terminal multiplexer"
 date: 2010-01-07 15:10
 comments: true
-categories: [tmux, terminal, unix, linux]
+categories: [tmux, linux]
 ---
 Over the last couple of days I have been familiarising myself with [tmux](http://tmux.sourceforge.net/). 
 As it says on the homepage,

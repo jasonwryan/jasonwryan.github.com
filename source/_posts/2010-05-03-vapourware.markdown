@@ -3,7 +3,7 @@ layout: post
 title: "Vapourware"
 date: 2010-04-03 13:18
 comments: true
-categories: [pr, media, software, bullshit]
+categories: [media]
 ---
 This morning I received a heap of brochures inviting me to attend
 professional development courses, training seminars and conferences. One
