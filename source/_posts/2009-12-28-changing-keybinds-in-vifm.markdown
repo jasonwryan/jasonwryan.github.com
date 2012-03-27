@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "changing keybinds in vifm"
+title: "Changing Keybinds in vifm"
 date: 2009-12-28 13:50
 comments: true
 categories: [vifm, linux, unix, filemanager, hack]
@@ -16,11 +16,11 @@ height="227" alt="Vifm"/></a>
 The only drawback, for me, is that as of the current version (0.5-1) you
 can't map keys. While the developer has indicated it is on the todo list,
 he also flagged that it is some way off. If, like me, you `map : ;`
-in [Vim](href="http://www.vim.org/), then not having this functionality is a minor
+in [Vim](http://www.vim.org/), then not having this functionality is a minor
 irritant. Fortunately, it is also easily fixed. Ken Steen, the Vifm developer,
 was kind enough to point me in the right direction…
 
-Download [the tarball](a href="http://aur.archlinux.org/packages.php?ID=6011) from 
+Download [the tarball](http://aur.archlinux.org/packages.php?ID=6011) from 
 <acronym title="Arch User Repository">AUR</acronym> and untar it etc.,
 
 {% codeblock lang:sh %}
@@ -54,6 +54,6 @@ Recompile Vifm and you are done&#8230;
 $ makepkg -efi
 {% endcodeblock %}
 
-### Update 18/2/10 ### 
+### Update 18/2/10  
 Vifm has now been moved to Community, so you can use
 [ABS](http://wiki.archlinux.org/index.php/Arch_Build_System%22) to build the package.
