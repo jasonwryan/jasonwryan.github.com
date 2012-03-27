@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "tmux - terminal multiplexer"
-date: 2012-03-27 13:28
+date: 2010-01-07 15:10
 comments: true
 categories: [tmux, terminal, unix, linux]
 ---

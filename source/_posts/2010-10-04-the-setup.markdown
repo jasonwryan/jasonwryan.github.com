@@ -1,0 +1,189 @@
+---
+layout: post
+title: "The Setup"
+date: 2010-10-04 17:23
+comments: true
+categories: [linux, archlinux, ubuntu, dwm, software]
+---
+[![image](http://dl.dropbox.com/u/261312/Blog-images/setup.png)](http://www.flickr.com/photos/jasonwryan/4522790892/ "Arch Linux and dwm")
+
+Inspired by [The Setup](http://usesthis.com/)<sup>1</sup>, I decided to document
+the free (as in [freedom](http://www.gnu.org/philosophy/free-sw.html))
+and open source software tools I use daily.
+
+I made the move to using open-source about four years ago. At the time
+it was mostly a practical decision — the Pentium 4 laptop that I was
+using with XP on it had slowed to a crawl and I wasn’t keen to replace
+it, so I installed Ubuntu (Hardy Heron) on it and haven’t looked back.
+
+That same machine, incidentally, is still happily churning away, but it
+now runs a lightweight [Debian Stable](http://www.debian.org/releases/stable/).
+
+### Desktop
+My primary home machine is a one I had built from spec two to three
+years ago. It was always intended to be a long-term investment, with
+sufficient power and storage to last for the better part of a decade.
+
+Centurion is an 
+[Asus P5E-V motherboard](http://www.asus.com/Product.aspx?P_ID=cXoprTXLaShErTzI&content=specifications)
+with an 
+[Intel Core 2 Quad 6600 2.4GHz CPU](http://www.intel.com/products/processor/core2quad/index.htm) and
+4GB of DDR2 RAM. The sound card is an 
+[M-Audio Audiophile 2496](http://www.m-audio.com/products/en_us/Audiophile2496.html) and the
+graphics card is a 
+[1GB nVidia GeForce 9600GT](http://www.nvidia.com/object/product_geforce_9600gt_us.html)
+driving an LG 22” flat panel 1680x1050 display.
+
+#### Software
+I dual boot this machine, switching between the current
+[Ubuntu](http://www.ubuntu.com) (10.04) and [Arch Linux](http://archlinux.org).
+
+There are two 1TB Seagate drives in a [RAID1 array](http://en.wikipedia.org/wiki/RAID),
+and a 500GB Seagate which has Arch on it as well as a couple of virtual machines. 
+I back up the RAID array frequently, using [rsync](http://www.samba.org/rsync/), as it
+holds my <span class="file">/home</span> but don’t worry about the 500GB drive 
+as I figure it is simple to reinstall Arch or a virtual machine…
+
+I try to use the same software across all of my machines to simplify my
+working habits, however I am experiencing some tension between Ubuntu
+and Arch insofar as Arch is a rolling release and you very quickly get
+used to the most recent builds…
+
+Applications specific to the Ubuntu box include:
+
+* [Firefox](http://www.getfirefox.net/): I also have
+[Chrome](http://www.google.com/chrome) installed on this machine, but
+stick with the ‘fox for [Firebug](http://getfirebug.com/) and other
+extensions
+
+* [Thunderbird](http://www.mozillamessaging.com/en-US/thunderbird/): with
+the [Enigmail](http://enigmail.mozdev.org/home/index.php.html)
+extension. One of those areas of tension - it’s just a matter of time
+before I move to `mutt` (see EeePC)
+
+* [Squeezeserver](http://wiki.slimdevices.com/index.php/SlimServer): I
+have a Logitech Squeezebox to serve my music and it runs off this great
+open source software
+
+* [Virtualbox](http://www.virtualbox.org/) (OS): for running virtual
+machines - currently [Slackware](http://www.slackware.com/) and
+[FreeBSD](http://www.freebsd.org/).
+
+### EeePC 901
+Archer is a 901 I bought two years ago – the 
+[Linux model with the 4/16GB SSD](http://eeepc.asus.com/au/product901-spec.html), and I
+absolutely love it. I put a second GB of RAM into it and another 16GB SD
+Card (for /music) and it does everything that I need. The 
+[Atom 1.6GHz processor](http://www.intel.com/products/processor/atom/index.htm)
+handles compiling relatively smartly and the screen and keyboard, while
+small (9” at 1024x600) are not uncomfortable to use for protracted
+sessions. It is also *deathly quiet*. The only other addition is a
+second 6 cell battery so I can safely count on 8-10 hours out of it.
+
+One of the reasons that it works so efficiently is that it is an
+*extremely* minimal Arch Linux setup.
+
+#### Software
+Applications specific to this machine are:
+
+-   [dwm](http://dwm.suckless.org "dwm page on suckless"): *the*
+    suckless window manager. With added functionality of some patches:
+    init-pertag, cycle and push: see [the patchset for
+    details](https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/dwm/5.8.2-2.diff)
+-   [dmenu](http://tools.suckless.org/dmenu/): application launcher,
+    again from suckless.org
+-   [mutt](http://www.mutt.org/): the best email client I have used -
+    requires some setup, but –if you want your mail client to run
+    exactly as you would like– then this one repays the investment in
+    spades. Mutt is just a MUA, the rest of the email cycle is handled
+    by:
+    -   [offlineimap](http://github.com/jgoerzen/offlineimap/wiki): to
+        fetch mail
+    -   [msmtp](http://msmtp.sourceforge.net/): to send mail
+    -   [GnuPG](http://www.gnupg.org/): for signing and encryption
+    -   [abook](http://abook.sourceforge.net/): address book
+    -   [urlview](http://linuxcommand.org/man_pages/urlview1.html) and
+        [lynx](http://lynx.browser.org/): open urls from mutt
+
+-   ~~[uzbl](http://www.uzbl.org/): a lightweight webkit browser that is
+    infintely extensible and
+    [configurable](https://bitbucket.org/jasonwryan/eeepc/src/tip/.config/uzbl/config)~~^2^
+-   [Vimprobable](http://www.vimprobable.org/) in
+    [tabbed](http://tools.suckless.org/tabbed): another lightweight
+    webkit browser that can be
+    [customized](http://www.flickr.com/photos/jasonwryan/5063510130/ "Screenshot on Flickr")
+    to your heart’s desire…
+-   A host of small programs that make life easy:
+    -   [feh](https://derf.homelinux.org/projects/feh/): image viewer
+    -   [autocutsel](http://www.nongnu.org/autocutsel/): synchronize
+        clipboards
+    -   [dzen](http://sites.google.com/site/gotmor/dzen) and
+        [conky](http://conky.sourceforge.net/): to print system stats to
+        dwm’s status bar
+    -   [surfraw](http://surfraw.alioth.debian.org/): command line
+        search client
+    -   [unclutter](http://www.ibiblio.org/pub/X11/contrib/utilities/unclutter-8.README):
+        hides the mouse cursor (don’t really need a mouse with this
+        setup)
+    -   [xmodmap](http://www.xfree86.org/4.2.0/xmodmap.1.html): map Caps
+        Lock to Escape
+
+#### Common tools
+
+Applications and utilities that I use across all of my machines include:
+
+- [Urxvt](http://software.schmorp.de/pkg/rxvt-unicode.html): I would’nt
+  dream of using another terminal… Run as a daemon, with these
+  applications:
+
+    -   [tmux](http://tmux.sourceforge.net/): for local and remote terminal
+        sessions
+    -   [Vim](http://www.vim.org/): with a [simple notes function](http://jasonwryan.com/2010-09-28-command-line-notes) 
+        in my .bashrc
+    -   [Vifm](http://vifm.sourceforge.net/): Vi-like file manager – for
+        when I am not using
+        [coreutils](http://www.gnu.org/software/coreutils/)
+    -   [TTYtter](http://www.floodgap.com/software/ttytter/): fantastic
+        Twitter client: if it could integrate Identi.ca into a single feed,
+        it would be perfect…
+    -   [irssi](http://irssi.org/): for IRC
+    -   [Mplayer](http://www.mplayerhq.hu/design7/news.html): for movies
+    -   [MPD](http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki) and
+        [ncmpcpp](http://unkart.ovh.org/ncmpcpp/): music player daemon and
+        ncurses player
+    -   [mpdscribble](http://code.google.com/p/mpdscribble/): for scrobbling
+        to Libre.fm and Last.fm
+    -   [rtorrent](http://libtorrent.rakshasa.no/): run inside tmux for
+    remote sessions. Genius.
+
+- [Dropbox](http://www.dropbox.com/): the daemon is closed source, but
+  this is the best tool I have found for synching across machines. If the
+  Ubuntu One devs ever focus on other Linux distros, I’d move across.
+- [Truecrypt](http://www.truecrypt.org/): a TC volume in Dropbox and you
+  are set
+- [Skype](http://www.skype.com/intl/en/home).
+
+#### Other Utilities
+I use [mercurial](http://mercurial.selenic.com/) and
+[bitbucket](https://bitbucket.org/jasonwryan/) to share my dotfiles
+between Arch machines (one of my work boxes is also running Arch). I
+have two [Linksys WRT54GL routers](http://www.linksysbycisco.com/EU/en/products/WRT54GL), both
+running [Tomato](http://www.polarcloud.com/tomato), to handle my routing
+and wireless networking (thanks to
+[@jethrocarr](http://twitter.com/jethrocarr "Jethro on Twitter") for
+solving that puzzle). For LAN file sharing I use
+[NFS](http://nfs.sourceforge.net/) and I use
+[OpenSSH](http://www.openssh.com/) to access my machines remotely. I
+have a third generation [iPod](http://guides.macrumors.com/iPod_(3G))
+and I run [Rockbox](http://www.rockbox.org/) on it.
+
+You can see screenshot of these machines on
+[flickr](http://www.flickr.com/photos/jasonwryan).
+
+<div class="footnotes">
+1. …and the fact that, apart from RMS, it is pretty much MacBookPros
+all the way down.
+<br />
+2. Updated 9/10/10 - <a href="http://jasonwryan.com/2010-10-07-vimprobable" title="My post on changing to Vimprobable">moved to Vimprobable</a>
+after some issues with uzbl.
+</div>
