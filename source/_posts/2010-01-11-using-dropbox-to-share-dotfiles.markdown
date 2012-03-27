@@ -28,7 +28,7 @@ $ ln -s ../../path/to/dotfile
 The next step was to create a simple <acronym title="HyperText Markup Language">HTML</acronym> page 
 (and a stylesheet to make it look presentable) and drop them into the same directory.
 
-<a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="jason's dotfile repo"><img src="http://dl.dropbox.com/u/261312/Blog-images/dropbox-repo.png"/></a>
+<a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="jason's dotfile repo"><img src="http://dl.dropbox.com/u/261312/Blog-images/dropbox-repo.png"></a>
 
 ### Caveat ###
 Dropbox has the very handy feature of retaining versions of all the files you upload. Unfortunately, in this case, that means that the symlinks will always point to the file that you originally set them at — <em>irrespective of any updates you overwrite them with</em>.
