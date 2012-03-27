@@ -41,8 +41,8 @@ So I thought I would rectify that.
 
 You can grab the archwiki elvis from my 
 [mercurial repo](http://beta.intuxication.org/jasonwryan/longbow/file/tip/scripts/archwiki "Intuxication repo"),
-copy it into your local directory at $XDG\_CONFIG\_HOME/surfraw/elvi/ or
-in the system folder at $XDG\_CONFIG\_DIRS/surfraw/ and you can surf the
+copy it into your local directory at <span class="file">$XDG\_CONFIG\_HOME/surfraw/elvi/</span> or
+in the system folder at <span class="file">$XDG\_CONFIG\_DIRS/surfraw/</span> and you can surf the
 Arch Wiki, or any one of the nine other language wikis, from the command
 line.
 
