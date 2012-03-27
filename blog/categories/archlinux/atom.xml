@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-27T21:29:03+13:00</updated>
+  <updated>2012-03-27T22:24:43+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,250 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Setting Urgent Hints in dwm]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/01/25/setting-urgent-hints-in-dwm/"/>
+    <updated>2011-01-25T17:45:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/01/25/setting-urgent-hints-in-dwm</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5379701719/#/photos/jasonwryan/5379701719/lightbox/" title="Arch Linux: dwm with statuscolors patch"><img src="http://dl.dropbox.com/u/261312/Blog-images/dwm-urgent.png" alt="image" /></a></p>
+
+<p>After nearly 12 months of running a pretty stable
+<a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>, with a consistent
+patchset (cycle,
+<a href="http://dwm.suckless.org/patches/push" title="Push on suckless wiki">push</a>,
+and init pertag<sup>1</sup>) I finally added another one:
+statuscolours<sup>2</sup>…</p>
+
+<p>I have been experimenting with
+<a href="http://jasonwryan.com/post/2461350935/wmfs" title="My post on using WMFS">WMFS</a>,
+which is another very nice, minimal tiling window manager and was really
+enjoying the urgency hints in the status bar, so I decided to patch that
+functionality into dwm.</p>
+
+<p>Most terminal applications will send a bell when your attention is
+required; in my case, I was looking for a way to trigger notifications
+for new mail in
+<a href="http://www.mutt.org/" title="If you are using another mail user agent, you are doing it wrong...">mutt</a>
+or highlights in <a href="http://irssi.org/" title="IRC client">irssi</a>. In mutt, it
+was just a case of setting a bell for when mail arrived:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span>beep_new             <span class="c"># bell on new mail</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And in irssi:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">beep_msg_level</span> <span class="o">=</span> <span class="s2">&quot;NOTICE MSGS HILIGHT&quot;</span>;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>In <a href="http://tmux.sourceforge.net/" title="terminal mulitplexer">tmux</a>, to cover
+all your terminal bases, add:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set</span> -g bell-action any <span class="c"># listen for activity on all windows</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The next step is to pass those beeps to your terminal. The entry for
+Urxvt is one I picked up after a quick search turned up
+<a href="http://rsontech.net/articles/2008/11/17/1/handling-urgency-hints" title="Post on reson.tech">this post by rson</a>
+which had the .Xdefaults line I was looking for:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>URxvt*urgentOnBell: <span class="nb">true</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now, whenever a bell is triggered in irssi or mutt, that is passed to
+the terminal as an urgent hint. The final step was patching statuscolors
+into dwm.c to change the tag colour when the hint was received.</p>
+
+<p>You can see my
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Build/dwm/5.8.2-2.diff" title="dwm.c patched">patched dwm.c</a>
+in my intuxication repo.</p>
+
+<div class="footnotes">
+1. These patches are from the extremely helpful Arch Forum thread: 
+<a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a>
+<br />
+2. I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
+from the suckless mailing list. It irons out the padding issues in the one on the wiki.
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mail Checking Script]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/01/08/mail-checking-script/"/>
+    <updated>2011-01-08T11:04:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/01/08/mail-checking-script</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/mailcheck.png" alt="image" /></p>
+
+<p>I use <a href="http://www.mutt.org/" title="Mutt homepage">mutt</a> and
+<a href="https://github.com/jgoerzen/offlineimap/wiki" title="Offlineimap on github">offlineimap</a>
+to manage email on my Arch Linux machines. I like the simplicity and the
+power that this approach offers; that’s power in the sense of
+extensibility and customization, by the way…</p>
+
+<p>Using <a href="http://dwm.suckless.org/" title="dwm homepage">dwm</a> as my window
+manager, I had relied on
+<a href="http://jasonwryan.com/2009-11-21-dzen2-and-conky-cli-in-dwm" title="My post on setting this up">conky and dzen2</a>
+to pipe system information into my status bar. Unfortunately, conky only
+supports one mail spool so if, like me, you use offlineimap to
+synchronize multiple mailboxes, conky would only show new mail in your
+primary box. I had asked in #conky about multiple mail spools, but it
+doesn’t seem to be supported.</p>
+
+<p>When I recently started using
+<a href="http://jasonwryan.com/2010-12-26-wmfs-window-manager-from-scratch" title="My post on Window Manager From Scratch">WMFS</a>
+I decided to move to a
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/wmfs-status" title="Script in intuxication repo">bash script for my status information</a>.
+So I approached the problem afresh and decided to write a script to poll
+the new mail directories and update my status bar when mail arrived.</p>
+
+<p>Offlineimap creates a directory structure like so:</p>
+
+<pre><code>   Mail/ -------
+      |         |
+      |     Mail_Account_1
+      |         |
+      |         | --  INBOX 
+      |         |       | -- cur
+      |         |       | -- new
+      |         |       | -- temp
+      |         |
+      |         | -- INBOX.Drafts
+      |         |       | -- cur
+</code></pre>
+
+<p>As I was only interested in checking the <span class="file">INBOX/new</span>
+directory of each account, I had imagined that it would be necessary to set up some
+elaborate array to effectively check each of the requisite sub-directories…</p>
+
+<p>No, it was pretty simple. Just
+<a href="http://www.faqs.org/docs/abs/HTML/globbingref.html" title="ABS entry on globing">globbing</a>
+and
+<a href="http://linuxmanpages.com/man1/find.1.php" title="man page for find">find</a>,
+actually.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>mailcheck.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Set maildirs&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;maildirs<span class="o">=</span><span class="s2">&quot;$HOME/Mail/*/INBOX/new/&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;find <span class="nv">$maildirs</span> -type f | wc -l
+</span><span class='line'><span class="nb">exit </span>0
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The glob (<code>*</code>) takes care of the different mail account names, and has
+the added bonus of being portable, and find returns any files (<code>-type f</code>)
+with <code>wc</code> counting the number of lines (the <code>-l</code> switch).</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[WMFS - Window Manager From Scratch]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/12/26/wmfs-window-manager-from-scratch/"/>
+    <updated>2010-12-26T11:08:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/12/26/wmfs-window-manager-from-scratch</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5289976238/lightbox/" title="Screenshot on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/wmfs.png" alt="image" /></a></p>
+
+<p>I have been experimenting with a couple of new window managers over the
+last week or so. Not that I am in any way dissatisfied with
+<a href="http://dwm.suckless.org/" title="suckless page for dwm">dwm</a> — far from it; I
+do from time to time, however, like to see what else is on offer.</p>
+
+<p><a href="http://wmfs.info/projects/wmfs" title="WMFS homepage">WMFS</a> is a fairly new
+entrant in the window manager marketplace. The developers describe it
+as:</p>
+
+<blockquote><p>a lightweight and highly configurable tiling window manager for X… It
+supports Xft (Freetype) fonts and is compliant with the Extended
+Window Manager Hints (EWMH) specifications, Xinerama and Xrandr.</p></blockquote>
+
+<p>The <a href="http://aur.archlinux.org/packages.php?ID=26924" title="AUR page">git version is available</a> in
+AUR, and is straightforward to build and install. The fun, as always,
+comes with customization…</p>
+
+<p>As is says on the box, WMFS is highly configurable. The configuration is
+all done (initially) in one file, which you will need to copy to your
+<span class="file">~/.config/wmfs/directory</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cp /etc/xdg/wmfs/wmfsrc ~/.config/wmfs/
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Even the default config is relatively fully featured. There are nine
+default layouts (about five more than I usually need, but it is always
+better to over cater). The <span class="file">wmfsrc</span> is quite well
+commented, so most of the options are self explanatory.</p>
+
+<p>One thing I did note about editing this file, which is probably more a
+reflection of my haste rather than the wm itself, is that it seemed
+<em>very</em> unforgiving of any errors. More than once I had to copy the
+default wmfsrc back across and start again. My advice is to make any
+changes cumulatively, and test by reloading before continuing.</p>
+
+<p>You can see my config file in my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/.config/wmfs/wmfsrc" title="Mercurial repository for EeePC">bitbucket repo</a>.
+Most of the changes have been made in setting up my preferred tags and
+keybindings – so they are consistent with my dwm and
+<a href="http://plhk.ru/" title="Echinus window manager home">echinus</a> setups.</p>
+
+<p>One of the great features of WMFS is the status bar. You can pipe all
+sorts of information into it with a bash script, and you can use colours
+and icons (if that is your thing). Simply sourcing the bash script from
+within wmfsrc will see it up and running:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">background_command</span> <span class="o">=</span> <span class="s2">&quot;$HOME/.config/wmfs/autostart.sh&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Or, if you prefer to use conky:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>conky | <span class="k">while </span><span class="nb">read</span> -r; <span class="k">do </span>wmfs -s -name <span class="s2">&quot;$REPLY&quot;</span>; <span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>I use the status bar to display some basic system information. You can
+see from
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/Scripts/wmfs-status" title="Script in bitbucket repo">my status script</a>
+that most of it is simply piping commands through the awesomeness that
+is <a href="http://awk.info/" title="Awk Community Portal">awk</a>.</p>
+
+<p>I hadn’t thought that I would find a replacement for dwm, but WMFS is a
+serious contender. It has all of the functionality out-of-the-box,
+including:</p>
+
+<ul>
+<li>pre-set layout per tag</li>
+<li>rules to send applications to specific tags</li>
+<li>completely customizable keybinds, and – as a bonus,</li>
+<li><a href="http://en.wikipedia.org/wiki/Vi" title="Wikipedia page">Vi</a>-driven
+command interface</li>
+</ul>
+
+
+<p>Unlike dwm, it requires no patching for any of this. It has been
+completely stable while I have been using it and, while not as light as
+dwm, it is still in the minimalist camp in terms of size.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Vimprobable]]></title>
@@ -304,183 +548,6 @@ all the way down.
 after some issues with uzbl.
 </div>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Sessions in tmux]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux/"/>
-    <updated>2010-10-03T20:15:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5046091307/" title="Sessions in tmux by jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4146/5046091307_39c200f1b0.jpg" width="500" height="293" alt="Sessions in tmux"/></a></p>
-
-<p>Now that I have been using it for several months, I have become absolutely dependent upon <a href="http://tmux.sourceforge.net/" target="_blank">tmux</a>, the terminal multiplexer.
-It is both ruthlessly efficient, and can be configured to match exacting requirements. One of those options is to initialize sessions with a preloaded window configuration. After reading the <a href="http://wisconsinlinux.org/tmux-manpage-from-cvs/tmux.1.txt" target="_blank">man page</a> (which, truth be told, could be a little clearer) and some experimentation, I have worked out how to set up my tmux sessions how I want them.
-I have just updated the <a href="http://wiki.archlinux.org/index.php/Tmux">Arch Wiki tmux entry</a>,
-so thought I would share it here.</p>
-
-<p>The relevant part of my config file looks like this:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;session initialization&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;new  -n TTYtter /home/jason/Scripts/ttytter.pl
-</span><span class='line'>neww -n irssi /home/jason/Scripts/startirssi.sh
-</span><span class='line'>neww -n ncmpcpp/vifm ncmpcpp
-</span><span class='line'>splitw -v -p 50 -t 0 vifm
-</span><span class='line'>neww -n bash bash
-</span><span class='line'>selectw -t 1
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Which, when I start tmux with the attach (or a) option, gives me the following window layout:</p>
-
-<ul>
-<li>TTYtter</li>
-<li>irssi</li>
-<li>ncmpcpp/vifm &nbsp; &nbsp; # window split vertically in half, ncmpcpp on top of vifm</li>
-<li>bash</li>
-</ul>
-
-
-<p>The <code>selectw</code> option means that the default view is TTYtter.</p>
-
-<p>Simple.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Patching dwm]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/03/02/patching-dwm/"/>
-    <updated>2010-03-02T20:16:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/03/02/patching-dwm</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/patching-dwm.png" alt="image" /></p>
-
-<p>I had posted <a href="http://jasonwryan.com/2009-12-19-patching-dwm-with-pertag-and-bstack" title="Patching dwm with pertag &amp; bstack">a while back</a>
-about my (failed) attempt to patch <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>
-with both pertag and some of the other layout patches. I had been able to get it to work with
-<a href="http://dwm.suckless.org/patches/bottom_stack" title="dwm wiki: bstack">bottomstack</a>,
-but adding another patch caused some of the chunks to fail. It seems
-pertag moves the code around to the point that – using
-<a href="http://dwm.suckless.org/patches/" title="patches: dwm wiki">the standard patching method</a> –
-any further patches won’t take.</p>
-
-<p>Further investigation, and some trial and a tolerable amount of error,
-have however demonstrated to me that it is quite possible to patch dwm
-to your heart’s content; or at least to my meagre needs. Which in the
-case of <a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="EeePC configs">my EeePC</a>
-is pertag, cycle and push, with the addition of bstack on
-<a href="https://bitbucket.org/jasonwryan/workstation/src/" title="Workstation configs">my workstation</a>.</p>
-
-<p>The solution, as I have found in almost every instance of my tinkering
-with dwm, is stunningly simple. Start with a new version of dwm and
-apply the
-<a href="http://dwm.suckless.org/patches/pertag" title="dwm wiki: pertag">pertag diff</a>. Then
-manually add all of the chunks of the subsequent patches.</p>
-
-<p>All of the changes are now in dwm.c and your config.h should only have
-the necessary keybindings to activate the functionality you have added
-to this amazing window manager.</p>
-
-<p>If you want to see what changes this makes, you can take a peek at
-<a href="https://bitbucket.org/jasonwryan/workstation/src/tip/dwm-5.7.2-2/" title="diff in mercurial repo">my .diff</a>
-(for bstack, cycle, pertag and push). You are equally welcome to apply
-it if that is the functionality that you are looking for in 5.7.2.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Patching dwm with pertag and bstack]]></title>
-    <link href="http://jasonwryan.github.com/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/"/>
-    <updated>2009-12-19T17:40:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2009/12/19/patching-dwm-with-pertag-and-bstack</id>
-    <content type="html"><![CDATA[<p>Over the last several months I have been using <a href="http://dwm.suckless.org/">dwm</a>
-as my window manager on two <a href="http://www.archlinux.org/">Arch Linux</a>
-machines:  my <a href="http://www.flickr.com/photos/jasonwryan/4196530478/" title="Flickr image"
-target="_blank">EeePC 901</a> and an <a href="http://www.flickr.com/photos/jasonwryan/4193384965/" title="Flickr image"
-target="_blank">old Dell</a> at work.</p>
-
-<p>There is a lot to like about dwm, but the most attractive qualities for me
-are the fact that it is <a href="http://en.wikipedia.org/wiki/Source_lines_of_code">under 2000 SLOC</a>
-and is very configurable.</p>
-
-<p>The most recent version, 5.7.2, included some changes that meant that some
-of the patches wouldn't play nicely together anymore; trying to combine
-any of the layout patches with <a href="http://dwm.suckless.org/patches/pertag">pertag</a>
-would result in the code failing to compile.</p>
-
-<p>Fortunately, there is a fix described on <a href="http://lists.suckless.org/dev/0911/2317.html">the mailing list</a>.
-Essentially, it involves manually applying the patch to the source code.</p>
-
-<p>Start with a vanilla version of the code. Move to the source directory and
-apply the pertag patch:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> <span class="nv">$BUILD</span>/dwm/src/dwm-5.7.2/ patch -p1 &amp;lt; dwm-5.7.2-pertag.diff
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then manually add the <a href="http://dwm.suckless.org/patches/bottom_stack">bstack</a>
-(or any of the other layout patches) to <span class="file">dwm.c</span>:</p>
-
-<p>Include the <code>bstack</code> declaring function with the others, beginning line 153. I
-inserted it alphabetically…</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">attachstack</span><span class="p">(</span><span class="n">Client</span> <span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">c</span><span class="p">);</span>
-</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="n">m</span><span class="p">);</span>
-</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">buttonpress</span><span class="p">(</span><span class="n">XEvent</span> <span class="o">*</span><span class="n">e</span><span class="p">);</span>
-</span><span class='line'><span class="err">…</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>And then, <em>after</em> the <code>#include “config.h”</code> declaration at
-275, add in the rest of the patch. For consistency's sake, I included it
-at line 415:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">void</span> <span class="nf">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">mh</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">Client</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="n">c</span><span class="p">;</span> <span class="k">for</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">m</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">clients</span><span class="p">);</span> <span class="n">c</span><span class="p">;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">c</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">next</span><span class="p">),</span> <span class="n">n</span><span class="o">++</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'><span class="k">return</span><span class="p">;</span>
-</span><span class='line'><span class="err">…</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Add you keybindings into your header file (<span class="file">config.h</span>) and recompile:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>makepkg -efi
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Done.</p>
-
-<p>The only fly in the ointment is that, for me anyway, I have been unable to
-get any of the other layout patches to work with this setup; either by regular
-patching or using the above method. YMMV.</p>
-
-<h3>Update</h3>
-
-<p>So I was wrong: you can get pertag to work with all the
-other patches, and it is <a href="http://jasonwryan.com/post/421618180/patching-dwm">not that difficult</a>…</p>
 ]]></content>
   </entry>
   
