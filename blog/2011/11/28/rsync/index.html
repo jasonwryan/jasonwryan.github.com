@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>rsync + SSH Backups - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="I posted recently about setting up a microserver
+and included a
+rsync
+script for backing up my files to the server. At the time, I was running
+it &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/11/28/rsync">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jasonwryan.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">rsync + SSH Backups</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-28T12:23:00+13:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/rsync-ssh.png" alt="image" /></p>
+
+<p>I <a href="http://jasonwryan.com/blog/2011-11-18-microserver" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
+and included a
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
+script for backing up my files to the server. At the time, I was running
+it manually, but since have sorted out the excludes list and have now
+automated it.</p>
+
+<p>My original scheme was to set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
+mount an
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
+before rsync’ing the directories across. In the end, I went with SSH and
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
+as debugging all of the various permissions issues with the NFS share
+did not seem worth the effort.</p>
+
+<p>First, on my local desktop, I created the keypair called, inventively,
+rsync:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
+</span><span class='line'>mv rsync ~/.ssh <span class="o">&amp;&amp;</span> chmod 600 ~/.ssh/rsync
+</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This keypair was created <em>without a passphrase</em> so that the script could
+be successfully called from <code>cron</code>. To slightly increase the security
+around a key without a passphrase, I used the from option in
+authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
+machine(s), like so:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
+the SSH command:</p>
+
+<figure class='code'><figcaption><span>.ssh/config </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Host backups
+</span><span class='line'>   Hostname 192.168.1.200
+</span><span class='line'>   Port 0000
+</span><span class='line'>   User jason
+</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And I was done. Everynight at 10pm, all of my data will be backed up to
+the server. The rsync command in the script:</p>
+
+<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># Backup to remote server over SSH</span>
+</span><span class='line'>
+</span><span class='line'>rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\</span>
+</span><span class='line'>    --log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
+</span><span class='line'>    -e ssh /home/jason /etc backups:Backups/Centurion
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h5>Notes</h5>
+
+<ol>
+<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
+</ol>
+
+
+<p>Creative Commons image from
+<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-28T12:23:00+13:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/linux/'>linux</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/11/18/microserver/" title="Previous Post: Microserver">&laquo; Microserver</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/11/29/rtorrent/" title="Next Post: Building rtorrent on Debian Squeeze">Building rtorrent on Debian Squeeze &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/01/readline/">Readline Bindings in Vi Mode</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/29/rtorrent/">Building rtorrent on Debian Squeeze</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/rsync/">rsync + SSH Backups</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/18/microserver/">Microserver</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/07/irc-dzen/">IRC Notifications with dzen2</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("jasonwryan", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <p>Follow <a href="http://twitter.com/jasonwryan">@jasonwryan</a></p>
+  
+</section>
+
+
+<section>
+  <h1>My Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2012 - Jason Ryan -
+<span class="credit">Site powered by <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/11/28/rsync/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2011/11/28/rsync/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: hack | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/hack/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T12:34:25+13:00</updated>
+  <updated>2012-03-28T17:32:39+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,149 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[IRC Notifications with dzen2]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/11/07/irc-dzen/"/>
+    <updated>2011-11-07T19:48:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/11/07/irc-dzen</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
+
+<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective of whether I
+was connected to the session, or that particular machine at the time.</p>
+
+<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
+and there is a script called
+<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
+that will print any mentions in a channel to a file. I then configured
+the fnotify script to write to a folder in Dropbox. Now, whenever I am
+mentioned in freenode, the file is updated across all my machines.</p>
+
+<p>The next challenge was to translate the updating of the fnotify file
+into a notification on my current machine. As I don’t use
+<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
+on my Arch machines, I wanted to make it work with
+<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
+Enter a simple shell script:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;echo <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
+so that it runs in the background after login. Whenever the metadata
+(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
+written to my
+<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
+with the message.</p>
+
+<p>Simple; but does what I need…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Dropbox’s API won’t work with dzen2—or with other lightweight
+notifications like
+<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
+<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
+(that was closed without any progress)—hence my having to resort to a
+home-cooked solution…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Tarsnap]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/09/08/tarsnap/"/>
+    <updated>2011-09-08T17:55:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/09/08/tarsnap</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap.jpg" alt="image" /></p>
+
+<p>I have been using <a href="http://www.tarsnap.com/" title="Tarsnap homepage">Tarsnap</a>
+for a couple of months now to backup
+<a href="http://jasonwryan.com/blog/2010-10-04-the-setup" title="My setup">my EeePC</a>.
+Tarsnap’s (superb) tagline is: <code>online backups for the truly paranoid.</code></p>
+
+<p>Essentially, Tarsnap stores your encrypted backups on
+<a href="http://aws.amazon.com/s3//192-5766046-6455343/" title="Amazon page">Amazon’s S3 servers</a>,
+recognizes duplicate data and avoids storing it again, and only deletes
+data once no remaining archives require it. I can recommend it as a
+terrific service for a number of reasons.</p>
+
+<p>It is <em><a href="http://www.tarsnap.com/security.html" title="Security page">secure</a></em>.
+Developed by the FreeBSD Security Officer, there is a
+<a href="http://www.tarsnap.com/bugbounty.html" title="Bug bounty details">bug bounty</a> for
+anyone who does discover bugs or security holes. It is very reasonably
+priced. It is reliable. And most importantly,
+<a href="http://www.tarsnap.com/about.html" title="Tarsnap about page">Dr Colin Percival</a>,
+erstwhile child prodigy and developer, is extremely helpful either on
+the mailing list or IRC if you have any questions or need help.</p>
+
+<p>If, however, you have a quick look at the
+<a href="http://www.tarsnap.com/man-tarsnap.1.html" title="tarsnap(1)">man page</a>, you will
+see that it is not exactly a simple application. After a couple of
+months of trying to remember all of the relevant flags, I searched for a
+script that would simplify the process for me. There are
+<a href="http://duckduckgo.com/?q=tarsnap+%2B+bash+script" title="DDG results">a few online</a>,
+but they are all intended to fully automate the process (which makes
+sense for something like backups)…</p>
+
+<p>What I was looking for, however, was something more interactive: more
+along the lines of a prompt. So, realizing I would have to scratch my
+own itch, I wrote a wrapper script to assist my failing memory.</p>
+
+<p>The script prints out a menu of the available options and, once you have
+selected the activity that you would like (creating a new snapshot,
+deleting an old one etc.,), then the script checks if any further input
+is required, for example, the name of the snapshot to delete, and then
+executes it. It is nothing flash, but it works…</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap2.png" alt="image" /></p>
+
+<p>You can <a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/snap" title="Snap script on Intuxication">grab the script</a>
+from my mercurial repo. It’s written in bash, but if you require
+<a href="http://tldp.org/LDP/abs/html/portabilityissues.html" title="Advanced Bash Scripting Guide">portability</a>,
+it shouldn’t be too hard to tweak.</p>
+
+<h4>Updated 3/10/11</h4>
+
+<p>I have rewritten the script to be
+<a href="http://pubs.opengroup.org/onlinepubs/9699919799/" title="POSIX Standard at the Open Group">POSIX compliant</a>
+and also to better conform to basic UNIX behaviours, in terms of the
+options etc. It should now be good to run in most shells.</p>
+
+<h5>Notes</h5>
+
+<p>Creative Commons licensed image by
+<a href="http://www.flickr.com/photos/declanjewell/2447653142/" title="Flickr image credit">Declan TM</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Script to Edit Config Files]]></title>
@@ -214,7 +357,7 @@ find—then you could simplify it like so:</p>
     <id>http://jasonwryan.github.com/blog/2011/06/26/using-vimprobable</id>
     <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable2.png" alt="image" /></p>
 
-<p>I <a href="http://jasonwryan.com/2010-10-07-vimprobable" title="Post on using Vimprobable">posted last year about Vimprobable</a>
+<p>I <a href="http://jasonwryan.com/blog/2010-10-07-vimprobable" title="Post on using Vimprobable">posted last year about Vimprobable</a>
 a <a href="http://www.webkit.org/" title="Webkit site">webkit browser</a> that uses
 Vim-like keybinds and can be run completely without the rodent.</p>
 
@@ -440,155 +583,13 @@ loaded:</p>
 <h5>Notes</h5>
 
 <ol>
-<li><p><a href="http://jasonwryan.com/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
-<a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
-&amp; <a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
-<li><p><a href="http://jasonwryan.com/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
+<li><p><a href="http://jasonwryan.com/blog/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
+<a href="http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
+&amp; <a href="http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
+<li><p><a href="http://jasonwryan.com/blog/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
 <li><p>Image squashed to fit the requirements of this blog…</p></li>
 </ol>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[w3m, Surfraw and Yanking URLs]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/05/05/w3m/"/>
-    <updated>2011-05-05T19:57:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/05/05/w3m</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/w3m.png" alt="image" /></p>
-
-<p>I posted a couple of weeks ago about
-<a href="http://jasonwryan.com/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
-to the point of writing a couple of my own <em>elvi</em>. As part of the
-ongoing tweaking of my Surfraw experience, I have been experimenting
-with different
-<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
-to see which one best fits my workflow.</p>
-
-<p>I have previously been using both
-<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
-and it’s homonym,
-<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
-these have been perfectly acceptable, they weren’t quite providing the
-level of functionality —and integration with my vim-oriented workflow—
-that I was looking for. Enter
-<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
-
-<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
-`less’. With w3m you can browse web pages through a terminal emulator
-window (xterm, rxvt or something like that). Moreover, w3m can be used
-as a text formatting tool which typesets HTML into plain text.</p></blockquote>
-
-<p>w3m is a step up from the other two for a variety of reasons. It
-supports tables, frames, SSL connections, color and inline images. It
-also renders pages in a form as true to their original layout as
-possible. The killer features on top of that are, for me, the above
-mentioned rendering of HTML as text (meaning you can save content
-easily), and the customizable keybinds.</p>
-
-<p>There was however, one significant sticking point. After countless hours
-fruitlessly searching, I was unable to find a way to yank URLs to the
-clipboard. As I have been spending a little time of late on
-<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
-I thought I would ask the good folk there…</p>
-
-<p>Less than fourty hours later, I had an answer so simple and elegant,
-that I was literally grinning when I read it. It deserves quoting in
-full. It is that ingenious.</p>
-
-<blockquote><p>Set the “External Browser” option to
-<code>sh -c 'echo "$0" | xsel'</code></p>
-
-<p>You can use xsel -b to use the clipboard instead of the primary
-selection. An alternative to
-<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
-is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
-(xclip for the primary selection, xclip -selection CLIPBOARD for the
-clipboard).</p>
-
-<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
-Then press M to copy (yank) the URL of the current page, or ESCM to
-copy the URL of the link under the cursor.</p>
-
-<p>You can use the second or third external browser for that instead;
-then the key combination is 2M or 3M or 2ESCM or 3ESCM.
-<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
-
-<p>This simple hack means that it is now trivial to yank either the URL of
-the current page, or of the link under the cursor to primary selection.
-It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
-and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
-<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN    <span class="p">&lt;</span><span class="k">br</span>/<span class="p">&gt;</span>
-</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
-
-<h4>Updated 8/5/11</h4>
-
-<p>Gilles has edited and updated his answer with a slight change:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>This prevents a new line being appended.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Sessions in tmux]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux/"/>
-    <updated>2010-10-03T20:15:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5046091307/" title="Sessions in tmux by jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4146/5046091307_39c200f1b0.jpg" width="500" height="293" alt="Sessions in tmux"/></a></p>
-
-<p>Now that I have been using it for several months, I have become absolutely dependent upon <a href="http://tmux.sourceforge.net/" target="_blank">tmux</a>, the terminal multiplexer.
-It is both ruthlessly efficient, and can be configured to match exacting requirements. One of those options is to initialize sessions with a preloaded window configuration. After reading the <a href="http://wisconsinlinux.org/tmux-manpage-from-cvs/tmux.1.txt" target="_blank">man page</a> (which, truth be told, could be a little clearer) and some experimentation, I have worked out how to set up my tmux sessions how I want them.
-I have just updated the <a href="http://wiki.archlinux.org/index.php/Tmux">Arch Wiki tmux entry</a>,
-so thought I would share it here.</p>
-
-<p>The relevant part of my config file looks like this:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;session initialization&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;new  -n TTYtter /home/jason/Scripts/ttytter.pl
-</span><span class='line'>neww -n irssi /home/jason/Scripts/startirssi.sh
-</span><span class='line'>neww -n ncmpcpp/vifm ncmpcpp
-</span><span class='line'>splitw -v -p 50 -t 0 vifm
-</span><span class='line'>neww -n bash bash
-</span><span class='line'>selectw -t 1
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Which, when I start tmux with the attach (or a) option, gives me the following window layout:</p>
-
-<ul>
-<li>TTYtter</li>
-<li>irssi</li>
-<li>ncmpcpp/vifm &nbsp; &nbsp; # window split vertically in half, ncmpcpp on top of vifm</li>
-<li>bash</li>
-</ul>
-
-
-<p>The <code>selectw</code> option means that the default view is TTYtter.</p>
-
-<p>Simple.</p>
 ]]></content>
   </entry>
   

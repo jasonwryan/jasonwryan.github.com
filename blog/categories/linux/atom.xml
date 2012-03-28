@@ -4,7 +4,7 @@
   <title><![CDATA[Category: linux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T12:34:25+13:00</updated>
+  <updated>2012-03-28T17:32:39+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -14,19 +14,45 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Script to Edit Config Files]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/07/19/script-to-edit-config-files/"/>
-    <updated>2011-07-19T19:34:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/07/19/script-to-edit-config-files</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/xdg-script.png" alt="image" /></p>
+    <title type="html"><![CDATA[Readline Bindings in Vi Mode]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/12/01/readline/"/>
+    <updated>2011-12-01T18:43:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/12/01/readline</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/readline.png" alt="image" /></p>
 
-<p>Even with bash completion, endlessly typing and tabbing through the
-directory tree to make a simple change to a config file quickly becomes
-tedious, so I concocted this script to make it somewhat more
-straightforward.</p>
+<p>I recently threw caution to the wind and
+<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
+I wanted to take advantage of the superior command editing ability that
+this mode offered, and also to continue to bake vi[m] methods into every
+aspect of my working environment.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>xdg.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>The change has been relatively straightforward; the only issues I have
+experienced are really just around a couple of keybinds that I had
+become accustomed to in normal/Emacs mode:</p>
+
+<ul>
+<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
+<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
+</ul>
+
+
+<p>The first, the ability to recall the final arguments of previous
+commands was a showstopper for me: I really struggled without this.
+Being able to recall a long file path and append it to a new command is
+invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
+exactly this. Why it is not bound by default in vi mode is beyond me…</p>
+
+<p>The other was purely cosmetic, really. I am an inveterate clearer of the
+screen—unless I am referring to something printed to stdout, I always
+prefer to work at the top of the console.</p>
+
+<p>In any event, with the
+<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
+it was a trivial exercize to restore this functionality to my bash shell
+in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -43,92 +69,198 @@ straightforward.</p>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>&lt;h1>for vi mode&lt;/h1>
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>&lt;p>set editing-mode vi
+</span><span class='line'>$if mode=vi&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;for f in <span class="nv">$dir</span>/* ; <span class="k">do</span>
-</span><span class='line'><span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
-</span><span class='line'>    <span class="k">case</span> <span class="nv">$file</span> in
-</span><span class='line'>    conf | config | *.cfg | *rc<span class="o">)</span>  <span class="nv">$EDITOR</span> <span class="s2">&quot;$f&quot;</span> ;;
-</span><span class='line'>    *<span class="o">)</span>  :  ;;
-</span><span class='line'>    <span class="k">esac</span>
-</span><span class='line'><span class="k">done</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>&lt;p>set keymap vi-command&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'>&lt;h1>these are for vi-command mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>"\e[A": history-search-backward            # arrow up
+</span><span class='line'>"\e[B": history-search-forward             # arrow down
+</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
+</span><span class='line'>Control-l: clear-screen&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set keymap vi-insert&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>these are for vi-insert mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>"\e[A": history-search-backward
+</span><span class='line'>"\e[B": history-search-forward
+</span><span class='line'>"\ep": yank-last-arg
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>$endif</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>A relatively simple script, with a nice feature or two, it does a couple
-of things. First, it
-<a href="http://wiki.bash-hackers.org/commands/classictest" title="Bash Hackers: test">tests</a>
-that the directory actually exists:</p>
+<p>There is an extensive list of
+<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
+with which you can customize your shell environment.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Building rtorrent on Debian Squeeze]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/11/29/rtorrent/"/>
+    <updated>2011-11-29T21:21:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/11/29/rtorrent</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/rtorrent.png" alt="image" /></p>
+
+<p>After <a href="http://jasonwryan.com/blog/2011-11-18-microserver" title="Post on the HP microserver">setting up my server</a>,
+I wanted to use it as a torrent box. The version of
+<a href="http://libtorrent.rakshasa.no/" title="rtorrent &amp; libtorrent homepage">rtorrent</a>
+in the Debian stable repositories is 0.8.6, which is unfortunate as
+support for <a href="http://en.wikipedia.org/wiki/Magnet_URI_scheme" title="Wikipedia page on magnet URIs">magnet links</a>
+was introduced in 0.8.7.</p>
+
+<p>To remedy this, I decided to build the current stable version of
+rtorrent, 0.8.9. At the same time—seeing as I was getting my hands dirty
+anyway—I thought I’d patch in colour support.</p>
+
+<p>This is a straightforward two-step process. First, build the current
+version of libtorrent, 0.12.9:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;if <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
+</span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
+</span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
+</span><span class='line'>./configure &amp;amp;&amp;amp; make
+</span><span class='line'>sudo checkinstall
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>and then loops through all of the files in the directory using a
-<a href="http://mywiki.wooledge.org/glob" title="Entry on Greg's Wiki">glob</a> and
-checks for a pattern match.</p>
-
-<p>In order for the
-<a href="http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_03.html" title="Cases on Bash Guide">case statement</a>
-to work, however, the directory path has to be stripped from the file
-name.</p>
-
-<p>Rather than run another process with
-<a href="http://www.gnu.org/software/coreutils/manual/html_node/basename-invocation.html" title="GNU basename in coreutils">basename</a>,
-I used
-<a href="http://wiki.bash-hackers.org/syntax/pe#substring_removal" title="Bash Hackers Wiki">parameter expansion</a>
-to remove the substring:</p>
+<p>Once libtorrent is successfully built and installed, you can begin the
+rtorrent build:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;file<span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
+</span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
+</span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>which turns, for example, <span class="file">$XDG_CONGIG_HOME/newsbeuter/conf</span> into a
-simple conf. This can then be evaluated for a match with the file names
-in the case statement and passed to the <code>$EDITOR</code>.</p>
+<p>Then, if you want colour support, you need the patch. I used the version
+in the
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
+but you can also grab a copy from a paste site:</p>
 
-<p>If no match is found, nothing (<code>:</code>) is done.</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
+</span><span class='line'>mv canvas_colour.patch src/
+</span><span class='line'>patch -uNp1 -i canvas_colour.patch
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>Now, it is simply a matter of entering <code>xdg vimprobable</code> and
-<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span> is opened in Vim.</p>
+<p>The patch should apply cleanly. Then specify where libtorrent is
+installed to ensure that it is linked during the rtorrent build:</p>
 
-<h4>Updated 19/10/11</h4>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
+</span><span class='line'>make
+</span><span class='line'>sudo checkinstall
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>After using this script for a while it became clear to me that it has a
-significant drawback: too many applications place their config files in
-directories other than <span class="file">$XDG_CONFIG_HOME</span>. So,
-<a href="https://bbs.archlinux.org/viewtopic.php?id=128585" title="Post on the Arch boards">with some help</a>,
-I updated the script. It now covers all of the directories where you are
-likely to find dotfiles.</p>
+<p>Once again, this should compile cleanly and you will now have rtorrent
+with colour and magnet link support installed in
+<span class="file">/usr/local/bin/rtorrent</span>.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>xdg.sh v2 </span></figcaption>
+<h5>Notes</h5>
+
+<p>I prefer to use
+<a href="http://asic-linux.com.mx/~izto/checkinstall/" title="checkinstall homepage">checkinstall</a>
+so that self-installed applications are tracked by
+<a href="http://wiki.debian.org/Apt" title="Debian wiki entry">Apt</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[rsync + SSH Backups]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/11/28/rsync/"/>
+    <updated>2011-11-28T12:23:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/11/28/rsync</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/rsync-ssh.png" alt="image" /></p>
+
+<p>I <a href="http://jasonwryan.com/blog/2011-11-18-microserver" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
+and included a
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
+script for backing up my files to the server. At the time, I was running
+it manually, but since have sorted out the excludes list and have now
+automated it.</p>
+
+<p>My original scheme was to set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
+mount an
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
+before rsync’ing the directories across. In the end, I went with SSH and
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
+as debugging all of the various permissions issues with the NFS share
+did not seem worth the effort.</p>
+
+<p>First, on my local desktop, I created the keypair called, inventively,
+rsync:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
+</span><span class='line'>mv rsync ~/.ssh &amp;amp;&amp;amp; chmod 600 ~/.ssh/rsync
+</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This keypair was created <em>without a passphrase</em> so that the script could
+be successfully called from <code>cron</code>. To slightly increase the security
+around a key without a passphrase, I used the from option in
+authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
+machine(s), like so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
+the SSH command:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.ssh/config </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Host backups
+</span><span class='line'>   Hostname 192.168.1.200
+</span><span class='line'>   Port 0000
+</span><span class='line'>   User jason
+</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And I was done. Everynight at 10pm, all of my data will be backed up to
+the server. The rsync command in the script:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -142,275 +274,79 @@ likely to find dotfiles.</p>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;dirs<span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
-</span><span class='line'><span class="nv">IFS</span><span class="o">=</span><span class="s1">$&#39;\n&#39;</span>
-</span><span class='line'><span class="nb">read</span> -r -d <span class="s1">&#39;&#39;</span> -a files &amp;lt; <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;&amp;lt;<span class="o">(</span>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
-</span><span class='line'>       -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> 2&amp;gt;/dev/null<span class="o">)</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">((</span> <span class="k">${#</span><span class="nv">files</span><span class="p">[*]</span><span class="k">}</span> <span class="o">))</span> &amp;amp;&amp;amp; <span class="s2">&quot;$EDITOR&quot;</span> <span class="s2">&quot;${files}&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>If you would prefer a more portable version—which still relies on GNU
-find—then you could simplify it like so:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>xdg.sh v3 </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
 </pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;dirs<span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>&lt;h1&gt;Backup to remote server over SSH&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="o">(</span> <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>&lt;p&gt;rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;   -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>-o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>-o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
-</span><span class='line'>-o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
-</span><span class='line'>-o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> <span class="se">\</span>
-</span><span class='line'>-exec <span class="s2">&quot;$EDITOR&quot;</span> <span class="o">{}</span> +
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;--log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
+</span><span class='line'>-e ssh /home/jason /etc backups:Backups/Centurion
 </span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
+</ol>
+
+
+<p>Creative Commons image from
+<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
 ]]></content>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Using Vimprobable]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/06/26/using-vimprobable/"/>
-    <updated>2011-06-26T14:08:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/06/26/using-vimprobable</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable2.png" alt="image" /></p>
+    <title type="html"><![CDATA[Microserver]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/11/18/microserver/"/>
+    <updated>2011-11-18T17:13:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/11/18/microserver</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/microserver.png" alt="image" /></p>
 
-<p>I <a href="http://jasonwryan.com/2010-10-07-vimprobable" title="Post on using Vimprobable">posted last year about Vimprobable</a>
-a <a href="http://www.webkit.org/" title="Webkit site">webkit browser</a> that uses
-Vim-like keybinds and can be run completely without the rodent.</p>
+<p>I recently picked up a
+<a href="http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html" title="HP specs page">HP Microserver</a>;
+a small, silent server to use primarily to back up
+<a href="http://jasonwryan.com/blog/2010-10-04-the-setup" title="Slightly out-of-date setup post">my other boxes</a>.
+I went for the 2GB version without any preinstalled operating system.</p>
 
-<p>Over the last couple of months I have become increasingly comfortable
-with it, and with the addition of
-<a href="http://vimprobable.org/pipermail/vimprobable-users/2011-June/000800.html" title="External handlers patch on ML">some great recent functionality</a>,
-it has become my default browser.</p>
+<p>As I want this machine to just sit quietly in my garage for the next 5
+or 6 years, I opted for
+<a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
+base system. After installing two 1TB drives, I set them up as an
+<a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
+RAID 1 array, in a i
+<a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
 
-<p>The project has good documentation, in the form of two man pages:
-<code>vimprobable</code> and <code>vimprobablerc</code>, but I thought I’d share some of my
-customizations and working methods.</p>
+<p><strong>Pro tip</strong> when you get to the part of the partitioning where you
+configure the volume for encryption, make sure you select <em>No</em> for
+<em>erase data</em>. It took close to 90 hours to scrub both the hard drives.
+And, as I am not really expecting
+<a href="http://www.extremetech.com/computing/105931-full-disk-encryption-is-too-good-says-us-intelligence-agency" title="FDE defeats the NSA">a visit from the spooks</a>,
+that seems a little like overkill…</p>
 
-<h3>Copy &amp; Paste</h3>
+<p>Once the base install was complete, I set up my SSH keys,
+<a href="http://tmux.sourceforge.net/" title="tmux page">tmux</a>, configured the
+firewall and forwarded the necessary ports, set up
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia page: network file system">NFS</a>,
+and that was it. The box is deathly quite, can be mounted locally for
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync entry">rsync backups</a> and
+accessed remotely (for a tmux session running
+<a href="http://irssi.org/" title="Irssi homepage">irssi</a>), and all for less than
+NZD700.</p>
 
-<p>The only time I have been tempted to take my hand off the keyboard was
-to insert the cursor at the correct character to begin a selection to
-copy and paste. This is unnecessary. With the right options in
-<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span>,
-you can do it all from the keyboard.</p>
+<p>I knocked together a quick script<sup>1</sup> to manage the backing up; currently
+I run it manually, but once I have the excludes file tweaked properly,
+I’ll set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
+automate the task.</p>
 
-<p>Map the keys you would like to use to enter and exit caret mode. I use
-<kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
-return to normal mode:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
-</span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then, it is just a matter of identifying the text that you wish to copy
-(in the photo above I was copying a script to launch <code>tabbed</code>), and
-highlighting it via search. So the sequence is:</p>
-
-<pre>
-1.  <kbd>/</kbd> - to enter search mode
-2.  <kbd>#</kbd><kbd>!</kbd> <kbd>Enter</kbd> - the shebang and then enter to highlight the correct
-    sequence
-3.  <kbd>Ctrl</kbd><kbd>c</kbd> to enter caret mode
-4.  and then <kbd>Shift</kbd><kbd>Up</kbd> or <kbd>Shift</kbd><kbd>Down</kbd> to highlight the following or
-    preceding lines
-5.  yanking the selected text is <kbd>Shift</kbd><kbd>y</kbd>, and the text is now stored in
-    your clipboard.
-</pre>
-
-
-<h3>Opening new instances in tabbed</h3>
-
-<p>I highlighted the section on tabbed from the
-<a href="http://www.vimprobable.org/" title="Vimprobable website">Vimprobable site</a> for a reason.
-The second tip is how to set up
-<a href="http://tools.suckless.org/tabbed" title="tabbed on suckless.org">tabbed</a> to
-work well with other applications.</p>
-
-<p>By default, any new windows (ie., instances of Vimprobable) opened from
-within Vimprobable are “caught”—and managed— by <code>tabbed</code>. However, if you
-open a link from, say
-<a href="http://newsbeuter.org/" title="ncurses rss reader">newsbeuter</a> or
-<a href="http://tyrs.nicosphere.net/index.html" title="ncurses twitter/identi.ca client">Tyrs</a>,
-this will open an instance outside <code>tabbed</code> which, if you are using a
-tiling window manager like
-<a href="http://dwm.suckless.org/" title="THE titling wm">dwm</a>, means this window gets
-pushed to master in your stack. This is not entirely satisfactory.</p>
-
-<p>Thanks to
-<a href="http://lists.suckless.org/dev/1106/8761.html" title="Tabbed thread on suckless ML">Connor Lane Smith on the suckless ML</a>,
-I have a solution to have all new instances of Vimprobable sent to
-<code>tabbed</code>, whether opened in another application, or if I click on a link
-in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
-
-<p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
-<psan class="file">/tmp</span>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&amp;lt;/tmp/tabbed.xid)&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then it is just a matter of setting up other applications to pass links
-to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
-<span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> %s
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The workaround for Urxvtc was a little trickier. I finally got there
-with some help from
-<a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
-In my <span class="file">~/.Xdefaults</span> I have:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
-</span><span class='line'>URxvt.perl-ext-common: default,matcher
-</span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
-</span><span class='line'>URxvt.matcher.button: 1
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Script to open Vimprobable instances in tabbed&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;exec vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Now whenever I open a link in an application or by clicking a link in
-the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
-it is passed to Vimprobable in <code>tabbed</code>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Setting tmux statusbar if in X]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x/"/>
-    <updated>2011-06-10T22:56:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5636783883/" title="Arch Linux: dwm, tmux &amp; scratchpad by jasonwryan, on Flickr"><img src="http://farm6.static.flickr.com/5303/5636783883_5b7272453b.jpg" alt="Arch Linux: dwm, tmux &amp; scratchpad" /></a></p>
-
-<p>I have been posting quite a bit about
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a> of late<sup>1</sup>.
-It is a marvellous application and lends itself to all sorts of interesting
-uses. When you first install it, you will find a number of user config
-files in <span class="file">/usr/share/tmux/</span>. I started with tmux by copying
-<a href="http://cinderwick.ca/" title="Thayer Williams' site">Thayer’s</a> config across
-and then working up from there. There is a section
-<a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
-that has always puzzled me, and so I decided to get to the bottom of it.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;show some useful stats but only when tmux is started&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;outside of Xorg, otherwise dwm statusbar shows these already&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>It is a great idea. If you are running tmux in X, then you have
-<a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
-what the time is,
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="dwm status bar in my mercurial repo">how much battery you have left</a>
-etc,. You don’t need to replicate that functionality in tmux. If,
-however, you are in the console, you don’t have that information, unless
-you print it in tmux’s statusbar.</p>
-
-<p>I had tried to get this to work once or twice over the last couple of
-years, but never persevered with it. However, as I have been doing a bit
-of work making the console as functional as possible<sup>2</sup>, I thought I
-would revisit it.</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status1.png" alt="image" /></p>
-
-<p>The insight that I had that got it working for me was to use the
-source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
-depending if X was running or not. I just adapted Thayer’s code, like
-so:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Statusbar starting in X or not&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
-</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>And then created those files with the desired statusbar options. So, for
-example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
-loaded:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -419,173 +355,179 @@ loaded:</p>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
 </pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Statusbar <span class="k">if </span>tmux run in console&lt;/h1&gt;
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;h1&gt;information normally in dwm bar&lt;/h1&gt;
+</span><span class='line'>&lt;h1&gt;Backup to remote server over NFS&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g status-right-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
+</span><span class='line'> <span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
+</span><span class='line'> mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">fi</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;sync directories&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
+</span><span class='line'> /home/jason /etc /media/Sentinel/Backups/Centurion
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
+</span><span class='line'> umount /media/Sentinel
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">fi</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png" alt="image" /></p>
-
-<p>All the relevant files are in
-<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/.tmux" title="My intuxication repository">my mercurial repo</a>.</p>
 
 <h5>Notes</h5>
 
 <ol>
-<li><p><a href="http://jasonwryan.com/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
-<a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
-&amp; <a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
-<li><p><a href="http://jasonwryan.com/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
-<li><p>Image squashed to fit the requirements of this blog…</p></li>
+<li>Any faults aside, it should be reasonably portable…</li>
 </ol>
 
 ]]></content>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Copy &amp; Paste in tmux]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/06/07/copy-and-paste-in-tmux/"/>
-    <updated>2011-06-07T19:54:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/06/07/copy-and-paste-in-tmux</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-copy.png" alt="image" /></p>
+    <title type="html"><![CDATA[IRC Notifications with dzen2]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/11/07/irc-dzen/"/>
+    <updated>2011-11-07T19:48:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/11/07/irc-dzen</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
 
-<p>I’ve posted a couple of times<sup>1</sup> about
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
-terminal mutliplexer. One question I see raised a lot in #tmux is how
-to copy and paste.</p>
+<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective of whether I
+was connected to the session, or that particular machine at the time.</p>
 
-<p>The documentation for tmux is excellent: the
-<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
-one of the most clear and thorough I have read. And while it is
-explained there, I thought I would share my approach anyway.</p>
+<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
+and there is a script called
+<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
+that will print any mentions in a channel to a file. I then configured
+the fnotify script to write to a folder in Dropbox. Now, whenever I am
+mentioned in freenode, the file is updated across all my machines.</p>
 
-<p>First, I set tmux to use vi keys:</p>
+<p>The next challenge was to translate the updating of the fnotify file
+into a notification on my current machine. As I don’t use
+<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
+on my Arch machines, I wanted to make it work with
+<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
+Enter a simple shell script:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>setw -g mode-keys vi
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then I change the default keybinds to suit my workflow. As explained in
-the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
-and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
-to more intuitive and Vim-like keys:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
-</span><span class='line'><span class="nb">bind </span>Escape copy-mode
-</span><span class='line'>unbind p
-</span><span class='line'><span class="nb">bind </span>p paste-buffer
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;echo <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>This seems a lot closer to all of the other Vim-like apps that I run -
-where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
-<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
+<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
+so that it runs in the background after login. Whenever the metadata
+(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
+written to my
+<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
+with the message.</p>
 
-<p>So, to string it all together, the command sequence necessary to copy
-some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
-
-<pre>
-<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
-# move cursor to the start or end of the desired text string
-<kbd>v</kbd>                        # to activate highlighting
-# move cursor to cover the requisite string
-<kbd>y</kbd>                        # to capture the string
-<kbd>q</kbd>                        # exit copy mode
-<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
-</pre>
-
-
-<p>Simple.</p>
-
-<p>This means that you can scroll back through the output of <em>anything</em> in
-your terminal, and copy and paste it anywhere. Once you set it up, it is
-a very powerful tool…</p>
+<p>Simple; but does what I need…</p>
 
 <h5>Notes</h5>
 
-<p>1.<a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux">Sessions in tmux</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Network Flooding on Ubuntu]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu/"/>
-    <updated>2011-06-06T13:40:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-logo.png" alt="image" /></p>
+<ol>
+<li>Dropbox’s API won’t work with dzen2—or with other lightweight
+notifications like
+<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
+<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
+(that was closed without any progress)—hence my having to resort to a
+home-cooked solution…</li>
+</ol>
 
-<p>I have been experiencing problems with my wifi LAN when playing music
-through
-<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
-or watching movies. My upload speeds would climb to around 120-130Kb/s
-and my wifi would just go down.</p>
-
-<p>Apart from being frustrating, this was inconvenient as it meant that if
-I was doing either of those things, my stereo in the living room
-couldn’t stream music from my
-<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
-other members of the family (or guests) couldn’t connect to the access
-point to get online.</p>
-
-<p>After asking on
-<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
-(which, like many of the Ubuntu-related fora is populated with people
-who are more well-intentioned than they are knowledgeable - which seems
-to me one of the fundamental problems the distro has; but I’ll save that
-rant for another day), one helpful user suggested I use
-<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
-the network traffic.</p>
-
-<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
-immediately instructive. Wireshark quickly identified that, as soon as I
-started mpd, one of my ports was being flooded: 46560</p>
-
-<p><code>lsof</code> showed that pulse audio was the culprit:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Quelle surprise… When software engineers want a case study of opacity
-and abstraction from the user, this should be their first port of call.</p>
-
-<p>Worse, it is a known bug.
-<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
-And apparently insufficiently serious to warrant any attention. Fair
-enough, I suppose, given the fix is easy enough <em>if you know what you
-are trying to fix…</em></p>
-
-<p>Install the Pulse audio preferences tool:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install papref
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>…and disable Multicast/RTP.</p>
-
-<p>Another example for me of Ubuntu’s fast waning utility as a distribution
-for people that want to be able to exercize some control over their
-system. It is only still installed on this machine because there isn’t
-an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
-here and, with my international traffic capped to 30Kb/s until last
-month, I wasn’t prepared to try and run a distro on that sort of
-bandwidth. Now that has changed, I suspect that Ubuntu’s days are
-numbered on this box.</p>
 ]]></content>
   </entry>
   

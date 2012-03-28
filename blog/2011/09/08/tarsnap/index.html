@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Tarsnap - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="I have been using Tarsnap
+for a couple of months now to backup
+my EeePC.
+Tarsnap’s (superb) tagline is: online backups for the truly paranoid. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/09/08/tarsnap">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jasonwryan.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Tarsnap</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-09-08T17:55:00+12:00" pubdate data-updated="true">Sep 8<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap.jpg" alt="image" /></p>
+
+<p>I have been using <a href="http://www.tarsnap.com/" title="Tarsnap homepage">Tarsnap</a>
+for a couple of months now to backup
+<a href="http://jasonwryan.com/blog/2010-10-04-the-setup" title="My setup">my EeePC</a>.
+Tarsnap’s (superb) tagline is: <code>online backups for the truly paranoid.</code></p>
+
+<p>Essentially, Tarsnap stores your encrypted backups on
+<a href="http://aws.amazon.com/s3//192-5766046-6455343/" title="Amazon page">Amazon’s S3 servers</a>,
+recognizes duplicate data and avoids storing it again, and only deletes
+data once no remaining archives require it. I can recommend it as a
+terrific service for a number of reasons.</p>
+
+<p>It is <em><a href="http://www.tarsnap.com/security.html" title="Security page">secure</a></em>.
+Developed by the FreeBSD Security Officer, there is a
+<a href="http://www.tarsnap.com/bugbounty.html" title="Bug bounty details">bug bounty</a> for
+anyone who does discover bugs or security holes. It is very reasonably
+priced. It is reliable. And most importantly,
+<a href="http://www.tarsnap.com/about.html" title="Tarsnap about page">Dr Colin Percival</a>,
+erstwhile child prodigy and developer, is extremely helpful either on
+the mailing list or IRC if you have any questions or need help.</p>
+
+<p>If, however, you have a quick look at the
+<a href="http://www.tarsnap.com/man-tarsnap.1.html" title="tarsnap(1)">man page</a>, you will
+see that it is not exactly a simple application. After a couple of
+months of trying to remember all of the relevant flags, I searched for a
+script that would simplify the process for me. There are
+<a href="http://duckduckgo.com/?q=tarsnap+%2B+bash+script" title="DDG results">a few online</a>,
+but they are all intended to fully automate the process (which makes
+sense for something like backups)…</p>
+
+<p>What I was looking for, however, was something more interactive: more
+along the lines of a prompt. So, realizing I would have to scratch my
+own itch, I wrote a wrapper script to assist my failing memory.</p>
+
+<p>The script prints out a menu of the available options and, once you have
+selected the activity that you would like (creating a new snapshot,
+deleting an old one etc.,), then the script checks if any further input
+is required, for example, the name of the snapshot to delete, and then
+executes it. It is nothing flash, but it works…</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap2.png" alt="image" /></p>
+
+<p>You can <a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/snap" title="Snap script on Intuxication">grab the script</a>
+from my mercurial repo. It’s written in bash, but if you require
+<a href="http://tldp.org/LDP/abs/html/portabilityissues.html" title="Advanced Bash Scripting Guide">portability</a>,
+it shouldn’t be too hard to tweak.</p>
+
+<h4>Updated 3/10/11</h4>
+
+<p>I have rewritten the script to be
+<a href="http://pubs.opengroup.org/onlinepubs/9699919799/" title="POSIX Standard at the Open Group">POSIX compliant</a>
+and also to better conform to basic UNIX behaviours, in terms of the
+options etc. It should now be good to run in most shells.</p>
+
+<h5>Notes</h5>
+
+<p>Creative Commons licensed image by
+<a href="http://www.flickr.com/photos/declanjewell/2447653142/" title="Flickr image credit">Declan TM</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-09-08T17:55:00+12:00" pubdate data-updated="true">Sep 8<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/backup/'>backup</a>, <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/linux/'>linux</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/07/19/script-to-edit-config-files/" title="Previous Post: Script to Edit Config Files">&laquo; Script to Edit Config Files</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/09/10/tmux-and-ssh-keys/" title="Next Post: tmux &amp; SSH Keys">tmux &amp; SSH Keys &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/01/readline/">Readline Bindings in Vi Mode</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/29/rtorrent/">Building rtorrent on Debian Squeeze</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/28/rsync/">rsync + SSH Backups</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/18/microserver/">Microserver</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/11/07/irc-dzen/">IRC Notifications with dzen2</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("jasonwryan", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <p>Follow <a href="http://twitter.com/jasonwryan">@jasonwryan</a></p>
+  
+</section>
+
+
+<section>
+  <h1>My Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2012 - Jason Ryan -
+<span class="credit">Site powered by <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/09/08/tarsnap/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2011/09/08/tarsnap/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

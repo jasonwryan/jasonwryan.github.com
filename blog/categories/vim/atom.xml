@@ -4,7 +4,7 @@
   <title><![CDATA[Category: vim | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/vim/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T12:34:25+13:00</updated>
+  <updated>2012-03-28T17:32:39+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,102 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Readline Bindings in Vi Mode]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/12/01/readline/"/>
+    <updated>2011-12-01T18:43:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/12/01/readline</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/readline.png" alt="image" /></p>
+
+<p>I recently threw caution to the wind and
+<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
+I wanted to take advantage of the superior command editing ability that
+this mode offered, and also to continue to bake vi[m] methods into every
+aspect of my working environment.</p>
+
+<p>The change has been relatively straightforward; the only issues I have
+experienced are really just around a couple of keybinds that I had
+become accustomed to in normal/Emacs mode:</p>
+
+<ul>
+<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
+<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
+</ul>
+
+
+<p>The first, the ability to recall the final arguments of previous
+commands was a showstopper for me: I really struggled without this.
+Being able to recall a long file path and append it to a new command is
+invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
+exactly this. Why it is not bound by default in vi mode is beyond me…</p>
+
+<p>The other was purely cosmetic, really. I am an inveterate clearer of the
+screen—unless I am referring to something printed to stdout, I always
+prefer to work at the top of the console.</p>
+
+<p>In any event, with the
+<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
+it was a trivial exercize to restore this functionality to my bash shell
+in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>for vi mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set editing-mode vi
+</span><span class='line'>$if mode=vi&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set keymap vi-command&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>these are for vi-command mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>"\e[A": history-search-backward            # arrow up
+</span><span class='line'>"\e[B": history-search-forward             # arrow down
+</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
+</span><span class='line'>Control-l: clear-screen&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set keymap vi-insert&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>these are for vi-insert mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>"\e[A": history-search-backward
+</span><span class='line'>"\e[B": history-search-forward
+</span><span class='line'>"\ep": yank-last-arg
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>$endif</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>There is an extensive list of
+<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
+with which you can customize your shell environment.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Vim Colours in the Console]]></title>

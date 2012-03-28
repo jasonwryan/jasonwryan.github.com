@@ -4,7 +4,7 @@
   <title><![CDATA[Category: tmux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/tmux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T12:34:25+13:00</updated>
+  <updated>2012-03-28T17:32:39+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,264 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[IRC Notifications with dzen2]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/11/07/irc-dzen/"/>
+    <updated>2011-11-07T19:48:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/11/07/irc-dzen</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
+
+<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective of whether I
+was connected to the session, or that particular machine at the time.</p>
+
+<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
+and there is a script called
+<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
+that will print any mentions in a channel to a file. I then configured
+the fnotify script to write to a folder in Dropbox. Now, whenever I am
+mentioned in freenode, the file is updated across all my machines.</p>
+
+<p>The next challenge was to translate the updating of the fnotify file
+into a notification on my current machine. As I don’t use
+<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
+on my Arch machines, I wanted to make it work with
+<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
+Enter a simple shell script:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;echo <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
+so that it runs in the background after login. Whenever the metadata
+(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
+written to my
+<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
+with the message.</p>
+
+<p>Simple; but does what I need…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Dropbox’s API won’t work with dzen2—or with other lightweight
+notifications like
+<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
+<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
+(that was closed without any progress)—hence my having to resort to a
+home-cooked solution…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[tmux &amp; SSH Keys]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/09/10/tmux-and-ssh-keys/"/>
+    <updated>2011-09-10T16:46:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/09/10/tmux-and-ssh-keys</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-ssh.jpg" alt="image" /></p>
+
+<p>I have posted before about tmux<sup>1</sup>, the terminal multiplexer. One of the
+(minor) frustrations that I have to-date done nothing about was setting
+up persistent SSH key management across sessions. The ability to enter
+the passphrase for my public keys once, and then to be able to access
+remote hosts—or {git,hg} push—without having to re-enter a passphrase.</p>
+
+<p>My solution is quite hackish, but it works and, given
+<a href="http://duckduckgo.com/?q=tmux+ssh-agent" title="tmux and ssh-agent on DDG">the only other solutions</a>
+I was able to find by searching seem even more convoluted, I thought I
+would share it.</p>
+
+<p>There are a couple of separate steps, none of them of any real
+consequence, but each necessary.</p>
+
+<p>First, in your <span class="file">$HOME/.tmux.conf</span> you need to enable update-environment:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set</span> -g update-environment <span class="s2">&quot;DISPLAY SSH_ASKPASS SSH_AUTH_SOCK</span>
+</span><span class='line'><span class="s2">SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>From the <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="tmux manual">man page</a>:</p>
+
+<blockquote><p>Set a space-separated string containing a list of environment
+variables to be copied into the session environment when a new session
+is created or an existing session is attached. Any variables that do
+not exist in the source environment are set to be removed from the
+session environment (as if -r was given to the set-environment
+command).</p></blockquote>
+
+<p>The next step is to create a script (mine is bound to a key sequence to
+launch from scratch, you can adopt a simpler approach) that starts tmux
+and initializes ssh-agent:<sup>2</sup></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;PID<span class="o">=</span><span class="k">$(</span>pgrep tmux<span class="k">)</span>
+</span><span class='line'><span class="nv">new</span><span class="o">=</span><span class="s2">&quot;tmux -f $HOME/.tmux/conf new -s secured&quot;</span>
+</span><span class='line'><span class="nv">old</span><span class="o">=</span><span class="s2">&quot;tmux attach -t secured -d&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="s2">&quot;$SSH_AUTH_SOCK&quot;</span> <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;eval <span class="sb">`</span>ssh-agent<span class="sb">`</span>
+</span><span class='line'><span class="nb">trap</span> <span class="s2">&quot;kill $SSH\_AGENT\_PID&quot;</span> 0
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="s2">&quot;$PID&quot;</span> <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${new}&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;else&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${old}&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;ssh-add
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The final step is to install
+<a href="http://www.funtoo.org/wiki/Keychain" title="Keychain homepage">keychain</a>, and
+set it up. I followed the
+<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Using_keychain" title="...because it rocks!">instructions on the Arch Wiki</a>
+and opted for a couple of lines in <span class="file">$HOME/.bash_profile</span><sup>3</sup>, like so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
+</span><span class='line'><span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span> &amp;amp;&amp;amp;&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;source <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>That’s it. Now, hitting a key sequence opens a terminal, I am prompted
+for my passphrase and then, if I open another window, or another tmux
+session <em>as long is the first session is still running, attached or
+not</em>, I am authenticated and can SSH or push without a prompt.</p>
+
+<h4>Updated 7/10/11</h4>
+
+<p>I refined the sequence to provide me a little more flexibility: now the
+keychain is only called if I start a specific named tmux session. To do
+this, I changed my <span class="file">$HOME/.bash_profile</span> to test for that session:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">tsess</span><span class="o">=</span><span class="k">$(</span>tmux ls<span class="k">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;${tsess%%:*}&quot;</span> <span class="o">=</span> <span class="s2">&quot;secured&quot;</span> <span class="o">]]</span> &amp;amp;&amp;amp;
+</span><span class='line'>   <span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;# start keychain
+</span><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id<span class="se">\_</span>rsa
+</span><span class='line'>. <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>Previous posts:</p>
+
+<ul>
+<li><a href="http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer" title="First post on tmux">tmux: terminal multiplexer</a></li>
+<li><a href="http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux" title="tmux sessions">Sessions in tmux</a></li>
+<li><a href="http://jasonwryan.com/blog/2011-06-07-copy-and-paste-in-tmux" title="Copy and paste in tmux">Copy &amp; paste in tmux</a></li>
+<li><a href="http://jasonwryan.com/blog/2011-06-10-setting-tmux-status-bar-if-in-x" title="tmux status bars">Setting tmux status bar if in X</a></li>
+</ul>
+</li>
+<li><p>Updated to include session test. Changes <a href="http://beta.intuxication.org/jasonwryan/archer/rev/e1762094c1b7/" title="Mercurial changelog">here</a>.</p></li>
+<li>Alternatively, placing the script in <span class="file">/etc/profile.d/keychain.sh</span> will
+start the agent when you login, as opposed to starting a specific
+shell. Your call on security versus convenience…</li>
+</ol>
+
+
+<p>Creative Commons image from <a href="http://www.flickr.com/photos/marts-pics/2292588212/in/photostream/" title="Public Key on Flickr">mer de glace</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Setting tmux statusbar if in X]]></title>
@@ -114,10 +372,10 @@ loaded:</p>
 <h5>Notes</h5>
 
 <ol>
-<li><p><a href="http://jasonwryan.com/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
-<a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
-&amp; <a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
-<li><p><a href="http://jasonwryan.com/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
+<li><p><a href="http://jasonwryan.com/blog/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
+<a href="http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
+&amp; <a href="http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
+<li><p><a href="http://jasonwryan.com/blog/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
 <li><p>Image squashed to fit the requirements of this blog…</p></li>
 </ol>
 
@@ -192,7 +450,7 @@ a very powerful tool…</p>
 
 <h5>Notes</h5>
 
-<p>1.<a href="http://jasonwryan.com/2010-01-07-tmux-terminal-multiplexer">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/2010-10-03-sessions-in-tmux">Sessions in tmux</a></p>
+<p>1.<a href="http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux">Sessions in tmux</a></p>
 ]]></content>
   </entry>
   
@@ -372,316 +630,6 @@ of the finished product on Flickr.</p>
 <li><p><a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a></p></li>
 </ol>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Sessions in tmux]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux/"/>
-    <updated>2010-10-03T20:15:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/10/03/sessions-in-tmux</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5046091307/" title="Sessions in tmux by jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4146/5046091307_39c200f1b0.jpg" width="500" height="293" alt="Sessions in tmux"/></a></p>
-
-<p>Now that I have been using it for several months, I have become absolutely dependent upon <a href="http://tmux.sourceforge.net/" target="_blank">tmux</a>, the terminal multiplexer.
-It is both ruthlessly efficient, and can be configured to match exacting requirements. One of those options is to initialize sessions with a preloaded window configuration. After reading the <a href="http://wisconsinlinux.org/tmux-manpage-from-cvs/tmux.1.txt" target="_blank">man page</a> (which, truth be told, could be a little clearer) and some experimentation, I have worked out how to set up my tmux sessions how I want them.
-I have just updated the <a href="http://wiki.archlinux.org/index.php/Tmux">Arch Wiki tmux entry</a>,
-so thought I would share it here.</p>
-
-<p>The relevant part of my config file looks like this:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;session initialization&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;new  -n TTYtter /home/jason/Scripts/ttytter.pl
-</span><span class='line'>neww -n irssi /home/jason/Scripts/startirssi.sh
-</span><span class='line'>neww -n ncmpcpp/vifm ncmpcpp
-</span><span class='line'>splitw -v -p 50 -t 0 vifm
-</span><span class='line'>neww -n bash bash
-</span><span class='line'>selectw -t 1
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Which, when I start tmux with the attach (or a) option, gives me the following window layout:</p>
-
-<ul>
-<li>TTYtter</li>
-<li>irssi</li>
-<li>ncmpcpp/vifm &nbsp; &nbsp; # window split vertically in half, ncmpcpp on top of vifm</li>
-<li>bash</li>
-</ul>
-
-
-<p>The <code>selectw</code> option means that the default view is TTYtter.</p>
-
-<p>Simple.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[tmux - terminal multiplexer]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/01/07/tmux-terminal-multiplexer/"/>
-    <updated>2010-01-07T15:10:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/01/07/tmux-terminal-multiplexer</id>
-    <content type="html"><![CDATA[<p>Over the last couple of days I have been familiarising myself with <a href="http://tmux.sourceforge.net/">tmux</a>.
-As it says on the homepage,</p>
-
-<p><blockquote><p>tmux is a terminal multiplexer: it enables a number of terminals (or windows), each running a separate program, to be created, accessed, and controlled from a single screen. tmux may be detached from a screen and continue running in the background, then later reattached.</p></blockquote></p>
-
-<p>I was attracted to tmux after seeing a number of enthusiastic postings on the
-<a href="http://bbs.archlinux.org/viewtopic.php?id=84157">Arch forums</a>, and by the promise of
-better management of multiple terminals in a single <a href="http://dwm.suckless.org/">dwm tag</a>…</p>
-
-<p>It's available in the community repo, so:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S tmux
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then it is just a matter of configuring it to suit your style of working,
-keyboard bindings etc. Helpfully, it comes with some example config files to
-start you off. These can be found at <span class="file">/usr/share/tmux/*.conf</span>.
-I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams'</a> for mine:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-<span class='line-number'>93</span>
-<span class='line-number'>94</span>
-<span class='line-number'>95</span>
-<span class='line-number'>96</span>
-<span class='line-number'>97</span>
-<span class='line-number'>98</span>
-<span class='line-number'>99</span>
-<span class='line-number'>100</span>
-<span class='line-number'>101</span>
-<span class='line-number'>102</span>
-<span class='line-number'>103</span>
-<span class='line-number'>104</span>
-<span class='line-number'>105</span>
-<span class='line-number'>106</span>
-<span class='line-number'>107</span>
-<span class='line-number'>108</span>
-<span class='line-number'>109</span>
-<span class='line-number'>110</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;set prefix key to ctrl+t&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;unbind C-b
-</span><span class='line'><span class="nb">set</span> -g prefix C-t&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;more intuitive keybindings <span class="k">for </span>splitting&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;unbind %
-</span><span class='line'><span class="nb">bind </span>h split-window -h
-</span><span class='line'>unbind <span class="s1">&#39;&quot;&#39;</span>
-</span><span class='line'><span class="nb">bind </span>v split-window -v&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;set vi keys&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;unbind <span class="o">[</span>
-</span><span class='line'><span class="nb">bind </span>Escape copy-mode
-</span><span class='line'>setw -g mode-keys vi&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;send the prefix to client inside window <span class="o">(</span>ala nested sessions<span class="o">)</span>&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;bind-key a send-prefix&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;toggle last window like screen&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;bind-key C-b last-window&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;confirm before killing a window or the server&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;bind-key k confirm <span class="nb">kill</span>-window
-</span><span class='line'><span class="nb">bind</span>-key K confirm <span class="nb">kill</span>-server&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;toggle statusbar&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;bind-key b <span class="nb">set</span>-option status&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;ctrl+left/right cycles thru windows&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;bind-key -n C-right next
-</span><span class='line'><span class="nb">bind</span>-key -n C-left prev&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;open a man page in new window&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;bind / <span class="nb">command</span>-prompt <span class="s2">&quot;split-window &#39;exec man %%&#39;&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;quick view of processes&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;bind <span class="s1">&#39;~&#39;</span> split-window <span class="s2">&quot;exec htop&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;scrollback buffer n lines&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g <span class="nb">history</span>-limit 5000&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;on-screen <span class="nb">time </span><span class="k">for </span>display-panes in ms&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g display-panes-time 2000&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;start window indexing at one instead of zero&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g base-index 1&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;enable wm window titles&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g <span class="nb">set</span>-titles on&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;wm window title string <span class="o">(</span>uses statusbar variables<span class="o">)</span>&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g <span class="nb">set</span>-titles-string <span class="s2">&quot;tmux:#I #W&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;session initialization&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;new -s TTYtter ttytter
-</span><span class='line'>neww -t 2
-</span><span class='line'>neww -d -t 3
-</span><span class='line'>neww -d -t 5
-</span><span class='line'>selectw -t 1&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h4&gt;statusbar&lt;/h4&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g status-interval 1
-</span><span class='line'><span class="nb">set</span> -g status-justify centre <span class="c"># center align window list</span>
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="s1">&#39;#[fg=green] #H #[default]&#39;</span>
-</span><span class='line'><span class="nb">set</span> -g status-right <span class="s1">&#39;#[fg=blue,bright]Up#(uptime | cut -f 4-5 -d &quot; &quot; | cut -f 1 -d &quot;,&quot;)&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">&lt;h1&gt;[default]:: #[fg=cyan]#(cut -d &quot; &quot; -f 1-4 /proc/loadavg) &#39;</span>&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;default statusbar colors&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g status-fg white
-</span><span class='line'><span class="nb">set</span> -g status-bg default
-</span><span class='line'><span class="nb">set</span> -g status-attr bright&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;default window title colors&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set-window-option -g window-status-fg white
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-bg default
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-attr dim&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;active window title colors&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set-window-option -g window-status-current-fg white
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-bg default
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-attr bright&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;command/message line colors&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g message-fg white
-</span><span class='line'><span class="nb">set</span> -g message-bg black
-</span><span class='line'><span class="nb">set</span> -g message-attr bright
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Copy this file to <span class="file">~/.tmux.conf</span>. The final result:</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4252840248/" title="Archlinux:  tmux running in dwm by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2703/4252840248_01ca8e7cc1.jpg" width="500" height="293" alt="Archlinux:  tmux running in dwm"/></a></p>
-
-<h3>Updated 16/11/10</h3>
-
-<p>For a current version of my <span class="file">.tmux.conf</span>, check my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.tmux.conf" title="bitbucket site" target="_blank">mercurial repository</a>.</p>
 ]]></content>
   </entry>
   

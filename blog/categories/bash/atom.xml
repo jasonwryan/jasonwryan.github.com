@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/bash/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T12:34:25+13:00</updated>
+  <updated>2012-03-28T17:32:39+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -14,19 +14,45 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Script to Edit Config Files]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/07/19/script-to-edit-config-files/"/>
-    <updated>2011-07-19T19:34:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/07/19/script-to-edit-config-files</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/xdg-script.png" alt="image" /></p>
+    <title type="html"><![CDATA[Readline Bindings in Vi Mode]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/12/01/readline/"/>
+    <updated>2011-12-01T18:43:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/12/01/readline</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/readline.png" alt="image" /></p>
 
-<p>Even with bash completion, endlessly typing and tabbing through the
-directory tree to make a simple change to a config file quickly becomes
-tedious, so I concocted this script to make it somewhat more
-straightforward.</p>
+<p>I recently threw caution to the wind and
+<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
+I wanted to take advantage of the superior command editing ability that
+this mode offered, and also to continue to bake vi[m] methods into every
+aspect of my working environment.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>xdg.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>The change has been relatively straightforward; the only issues I have
+experienced are really just around a couple of keybinds that I had
+become accustomed to in normal/Emacs mode:</p>
+
+<ul>
+<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
+<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
+</ul>
+
+
+<p>The first, the ability to recall the final arguments of previous
+commands was a showstopper for me: I really struggled without this.
+Being able to recall a long file path and append it to a new command is
+invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
+exactly this. Why it is not bound by default in vi mode is beyond me…</p>
+
+<p>The other was purely cosmetic, really. I am an inveterate clearer of the
+screen—unless I am referring to something printed to stdout, I always
+prefer to work at the top of the console.</p>
+
+<p>In any event, with the
+<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
+it was a trivial exercize to restore this functionality to my bash shell
+in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -43,92 +69,117 @@ straightforward.</p>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>&lt;h1>for vi mode&lt;/h1>
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>&lt;p>set editing-mode vi
+</span><span class='line'>$if mode=vi&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;for f in <span class="nv">$dir</span>/* ; <span class="k">do</span>
-</span><span class='line'><span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
-</span><span class='line'>    <span class="k">case</span> <span class="nv">$file</span> in
-</span><span class='line'>    conf | config | *.cfg | *rc<span class="o">)</span>  <span class="nv">$EDITOR</span> <span class="s2">&quot;$f&quot;</span> ;;
-</span><span class='line'>    *<span class="o">)</span>  :  ;;
-</span><span class='line'>    <span class="k">esac</span>
-</span><span class='line'><span class="k">done</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>&lt;p>set keymap vi-command&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'>&lt;h1>these are for vi-command mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>"\e[A": history-search-backward            # arrow up
+</span><span class='line'>"\e[B": history-search-forward             # arrow down
+</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
+</span><span class='line'>Control-l: clear-screen&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set keymap vi-insert&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>these are for vi-insert mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>"\e[A": history-search-backward
+</span><span class='line'>"\e[B": history-search-forward
+</span><span class='line'>"\ep": yank-last-arg
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>$endif</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>A relatively simple script, with a nice feature or two, it does a couple
-of things. First, it
-<a href="http://wiki.bash-hackers.org/commands/classictest" title="Bash Hackers: test">tests</a>
-that the directory actually exists:</p>
+<p>There is an extensive list of
+<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
+with which you can customize your shell environment.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[rsync + SSH Backups]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/11/28/rsync/"/>
+    <updated>2011-11-28T12:23:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/11/28/rsync</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/rsync-ssh.png" alt="image" /></p>
+
+<p>I <a href="http://jasonwryan.com/blog/2011-11-18-microserver" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
+and included a
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
+script for backing up my files to the server. At the time, I was running
+it manually, but since have sorted out the excludes list and have now
+automated it.</p>
+
+<p>My original scheme was to set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
+mount an
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
+before rsync’ing the directories across. In the end, I went with SSH and
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
+as debugging all of the various permissions issues with the NFS share
+did not seem worth the effort.</p>
+
+<p>First, on my local desktop, I created the keypair called, inventively,
+rsync:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;if <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
+</span><span class='line'>mv rsync ~/.ssh &amp;amp;&amp;amp; chmod 600 ~/.ssh/rsync
+</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>and then loops through all of the files in the directory using a
-<a href="http://mywiki.wooledge.org/glob" title="Entry on Greg's Wiki">glob</a> and
-checks for a pattern match.</p>
+<p>This keypair was created <em>without a passphrase</em> so that the script could
+be successfully called from <code>cron</code>. To slightly increase the security
+around a key without a passphrase, I used the from option in
+authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
+machine(s), like so:</p>
 
-<p>In order for the
-<a href="http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_03.html" title="Cases on Bash Guide">case statement</a>
-to work, however, the directory path has to be stripped from the file
-name.</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>Rather than run another process with
-<a href="http://www.gnu.org/software/coreutils/manual/html_node/basename-invocation.html" title="GNU basename in coreutils">basename</a>,
-I used
-<a href="http://wiki.bash-hackers.org/syntax/pe#substring_removal" title="Bash Hackers Wiki">parameter expansion</a>
-to remove the substring:</p>
+<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
+the SSH command:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.ssh/config </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;file<span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Host backups
+</span><span class='line'>   Hostname 192.168.1.200
+</span><span class='line'>   Port 0000
+</span><span class='line'>   User jason
+</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>which turns, for example, <span class="file">$XDG_CONGIG_HOME/newsbeuter/conf</span> into a
-simple conf. This can then be evaluated for a match with the file names
-in the case statement and passed to the <code>$EDITOR</code>.</p>
+<p>And I was done. Everynight at 10pm, all of my data will be backed up to
+the server. The rsync command in the script:</p>
 
-<p>If no match is found, nothing (<code>:</code>) is done.</p>
-
-<p>Now, it is simply a matter of entering <code>xdg vimprobable</code> and
-<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span> is opened in Vim.</p>
-
-<h4>Updated 19/10/11</h4>
-
-<p>After using this script for a while it became clear to me that it has a
-significant drawback: too many applications place their config files in
-directories other than <span class="file">$XDG_CONFIG_HOME</span>. So,
-<a href="https://bbs.archlinux.org/viewtopic.php?id=128585" title="Post on the Arch boards">with some help</a>,
-I updated the script. It now covers all of the directories where you are
-likely to find dotfiles.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>xdg.sh v2 </span></figcaption>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -142,260 +193,78 @@ likely to find dotfiles.</p>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;dirs<span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
-</span><span class='line'><span class="nv">IFS</span><span class="o">=</span><span class="s1">$&#39;\n&#39;</span>
-</span><span class='line'><span class="nb">read</span> -r -d <span class="s1">&#39;&#39;</span> -a files &amp;lt; <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;&amp;lt;<span class="o">(</span>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
-</span><span class='line'>       -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> 2&amp;gt;/dev/null<span class="o">)</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">((</span> <span class="k">${#</span><span class="nv">files</span><span class="p">[*]</span><span class="k">}</span> <span class="o">))</span> &amp;amp;&amp;amp; <span class="s2">&quot;$EDITOR&quot;</span> <span class="s2">&quot;${files}&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>If you would prefer a more portable version—which still relies on GNU
-find—then you could simplify it like so:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>xdg.sh v3 </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
 </pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;dirs<span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>&lt;h1&gt;Backup to remote server over SSH&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="o">(</span> <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>&lt;p&gt;rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;   -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>-o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>-o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
-</span><span class='line'>-o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
-</span><span class='line'>-o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> <span class="se">\</span>
-</span><span class='line'>-exec <span class="s2">&quot;$EDITOR&quot;</span> <span class="o">{}</span> +
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;--log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
+</span><span class='line'>-e ssh /home/jason /etc backups:Backups/Centurion
 </span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Archwiki elvis for Surfraw]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/04/13/archwiki-elvis-for-surfraw/"/>
-    <updated>2011-04-13T19:29:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/04/13/archwiki-elvis-for-surfraw</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/arch-elvis.png" alt="image" /></p>
-
-<p>I have been using
-<a href="http://surfraw.alioth.debian.org/" title="Surfraw manifesto">Surfraw</a> for the
-better part of eighteen months, and I think that it is a perfect Unix
-tool: it does <em>one</em> thing, extremely well… If you haven’t come across
-it, Surfraw is a command-line interface to a couple of dozen
-repositories of knowledge. It is described thus:</p>
-
-<blockquote><p>It reclaims google, altavista, babelfish, dejanews, freshmeat,
-research index, slashdot and many others from the false-prophet,
-pox-infested heathen lands of html-forms, placing these wonders where
-they belong, deep in unix heartland, as god loving extensions to the
-shell.<sup>1</sup></p></blockquote>
-
-<p>The shell scripts that power the searches of the repositories are called
-<em>elvi</em>, the singular being <em>elvis</em>. Currently, in
-<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=summary" title="Debian Git Repo: Surfraw">the git repo</a>,
-there are
-<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=tree;f=elvi;hb=HEAD" title="elvi in the git repo">over 100 elvi</a>,
-ranging from Wikipedia through to the CIA website (yes, the project was
-founded by <a href="http://en.wikipedia.org/wiki/Julian_Assange" title="Julian's Wikipedia page">Julian Assange</a>),
-Slashdot and The Wayback Machine.</p>
-
-<p>As comprehensive as the list of elvi is, there was one glaring hole.
-Arch Linux is represented in terms of elvi to search the
-<a href="http://aur.archlinux.org/" title="Arch User Repository">AUR</a> and the
-<a href="http://www.archlinux.org/packages/" title="Arch Package Database">official package repositories</a>,
-but nothing for the
-<a href="https://wiki.archlinux.org/index.php/Main_Page" title="Definitive Arch Linux documentation">Arch Wiki</a>,
-perhaps the best GNU/Linux reference wiki on the web.</p>
-
-<p>So I thought I would rectify that.</p>
-
-<p>You can grab the archwiki elvis from my
-<a href="http://beta.intuxication.org/jasonwryan/longbow/file/tip/scripts/archwiki" title="Intuxication repo">mercurial repo</a>,
-copy it into your local directory at <span class="file">$XDG_CONFIG_HOME/surfraw/elvi/</span> or
-in the system folder at <span class="file">$XDG_CONFIG_DIRS/surfraw/</span> and you can surf the
-Arch Wiki, or any one of the nine other language wikis, from the command
-line.</p>
-
-<blockquote><p>Surfrawize the soul of your favourite internet wonder. Join the
-<strong>S</strong>hell <strong>U</strong>sers’ <strong>R</strong>evolutionary <strong>F</strong>ront <strong>A</strong>gainst the
-WW<strong>W</strong> by submitting code. Reclaim heathen lands. Bear witness to the
-truth. Its love will set you free.</p></blockquote>
 
 <h5>Notes</h5>
 
 <ol>
-<li>A bonus: all of the documentation is written like Unix
-<a href="http://en.wikipedia.org/wiki/Agitprop" title="Wikipedia entry">agitprop</a>…</li>
+<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
 </ol>
 
+
+<p>Creative Commons image from
+<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
 ]]></content>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Setting Urgent Hints in dwm]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/01/25/setting-urgent-hints-in-dwm/"/>
-    <updated>2011-01-25T17:45:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/01/25/setting-urgent-hints-in-dwm</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5379701719/#/photos/jasonwryan/5379701719/lightbox/" title="Arch Linux: dwm with statuscolors patch"><img src="http://dl.dropbox.com/u/261312/Blog-images/dwm-urgent.png" alt="image" /></a></p>
+    <title type="html"><![CDATA[Microserver]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/11/18/microserver/"/>
+    <updated>2011-11-18T17:13:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/11/18/microserver</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/microserver.png" alt="image" /></p>
 
-<p>After nearly 12 months of running a pretty stable
-<a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>, with a consistent
-patchset (cycle,
-<a href="http://dwm.suckless.org/patches/push" title="Push on suckless wiki">push</a>,
-and init pertag<sup>1</sup>) I finally added another one:
-statuscolours<sup>2</sup>…</p>
+<p>I recently picked up a
+<a href="http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html" title="HP specs page">HP Microserver</a>;
+a small, silent server to use primarily to back up
+<a href="http://jasonwryan.com/blog/2010-10-04-the-setup" title="Slightly out-of-date setup post">my other boxes</a>.
+I went for the 2GB version without any preinstalled operating system.</p>
 
-<p>I have been experimenting with
-<a href="http://jasonwryan.com/2010-12-26-wmfs-window-manager-from-scratch" title="My post on using WMFS">WMFS</a>,
-which is another very nice, minimal tiling window manager and was really
-enjoying the urgency hints in the status bar, so I decided to patch that
-functionality into dwm.</p>
+<p>As I want this machine to just sit quietly in my garage for the next 5
+or 6 years, I opted for
+<a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
+base system. After installing two 1TB drives, I set them up as an
+<a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
+RAID 1 array, in a i
+<a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
 
-<p>Most terminal applications will send a bell when your attention is
-required; in my case, I was looking for a way to trigger notifications
-for new mail in
-<a href="http://www.mutt.org/" title="If you are using another mail user agent, you are doing it wrong...">mutt</a>
-or highlights in <a href="http://irssi.org/" title="IRC client">irssi</a>. In mutt, it
-was just a case of setting a bell for when mail arrived:</p>
+<p><strong>Pro tip</strong> when you get to the part of the partitioning where you
+configure the volume for encryption, make sure you select <em>No</em> for
+<em>erase data</em>. It took close to 90 hours to scrub both the hard drives.
+And, as I am not really expecting
+<a href="http://www.extremetech.com/computing/105931-full-disk-encryption-is-too-good-says-us-intelligence-agency" title="FDE defeats the NSA">a visit from the spooks</a>,
+that seems a little like overkill…</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span>beep_new             <span class="c"># bell on new mail</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p>Once the base install was complete, I set up my SSH keys,
+<a href="http://tmux.sourceforge.net/" title="tmux page">tmux</a>, configured the
+firewall and forwarded the necessary ports, set up
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia page: network file system">NFS</a>,
+and that was it. The box is deathly quite, can be mounted locally for
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync entry">rsync backups</a> and
+accessed remotely (for a tmux session running
+<a href="http://irssi.org/" title="Irssi homepage">irssi</a>), and all for less than
+NZD700.</p>
 
-<p>And in irssi:</p>
+<p>I knocked together a quick script<sup>1</sup> to manage the backing up; currently
+I run it manually, but once I have the excludes file tweaked properly,
+I’ll set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
+automate the task.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">beep_msg_level</span> <span class="o">=</span> <span class="s2">&quot;NOTICE MSGS HILIGHT&quot;</span>;
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>In <a href="http://tmux.sourceforge.net/" title="terminal mulitplexer">tmux</a>, to cover
-all your terminal bases, add:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set</span> -g bell-action any <span class="c"># listen for activity on all windows</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The next step is to pass those beeps to your terminal. The entry for
-Urxvt is one I picked up after a quick search turned up
-<a href="http://rsontech.net/articles/2008/11/17/1/handling-urgency-hints" title="Post on reson.tech">this post by rson</a>
-which had the .Xdefaults line I was looking for:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>URxvt*urgentOnBell: <span class="nb">true</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Now, whenever a bell is triggered in irssi or mutt, that is passed to
-the terminal as an urgent hint. The final step was patching statuscolors
-into dwm.c to change the tag colour when the hint was received.</p>
-
-<p>You can see my
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Build/dwm/5.8.2-2.diff" title="dwm.c patched">patched dwm.c</a>
-in my intuxication repo.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>These patches are from the extremely helpful Arch Forum thread:
-<a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a></li>
-<li>I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
-from the suckless mailing list. It irons out the padding issues in the one on the wiki.</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mail Checking Script]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/01/08/mail-checking-script/"/>
-    <updated>2011-01-08T11:04:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/01/08/mail-checking-script</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/mailcheck.png" alt="image" /></p>
-
-<p>I use <a href="http://www.mutt.org/" title="Mutt homepage">mutt</a> and
-<a href="https://github.com/jgoerzen/offlineimap/wiki" title="Offlineimap on github">offlineimap</a>
-to manage email on my Arch Linux machines. I like the simplicity and the
-power that this approach offers; that’s power in the sense of
-extensibility and customization, by the way…</p>
-
-<p>Using <a href="http://dwm.suckless.org/" title="dwm homepage">dwm</a> as my window
-manager, I had relied on
-<a href="http://jasonwryan.com/2009-11-21-dzen2-and-conky-cli-in-dwm" title="My post on setting this up">conky and dzen2</a>
-to pipe system information into my status bar. Unfortunately, conky only
-supports one mail spool so if, like me, you use offlineimap to
-synchronize multiple mailboxes, conky would only show new mail in your
-primary box. I had asked in #conky about multiple mail spools, but it
-doesn’t seem to be supported.</p>
-
-<p>When I recently started using
-<a href="http://jasonwryan.com/2010-12-26-wmfs-window-manager-from-scratch" title="My post on Window Manager From Scratch">WMFS</a>
-I decided to move to a
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/wmfs-status" title="Script in intuxication repo">bash script for my status information</a>.
-So I approached the problem afresh and decided to write a script to poll
-the new mail directories and update my status bar when mail arrived.</p>
-
-<p>Offlineimap creates a directory structure like so:</p>
-
-<pre><code>   Mail/ -------
-      |         |
-      |     Mail_Account_1
-      |         |
-      |         | --  INBOX 
-      |         |       | -- cur
-      |         |       | -- new
-      |         |       | -- temp
-      |         |
-      |         | -- INBOX.Drafts
-      |         |       | -- cur
-</code></pre>
-
-<p>As I was only interested in checking the <span class="file">INBOX/new</span>
-directory of each account, I had imagined that it would be necessary to set up some
-elaborate array to effectively check each of the requisite sub-directories…</p>
-
-<p>No, it was pretty simple. Just
-<a href="http://www.faqs.org/docs/abs/HTML/globbingref.html" title="ABS entry on globing">globbing</a>
-and
-<a href="http://linuxmanpages.com/man1/find.1.php" title="man page for find">find</a>,
-actually.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>mailcheck.sh </span></figcaption>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -406,99 +275,236 @@ actually.</p>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
 </pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Set maildirs&lt;/h1&gt;
+</span><span class='line'>&lt;h1&gt;Backup to remote server over NFS&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;maildirs<span class="o">=</span><span class="s2">&quot;$HOME/Mail/*/INBOX/new/&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;find <span class="nv">$maildirs</span> -type f | wc -l
-</span><span class='line'><span class="nb">exit </span>0
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
+</span><span class='line'> <span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
+</span><span class='line'> mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">fi</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;sync directories&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
+</span><span class='line'> /home/jason /etc /media/Sentinel/Backups/Centurion
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
+</span><span class='line'> umount /media/Sentinel
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">fi</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The glob (<code>*</code>) takes care of the different mail account names, and has
-the added bonus of being portable, and find returns any files (<code>-type f</code>)
-with <code>wc</code> counting the number of lines (the <code>-l</code> switch).</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Command Line Notes]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/09/28/command-line-notes/"/>
-    <updated>2010-09-28T17:56:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/09/28/command-line-notes</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-1.png" alt="image" /></p>
-
-<p>A couple of weeks ago, I came across these
-<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
-written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
-notes.</p>
-
-<p>The functions as described in the article are so:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$&lt;em&gt;&quot;</span>.txt <span class="o">}</span> nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$&lt;/em&gt;&quot;</span> <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Unfortunately, the second function – for retrieving the list of files in
-the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
-and it will only list files in the top level directory. If you are an
-inverterate note taker, this plainly won’t scale.</p>
-
-<p>My first attempt at hacking a solution yielded this little beauty:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\</span>
-</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Which removes <code>ls</code> from the function and allows nested directories, but
-is needlessly complex and, with four pipes, hideously <del>inefficient</del>
-inelegant.</p>
-
-<p>After reading up on Awk, particularly
-<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
-I arrived at something marginally longer but relying solely on the
-awesome power of awk to make the various transformations I was seeking…</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
-</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>An added advantage is that it is scalable irrespective of how deep the
-directories go. I’m sure that with some more awk-foo I could write a
-more effective set of conditionals, but this seemed a pretty good start
-for a simple note taking utility.</p>
-
-<h3>Updated 3/11/10</h3>
-
-<p>To remove a little of the visual clutter, I amended the awk script to
-strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
-</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
-in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
-symlink to it from <span class="file">~/.notes</span>.</p>
 
 <h5>Notes</h5>
 
 <ol>
-<li><p>See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.</p></li>
-<li><p>Obligatory “after” screenshot:</p></li>
+<li>Any faults aside, it should be reasonably portable…</li>
 </ol>
 
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[IRC Notifications with dzen2]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/11/07/irc-dzen/"/>
+    <updated>2011-11-07T19:48:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/11/07/irc-dzen</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
 
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-2.png" title="'Screenshot of editing text'" ></p>
+<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective of whether I
+was connected to the session, or that particular machine at the time.</p>
+
+<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
+and there is a script called
+<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
+that will print any mentions in a channel to a file. I then configured
+the fnotify script to write to a folder in Dropbox. Now, whenever I am
+mentioned in freenode, the file is updated across all my machines.</p>
+
+<p>The next challenge was to translate the updating of the fnotify file
+into a notification on my current machine. As I don’t use
+<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
+on my Arch machines, I wanted to make it work with
+<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
+Enter a simple shell script:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;echo <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
+so that it runs in the background after login. Whenever the metadata
+(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
+written to my
+<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
+with the message.</p>
+
+<p>Simple; but does what I need…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Dropbox’s API won’t work with dzen2—or with other lightweight
+notifications like
+<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
+<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
+(that was closed without any progress)—hence my having to resort to a
+home-cooked solution…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pinboard Elvis]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/10/01/pinboard-elvis/"/>
+    <updated>2011-10-01T10:29:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/10/01/pinboard-elvis</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/pinboard-elvis.png" alt="image" /></p>
+
+<p>After recovering from
+<a href="http://jasonwryan.com/blog/2011-09-28-delicious" title="My post on the delicious fiasco">the shock of the botched delicious relaunch</a>,
+I have switched to
+<a href="http://pinboard.in/u:jasonwryan/" title="My bookmarks on Pinboard">Pinboard</a>
+for my bookmarking. Previously, I was just synching my bookmarks from
+delicious, but now I have abandoned that trainwreck completely.</p>
+
+<p>Two things made the transition painless. The first was the
+<a href="http://www.appbrain.com/app/me.mitnworb.save.to.pinboard/" title="Save to Pinboard page">Pinboard Android app</a>
+so I could access and manage bookmarks from my phone; the second was a
+little trickier.</p>
+
+<p>As I have previously mentioned, I use bookmarking not just to retrieve
+my own saved pages, but as a search repository for material that other
+people have decided is interesting or valuable enough to want to save.
+And there is no better tool for this sort of searching than
+<a href="http://surfraw.alioth.debian.org/" title="Surfraw - Shell Users' Revolutionary Front Rage Against the Web">Surfraw</a><sup>1</sup></p>
+
+<p>I had written an elvis to search delicious bookmarks, so to complete the
+transition to Pinboard, I needed to do the same. It was a little
+trickier than I had anticipated, as some of the URLs (particularly when
+searching across multiple tags) were reasonably complex given my modest
+scripting skills. But
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.config/surfraw/elvi/pin" title="Pinboard elvis in mercurial repo">I got there in the end…</a></p>
+
+<p>Now searching for web pages that I or anyone else has saved to Pinboard
+is as simple as typing:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pin -t<span class="o">=</span>unix+linux+vim
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Which will return all saved pages that share those three tags. I can
+also refine my search to a particular user with the <code>-u</code>{ser} switch, or
+just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Previous posts on Surfraw:
+
+<ul>
+<li> <a href="http://jasonwryan.com/blog/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">Arch Wiki elvis for Surfraw</a></li>
+<li> <a href="http://jasonwryan.com/blog/2011-05-05-w3m" title="Yanking links in w3m">w3m, Surfraw and yanking  URLs</a></li>
+</ul>
+</li>
+</ol>
+
 ]]></content>
   </entry>
   
