@@ -1,0 +1,69 @@
+---
+layout: post
+title: "Building rtorrent on Debian Squeeze"
+date: 2011-11-29 21:21
+comments: true
+categories: [debian, linux]
+---
+![image](http://dl.dropbox.com/u/261312/Blog-images/rtorrent.png)
+
+After [setting up my server](http://jasonwryan.com/blog/2011-11-18-microserver "Post on the HP microserver"),
+I wanted to use it as a torrent box. The version of
+[rtorrent](http://libtorrent.rakshasa.no/ "rtorrent & libtorrent homepage")
+in the Debian stable repositories is 0.8.6, which is unfortunate as
+support for [magnet links](http://en.wikipedia.org/wiki/Magnet_URI_scheme "Wikipedia page on magnet URIs")
+was introduced in 0.8.7.
+
+To remedy this, I decided to build the current stable version of
+rtorrent, 0.8.9. At the same time—seeing as I was getting my hands dirty
+anyway—I thought I’d patch in colour support.
+
+This is a straightforward two-step process. First, build the current
+version of libtorrent, 0.12.9:
+
+{% codeblock lang:sh %}
+wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
+tar -xvf libtorrent-0.12.9.tar.gz 
+cd libtorrent-0.12.9/
+./configure && make
+sudo checkinstall
+{% endcodeblock %}
+
+Once libtorrent is successfully built and installed, you can begin the
+rtorrent build:
+
+{% codeblock lang:sh %}
+wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
+tar -xvf rtorrent-0.8.9.tar.gz 
+cd rtorrent-0.8.9/
+{% endcodeblock %}
+
+Then, if you want colour support, you need the patch. I used the version
+in the
+[AUR](https://aur.archlinux.org/packages.php?ID=31956 "rtorrent-color in AUR"),
+but you can also grab a copy from a paste site:
+
+{% codeblock lang:sh %}
+wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
+mv canvas_colour.patch src/
+patch -uNp1 -i canvas_colour.patch
+{% endcodeblock %}
+
+The patch should apply cleanly. Then specify where libtorrent is
+installed to ensure that it is linked during the rtorrent build:
+
+{% codeblock lang:sh %}
+./configure --libdir=/usr/local/lib
+make
+sudo checkinstall
+{% endcodeblock %}
+
+Once again, this should compile cleanly and you will now have rtorrent
+with colour and magnet link support installed in
+<span class="file">/usr/local/bin/rtorrent</span>.
+
+##### Notes
+I prefer to use
+[checkinstall](http://asic-linux.com.mx/~izto/checkinstall/ "checkinstall homepage")
+so that self-installed applications are tracked by
+[Apt](http://wiki.debian.org/Apt "Debian wiki entry").

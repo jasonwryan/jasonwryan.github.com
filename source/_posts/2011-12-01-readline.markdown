@@ -1,0 +1,63 @@
+---
+layout: post
+title: "Readline Bindings in Vi Mode"
+date: 2011-12-01 18:43
+comments: true
+categories: [bash, vim, linux]
+---
+![image](http://dl.dropbox.com/u/261312/Blog-images/readline.png)
+
+I recently threw caution to the wind and 
+[changed my shell over to vi mode](https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25 "Bitbucket commit").
+I wanted to take advantage of the superior command editing ability that
+this mode offered, and also to continue to bake vi[m] methods into every
+aspect of my working environment.
+
+The change has been relatively straightforward; the only issues I have
+experienced are really just around a couple of keybinds that I had
+become accustomed to in normal/Emacs mode:
+
+-   <kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)
+-   <kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in *insert* mode
+
+The first, the ability to recall the final arguments of previous
+commands was a showstopper for me: I really struggled without this.
+Being able to recall a long file path and append it to a new command is
+invaluable. Fortunately, there is the `yank-last-arg` command that does
+exactly this. Why it is not bound by default in vi mode is beyond me…
+
+The other was purely cosmetic, really. I am an inveterate clearer of the
+screen—unless I am referring to something printed to stdout, I always
+prefer to work at the top of the console.
+
+In any event, with the 
+[bindable readline commands](http://tiswww.case.edu/php/chet/readline/readline.html#SEC13 "GNU Readline Library"),
+it was a trivial exercize to restore this functionality to my bash shell
+in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:
+
+{% codeblock ~/inputrc %}
+$include /etc/inputrc
+
+# for vi mode
+set editing-mode vi
+$if mode=vi
+
+set keymap vi-command
+# these are for vi-command mode
+"\e[A": history-search-backward            # arrow up
+"\e[B": history-search-forward             # arrow down
+"\ep": yank-last-arg                       # bind to Alt-p
+Control-l: clear-screen
+
+set keymap vi-insert
+# these are for vi-insert mode
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+"\ep": yank-last-arg
+Control-l: clear-screen
+$endif
+{% endcodeblock %}
+
+There is an extensive list of 
+[readline commands and variables](http://linux.about.com/library/cmd/blcmdl3_readline.htm "About.Linux page on readline")
+with which you can customize your shell environment.

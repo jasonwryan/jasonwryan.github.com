@@ -1,0 +1,65 @@
+---
+layout: post
+title: "Tarsnap"
+date: 2011-09-08 17:55
+comments: true
+categories: [linux, backup, hack]
+---
+![image](http://dl.dropbox.com/u/261312/Blog-images/tarsnap.jpg)
+
+I have been using [Tarsnap](http://www.tarsnap.com/ "Tarsnap homepage")
+for a couple of months now to backup 
+[my EeePC](http://jasonwryan.com/blog/2010-10-04-the-setup "My setup").
+Tarsnap’s (superb) tagline is: `online backups for the truly paranoid.`
+
+Essentially, Tarsnap stores your encrypted backups on 
+[Amazon’s S3 servers](http://aws.amazon.com/s3//192-5766046-6455343/ "Amazon page"),
+recognizes duplicate data and avoids storing it again, and only deletes
+data once no remaining archives require it. I can recommend it as a
+terrific service for a number of reasons.
+
+It is *[secure](http://www.tarsnap.com/security.html "Security page")*.
+Developed by the FreeBSD Security Officer, there is a 
+[bug bounty](http://www.tarsnap.com/bugbounty.html "Bug bounty details") for
+anyone who does discover bugs or security holes. It is very reasonably
+priced. It is reliable. And most importantly, 
+[Dr Colin Percival](http://www.tarsnap.com/about.html "Tarsnap about page"),
+erstwhile child prodigy and developer, is extremely helpful either on
+the mailing list or IRC if you have any questions or need help.
+
+If, however, you have a quick look at the 
+[man page](http://www.tarsnap.com/man-tarsnap.1.html "tarsnap(1)"), you will
+see that it is not exactly a simple application. After a couple of
+months of trying to remember all of the relevant flags, I searched for a
+script that would simplify the process for me. There are 
+[a few online](http://duckduckgo.com/?q=tarsnap+%2B+bash+script "DDG results"),
+but they are all intended to fully automate the process (which makes
+sense for something like backups)…
+
+What I was looking for, however, was something more interactive: more
+along the lines of a prompt. So, realizing I would have to scratch my
+own itch, I wrote a wrapper script to assist my failing memory.
+
+The script prints out a menu of the available options and, once you have
+selected the activity that you would like (creating a new snapshot,
+deleting an old one etc.,), then the script checks if any further input
+is required, for example, the name of the snapshot to delete, and then
+executes it. It is nothing flash, but it works…
+
+![image](http://dl.dropbox.com/u/261312/Blog-images/tarsnap2.png)
+
+You can [grab the script](http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/snap "Snap script on Intuxication")
+from my mercurial repo. It’s written in bash, but if you require
+[portability](http://tldp.org/LDP/abs/html/portabilityissues.html "Advanced Bash Scripting Guide"),
+it shouldn’t be too hard to tweak.
+
+#### Updated 3/10/11
+
+I have rewritten the script to be
+[POSIX compliant](http://pubs.opengroup.org/onlinepubs/9699919799/ "POSIX Standard at the Open Group")
+and also to better conform to basic UNIX behaviours, in terms of the
+options etc. It should now be good to run in most shells.
+
+##### Notes
+Creative Commons licensed image by 
+[Declan TM](http://www.flickr.com/photos/declanjewell/2447653142/ "Flickr image credit")

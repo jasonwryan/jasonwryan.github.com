@@ -15,7 +15,7 @@ and init pertag<sup>1</sup>) I finally added another one:
 statuscolours<sup>2</sup>…
 
 I have been experimenting with
-[WMFS](http://jasonwryan.com/2010-12-26-wmfs-window-manager-from-scratch "My post on using WMFS"),
+[WMFS](http://jasonwryan.com/blog/2010-12-26-wmfs-window-manager-from-scratch "My post on using WMFS"),
 which is another very nice, minimal tiling window manager and was really
 enjoying the urgency hints in the status bar, so I decided to patch that
 functionality into dwm.

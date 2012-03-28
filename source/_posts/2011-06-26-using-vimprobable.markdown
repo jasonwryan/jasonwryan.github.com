@@ -7,7 +7,7 @@ categories: [linux, browser, hack]
 ---
 ![image](http://dl.dropbox.com/u/261312/Blog-images/vimprobable2.png)
 
-I [posted last year about Vimprobable](http://jasonwryan.com/2010-10-07-vimprobable "Post on using Vimprobable")
+I [posted last year about Vimprobable](http://jasonwryan.com/blog/2010-10-07-vimprobable "Post on using Vimprobable")
 a [webkit browser](http://www.webkit.org/ "Webkit site") that uses
 Vim-like keybinds and can be run completely without the rodent.
 

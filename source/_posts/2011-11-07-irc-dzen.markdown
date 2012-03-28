@@ -1,0 +1,53 @@
+---
+layout: post
+title: "IRC Notifications with dzen2"
+date: 2011-11-07 19:48
+comments: true
+categories: [tmux, linux, bash, hack]
+---
+![image](http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png)
+
+I have a persistent [tmux](http://tmux.sourceforge.net/ "tmux homepage")
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective of whether I
+was connected to the session, or that particular machine at the time.
+
+I use [irssi](http://irssi.org/about "irssi homepage") as my IRC client,
+and there is a script called
+[fnotify](http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html "Blog post explaining fnotify")
+that will print any mentions in a channel to a file. I then configured
+the fnotify script to write to a folder in Dropbox. Now, whenever I am
+mentioned in freenode, the file is updated across all my machines.
+
+The next challenge was to translate the updating of the fnotify file
+into a notification on my current machine. As I don’t use
+[libnotify](http://developer.gnome.org/libnotify/ "libnotify reference manual")
+on my Arch machines, I wanted to make it work with
+[dzen2](http://sites.google.com/site/gotmor/dzen "dzen homepage")^1
+Enter a simple shell script:
+
+{% codeblock highlights.sh %}
+#!/bin/sh
+dir="$HOME/Dropbox/irssi/"
+
+while inotifywait -qqre attrib "$dir" >/dev/null 2>&1; do
+    echo "IRC: You have been pinged..." | dzen2 -p 3
+done
+{% endcodeblock %}
+
+I have included this in my <span class="file">$HOME/.xinitrc</span> 
+so that it runs in the background after login. Whenever the metadata 
+(the `attrib` switch) of the file changes, a dzen2 notification is 
+written to my
+[dwm](http://dwm.suckless.org "THE supreme window manager") statusbar
+with the message.
+
+Simple; but does what I need…
+
+##### Notes
+1. Dropbox’s API won’t work with dzen2—or with other lightweight
+notifications like
+[statnot](https://github.com/halhen/statnot "statnot on github"), so I
+[filed a bug report](http://dropbox.zendesk.com/requests/336478 "Closed Dropbox bug report")
+(that was closed without any progress)—hence my having to resort to a
+home-cooked solution…

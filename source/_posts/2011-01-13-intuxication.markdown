@@ -8,7 +8,7 @@ categories: [vcs, linux]
 ![image](http://dl.dropbox.com/u/261312/Blog-images/intuxication.png)
 
 I have previously posted about using 
-[Mercurial to share dotfiles](http://jasonwryan.com/2010-02-10-using-mercurial-to-share-dotfiles "Mu post on using mercurial"),
+[Mercurial to share dotfiles](http://jasonwryan.com/blog/2010-02-10-using-mercurial-to-share-dotfiles "Mu post on using mercurial"),
 and how I have been using
 [bitbucket](http://bitbucket.org/ "bitbucket homepage") as a free host
 for that service.

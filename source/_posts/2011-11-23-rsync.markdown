@@ -1,0 +1,79 @@
+---
+layout: post
+title: "rsync + SSH Backups"
+date: 2011-11-28 12:23
+comments: true
+categories: [linux, bash]
+---
+![image](http://dl.dropbox.com/u/261312/Blog-images/rsync-ssh.png)
+
+I [posted recently about setting up a microserver](http://jasonwryan.com/blog/2011-11-18-microserver "Writeup of microserver setup")
+and included a
+[rsync](http://en.wikipedia.org/wiki/Rsync "Wikipedia rsync article")
+script for backing up my files to the server. At the time, I was running
+it manually, but since have sorted out the excludes list and have now
+automated it.
+
+My original scheme was to set up a 
+[cron job](http://en.wikipedia.org/wiki/Cron "Wikipedia entry on cron") and
+mount an 
+[NFS share](http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29 "Wikipedia NFS protocol article")
+before rsync’ing the directories across. In the end, I went with SSH and
+[public key authentication](http://en.wikipedia.org/wiki/Public-key_cryptography "Wikipedia: public key cryptography")
+as debugging all of the various permissions issues with the NFS share
+did not seem worth the effort.
+
+First, on my local desktop, I created the keypair called, inventively,
+rsync:
+
+{% codeblock lang:sh %}
+ssh-keygen -t rsa -f rsync
+mv rsync ~/.ssh && chmod 600 ~/.ssh/rsync
+ssh-copy-id -i rsync.pub jason@microserver
+{% endcodeblock %}
+
+This keypair was created *without a passphrase* so that the script could
+be successfully called from `cron`. To slightly increase the security
+around a key without a passphrase, I used the from option in
+authorized\_keys<sup>1</sup>, to restrict access to the IP address of the client
+machine(s), like so:
+
+{% codeblock lang:sh %}
+from="192.168.1.10*" ssh-rsa AAAAB3Nza...
+{% endcodeblock %}
+
+It was then just a matter of adding a line to my `crontab`:
+
+{% codeblock lang:sh %}
+crontab -e
+00 22 * * * /home/jason/Scripts/runbackup
+{% endcodeblock %}
+
+To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
+the SSH command:
+
+{% codeblock .ssh/config %}
+Host backups
+   Hostname 192.168.1.200
+   Port 0000
+   User jason
+   IdentityFile ~/.ssh/rsync
+{% endcodeblock %}
+
+And I was done. Everynight at 10pm, all of my data will be backed up to
+the server. The rsync command in the script:
+
+{% codeblock runbackup.sh %}
+#!/bin/sh
+# Backup to remote server over SSH
+
+rsync -azP --delete --exclude-from=/home/jason/Scripts/excludes.txt \
+    --log-file=/home/jason/Documents/rsync-$(date +%d%m%y).log \
+    -e ssh /home/jason /etc backups:Backups/Centurion
+{% endcodeblock %}
+
+##### Notes
+1. All of the options are detailed in [man sshd(8)](http://www.manpagez.com/man/8/sshd/ "manual page for sshd").
+
+Creative Commons image from
+[skreuzer](http://www.flickr.com/photos/skreuzer/511738484/ "Flickr image from skreuzer").
