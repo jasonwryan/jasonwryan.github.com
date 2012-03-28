@@ -53,7 +53,7 @@ the &hellip;">
   <fieldset role="search">
     <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
 </form>
   
@@ -402,7 +402,7 @@ what aurphan does:</p>
 <blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
 today!</p></blockquote>
 
-<p>Running aurphan -a, for example, will identify any
+<p>Running <code>aurphan -a</code>, for example, will identify any
 <a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
 database that are not currently maintained; allowing you to log in to
 the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
@@ -676,7 +676,7 @@ that for another long post.</p>
 
 <p>Anyway, the setup I decided on was reasonably straightforward: two 1TB
 drives comprising two Raid1 devices, one for a small (150Mb)
-<span class="file">/boot</span> andthe other holding three logical volumes
+<span class="file">/boot</span> and the other holding three logical volumes
 in a LUKS crypt. This way, I have the flexibility to grow the volumes as
 needed, and only require thesingle passphrase at boot to unlock the
 enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
@@ -690,7 +690,7 @@ this <a href="http://www.pindarsign.de/webblog/?p=767" title="Blog post on LUKS 
 This post (and the next) are notes to remind me how I got here and, in
 the follow-up, what I need to do to restore this build…</p>
 
-<p>First up, prepare the two hard drives. This took roughly \~90 hours for
+<p>First up, prepare the two hard drives. This took roughly ~90 hours for
 the 1TB drives, so allow some time:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -709,10 +709,10 @@ using <code>cfdisk</code>:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>I created a 150Mb partition for /boot - marked with the boot flag, and
-then partitoned the rest of the drive. Both partitons should be primary
-and be FSType linux_raid (the FD option). Write the partition tabel to
-a file and then import it to the second drive so both are exactly the
+<p>I created a 150Mb partition for <span class="file">boot</span> - marked
+with the boot flag, and then partitoned the rest of the drive. Both partitons
+should be primary and be <code>FSType linux\_raid</code> (the FD option). Write the
+partition tabel toa file and then import it to the second drive so both are exactly the
 same:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -757,9 +757,10 @@ drives.</p>
 
 
 <p>Once the drives are synched and pronounced clean, it it time to encrypt
-the second Raid device, /dev/md1. You can’t encrypt the array that
-contains /boot, but having it duplicated in a Raid array means that, if
-one drive goes down, you can still boot the other.</p>
+the second Raid device, <span class="file">dev/md1</span>. You can’t encrypt
+the array that contains <span class="file">/boot</span>,
+but having it duplicated in a Raid array means that, ifone drive goes down,
+you can still boot the other.</p>
 
 <p>Load the module for encryption, and then set it up:</p>
 
