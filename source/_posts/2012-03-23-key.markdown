@@ -1,0 +1,103 @@
+---
+layout: post
+title: "Signing Your Own Key"
+date: 2012-03-23 11:36
+comments: true
+categories: [archlinux]
+---
+![image](http://dl.dropbox.com/u/261312/Blog-images/key.jpg)
+
+Some time in the last couple of days, the last of the packages in the
+Community repository were signed and, thanks to the tremendous work of
+the Arch developers and Trusted Users, you can fully implement package
+signing in your <span class="file">/etc/pacman.conf</span>.
+
+You can check the state of the signed packages with this expac
+one-liner; it will return a list of any *unsigned* packages:
+
+{% codeblock lang:sh %}
+expac -S '%r %n %g' | awk '$3=="(null)" {print $1 "/" $2}'
+{% endcodeblock %}
+
+Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
+take advantage of this. My overall `SigLevel` setting requires signed
+packages, and—as of yesterday—I was able to move the last repository
+entry over to do the same:
+
+
+{% codeblock lang:sh %}
+SigLevel = Required DatabaseOptional TrustedOnly
+
+[core]
+SigLevel = PackageRequired
+Include = /etc/pacman.d/mirrorlist
+
+[extra]
+SigLevel = PackageRequired
+Include = /etc/pacman.d/mirrorlist
+
+[community]
+SigLevel = PackageRequired
+Include = /etc/pacman.d/mirrorlist
+
+[multilib]
+SigLevel = PackageRequired
+Include = /etc/pacman.d/mirrorlist
+{% endcodeblock %}
+
+The next step was to add my key to pacman’s keychain so that I could
+sign the packages that I build using ABS or from the
+[AUR](https://aur.archlinux.org/ "Arch User Repository"). Allan has an
+[excellent post on setting this up](http://allanmcrae.com/2011/08/pacman-package-signing-1-makepkg-and-repo-add/ "The first in a series of four posts on signing: read them all").
+
+First, import your key into pacman’s keyring:
+
+{% codeblock lang:sh %}
+pacman-key -r 0xB1BD4E40
+{% endcodeblock %}
+
+Then follow the prompts as you edit the key to sign, set a trust level
+and save your key:
+
+{% codeblock lang:sh %}
+pacman-key --edit-key 0xB1BD4E40
+gpg> lsign
+...
+gpg> trust
+...
+gpg> save
+{% endcodeblock %}
+
+Then it is just a matter of changing the `BUILDENV` option in your
+<span class="file">/etc/makepkg.conf</span>, which is set to `!sign` 
+by default. Remove the bang and include the details of the key you wish to use:
+
+{% codeblock lang:sh %}
+#-- Packager: name/email of the person or organization building packages
+PACKAGER="Jason Ryan <jasonwryan@gmail.com>"
+#-- Specify a key to use for package signing
+GPGKEY="B1BD4E40"
+{% endcodeblock %}
+
+Now, when you build a package, you will be prompted for your key’s
+passphrase:
+
+{% codeblock lang:sh %}
+==> Signing package...
+
+You need a passphrase to unlock the secret key for
+user: "Jason W Ryan <jasonwryan@gmail.com>"
+2048-bit RSA key, ID B1BD4E40, created 2010-08-21
+
+Enter passphrase:
+{% endcodeblock %}
+
+Enter the correct passphrase and your package is built and signed:
+
+{% codeblock lang:sh %}
+-> Created signature file /home/jason/Build/{pkg}.pkg.tar.xz.sig.
+{% endcodeblock %}
+
+Creative Commons image by
+[donovanbeeson](http://www.flickr.com/photos/donovan_beeson/3185668524/ "Coraline key on Flickr")
+on Flickr.

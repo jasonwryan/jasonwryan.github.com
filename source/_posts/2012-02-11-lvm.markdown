@@ -1,0 +1,219 @@
+---
+layout: post
+title: "LVM on LUKS on RAID1 on Arch Linux"
+date: 2012-02-11 15:58
+comments: true
+categories: [archlinux]
+---
+![image](http://dl.dropbox.com/u/261312/Blog-images/lvm-luks-raid.png)
+
+After much procrastination, I finally got around to moving the last of
+my machines to Arch Linux: 
+[my home desktop](http://jasonwryan.com/blog/2010-10-04-the-setup "The Setup post"),
+which has been running Ubuntu since the end of 2007. I’d like to share a
+few thoughts about why I finally walked away from Ubuntu, but I’ll save
+that for another long post.
+
+Anyway, the setup I decided on was reasonably straightforward: two 1TB
+drives comprising two Raid1 devices, one for a small (150Mb) 
+<span class="file">/boot</span> andthe other holding three logical volumes 
+in a LUKS crypt. This way, I have the flexibility to grow the volumes as 
+needed, and only require thesingle passphrase at boot to unlock the 
+enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
+and <span class="file">/home</span>.
+
+Almost all of the information here has been gleaned gratefully from
+other sources; principally the Arch Wiki entries on
+[LUKS](https://wiki.archlinux.org/index.php/LUKS "Arch wiki entry") and
+[LVM](https://wiki.archlinux.org/index.php/Lvm "Arch LVM article") and
+this [helpful blog post](http://www.pindarsign.de/webblog/?p=767 "Blog post on LUKS and LVM").
+This post (and the next) are notes to remind me how I got here and, in
+the follow-up, what I need to do to restore this build…
+
+First up, prepare the two hard drives. This took roughly \~90 hours for
+the 1TB drives, so allow some time:
+
+{% codeblock lang:sh %}
+dd if=/dev/random of=/dev/sd[a,b]
+{% endcodeblock %}
+
+Once the drives are scrubbed (read the Arch Wiki on why that is
+necessary), you can move to the actual installation business. I used a
+256Mb thumb drive with the most recent x86\_64 netinstall image burned
+to it. Boot into the live environment and set up the initial partitions
+using `cfdisk`:
+
+{% codeblock lang:sh %}
+cfdisk /dev/sda
+{% endcodeblock %}
+
+I created a 150Mb partition for /boot - marked with the boot flag, and
+then partitoned the rest of the drive. Both partitons should be primary
+and be FSType linux\_raid (the FD option). Write the partition tabel to
+a file and then import it to the second drive so both are exactly the
+same:
+
+{% codeblock lang:sh %}
+sfdisk -d /dev/sda > part-table
+sfdisk /dev/sdb < part-table
+{% endcodeblock %}
+
+Now, set up the Raid arrays. Start by loading the required modules and
+then create the two arrays. The metadata flag is important: if you are
+using legacy grub, as I did, you must use the 0.90 type or your MBR will
+get overwritten:
+
+{% codeblock lang:sh %}
+modprobe raid1 && modprobe dm-mod
+mdadm --create /dev/md0 --level=1 --raid-devices=2 \
+    --metadata=0.90 /dev/sd[ab]1
+mdadm --create /dev/md1 --level=1 --raid-devices=2 /dev/sd[ab]2
+{% endcodeblock %}
+
+<sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup>
+
+At this point, you can switch to another TTY to watch the disks
+sync—again, this could take some time, depending on the size of the
+drives.
+
+{% codeblock lang:sh %}
+watch -n1 cat /proc/mdstat
+{% endcodeblock %}
+
+Check that it all went to plan…
+
+{% codeblock lang:sh %}
+mdadm --misc --detail /dev/md[01] | less
+{% endcodeblock %}
+
+Once the drives are synched and pronounced clean, it it time to encrypt
+the second Raid device, /dev/md1. You can’t encrypt the array that
+contains /boot, but having it duplicated in a Raid array means that, if
+one drive goes down, you can still boot the other.
+
+Load the module for encryption, and then set it up:
+
+{% codeblock lang:sh %}
+modprobe dm-crypt
+cryptsetup --cipher=aes-xts-plain --verify-passphrase \
+    --key-size=512 luksFormat /dev/md1
+{% endcodeblock %}
+
+Now, open the encrypted device to create the logical volumes:
+
+{% codeblock lang:sh %}
+cryptsetup luksOpen /dev/md1 cryptdisk   [1]
+{% endcodeblock %}
+
+The three next steps create, in this order, the physical volume (the
+container, if you will), the group and then the individual volumes
+contained in the group. Choose simple, memorable names and do not
+hypenate them. The {pv,vg,lv}display commands print out the details of
+the devices once created.
+
+{% codeblock lang:sh %}
+pvcreate /dev/mapper/cryptdisk  
+pvdisplay
+
+vgcreate vgroup /dev/mapper/cryptdisk  
+vgdisplay
+
+lvcreate --size 20G --name lvroot vgroup
+lvcreate --contiguous y --size 2G --name lvswap vgroup 
+lvcreate --extents +100%FREE --name lvdata vgroup 
+lvdisplay
+{% endcodeblock %}
+
+It should be pointed out that the 
+[Arch Installer Framework](https://github.com/Dieterbe/aif "AIF on Github") supports
+LUKS and LVM, so you can accomplish these last two steps from within the
+installer. I tried both and I found that I had a little more control
+doing it manually, but YMMV.
+
+At this point, you are ready to enter the installer and complete the
+install. Run /arch/setup and move through the early setup until you
+reach the 'Prepare Hard Drives' section. Select option 3, 'Configure block
+devices, mountpoints and filesystems'. Make sure that the only “raw”
+device that you configure is <span class="file">/dev/md0</span>, your 
+<span class="file">/boot</span> partition. Otherwise,
+you are configuring the logical volumes, *not* the devices they are
+built on.
+
+After succesfully setting up the drives, install the base packages and
+then, once that is complete, switch TTYs and update your Raid
+configuration *prior to configuring your system*. This means that when
+your `initrd` is regenerated, it will inlcude the correct Raid
+information:
+
+{% codeblock lang:sh %}
+mdadm --examine --scan > /mnt/etc/mdadm.conf
+{% endcodeblock %}
+
+When you are done, move to configure your system and make sure to add
+the relevant details to both your <span class="file">/etc/rc.conf</span> and your
+<span class="file">/etc/mkinitcpio.conf</span>. In the former:
+
+{% codeblock lang:sh %}
+USELVM="yes"
+USEDMRAID="yes"
+{% endcodeblock %}
+
+and in /etc/mkinitcpio.conf:
+
+{% codeblock lang:sh %}
+MODULES="... dm_mod dm_crypt aes_x86_64 raid1 ..."
+HOOKS="... udev mdadm encrypt lvm2 filesystems ..."  [2]
+{% endcodeblock %}
+
+That is the straightforward part of the install over. The final step is
+a little more tricky: installing a bootloader. My experience, and I
+tried a number of times using different approaches, is that this *won’t
+work*. The installer doesn’t seem to like the Raid setup, so it
+complains about it:
+
+{% codeblock lang:sh %}
+"Missing/Invalid root device for /dev/md0"
+{% endcodeblock %}
+
+It’s not all bad, as this is the final hurdle and it is not a
+particularly high one.
+
+The important step is to ensure that your <span class="file">/boot/grub/menu.lst</span> is setup
+correctly. Given the names I chose above for my devices, mine looks like
+this:
+
+{% codeblock lang:sh %}
+# (0) Arch
+title  Arch Linux
+root   (hd0,0)
+kernel /vmlinuz26 root=/dev/mapper/vgroup-lvroot \
+cryptdevice=/dev/md1:vgroup ro
+initrd /kernel26.img
+
+# (1) Arch Fallback
+title  Arch Linux Fallback
+root   (hd0,0)
+kernel /vmlinuz26 root=/dev/mapper/vgroup-lvroot \
+cryptdevice=/dev/md1:vgroup ro
+initrd /kernel26-fallback.img
+{% endcodeblock %}
+
+Once it is all setup, simply exit the installer. At this point, you have
+a perfectly secure, redundant, new Arch Linux install that you can’t
+boot into. You have two choices; chroot in and manually install grub
+now, or reboot and do it then. I opted for the latter as it would be
+more like a recovery mission—and I wanted to make sure that I was
+capable enough to manage that before committing all of my backed-up data
+to the machine.
+
+I’ll post the details of the relatively straightforward steps required
+to chroot into the system and install grub on both hard drives in a
+couple of days.
+
+##### Notes
+1. The name `cryptdisk` is arbitrary - just make it memorable and use it
+consistently…
+
+2. I am not sure how necessary it is to have the Raid modules included
+here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
+warranted.

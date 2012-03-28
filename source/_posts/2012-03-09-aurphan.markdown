@@ -1,0 +1,58 @@
+---
+layout: post
+title: "Simple aurphan notifier"
+date: 2012-03-09 16:52
+comments: true
+categories: [archlinux, bash, hack]
+---
+![image](http://dl.dropbox.com/u/261312/Blog-images/aurphan.png)
+
+If you are an Arch Linux user and you are not using
+[aurphan](http://www.archlinux.org/packages/community/any/aurphan/ "aurphan package details"),
+you can take a moment to hang your head in shame before you click on to
+whatever the next thing is. The package description sums up perfectly
+what aurphan does:
+
+> Finds packages in need of maintainers, bug fixes and patches. Adopt
+> today!
+
+Running aurphan -a, for example, will identify any 
+[AUR packages](https://aur.archlinux.org/ "Arch User Repository") in your
+database that are not currently maintained; allowing you to log in to
+the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
+fulfilled.^1
+
+If, like most Archers, you have a compulsive desire to automate
+*everything* then clearly typing (or even remembering to type) aurphan
+-a into a terminal periodically is as ludicrous as it is onerous. The
+obvious answer is some shell script and a cron job.
+
+First, the `cron` job:
+
+{% codeblock lang:sh %}
+crontab -e
+@hourly aurphan -a >/tmp/aurphans
+{% endcodeblock %}
+
+Then, as part of my 
+[dwm-status script](http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status "Script in intuxication repo"),
+a function to check that there are no new additions to the file and, if
+there are, flash a highlight:
+
+{% codeblock lang:sh %}
+aur(){
+    aurphans="$(awk '$0 !~ /^No /' /tmp/aurphans | wc -l)"
+    if [ $aurphans -gt 0 ]; then
+        echo -en "\x03*\x01"
+    fi
+}
+{% endcodeblock %}
+
+The awk filter excludes a null return, which is “No aurphans found.”
+Now, if any of the packages that I use from the AUR are disowned, I’ll
+be the first to know about it.
+
+##### Notes
+1. Actual feeling may differ depending on the package you have adopted
+and the amount of prescription painkillers that you are currently
+ingesting…

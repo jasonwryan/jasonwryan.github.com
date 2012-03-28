@@ -1,0 +1,94 @@
+---
+layout: post
+title: "Logging Straight Into X"
+date: 2011-12-18 22:13
+comments: true
+categories: [archlinux, bash]
+---
+![image](http://dl.dropbox.com/u/261312/Blog-images/login.png)
+
+I have been using
+[CDM](https://wiki.archlinux.org/index.php/CDM "Arcjh Wiki entry on CDM")
+to log into X on my Arch machines and, if I were to continue to require
+the ability to access different window managers with any frequency, I
+would use this approach. However, on my EeePC, I really only ever login
+to a [dwm](http://dwm.suckless.org/ "dwm at suckless.org") session or
+the console, so having a login manager seemed like an unnecessary step.
+
+Consequently, over the weekend, with the help of the 
+[Start X at Boot](https://wiki.archlinux.org/index.php/Start_X_at_Boot "Arch Linux wiki entry")
+article on the Arch Wiki, I removed CDM and arrived at a secure,
+flexible approach to logging into X (or the console).
+
+My <span class="file">/etc/inittab</span> already boots me into runlevel 5:
+
+{% codeblock lang:sh %}
+# Boot to X11
+id:5:initdefault:
+{% endcodeblock %}
+
+So it was just a case of putting a couple of lines in the correct
+[invocation file](http://www.gnu.org/software/bash/manual/bashref.html#Bash-Startup-Files "GNU Bash reference: startup files").
+I chose <span class="file">$HOME/.bash\_profile</span> because I only use Bash; if you use another
+shell you should probably go with <span class="file">$HOME/.profile</span>. The recommended lines
+from the Arch Wiki are:
+
+{% codeblock lang:sh %}
+if [[ -z $DISPLAY && $(tty) = /dev/tty1 ]]; then
+  exec startx
+  # Could use xinit instead of startx
+  #exec xinit -- /usr/bin/X -nolisten tcp vt7
+fi
+{% endcodeblock %}
+
+…and this works as advertised. If you are in TTY1 and you login, X is
+started. The disadvantage for me, though, was that when you shutdown,
+you must manually change to TTY7 (if that is your last
+[agetty](http://tldp.org/HOWTO/Remote-Serial-Console-HOWTO/getty-agetty.html "agetty remote serial console"))
+to see the shutdown messages.
+
+After rummaging around through various man and web pages, I finally
+alighted on this helpful option: `-novtswitch`. So, my entry to start X
+now looked like:
+
+{% codeblock lang:sh %}
+# startx if on tty1
+if [[ -z "$DISPLAY" ]] && [[ $(tty) = /dev/tty1 ]]; then
+    exec xinit -- :0 -novtswitch &>/dev/null &
+    logout
+fi
+{% endcodeblock %}
+
+Now, on shutdown and reboot, I see all of the shutdown messages. All
+that remained was to add an option to log into a tmux session if I
+didn’t want to use X. The final code looks like this:
+
+{% codeblock lang:sh ~/.profile %}
+# startx if on tty1 and tmux on tty2
+if [[ -z "$DISPLAY" ]] && [[ $(tty) = /dev/tty1 ]]; then
+    exec xinit -- :0 -novtswitch &>/dev/null &
+    logout
+elif [[ $(tty) = /dev/tty2 ]]; then
+    tmux -f $HOME/.tmux/conf new -s secured
+fi
+{% endcodeblock %}
+
+Logging in from TTY1 takes me into my dwm session, if I switch to TTY2 I
+am logged into a tmux session with keychain running. To start consolekit
+with dwm, I have this in my <span class="file">$HOME/.xinitrc</span>:
+
+{% codeblock lang:sh %}
+exec ck-launch-session $HOME/Scripts/dwm-start. 
+{% endcodeblock %}
+
+You can see my full <span class="file">$HOME/.bash\_profile</span> in 
+[my intuxication repo](http://beta.intuxication.org/jasonwryan/archer/file/tip/.bash_profile "bash_profile in intuxication").
+
+#### Updated 4/2/12
+For various reasons, I moved my environment variables from <span class="file">$HOME/.bashrc</span>
+into <span class="file">$HOME/.profile</span>; this meant that these variables were only inherited in
+interactive shells if `xinit` was called with `exec`.
+
+I have also ditched `consolekit` - for all of the processes it was
+spawning, it actually wasn’t performing any critical functions; or
+indeed any functions that I really needed at all…
