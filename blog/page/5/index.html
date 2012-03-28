@@ -9,9 +9,8 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I regularly back up all my dotfiles to Dropbox
-as a matter of course. I had intended, at some point, to set up a
-Git repo to automate the process and &hellip;">
+  <meta name="description" content="There is currently an interesting debate on Wikipedia about deleting the article on dwm. According to the Wikipedia notability guidelines,
+only &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +66,200 @@ Git repo to automate the process and &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/02/25/wikipedia-discriminates-against-foss/">Wikipedia Discriminates Against FOSS</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-02-25T06:59:00+13:00" pubdate data-updated="true">Feb 25<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>There is currently an interesting debate on Wikipedia about <a href="http://en.wikipedia.org/wiki/Wikipedia:Articles_for_deletion/Dwm" title="Wikipedia page">deleting the article on dwm.</a></p>
+
+<p>According to the Wikipedia <a href="http://en.wikipedia.org/wiki/Wikipedia:Notability" title="Wikipedia page">notability guidelines</a>,
+only</p>
+
+<blockquote><p>significant coverage in reliable sources that are independent of the
+subject</p></blockquote>
+
+<p>constitutes notability.</p>
+
+<p>So 300 words by the likes of <a href="http://blogs.zdnet.com/BTL/?p=31024" title="ZDNet article exposing corrupt practice in Tech reporting">Randall Kennedy</a>
+counts for more in terms of “notability” than the hundreds of thousands
+of lines of code contributed to
+<a href="http://dwm.suckless.org/" title="dwm wiki">dwm</a> and its forks
+(<a href="http://awesome.naquadah.org/" title="awesome home page">awesome</a> and
+<a href="http://www.rootshell.be/~polachok/code/" title="echinus page">echinus</a>) and
+clones (<a href="http://www.xmonad.org/" title="xmonad homepage">xmonad</a>,
+<a href="http://aerosuidae.net/musca.html" title="musca homepage">musca</a>,
+<a href="http://www.peereboom.us/scrotwm/html/scrotwm.html">scrotwm</a> <em>et al</em>)?</p>
+
+<p>The notion that, in the free/libre and open source software world, a
+project’s notability is measured in terms of the <em>prose</em> that appears in
+journals, books etc is myopic and—in terms of Wikipedia’s status as a
+FOSS project—quite disappointing. The real measure of notability of
+projects like this is the <strong>code they generate</strong>.</p>
+
+<p>Wikipedia’s criteria actively discriminates against free and open source
+projects where the measure of notability is not the column inches in
+trade magazines sponsored by advertising and advertorial, but by the
+passion and commitment of large communities of contributors who believe
+in the project enough to devote their code, time and money.</p>
+
+<p>Wikipedians need to review their criteria to reflect this reality;
+otherwise the “free encyclopedia” will continue to exclude exactly those
+free/libre projects…</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/02/10/using-mercurial-to-share-dotfiles/">Using Mercurial to Share Dotfiles</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-02-10T20:36:00+13:00" pubdate data-updated="true">Feb 10<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I posted a couple of weeks back about
+<a href="http://jasonwryan.com/blog/2010-01-11-using-dropbox-to-share-dotfiles">using dropbox to share dotfiles</a>
+and while I am pleased with how well that works, I had always intended to see how well a
+version control system would handle that (relatively trivial) chore.</p>
+
+<p>I chose <a href="http://mercurial.selenic.com/">Mercurial</a> only because it is the
+system used by <a href="http://suckless.org/">the suckless community</a> and, as their
+<a href="http://suckless.org/manifest/">philosophy</a> and the products they
+produce are of such exceptional quality, no further investigation seemed
+necessary.</p>
+
+<p>Installing mercurial, on both my Arch machines and the Ubuntu box was simple
+enough:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># pacman -S mercurial</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then, rather than use my <span class="file">/home</span> directory as the local repo
+(which for some reason—probably completely irrational—seemed somewhat risky),
+I opted to create the repository in a separate directory in my home folder and
+link to the relevant files.</p>
+
+<p>I signed up for a free account at <a href="http://bitbucket.org">bitbucket</a> and created a repository
+called “dotfiles.”</p>
+
+<p>The it was just a matter of cloning the new repository to my local
+machine:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg clone https://jasonwryan@bitbucket.org/jasonwryan/dotfiles/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and then entering the newly created directory and linking to the files that
+I wanted to share:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd </span>dotfiles/ ln /home/jason/.Xdefaults ln /home/jason/.apvlvrc
+</span><span class='line'>…
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note: I initially tried symlinking, but Mercurial didn&#8217;t like that
+<em>at all</em>, hence the hard links…</p>
+
+<p>Then it was just a matter of telling Mercurial that the requisite files
+are in the folder:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg add
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Commit the changes:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg ci
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>…and then push the changes to the <a href="https://bitbucket.org/jasonwryan/">bitbucket repository</a>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg push
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This was certainly a lot quicker to setup than the Dropbox method but, for
+all that I am using it for, it seems a little like overkill. I&#8217;ll chalk
+it up as a good way for me to get my head around <acronym title="Version
+Control Systems">vcs</acronym> more than anything else…</p>
+
+<h3>The Mercurial Book</h3>
+
+<p>For more information on Mercurial, I highly
+recommend Bryan O&#8217;Sullivan&#8217;s excellent
+<a href="http://hgbook.red-bean.com/">Mercurial: The Definitive Guide</a>.</p>
+
+<h4>Update</h4>
+
+<p>Post edited to reflect that fact that I now run two repos,
+one for the <a href="https://bitbucket.org/jasonwryan/workstation/src/"
+title="work machine repo" target="_blank">workstation</a> (as described here),
+and a second one for my <a href="https://bitbucket.org/jasonwryan/eeepc/src/"
+title="Netbook repo" target="_blank">EeePC</a> – which I did successfully
+create in <span class="file">/home</span> without any apocalyptic consequences.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
