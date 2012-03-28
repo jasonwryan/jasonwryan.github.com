@@ -30,7 +30,7 @@ transition to Pinboard, I needed to do the same. It was a little
 trickier than I had anticipated, as some of the URLs (particularly when
 searching across multiple tags) were reasonably complex given my modest
 scripting skills. But 
-[I got there in the end…](http://beta.intuxication.org/jasonwryan/archer/file/tip/.config/surfraw/elvi/pin "Pinboard elvis in mercurial repo")
+[I got there in the end…](https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.config/surfraw/elvi/pin "Pinboard elvis in mercurial repo")
 
 Now searching for web pages that I or anyone else has saved to Pinboard
 is as simple as typing:

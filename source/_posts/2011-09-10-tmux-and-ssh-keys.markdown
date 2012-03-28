@@ -102,7 +102,7 @@ fi
     -   [Copy & paste in tmux](http://jasonwryan.com/blog/2011/06/07/copy-and-paste-in-tmux/ "Copy and paste in tmux")
     -   [Setting tmux status bar if in X](http://jasonwryan.com/blog/2011/06/10/setting-tmux-status-bar-if-in-x/ "tmux status bars")
 
-2.  Updated to include session test. Changes [here](http://beta.intuxication.org/jasonwryan/archer/rev/e1762094c1b7/ "Mercurial changelog").
+2.  Updated to include session test. 
 3.  Alternatively, placing the script in <span class="file">/etc/profile.d/keychain.sh</span> will
     start the agent when you login, as opposed to starting a specific
     shell. Your call on security versus convenience…

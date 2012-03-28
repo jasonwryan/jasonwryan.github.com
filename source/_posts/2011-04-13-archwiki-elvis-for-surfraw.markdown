@@ -40,7 +40,7 @@ perhaps the best GNU/Linux reference wiki on the web.
 So I thought I would rectify that.
 
 You can grab the archwiki elvis from my 
-[mercurial repo](http://beta.intuxication.org/jasonwryan/longbow/file/tip/scripts/archwiki "Intuxication repo"),
+[mercurial repo](https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.config/surfraw/elvi/archwiki "mercurial repo"),
 copy it into your local directory at <span class="file">$XDG\_CONFIG\_HOME/surfraw/elvi/</span> or
 in the system folder at <span class="file">$XDG\_CONFIG\_DIRS/surfraw/</span> and you can surf the
 Arch Wiki, or any one of the nine other language wikis, from the command

@@ -25,7 +25,7 @@ doesn’t seem to be supported.
 When I recently started using
 [WMFS](http://jasonwryan.com/blog/2010/12/26/wmfs-window-manager-from-scratch/ "My post on Window Manager From Scratch")
 I decided to move to a 
-[bash script for my status information](http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/wmfs-status "Script in intuxication repo").
+[bash script for my status information](https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/wmfs-status "Script in mercurial repo").
 So I approached the problem afresh and decided to write a script to poll
 the new mail directories and update my status bar when mail arrived.
 

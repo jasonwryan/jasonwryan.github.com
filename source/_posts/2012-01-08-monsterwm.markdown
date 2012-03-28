@@ -56,7 +56,7 @@ is quite active) and has been admirably clear about his vision for the
 wm.
 
 You can see my monsterwm configs in 
-[my mercurial repository](http://beta.intuxication.org/jasonwryan/archer/browse/tip/Build/monsterwm-git "Intuxication repo: monsterwm").
+[my mercurial repository](https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Build/monsterwm-git "Mercurial repo: monsterwm").
 
 ##### Notes
 1. Updated with the correct genealogy…

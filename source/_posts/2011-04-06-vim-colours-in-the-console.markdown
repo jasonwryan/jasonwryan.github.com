@@ -77,7 +77,7 @@ Running Vim in the console was now starting to look promising:
 ![image](http://dl.dropbox.com/u/261312/Blog-images/vim-colours3.png)
 
 The final piece of the puzzle was to pass my 
-[X colours](http://beta.intuxication.org/jasonwryan/archer/file/tip/.colours/dark "jwr dark colours: mercurial repo")
+[X colours](https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.colours/dark  "jwr dark colours: mercurial repo")
 to the console. Fortunately, 
 [Aaron Griffin’s 2006 post](http://phraktured.net/linux-console-colors.html "The Overlord himself…")
 made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:
@@ -121,6 +121,6 @@ And you can see
 of the finished product on Flickr.
 
 ##### Notes
-1. <a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miro8.vim" title="Mercurial repo: miro8 colourscheme">miro8.vim</a>
+1. <a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.vim/colors/miro8.vim" title="Mercurial repo: miro8 colourscheme">miro8.vim</a>
       
-2. <a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a>
+2. <a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a>

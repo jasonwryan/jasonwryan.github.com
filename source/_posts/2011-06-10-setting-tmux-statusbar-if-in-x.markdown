@@ -25,7 +25,7 @@ that has always puzzled me, and so I decided to get to the bottom of it.
 It is a great idea. If you are running tmux in X, then you have
 [dwm’s](http://dwm.suckless.org/ "dwm homepage") status bar telling you
 what the time is, 
-[how much battery you have left](http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status "dwm status bar in my mercurial repo")
+[how much battery you have left](https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status "dwm status bar in my mercurial repo")
 etc,. You don’t need to replicate that functionality in tmux. If,
 however, you are in the console, you don’t have that information, unless
 you print it in tmux’s statusbar.
@@ -65,7 +65,7 @@ Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>
 ![image](http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png)
 
 All the relevant files are in 
-[my mercurial repo](http://beta.intuxication.org/jasonwryan/archer/browse/tip/.tmux "My intuxication repository").
+[my mercurial repo](https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.tmux "My mercurial repository").
 
 ##### Notes
 1. [Copy & paste in tmux](http://jasonwryan.com/blog/2011/06/07/copy-and-paste-in-tmux/ "Post on copy & paste in tmux"), 

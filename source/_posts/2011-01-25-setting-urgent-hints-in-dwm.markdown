@@ -58,8 +58,8 @@ the terminal as an urgent hint. The final step was patching statuscolors
 into dwm.c to change the tag colour when the hint was received.
 
 You can see my 
-[patched dwm.c](http://beta.intuxication.org/jasonwryan/archer/file/tip/Build/dwm/5.8.2-2.diff "dwm.c patched")
-in my intuxication repo.
+[patched dwm.c](https://bitbucket.org/jasonwryan/workstation/src/82e7f34ee0a3/dwm-5.8.2-2/5.8.2-2.diff  "dwm.c patched")
+in my mercurial repo.
 
 ##### Notes
 1. These patches are from the extremely helpful Arch Forum thread: 
