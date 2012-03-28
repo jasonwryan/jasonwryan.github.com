@@ -10,7 +10,7 @@ categories: [debian, linux, bash]
 I recently picked up a 
 [HP Microserver](http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html "HP specs page");
 a small, silent server to use primarily to back up 
-[my other boxes](http://jasonwryan.com/blog/2010-10-04-the-setup "Slightly out-of-date setup post").
+[my other boxes](http://jasonwryan.com/blog/2010/10/04/the-setup "Slightly out-of-date setup post").
 I went for the 2GB version without any preinstalled operating system.
 
 As I want this machine to just sit quietly in my garage for the next 5

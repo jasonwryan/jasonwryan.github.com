@@ -8,7 +8,7 @@ categories: [surfraw, linux, bash]
 ![image](http://dl.dropbox.com/u/261312/Blog-images/pinboard-elvis.png)
 
 After recovering from 
-[the shock of the botched delicious relaunch](http://jasonwryan.com/blog/2011-09-28-delicious/ "My post on the delicious fiasco"),
+[the shock of the botched delicious relaunch](http://jasonwryan.com/blog/2011/09/28/delicious/ "My post on the delicious fiasco"),
 I have switched to
 [Pinboard](http://pinboard.in/u:jasonwryan/ "My bookmarks on Pinboard")
 for my bookmarking. Previously, I was just synching my bookmarks from
@@ -45,6 +45,6 @@ just browse recent or popular tags. Simple, but ruthlessly efficient…
 
 ##### Notes
 1. Previous posts on Surfraw:
-    -   [Arch Wiki elvis for Surfraw](http://jasonwryan.com/blog/2011-04-13-archwiki-elvis-for-surfraw/ "My post on the Arch Wiki elvis")
-    -   [w3m, Surfraw and yanking  URLs](http://jasonwryan.com/blog/2011-05-05-w3m/ "Yanking links in w3m")
+    -   [Arch Wiki elvis for Surfraw](http://jasonwryan.com/blog/2011/04/13/archwiki-elvis-for-surfraw/ "My post on the Arch Wiki elvis")
+    -   [w3m, Surfraw and yanking  URLs](http://jasonwryan.com/blog/2011/05/05/w3m/ "Yanking links in w3m")
 

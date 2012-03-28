@@ -7,13 +7,13 @@ categories: [browser, archlinux]
 ---
 [![image](http://dl.dropbox.com/u/261312/Blog-images/vimprobable.png "Hacked Vimprobable2")](http://www.flickr.com/photos/jasonwryan/5055695051/ "Vimprobable on Flickr")
 
-After just posting details of [my setup](http://jasonwryan.com/blog/2010-10-04-the-setup/), 
+After just posting details of [my setup](http://jasonwryan.com/blog/2010/10/04/the-setup/), 
 I have made a reasonably significant (and it goes almost without saying, unplanned)
 change: after [uzbl](http://www.uzbl.org/) began unaccountably maxxing
 out my CPU, I decided to give [Vimprobable](http://www.vimprobable.org/)
 a go.
 
-I covered it briefly in my review of [5 alternate browsers](http://jasonwryan.com/blog/2010-05-21-5-alternate-browsers/) and liked the
+I covered it briefly in my review of [5 alternate browsers](http://jasonwryan.com/blog/2010/05/21/5-alternate-browsers/) and liked the
 idea of another vim-based browsing experience.
 
 There are two versions of Vimprobable; the differences, as described on

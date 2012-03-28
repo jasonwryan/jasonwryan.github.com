@@ -6,7 +6,7 @@ comments: true
 categories: [vcs, linux]
 ---
 I posted a couple of weeks back about 
-[using dropbox to share dotfiles](http://jasonwryan.com/blog/2010-01-11-using-dropbox-to-share-dotfiles/)
+[using dropbox to share dotfiles](http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/)
 and while I am pleased with how well that works, I had always intended to see how well a
 version control system would handle that (relatively trivial) chore.
 

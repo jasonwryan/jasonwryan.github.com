@@ -71,5 +71,5 @@ patching or using the above method. YMMV.
 
 ### Update
 So I was wrong: you can get pertag to work with all the
-other patches, and it is [not that difficult](http://jasonwryan.com/blog/2010-03-02-patching-dwm/)…
+other patches, and it is [not that difficult](http://jasonwryan.com/blog/2010/03/02/patching-dwm/)…
 
