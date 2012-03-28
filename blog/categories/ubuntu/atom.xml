@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ubuntu | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/ubuntu/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T23:34:42+13:00</updated>
+  <updated>2012-03-29T09:39:12+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -358,6 +358,72 @@ all the way down.</p></li>
 after some issues with uzbl.</p></li>
 </ol>
 
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mapping CapsLock to Escape in Ubuntu]]></title>
+    <link href="http://jasonwryan.github.com/blog/2010/02/21/capslock/"/>
+    <updated>2010-02-21T16:11:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2010/02/21/capslock</id>
+    <content type="html"><![CDATA[<p>The <kbd>CapsLock</kbd> key is one of the best examples of persistent usability failure;
+it continues to appear on just about every English-language keyboard, despite
+the fact that —aside from no-one ever uses it— it is an active hindrance to
+both the average typist and the sedulous coder…</p>
+
+<p>As a matter of course, I remove it in my Arch machines with an entry in my
+<span class="file"><a href="https://bitbucket.org/jasonwryan/workstation/src/tip/.xinitrc"
+title="My xinitrc on bitbucket">.xinitrc</a></span>, but in Ubuntu/Gnome, there is no
+such file. Consequently, there is this equally effective way of dispatching the
+<kbd>CapsLock</kbd>, or in my case, mapping it to something
+actually useful, <kbd>Esc</kbd>.</p>
+
+<p>First, create the <code>mapkey</code> file in your home directory:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>xmodmap -pke &gt; ~/.xmodmap.mapkey
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then open the file and edit it:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>vim ~/.xmodmap.mapkey
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Look for the <kbd>CapsLock</kbd> key, on my machine it is 66 (you can use
+<a href="http://www.x.org/archive/X11R7.5/doc/man/man1/xev.1.html" title="xev man page">xev</a>
+to locate all of your key codes), and then wreak your revenge. Just deleting
+everything after <code>keycode 66 =</code></p>
+
+<p>will render it useless, which may suit your style. I change the entry to make
+it another <kbd>Escape</kbd> key:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>keycode <span class="nv">66</span> <span class="o">=</span> Escape NoSymbol Escape NoSymbol Escape
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Log out and when you log back in, you have a useful key.</p>
+
+<h3>Updated for 10.04</h3>
+
+<p>The above hack was for 9.10 and earlier versions of Ubuntu.
+I have no idea why, but it (alone) doesn't work in Lucid Lynx.
+You need a couple of extra steps:</p>
+
+<p>Open <code>System &gt; Preferences &gt; Startup Applications</code>  and add
+two new items:</p>
+
+<ul>
+<li>Clear the <kbd>CapsLock</kbd> key with <code>xmodmap -e "clear Lock</code></li>
+<li>Map it to <kbd>Escape</kbd> by pointing to your xmodmap file
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>xmodmap ~/.xmodmap.mapkeys
+</span></code></pre></td></tr></table></div></figure></notextile></div></li>
+</ul>
+
+
+<p>Now, whenever you login the script(s) will run and your <kbd>CapsLock</kbd> will map
+to something actually useful, like <kbd>Escape</kbd>.</p>
 ]]></content>
   </entry>
   

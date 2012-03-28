@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Wikipedia Discriminates Against FOSS - jasonwryan.com</title>
+  <title>Mapping CapsLock to Escape in Ubuntu - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="There is currently an interesting debate on Wikipedia about deleting the article on dwm. According to the Wikipedia notability guidelines,
-only &hellip;">
+  <meta name="description" content="The CapsLock key is one of the best examples of persistent usability failure;
+it continues to appear on just about every English-language keyboard, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ only &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2010/02/25/wikipedia-discriminates-against-foss">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2010/02/21/capslock">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -69,7 +69,7 @@ only &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Wikipedia Discriminates Against FOSS</h1>
+      <h1 class="entry-title">Mapping CapsLock to Escape in Ubuntu</h1>
     
     
       <p class="meta">
@@ -85,48 +85,76 @@ only &hellip;">
   
 
 
-<time datetime="2010-02-25T06:59:00+13:00" pubdate data-updated="true">Feb 25<span>th</span>, 2010</time>
+<time datetime="2010-02-21T16:11:00+13:00" pubdate data-updated="true">Feb 21<span>st</span>, 2010</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>There is currently an interesting debate on Wikipedia about <a href="http://en.wikipedia.org/wiki/Wikipedia:Articles_for_deletion/Dwm" title="Wikipedia page">deleting the article on dwm.</a></p>
+<div class="entry-content"><p>The <kbd>CapsLock</kbd> key is one of the best examples of persistent usability failure;
+it continues to appear on just about every English-language keyboard, despite
+the fact that —aside from no-one ever uses it— it is an active hindrance to
+both the average typist and the sedulous coder…</p>
 
-<p>According to the Wikipedia <a href="http://en.wikipedia.org/wiki/Wikipedia:Notability" title="Wikipedia page">notability guidelines</a>,
-only</p>
+<p>As a matter of course, I remove it in my Arch machines with an entry in my
+<span class="file"><a href="https://bitbucket.org/jasonwryan/workstation/src/tip/.xinitrc"
+title="My xinitrc on bitbucket">.xinitrc</a></span>, but in Ubuntu/Gnome, there is no
+such file. Consequently, there is this equally effective way of dispatching the
+<kbd>CapsLock</kbd>, or in my case, mapping it to something
+actually useful, <kbd>Esc</kbd>.</p>
 
-<blockquote><p>significant coverage in reliable sources that are independent of the
-subject</p></blockquote>
+<p>First, create the <code>mapkey</code> file in your home directory:</p>
 
-<p>constitutes notability.</p>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>xmodmap -pke &gt; ~/.xmodmap.mapkey
+</span></code></pre></td></tr></table></div></figure>
 
-<p>So 300 words by the likes of <a href="http://blogs.zdnet.com/BTL/?p=31024" title="ZDNet article exposing corrupt practice in Tech reporting">Randall Kennedy</a>
-counts for more in terms of “notability” than the hundreds of thousands
-of lines of code contributed to
-<a href="http://dwm.suckless.org/" title="dwm wiki">dwm</a> and its forks
-(<a href="http://awesome.naquadah.org/" title="awesome home page">awesome</a> and
-<a href="http://www.rootshell.be/~polachok/code/" title="echinus page">echinus</a>) and
-clones (<a href="http://www.xmonad.org/" title="xmonad homepage">xmonad</a>,
-<a href="http://aerosuidae.net/musca.html" title="musca homepage">musca</a>,
-<a href="http://www.peereboom.us/scrotwm/html/scrotwm.html">scrotwm</a> <em>et al</em>)?</p>
 
-<p>The notion that, in the free/libre and open source software world, a
-project’s notability is measured in terms of the <em>prose</em> that appears in
-journals, books etc is myopic and—in terms of Wikipedia’s status as a
-FOSS project—quite disappointing. The real measure of notability of
-projects like this is the <strong>code they generate</strong>.</p>
+<p>Then open the file and edit it:</p>
 
-<p>Wikipedia’s criteria actively discriminates against free and open source
-projects where the measure of notability is not the column inches in
-trade magazines sponsored by advertising and advertorial, but by the
-passion and commitment of large communities of contributors who believe
-in the project enough to devote their code, time and money.</p>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>vim ~/.xmodmap.mapkey
+</span></code></pre></td></tr></table></div></figure>
 
-<p>Wikipedians need to review their criteria to reflect this reality;
-otherwise the “free encyclopedia” will continue to exclude exactly those
-free/libre projects…</p>
+
+<p>Look for the <kbd>CapsLock</kbd> key, on my machine it is 66 (you can use
+<a href="http://www.x.org/archive/X11R7.5/doc/man/man1/xev.1.html" title="xev man page">xev</a>
+to locate all of your key codes), and then wreak your revenge. Just deleting
+everything after <code>keycode 66 =</code></p>
+
+<p>will render it useless, which may suit your style. I change the entry to make
+it another <kbd>Escape</kbd> key:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>keycode <span class="nv">66</span> <span class="o">=</span> Escape NoSymbol Escape NoSymbol Escape
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Log out and when you log back in, you have a useful key.</p>
+
+<h3>Updated for 10.04</h3>
+
+<p>The above hack was for 9.10 and earlier versions of Ubuntu.
+I have no idea why, but it (alone) doesn&#8217;t work in Lucid Lynx.
+You need a couple of extra steps:</p>
+
+<p>Open <code>System &gt; Preferences &gt; Startup Applications</code>  and add
+two new items:</p>
+
+<ul>
+<li>Clear the <kbd>CapsLock</kbd> key with <code>xmodmap -e "clear Lock</code></li>
+<li>Map it to <kbd>Escape</kbd> by pointing to your xmodmap file</li>
+</ul>
+
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>xmodmap ~/.xmodmap.mapkeys
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, whenever you login the script(s) will run and your <kbd>CapsLock</kbd> will map
+to something actually useful, like <kbd>Escape</kbd>.</p>
 </div>
 
 
@@ -149,12 +177,12 @@ free/libre projects…</p>
   
 
 
-<time datetime="2010-02-25T06:59:00+13:00" pubdate data-updated="true">Feb 25<span>th</span>, 2010</time>
+<time datetime="2010-02-21T16:11:00+13:00" pubdate data-updated="true">Feb 21<span>st</span>, 2010</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/dwm/'>dwm</a>, <a class='category' href='/blog/categories/linux/'>linux</a>
+    <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/ubuntu/'>ubuntu</a>
   
 </span>
 
@@ -170,10 +198,10 @@ free/libre projects…</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2010/02/21/capslock/" title="Previous Post: Mapping CapsLock to Escape in Ubuntu">&laquo; Mapping CapsLock to Escape in Ubuntu</a>
+        <a class="basic-alignment left" href="/blog/2010/02/10/using-mercurial-to-share-dotfiles/" title="Previous Post: Using Mercurial to Share Dotfiles">&laquo; Using Mercurial to Share Dotfiles</a>
       
       
-        <a class="basic-alignment right" href="/blog/2010/02/27/using-uzbl/" title="Next Post: Using Uzbl">Using Uzbl &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2010/02/25/wikipedia-discriminates-against-foss/" title="Next Post: Wikipedia Discriminates Against FOSS">Wikipedia Discriminates Against FOSS &raquo;</a>
       
     </p>
   </footer>
@@ -271,8 +299,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2010/02/25/wikipedia-discriminates-against-foss/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2010/02/25/wikipedia-discriminates-against-foss/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2010/02/21/capslock/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2010/02/21/capslock/';
         var disqus_script = 'embed.js';
       
     (function () {
