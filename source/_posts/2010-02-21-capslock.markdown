@@ -1,0 +1,61 @@
+---
+layout: post
+title: "Mapping CapsLock to Escape in Ubuntu"
+date: 2010-02-21 16:11
+comments: true
+categories: [ubuntu, hack, linux]
+---
+The <kbd>CapsLock</kbd> key is one of the best examples of persistent usability failure;
+it continues to appear on just about every English-language keyboard, despite
+the fact that —aside from no-one ever uses it— it is an active hindrance to
+both the average typist and the sedulous coder…
+
+As a matter of course, I remove it in my Arch machines with an entry in my
+<span class="file"><a href="https://bitbucket.org/jasonwryan/workstation/src/tip/.xinitrc"
+title="My xinitrc on bitbucket">.xinitrc</a></span>, but in Ubuntu/Gnome, there is no
+such file. Consequently, there is this equally effective way of dispatching the
+<kbd>CapsLock</kbd>, or in my case, mapping it to something
+actually useful, <kbd>Esc</kbd>.
+
+First, create the `mapkey` file in your home directory:
+
+{% codeblock lang:sh %}
+xmodmap -pke > ~/.xmodmap.mapkey
+{% endcodeblock %}
+
+Then open the file and edit it:
+
+{% codeblock lang:sh %}
+vim ~/.xmodmap.mapkey
+{% endcodeblock %}
+
+Look for the <kbd>CapsLock</kbd> key, on my machine it is 66 (you can use 
+<a href="http://www.x.org/archive/X11R7.5/doc/man/man1/xev.1.html" title="xev man page">xev</a> 
+to locate all of your key codes), and then wreak your revenge. Just deleting 
+everything after `keycode 66 =`
+
+will render it useless, which may suit your style. I change the entry to make
+it another <kbd>Escape</kbd> key:
+
+{% codeblock lang:sh %}
+keycode 66 = Escape NoSymbol Escape NoSymbol Escape
+{% endcodeblock %}
+
+Log out and when you log back in, you have a useful key.
+
+### Updated for 10.04 
+The above hack was for 9.10 and earlier versions of Ubuntu.
+I have no idea why, but it (alone) doesn't work in Lucid Lynx. 
+You need a couple of extra steps:
+
+Open `System > Preferences > Startup Applications`  and add
+two new items:
+
+* Clear the <kbd>CapsLock</kbd> key with `xmodmap -e "clear Lock`
+* Map it to <kbd>Escape</kbd> by pointing to your xmodmap file 
+{% codeblock lang:sh %}
+xmodmap ~/.xmodmap.mapkeys
+{% endcodeblock %}
+
+Now, whenever you login the script(s) will run and your <kbd>CapsLock</kbd> will map
+to something actually useful, like <kbd>Escape</kbd>.
