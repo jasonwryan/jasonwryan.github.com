@@ -4,7 +4,7 @@
   <title><![CDATA[Category: hack | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/hack/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T17:32:39+13:00</updated>
+  <updated>2012-03-28T19:52:53+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,81 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Simple aurphan notifier]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/03/09/aurphan/"/>
+    <updated>2012-03-09T16:52:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/03/09/aurphan</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
+
+<p>If you are an Arch Linux user and you are not using
+<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
+you can take a moment to hang your head in shame before you click on to
+whatever the next thing is. The package description sums up perfectly
+what aurphan does:</p>
+
+<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
+today!</p></blockquote>
+
+<p>Running aurphan -a, for example, will identify any
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
+database that are not currently maintained; allowing you to log in to
+the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
+fulfilled.<sup>1</sup></p>
+
+<p>If, like most Archers, you have a compulsive desire to automate
+<em>everything</em> then clearly typing (or even remembering to type) aurphan
+-a into a terminal periodically is as ludicrous as it is onerous. The
+obvious answer is some shell script and a cron job.</p>
+
+<p>First, the <code>cron</code> job:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then, as part of my
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="Script in intuxication repo">dwm-status script</a>,
+a function to check that there are no new additions to the file and, if
+there are, flash a highlight:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;aurphans<span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The awk filter excludes a null return, which is “No aurphans found.”
+Now, if any of the packages that I use from the AUR are disowned, I’ll
+be the first to know about it.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Actual feeling may differ depending on the package you have adopted
+and the amount of prescription painkillers that you are currently
+ingesting…</li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[IRC Notifications with dzen2]]></title>
@@ -479,117 +554,6 @@ In my <span class="file">~/.Xdefaults</span> I have:</p>
 <p>Now whenever I open a link in an application or by clicking a link in
 the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
 it is passed to Vimprobable in <code>tabbed</code>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Setting tmux statusbar if in X]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x/"/>
-    <updated>2011-06-10T22:56:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5636783883/" title="Arch Linux: dwm, tmux &amp; scratchpad by jasonwryan, on Flickr"><img src="http://farm6.static.flickr.com/5303/5636783883_5b7272453b.jpg" alt="Arch Linux: dwm, tmux &amp; scratchpad" /></a></p>
-
-<p>I have been posting quite a bit about
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a> of late<sup>1</sup>.
-It is a marvellous application and lends itself to all sorts of interesting
-uses. When you first install it, you will find a number of user config
-files in <span class="file">/usr/share/tmux/</span>. I started with tmux by copying
-<a href="http://cinderwick.ca/" title="Thayer Williams' site">Thayer’s</a> config across
-and then working up from there. There is a section
-<a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
-that has always puzzled me, and so I decided to get to the bottom of it.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;show some useful stats but only when tmux is started&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;outside of Xorg, otherwise dwm statusbar shows these already&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>It is a great idea. If you are running tmux in X, then you have
-<a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
-what the time is,
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="dwm status bar in my mercurial repo">how much battery you have left</a>
-etc,. You don’t need to replicate that functionality in tmux. If,
-however, you are in the console, you don’t have that information, unless
-you print it in tmux’s statusbar.</p>
-
-<p>I had tried to get this to work once or twice over the last couple of
-years, but never persevered with it. However, as I have been doing a bit
-of work making the console as functional as possible<sup>2</sup>, I thought I
-would revisit it.</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status1.png" alt="image" /></p>
-
-<p>The insight that I had that got it working for me was to use the
-source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
-depending if X was running or not. I just adapted Thayer’s code, like
-so:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Statusbar starting in X or not&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
-</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>And then created those files with the desired statusbar options. So, for
-example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
-loaded:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Statusbar <span class="k">if </span>tmux run in console&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;information normally in dwm bar&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g status-right-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png" alt="image" /></p>
-
-<p>All the relevant files are in
-<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/.tmux" title="My intuxication repository">my mercurial repo</a>.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p><a href="http://jasonwryan.com/blog/2011-06-07-copy-and-paste-in-tmux" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
-<a href="http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux" title="Sessions in tmux">Sessions in tmux</a>
-&amp; <a href="http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer" title="Intro to tmux">Introduction to tmux</a></p></li>
-<li><p><a href="http://jasonwryan.com/blog/2011-04-06-vim-colours-in-the-console" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
-<li><p>Image squashed to fit the requirements of this blog…</p></li>
-</ol>
-
 ]]></content>
   </entry>
   

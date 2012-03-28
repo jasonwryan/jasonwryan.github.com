@@ -9,11 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have previously posted about using
-Mercurial to share dotfiles,
-and how I have been using
-bitbucket as a free host
-for that service. Recently, I &hellip;">
+  <meta name="description" content="I have been experiencing problems with my wifi LAN when playing music
+through
+mpd
+or watching movies. My upload speeds would climb to around 120- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -69,6 +68,847 @@ for that service. Recently, I &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/06/network-flooding-on-ubuntu/">Network Flooding on Ubuntu</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-06T13:40:00+12:00" pubdate data-updated="true">Jun 6<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-logo.png" alt="image" /></p>
+
+<p>I have been experiencing problems with my wifi LAN when playing music
+through
+<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
+or watching movies. My upload speeds would climb to around 120-130Kb/s
+and my wifi would just go down.</p>
+
+<p>Apart from being frustrating, this was inconvenient as it meant that if
+I was doing either of those things, my stereo in the living room
+couldn’t stream music from my
+<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
+other members of the family (or guests) couldn’t connect to the access
+point to get online.</p>
+
+<p>After asking on
+<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
+(which, like many of the Ubuntu-related fora is populated with people
+who are more well-intentioned than they are knowledgeable - which seems
+to me one of the fundamental problems the distro has; but I’ll save that
+rant for another day), one helpful user suggested I use
+<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
+the network traffic.</p>
+
+<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
+immediately instructive. Wireshark quickly identified that, as soon as I
+started mpd, one of my ports was being flooded: 46560</p>
+
+<p><code>lsof</code> showed that pulse audio was the culprit:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Quelle surprise… When software engineers want a case study of opacity
+and abstraction from the user, this should be their first port of call.</p>
+
+<p>Worse, it is a known bug.
+<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
+And apparently insufficiently serious to warrant any attention. Fair
+enough, I suppose, given the fix is easy enough <em>if you know what you
+are trying to fix…</em></p>
+
+<p>Install the Pulse audio preferences tool:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install papref
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>…and disable Multicast/RTP.</p>
+
+<p>Another example for me of Ubuntu’s fast waning utility as a distribution
+for people that want to be able to exercize some control over their
+system. It is only still installed on this machine because there isn’t
+an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
+here and, with my international traffic capped to 30Kb/s until last
+month, I wasn’t prepared to try and run a distro on that sort of
+bandwidth. Now that has changed, I suspect that Ubuntu’s days are
+numbered on this box.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/05/28/quoras-quandary/">Quora&#8217;s Quandary</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-28T10:05:00+12:00" pubdate data-updated="true">May 28<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora1.png" alt="image" /></p>
+
+<p>I joined <a href="http://www.quora.com/" title="Quora: Q&amp;A site">Quora</a> early in the
+new year and, while
+<a href="http://techcrunch.com/2011/01/23/why-i-don%E2%80%99t-buy-the-quora-hype/" title="TC article on the hype">the hype has in no way abated</a>,
+I have found that increasingly over the months that I have been
+visiting, there is less and less reason for me to return on any regular
+basis. And this puzzles me as I think the concept is, for me, an
+attractive one.</p>
+
+<p>In the five-odd months I have been visiting the site, I have managed to
+<a href="http://www.quora.com/Jason-Ryan" title="My Quora profile">contribute 58 answers</a>
+and over one hundred edits (more on that below); this strikes me as a reasonable
+commitment on my part and one that should return some dividend to me –
+at least in terms of satisfaction with the site. Alas, no.</p>
+
+<p>And why not? For several reasons. And reasons that have only really
+become apparent over the last month as I started to spend time on the
+<a href="http://unix.stackexchange.com/" title="Unix and Linux Stack Exchange">Unix &amp; Linux Stack Exchange site</a>.
+The contrast between the <em>experience</em> of the two sites, that are in
+essence very similar, couldn’t be more striking.</p>
+
+<p>The primary difference between the two is that Unix.SE isn’t a social
+site: you don’t follow anyone. Which, when you think about Q&amp;A sites,
+makes a lot more sense than Quora’s model. I still don’t understand the
+point of following people on Quora. Perhaps I am not following enough
+people, or the wrong ones, but I have yet to see <em>any benefit</em> in
+following on the site.</p>
+
+<p>One other area of seeming similarity between the sites is the ability to
+vote up (or down) questions and answers. On Unix.SE, this is implemented
+as a real strength as these votes determine contributor’s reputation,
+described thus:</p>
+
+<blockquote><p>Reputation is a rough measurement of how much the community trusts
+you. Reputation is never given, it is earned by convincing fellow
+users that you know what you’re talking about.</p></blockquote>
+
+<p>This has a twofold effect: it motivates contributors to provide quality
+answers (and
+<a href="http://unix.stackexchange.com/badges" title="StackExchange badges">rewards</a>
+them when they do), and more importantly, gives you a heuristic for how
+credible an answer may be. Quora doesn’t have this concept and, for me,
+is much the poorer for it.</p>
+
+<p>Reputation has consequences on Unix.SE: the more you accrue, the more
+privileges on the site you are granted. Again, this builds the
+community’s capability while encouraging individual contributors.</p>
+
+<p>Some of the other areas where Quora is really left wanting in comparison
+to Unix.SE are around the design of the site. The text box where you
+enter your answers or edits is a case in point:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora2.png" alt="image" /></p>
+
+<p>On Quora, it is like trying to change a car battery through a letterbox.
+The single, overriding impression is that entering information into the
+site is neither a priority nor pleasurable which, for a site aspiring to
+be a knowledge repository is incredibly perverse.</p>
+
+<p>This is compounded by the fact that the tools for presenting the
+information that you want to add to the site can charitably be described
+as rudimentary (one of the reasons that I have 100-odd edits is that it
+takes at least two to three attempts to present information in a
+semi-acceptable fashion). Searching for
+“<a href="http://www.quora.com/Quora-product/Are-there-any-markup-tags-when-writing-a-question?q=quora+markup+tools" title="Recursion alert">quora markup tools</a>”
+is as disappointing as it is frustrating.</p>
+
+<p>Being able to present information appropriately is critical. The
+StackExchange sites
+<a href="http://unix.stackexchange.com/editing-help" title="Unix.SE editing guidleines">allow all sorts</a>
+of HTML tags and
+<a href="http://daringfireball.net/projects/markdown/syntax" title="markdown syntax">markdown</a>,
+without apparently any additional
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting" title="Wikipedia page on Cross site scripting">XSS risk</a><sup>1</sup>.
+The result is questions and answers that are formatted in a way that
+enhances their legibility, rather than detracting from it.</p>
+
+<p>There are some other areas where Quora is not measuring up for me:
+opaque editorial and moderation policies and practices and an
+unwillingness to more actively curate the questions – and no, those two
+statements are not contradictory.</p>
+
+<p>The overall impression I am left with is that while both sites have
+similar aims (albeit Unix.SE’s is much more specific in terms of the
+subject matter), Quora seems to me to be really failing at building a
+community around it. Unless, of course, you count social media experts…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>God knows if that is actually the reason they refuse to allow
+potential contributors the ability to adequately format their
+information, but it seems plausible enough.</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/05/24/tyrs-ncurses-twitter-client/">Tyrs: ncurses Twitter Client</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-24T20:17:00+12:00" pubdate data-updated="true">May 24<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5754227102/in/photostream" title="Tyrs photo on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/tyrs.png" alt="image" /></a></p>
+
+<p>I have been a solid user of
+<a href="http://www.floodgap.com/software/ttytter/" title="TTYtter homepage">TTYtter</a>
+for a couple of years now, much preferring the speed and power of a
+command line Twitter client. And, after having tried–at one time or
+another–most of the Linux or cross-platform Twitter clients, I can
+safely say that for me TTYtter is easily the best.</p>
+
+<p>There is, however, a new
+<a href="http://www.gnu.org/software/ncurses/" title="ncurses page">ncurses</a> client
+that is showing a lot of promise:
+<a href="http://tyrs.nicosphere.net/index.html" title="Tyrs homepage">Tyrs</a>. Only at
+the 0.2.1.1 stage, and with a fraction of the functionality that TTYtter
+has, it is nevertheless a very nice client.</p>
+
+<p>Requiring little in the way of dependencies, only python-twitter and
+python-oauth2, both available in the
+<a href="http://aur.archlinux.org/" title="Arch Linux User Repository">AUR</a> or in the
+debian/Ubuntu repos (if you are using debian/Ubuntu, you will need the
+newer python-twitter-0.8.2 for it to run).</p>
+
+<p>Tyrs is easy to configure, with good documentation and a simple
+configuration file, located by default at
+$XDG_CONFIG_HOME/tyrs/tyrs.cfg. The default keybinds are
+<a href="http://www.vim.org/" title="THE editor">Vim-centric</a>, naturally…</p>
+
+<p>My config is pretty straightforward at this point:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>[keys]
+</span><span class='line'>retweet           <span class="p">=</span> <span class="k">p</span>
+</span><span class='line'>retweet_and_edit  <span class="p">=</span> <span class="k">P</span>
+</span><span class='line'>mentions          <span class="p">=</span> <span class="k">a</span>
+</span><span class='line'>reply             <span class="p">=</span> <span class="k">r</span>
+</span><span class='line'>
+</span><span class='line'>[<span class="k">colors</span>]
+</span><span class='line'><span class="nb">highlight</span>         <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>header            <span class="p">=</span> <span class="m">6</span>
+</span><span class='line'>hashtag           <span class="p">=</span> <span class="m">4</span>
+</span><span class='line'>attag             <span class="p">=</span> <span class="m">2</span>
+</span><span class='line'>text              <span class="p">=</span> <span class="m">7</span>
+</span><span class='line'>warning_msg       <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>info_msg          <span class="p">=</span> <span class="m">2</span>
+</span><span class='line'>
+</span><span class='line'>[params]
+</span><span class='line'>refresh           <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>tweet_border      <span class="p">=</span> <span class="m">0</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Written in Python, the code is well commented and relatively easy to
+find your way around if your are keen on hacking.</p>
+
+<p>The developer, Nicolas Paris, is both approachable and helpful and is
+actively developing Tyrs. With some more functionality in the pipeline,
+it looks to be a very nice application.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/05/05/w3m/">w3m, Surfraw and Yanking URLs</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-05T19:57:00+12:00" pubdate data-updated="true">May 5<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/w3m.png" alt="image" /></p>
+
+<p>I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/blog/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
+to the point of writing a couple of my own <em>elvi</em>. As part of the
+ongoing tweaking of my Surfraw experience, I have been experimenting
+with different
+<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
+to see which one best fits my workflow.</p>
+
+<p>I have previously been using both
+<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
+and it’s homonym,
+<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
+these have been perfectly acceptable, they weren’t quite providing the
+level of functionality —and integration with my vim-oriented workflow—
+that I was looking for. Enter
+<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
+
+<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
+`less’. With w3m you can browse web pages through a terminal emulator
+window (xterm, rxvt or something like that). Moreover, w3m can be used
+as a text formatting tool which typesets HTML into plain text.</p></blockquote>
+
+<p>w3m is a step up from the other two for a variety of reasons. It
+supports tables, frames, SSL connections, color and inline images. It
+also renders pages in a form as true to their original layout as
+possible. The killer features on top of that are, for me, the above
+mentioned rendering of HTML as text (meaning you can save content
+easily), and the customizable keybinds.</p>
+
+<p>There was however, one significant sticking point. After countless hours
+fruitlessly searching, I was unable to find a way to yank URLs to the
+clipboard. As I have been spending a little time of late on
+<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
+I thought I would ask the good folk there…</p>
+
+<p>Less than fourty hours later, I had an answer so simple and elegant,
+that I was literally grinning when I read it. It deserves quoting in
+full. It is that ingenious.</p>
+
+<blockquote><p>Set the “External Browser” option to
+<code>sh -c 'echo "$0" | xsel'</code></p>
+
+<p>You can use xsel -b to use the clipboard instead of the primary
+selection. An alternative to
+<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
+is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
+(xclip for the primary selection, xclip -selection CLIPBOARD for the
+clipboard).</p>
+
+<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
+Then press M to copy (yank) the URL of the current page, or ESCM to
+copy the URL of the link under the cursor.</p>
+
+<p>You can use the second or third external browser for that instead;
+then the key combination is 2M or 3M or 2ESCM or 3ESCM.
+<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
+
+<p>This simple hack means that it is now trivial to yank either the URL of
+the current page, or of the link under the cursor to primary selection.
+It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
+and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
+<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN
+</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
+
+<h4>Updated 8/5/11</h4>
+
+<p>Gilles has edited and updated his answer with a slight change:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This prevents a new line being appended.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/04/13/archwiki-elvis-for-surfraw/">Archwiki elvis for Surfraw</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-13T19:29:00+12:00" pubdate data-updated="true">Apr 13<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/arch-elvis.png" alt="image" /></p>
+
+<p>I have been using
+<a href="http://surfraw.alioth.debian.org/" title="Surfraw manifesto">Surfraw</a> for the
+better part of eighteen months, and I think that it is a perfect Unix
+tool: it does <em>one</em> thing, extremely well… If you haven’t come across
+it, Surfraw is a command-line interface to a couple of dozen
+repositories of knowledge. It is described thus:</p>
+
+<blockquote><p>It reclaims google, altavista, babelfish, dejanews, freshmeat,
+research index, slashdot and many others from the false-prophet,
+pox-infested heathen lands of html-forms, placing these wonders where
+they belong, deep in unix heartland, as god loving extensions to the
+shell.<sup>1</sup></p></blockquote>
+
+<p>The shell scripts that power the searches of the repositories are called
+<em>elvi</em>, the singular being <em>elvis</em>. Currently, in
+<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=summary" title="Debian Git Repo: Surfraw">the git repo</a>,
+there are
+<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=tree;f=elvi;hb=HEAD" title="elvi in the git repo">over 100 elvi</a>,
+ranging from Wikipedia through to the CIA website (yes, the project was
+founded by <a href="http://en.wikipedia.org/wiki/Julian_Assange" title="Julian's Wikipedia page">Julian Assange</a>),
+Slashdot and The Wayback Machine.</p>
+
+<p>As comprehensive as the list of elvi is, there was one glaring hole.
+Arch Linux is represented in terms of elvi to search the
+<a href="http://aur.archlinux.org/" title="Arch User Repository">AUR</a> and the
+<a href="http://www.archlinux.org/packages/" title="Arch Package Database">official package repositories</a>,
+but nothing for the
+<a href="https://wiki.archlinux.org/index.php/Main_Page" title="Definitive Arch Linux documentation">Arch Wiki</a>,
+perhaps the best GNU/Linux reference wiki on the web.</p>
+
+<p>So I thought I would rectify that.</p>
+
+<p>You can grab the archwiki elvis from my
+<a href="http://beta.intuxication.org/jasonwryan/longbow/file/tip/scripts/archwiki" title="Intuxication repo">mercurial repo</a>,
+copy it into your local directory at <span class="file">$XDG_CONFIG_HOME/surfraw/elvi/</span> or
+in the system folder at <span class="file">$XDG_CONFIG_DIRS/surfraw/</span> and you can surf the
+Arch Wiki, or any one of the nine other language wikis, from the command
+line.</p>
+
+<blockquote><p>Surfrawize the soul of your favourite internet wonder. Join the
+<strong>S</strong>hell <strong>U</strong>sers’ <strong>R</strong>evolutionary <strong>F</strong>ront <strong>A</strong>gainst the
+WW<strong>W</strong> by submitting code. Reclaim heathen lands. Bear witness to the
+truth. Its love will set you free.</p></blockquote>
+
+<h5>Notes</h5>
+
+<ol>
+<li>A bonus: all of the documentation is written like Unix
+<a href="http://en.wikipedia.org/wiki/Agitprop" title="Wikipedia entry">agitprop</a>…</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/04/06/vim-colours-in-the-console/">Vim Colours in the Console</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-06T21:19:00+12:00" pubdate data-updated="true">Apr 6<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours1.png" alt="image" /></p>
+
+<p>I have spent the last couple of days trying to understand why I couldn’t
+get <a href="http://www.vim.org/" title="Vim: the _only_ editor">Vim</a> to display the
+correct 16 colours in the console. Not in a terminal emulator in X, like
+<a href="http://invisible-island.net/xterm/xterm.html" title="XTerm homepage">xterm</a>
+or
+<a href="http://software.schmorp.de/pkg/rxvt-unicode.html" title="Homepage for urxvt">rxvt-unicode</a>,
+but in the consoles, TTY1-6.</p>
+
+<p>After a lot of searching, more reading into the
+<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-16.html" title="The Linux terminal...">arcane documentation</a>
+of Linux terminals than I was either prepared for or keen on and some
+experimentation, I have it working. With one caveat; I wasn’t prepared
+to set the <code>TERM</code> environment in my <span class="file">.vimrc</span>. Apart from being
+<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-10.html#ss10.5" title="Console documentation">cautioned against</a>,
+as I <em>do</em> set it for tmux, I was anxious to avoid any clashes when
+running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+(which I do most of the time).</p>
+
+<p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
+colours, gave me the default:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> <span class="o">&amp;&amp;</span> tput colors
+</span><span class='line'>linux
+</span><span class='line'>8
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which, under my current configuration of Vim, rendered colours like so:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours2.png" alt="image" /></p>
+
+<p>Hardly satisfactory.</p>
+
+<p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
+colours:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then I had to rewrite my colourscheme to change all of the references to
+the terminal colour numbers to colour <em>names</em>, as apparently that is
+what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
+</span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
+</span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
+</span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>…to the more literal:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
+</span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
+</span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
+</span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once I had made the necessary changes, I saved this new colourscheme as
+<span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
+have included it in an <code>if</code> condition in my original colourscheme<sup>2</sup>,
+but I was intent on keeping things compartmentalized until I had it working…</p>
+
+<p>Running Vim in the console was now starting to look promising:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours3.png" alt="image" /></p>
+
+<p>The final piece of the puzzle was to pass my
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.colours/dark" title="jwr dark colours: mercurial repo">X colours</a>
+to the console. Fortunately,
+<a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
+made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Linux console colors (jwr dark) </span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
+</span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then it was just a case of setting the relevant colourscheme in my
+<span class="file">.vimrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;<span class="nb">t_Co</span> <span class="p">&lt;</span> <span class="m">256</span>
+</span><span class='line'>    <span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>    <span class="k">colorscheme</span> miromiro
+</span><span class='line'><span class="k">endif</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And you can see
+<a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>
+of the finished product on Flickr.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p><a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miro8.vim" title="Mercurial repo: miro8 colourscheme">miro8.vim</a></p></li>
+<li><p><a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a></p></li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/01/25/setting-urgent-hints-in-dwm/">Setting Urgent Hints in dwm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-25T17:45:00+13:00" pubdate data-updated="true">Jan 25<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5379701719/#/photos/jasonwryan/5379701719/lightbox/" title="Arch Linux: dwm with statuscolors patch"><img src="http://dl.dropbox.com/u/261312/Blog-images/dwm-urgent.png" alt="image" /></a></p>
+
+<p>After nearly 12 months of running a pretty stable
+<a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>, with a consistent
+patchset (cycle,
+<a href="http://dwm.suckless.org/patches/push" title="Push on suckless wiki">push</a>,
+and init pertag<sup>1</sup>) I finally added another one:
+statuscolours<sup>2</sup>…</p>
+
+<p>I have been experimenting with
+<a href="http://jasonwryan.com/blog/2010-12-26-wmfs-window-manager-from-scratch" title="My post on using WMFS">WMFS</a>,
+which is another very nice, minimal tiling window manager and was really
+enjoying the urgency hints in the status bar, so I decided to patch that
+functionality into dwm.</p>
+
+<p>Most terminal applications will send a bell when your attention is
+required; in my case, I was looking for a way to trigger notifications
+for new mail in
+<a href="http://www.mutt.org/" title="If you are using another mail user agent, you are doing it wrong...">mutt</a>
+or highlights in <a href="http://irssi.org/" title="IRC client">irssi</a>. In mutt, it
+was just a case of setting a bell for when mail arrived:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span>beep_new             <span class="c"># bell on new mail</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And in irssi:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">beep_msg_level</span> <span class="o">=</span> <span class="s2">&quot;NOTICE MSGS HILIGHT&quot;</span>;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In <a href="http://tmux.sourceforge.net/" title="terminal mulitplexer">tmux</a>, to cover
+all your terminal bases, add:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set</span> -g bell-action any <span class="c"># listen for activity on all windows</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next step is to pass those beeps to your terminal. The entry for
+Urxvt is one I picked up after a quick search turned up
+<a href="http://rsontech.net/articles/2008/11/17/1/handling-urgency-hints" title="Post on reson.tech">this post by rson</a>
+which had the .Xdefaults line I was looking for:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>URxvt*urgentOnBell: <span class="nb">true</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, whenever a bell is triggered in irssi or mutt, that is passed to
+the terminal as an urgent hint. The final step was patching statuscolors
+into dwm.c to change the tag colour when the hint was received.</p>
+
+<p>You can see my
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Build/dwm/5.8.2-2.diff" title="dwm.c patched">patched dwm.c</a>
+in my intuxication repo.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>These patches are from the extremely helpful Arch Forum thread:
+<a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a></li>
+<li>I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
+from the suckless mailing list. It irons out the padding issues in the one on the wiki.</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -364,778 +1204,6 @@ dwm, it is still in the minimalist camp in terms of size.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/10/21/console-fonts-in-ubuntu/">Console Fonts in Ubuntu</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-10-21T20:38:00+13:00" pubdate data-updated="true">Oct 21<span>st</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-fonts.png" alt="image" /></p>
-
-<p>Invariably, an <a href="http://www.ubuntu.com/" title="Ubuntu homepage">Ubuntu</a>
-upgrade only ever brings me pain in one area: the framebuffer. Granted,
-most Ubuntu users probably don’t care about the resolution of their
-framebuffer because they probably rarely venture there.</p>
-
-<p>For me, however, having the correct resolution and a decent font is
-important. Not because I spend a huge amount of time there (I don’t),
-but because in the past I have been forced to — and quickly learned that
-if the resolution is off, it makes it <em>very</em> difficult to work with.</p>
-
-<p>So the recent, otherwise completely successful, upgrade to Maverick
-Meerkat once again left me with an almost useless console. Fortunately,
-the hack for forcing a 1680x1050 resolution worked<sup>1</sup>, so it was just a
-matter of getting
-<a href="http://fractal.csie.org/~eric/wiki/Terminus_font" title="Terminus homepage">Terminus</a>
-to stick as the default console font.</p>
-
-<p>This was one instance where Google failed me. There doesn’t seem to be
-any authoritative guide to setting your console font permanently. I
-edited <span class="file">/etc/default/console-setup</span>
-and added Terminus as the font, like so:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">CODESET</span><span class="o">=</span><span class="s2">&quot;Lat15&quot;</span>
-</span><span class='line'><span class="nv">FONTFACE</span><span class="o">=</span><span class="s2">&quot;Terminus&quot;</span>
-</span><span class='line'><span class="nv">FONTSIZE</span><span class="o">=</span><span class="s2">&quot;16&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Issuing, from the console:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo setupcon -v
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>would change the font to Terminus for that session but a reboot soon
-reverted it to the default fixed (which, given
-<a href="https://wiki.ubuntu.com/Ubuntu%20Font%20Family">Ubuntu have been working on their fonts</a>, is
-spectacularly ugly).</p>
-
-<p>I finally asked in #ubuntu and was pointed in the right direction:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo dpkg-reconfigure console-setup
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And <em>now</em> I have a workable framebuffer.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Hack to force higher framebuffer resolution in <span class="file">/etc/default/grub</span></li>
-</ol>
-
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">GRUB_GFXPAYLOAD_LINUX</span><span class="o">=</span>1680x1050
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/10/07/vimprobable/">Vimprobable</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-10-07T16:23:00+13:00" pubdate data-updated="true">Oct 7<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5055695051/" title="Vimprobable on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable.png" title="Hacked Vimprobable2" alt="image" /></a></p>
-
-<p>After just posting details of <a href="http://jasonwryan.com/blog/2010-10-04-the-setup">my setup</a>,
-I have made a reasonably significant (and it goes almost without saying, unplanned)
-change: after <a href="http://www.uzbl.org/">uzbl</a> began unaccountably maxxing
-out my CPU, I decided to give <a href="http://www.vimprobable.org/">Vimprobable</a>
-a go.</p>
-
-<p>I covered it briefly in my review of <a href="http://jasonwryan.com/blog/2010-5-21-5-alternate-browsers">5 alternate browsers</a> and liked the
-idea of another vim-based browsing experience.</p>
-
-<p>There are two versions of Vimprobable; the differences, as described on
-the website:</p>
-
-<blockquote><p>Both versions are actively maintained. The first version can only be
-customised by editing config.h before compiling. It is pretty stable
-and very usable. Version 2 has grown fairly stable already as well,
-but it’s still seeing bigger changes, of course. It aims at allowing
-more customisation, for example through :set and :map commands.</p></blockquote>
-
-<p>I downloaded the tarball for
-<a href="http://aur.archlinux.org/packages.php?ID=33779" title="Arch User Repository: Vimprobable2">Vimprobable2 from the AUR</a>,
-extracted the files and built the package.</p>
-
-<p>Customization occurs in 3 files<sup>1</sup>: the first two,
-<span class="file">config.h</span> and <span class="file">keymap.h</span>
-both require you to recompile after editing, which is a trivial task
-given the size of the programme.</p>
-
-<p>Vimprobable2 also features a third configuration option that doesn’t
-require compiling after changes, <span class="file">vimprobablerc</span>.
-Should you wish to use it, you will need to create this file in
-<span class="file">~/.config/vimprobable/</span>.
-Helpfully, there is a man page for all of the options in this file, to
-read it issue:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>man vimprobablerc
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Despite it’s spartan appearance, Vimprobable is a full-featured browser
-— with the advantage of being driven solely from the keyboard. It
-handles bookmarks (and the tagging thereof, which is impressive and
-handy), multiple search engines, cookies, history, etc…</p>
-
-<p>I have made a number of changes to the defaults, including moving some
-of the keybindings to be closer to uzbl’s (habit, really). The other
-area where I made some minor changes was to the hinting style. Hinting
-is just the way Vimprobable (and other browsers like uzbl and
-<a href="http://conkeror.org/">Conkeror</a>) follow links; the default is, to put
-it mildly, garish<sup>2</sup>, so I hacked around in <span class="file">hinting.js</span>
-to make it more attractive.</p>
-
-<p>If you are interested, my vimprobable files are in
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/vimprobable2-git/">bitbucket</a>,
-including the modified hinting.js.</p>
-
-<h3>Update</h3>
-
-<p>I think this is a keeper. I installed
-<a href="http://tools.suckless.org/tabbed" title="suckless' tabbed">tabbed</a> and now
-open Vimprobable in tabbed for tab management. A quick addition to my
-keybinds in <a href="http://dwm.suckless.org/" title="dynamic window manager">dwm</a> and
-I have a minimalist and powerful browser…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>Of course, you are not limited to these files; the beauty of free
-and open-source software is that you can change any of it…</p></li>
-<li><p>To support this claim, I searched google for an image of the default
-Vimprobable hinting style, and I could only find this
-<a href="http://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/103/10387/10387f2.jpg">screenshot of conkeror</a>,
-which will give you an idea…</p></li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/10/04/the-setup/">The Setup</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-10-04T17:23:00+13:00" pubdate data-updated="true">Oct 4<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/4522790892/" title="Arch Linux and dwm"><img src="http://dl.dropbox.com/u/261312/Blog-images/setup.png" alt="image" /></a></p>
-
-<p>Inspired by <a href="http://usesthis.com/">The Setup</a><sup>1</sup>, I decided to document
-the free (as in <a href="http://www.gnu.org/philosophy/free-sw.html">freedom</a>)
-and open source software tools I use daily.</p>
-
-<p>I made the move to using open-source about four years ago. At the time
-it was mostly a practical decision — the Pentium 4 laptop that I was
-using with XP on it had slowed to a crawl and I wasn’t keen to replace
-it, so I installed Ubuntu (Hardy Heron) on it and haven’t looked back.</p>
-
-<p>That same machine, incidentally, is still happily churning away, but it
-now runs a lightweight <a href="http://www.debian.org/releases/stable/">Debian Stable</a>.</p>
-
-<h3>Desktop</h3>
-
-<p>My primary home machine is a one I had built from spec two to three
-years ago. It was always intended to be a long-term investment, with
-sufficient power and storage to last for the better part of a decade.</p>
-
-<p>Centurion is an
-<a href="http://www.asus.com/Product.aspx?P_ID=cXoprTXLaShErTzI&amp;content=specifications">Asus P5E-V motherboard</a>
-with an
-<a href="http://www.intel.com/products/processor/core2quad/index.htm">Intel Core 2 Quad 6600 2.4GHz CPU</a> and
-4GB of DDR2 RAM. The sound card is an
-<a href="http://www.m-audio.com/products/en_us/Audiophile2496.html">M-Audio Audiophile 2496</a> and the
-graphics card is a
-<a href="http://www.nvidia.com/object/product_geforce_9600gt_us.html">1GB nVidia GeForce 9600GT</a>
-driving an LG 22” flat panel 1680x1050 display.</p>
-
-<h4>Software</h4>
-
-<p>I dual boot this machine, switching between the current
-<a href="http://www.ubuntu.com">Ubuntu</a> (10.04) and <a href="http://archlinux.org">Arch Linux</a>.</p>
-
-<p>There are two 1TB Seagate drives in a <a href="http://en.wikipedia.org/wiki/RAID">RAID1 array</a>,
-and a 500GB Seagate which has Arch on it as well as a couple of virtual machines.
-I back up the RAID array frequently, using <a href="http://www.samba.org/rsync/">rsync</a>, as it
-holds my <span class="file">/home</span> but don’t worry about the 500GB drive
-as I figure it is simple to reinstall Arch or a virtual machine…</p>
-
-<p>I try to use the same software across all of my machines to simplify my
-working habits, however I am experiencing some tension between Ubuntu
-and Arch insofar as Arch is a rolling release and you very quickly get
-used to the most recent builds…</p>
-
-<p>Applications specific to the Ubuntu box include:</p>
-
-<ul>
-<li><p><a href="http://www.getfirefox.net/">Firefox</a>: I also have
-<a href="http://www.google.com/chrome">Chrome</a> installed on this machine, but
-stick with the ‘fox for <a href="http://getfirebug.com/">Firebug</a> and other
-extensions</p></li>
-<li><p><a href="http://www.mozillamessaging.com/en-US/thunderbird/">Thunderbird</a>: with
-the <a href="http://enigmail.mozdev.org/home/index.php.html">Enigmail</a>
-extension. One of those areas of tension - it’s just a matter of time
-before I move to <code>mutt</code> (see EeePC)</p></li>
-<li><p><a href="http://wiki.slimdevices.com/index.php/SlimServer">Squeezeserver</a>: I
-have a Logitech Squeezebox to serve my music and it runs off this great
-open source software</p></li>
-<li><p><a href="http://www.virtualbox.org/">Virtualbox</a> (OS): for running virtual
-machines - currently <a href="http://www.slackware.com/">Slackware</a> and
-<a href="http://www.freebsd.org/">FreeBSD</a>.</p></li>
-</ul>
-
-
-<h3>EeePC 901</h3>
-
-<p>Archer is a 901 I bought two years ago – the
-<a href="http://eeepc.asus.com/au/product901-spec.html">Linux model with the 4/16GB SSD</a>, and I
-absolutely love it. I put a second GB of RAM into it and another 16GB SD
-Card (for /music) and it does everything that I need. The
-<a href="http://www.intel.com/products/processor/atom/index.htm">Atom 1.6GHz processor</a>
-handles compiling relatively smartly and the screen and keyboard, while
-small (9” at 1024x600) are not uncomfortable to use for protracted
-sessions. It is also <em>deathly quiet</em>. The only other addition is a
-second 6 cell battery so I can safely count on 8-10 hours out of it.</p>
-
-<p>One of the reasons that it works so efficiently is that it is an
-<em>extremely</em> minimal Arch Linux setup.</p>
-
-<h4>Software</h4>
-
-<p>Applications specific to this machine are:</p>
-
-<ul>
-<li><a href="http://dwm.suckless.org" title="dwm page on suckless">dwm</a>: <em>the</em>
-suckless window manager. With added functionality of some patches:
-init-pertag, cycle and push: see <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/dwm/5.8.2-2.diff">the patchset for
-details</a></li>
-<li><a href="http://tools.suckless.org/dmenu/">dmenu</a>: application launcher,
-again from suckless.org</li>
-<li><p><a href="http://www.mutt.org/">mutt</a>: the best email client I have used -
-requires some setup, but –if you want your mail client to run
-exactly as you would like– then this one repays the investment in
-spades. Mutt is just a MUA, the rest of the email cycle is handled
-by:</p>
-
-<ul>
-<li><a href="http://github.com/jgoerzen/offlineimap/wiki">offlineimap</a>: to
-fetch mail</li>
-<li><a href="http://msmtp.sourceforge.net/">msmtp</a>: to send mail</li>
-<li><a href="http://www.gnupg.org/">GnuPG</a>: for signing and encryption</li>
-<li><a href="http://abook.sourceforge.net/">abook</a>: address book</li>
-<li><a href="http://linuxcommand.org/man_pages/urlview1.html">urlview</a> and
-<a href="http://lynx.browser.org/">lynx</a>: open urls from mutt</li>
-</ul>
-</li>
-<li><p><del><a href="http://www.uzbl.org/">uzbl</a>: a lightweight webkit browser that is
-infintely extensible and
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.config/uzbl/config">configurable</a></del><sup>2^</sup></p></li>
-<li><a href="http://www.vimprobable.org/">Vimprobable</a> in
-<a href="http://tools.suckless.org/tabbed">tabbed</a>: another lightweight
-webkit browser that can be
-<a href="http://www.flickr.com/photos/jasonwryan/5063510130/" title="Screenshot on Flickr">customized</a>
-to your heart’s desire…</li>
-<li>A host of small programs that make life easy:
-
-<ul>
-<li><a href="https://derf.homelinux.org/projects/feh/">feh</a>: image viewer</li>
-<li><a href="http://www.nongnu.org/autocutsel/">autocutsel</a>: synchronize
-clipboards</li>
-<li><a href="http://sites.google.com/site/gotmor/dzen">dzen</a> and
-<a href="http://conky.sourceforge.net/">conky</a>: to print system stats to
-dwm’s status bar</li>
-<li><a href="http://surfraw.alioth.debian.org/">surfraw</a>: command line
-search client</li>
-<li><a href="http://www.ibiblio.org/pub/X11/contrib/utilities/unclutter-8.README">unclutter</a>:
-hides the mouse cursor (don’t really need a mouse with this
-setup)</li>
-<li><a href="http://www.xfree86.org/4.2.0/xmodmap.1.html">xmodmap</a>: map Caps
-Lock to Escape</li>
-</ul>
-</li>
-</ul>
-
-
-<h4>Common tools</h4>
-
-<p>Applications and utilities that I use across all of my machines include:</p>
-
-<ul>
-<li><p><a href="http://software.schmorp.de/pkg/rxvt-unicode.html">Urxvt</a>: I would’nt
-dream of using another terminal… Run as a daemon, with these
-applications:</p>
-
-<ul>
-<li>  <a href="http://tmux.sourceforge.net/">tmux</a>: for local and remote terminal
-  sessions</li>
-<li>  <a href="http://www.vim.org/">Vim</a>: with a <a href="http://jasonwryan.com/blog/2010-09-28-command-line-notes">simple notes function</a>
-  in my .bashrc</li>
-<li>  <a href="http://vifm.sourceforge.net/">Vifm</a>: Vi-like file manager – for
-  when I am not using
-  <a href="http://www.gnu.org/software/coreutils/">coreutils</a></li>
-<li>  <a href="http://www.floodgap.com/software/ttytter/">TTYtter</a>: fantastic
-  Twitter client: if it could integrate Identi.ca into a single feed,
-  it would be perfect…</li>
-<li>  <a href="http://irssi.org/">irssi</a>: for IRC</li>
-<li>  <a href="http://www.mplayerhq.hu/design7/news.html">Mplayer</a>: for movies</li>
-<li>  <a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki">MPD</a> and
-  <a href="http://unkart.ovh.org/ncmpcpp/">ncmpcpp</a>: music player daemon and
-  ncurses player</li>
-<li>  <a href="http://code.google.com/p/mpdscribble/">mpdscribble</a>: for scrobbling
-  to Libre.fm and Last.fm</li>
-<li>  <a href="http://libtorrent.rakshasa.no/">rtorrent</a>: run inside tmux for
-remote sessions. Genius.</li>
-</ul>
-</li>
-<li><p><a href="http://www.dropbox.com/">Dropbox</a>: the daemon is closed source, but
-this is the best tool I have found for synching across machines. If the
-Ubuntu One devs ever focus on other Linux distros, I’d move across.</p></li>
-<li><a href="http://www.truecrypt.org/">Truecrypt</a>: a TC volume in Dropbox and you
-are set</li>
-<li><a href="http://www.skype.com/intl/en/home">Skype</a>.</li>
-</ul>
-
-
-<h4>Other Utilities</h4>
-
-<p>I use <a href="http://mercurial.selenic.com/">mercurial</a> and
-<a href="https://bitbucket.org/jasonwryan/">bitbucket</a> to share my dotfiles
-between Arch machines (one of my work boxes is also running Arch). I
-have two <a href="http://www.linksysbycisco.com/EU/en/products/WRT54GL">Linksys WRT54GL routers</a>, both
-running <a href="http://www.polarcloud.com/tomato">Tomato</a>, to handle my routing
-and wireless networking (thanks to
-<a href="http://twitter.com/jethrocarr" title="Jethro on Twitter">@jethrocarr</a> for
-solving that puzzle). For LAN file sharing I use
-<a href="http://nfs.sourceforge.net/">NFS</a> and I use
-<a href="http://www.openssh.com/">OpenSSH</a> to access my machines remotely. I
-have a third generation <a href="http://guides.macrumors.com/iPod_(3G">iPod</a>)
-and I run <a href="http://www.rockbox.org/">Rockbox</a> on it.</p>
-
-<p>You can see screenshot of these machines on
-<a href="http://www.flickr.com/photos/jasonwryan">flickr</a>.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>…and the fact that, apart from RMS, it is pretty much MacBookPros
-all the way down.</p></li>
-<li><p>Updated 9/10/10 - <a href="http://jasonwryan.com/blog/2010-10-07-vimprobable" title="My post on changing to Vimprobable">moved to Vimprobable</a>
-after some issues with uzbl.</p></li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/10/03/sessions-in-tmux/">Sessions in tmux</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-10-03T20:15:00+13:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5046091307/" title="Sessions in tmux by jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4146/5046091307_39c200f1b0.jpg" width="500" height="293" alt="Sessions in tmux"/></a></p>
-
-<p>Now that I have been using it for several months, I have become absolutely dependent upon <a href="http://tmux.sourceforge.net/" target="_blank">tmux</a>, the terminal multiplexer.
-It is both ruthlessly efficient, and can be configured to match exacting requirements. One of those options is to initialize sessions with a preloaded window configuration. After reading the <a href="http://wisconsinlinux.org/tmux-manpage-from-cvs/tmux.1.txt" target="_blank">man page</a> (which, truth be told, could be a little clearer) and some experimentation, I have worked out how to set up my tmux sessions how I want them.
-I have just updated the <a href="http://wiki.archlinux.org/index.php/Tmux">Arch Wiki tmux entry</a>,
-so thought I would share it here.</p>
-
-<p>The relevant part of my config file looks like this:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># session initialization</span>
-</span><span class='line'>new  -n TTYtter /home/jason/Scripts/ttytter.pl
-</span><span class='line'>neww -n irssi /home/jason/Scripts/startirssi.sh
-</span><span class='line'>neww -n ncmpcpp/vifm ncmpcpp
-</span><span class='line'>splitw -v -p 50 -t 0 vifm
-</span><span class='line'>neww -n bash bash
-</span><span class='line'>selectw -t 1
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Which, when I start tmux with the attach (or a) option, gives me the following window layout:</p>
-
-<ul>
-<li>TTYtter</li>
-<li>irssi</li>
-<li>ncmpcpp/vifm &nbsp; &nbsp; # window split vertically in half, ncmpcpp on top of vifm</li>
-<li>bash</li>
-</ul>
-
-
-<p>The <code>selectw</code> option means that the default view is TTYtter.</p>
-
-<p>Simple.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/09/28/command-line-notes/">Command Line Notes</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-09-28T17:56:00+13:00" pubdate data-updated="true">Sep 28<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-1.png" alt="image" /></p>
-
-<p>A couple of weeks ago, I came across these
-<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
-written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
-notes.</p>
-
-<p>The functions as described in the article are so:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$*&quot;</span>.txt <span class="o">}</span> nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$*&quot;</span> <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Unfortunately, the second function – for retrieving the list of files in
-the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
-and it will only list files in the top level directory. If you are an
-inverterate note taker, this plainly won’t scale.</p>
-
-<p>My first attempt at hacking a solution yielded this little beauty:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\ </span>
-</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Which removes <code>ls</code> from the function and allows nested directories, but
-is needlessly complex and, with four pipes, hideously <del>inefficient</del>
-inelegant.</p>
-
-<p>After reading up on Awk, particularly
-<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
-I arrived at something marginally longer but relying solely on the
-awesome power of awk to make the various transformations I was seeking…</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
-</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>An added advantage is that it is scalable irrespective of how deep the
-directories go. I’m sure that with some more awk-foo I could write a
-more effective set of conditionals, but this seemed a pretty good start
-for a simple note taking utility.</p>
-
-<h3>Updated 3/11/10</h3>
-
-<p>To remove a little of the visual clutter, I amended the awk script to
-strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
-</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
-in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
-symlink to it from <span class="file">~/.notes</span>.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.</p></li>
-<li><p>Obligatory “after” screenshot:</p></li>
-</ol>
-
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-2.png" title="'Screenshot of editing text'" ></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/04/03/vapourware/">Vapourware</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-04-03T13:18:00+13:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This morning I received a heap of brochures inviting me to attend
-professional development courses, training seminars and conferences. One
-in particular stood out for reasons I’d like to share with you.</p>
-
-<p>By way of context; it’s a 2 day programme (workshops on the first,
-plenary sessions on the second) of social media for internal
-communicators. As I have a keen interest in internal communications, I
-studied their offering.</p>
-
-<p>One presentation, from an “international guest speaker,” is so striking
-I’ll reprint it in its entirety, removing the name of the company to
-prevent them any (further) embarassment, (all emphasis mine):</p>
-
-<blockquote><p>[Multi-national company] is rolling out Sharepoint this year. It
-<strong>will</strong> provide the organization with an enhanced way of
-communicating, collaborating and managing content - a dynamic platform
-on which to evolve and further improve [company’s] way or working.
-From an internal communications perspective, the Microsoft Office
-product provides an <strong>updated way</strong> to engage colleagues, in order to
-drive winning culture and business performance. This session captures
-the opportunities, benefits, <strong>and realities</strong> of implementing and
-living with Sharepoint.</p>
-
-<p>[Employee name], Internal Communications Director, [company].</p></blockquote>
-
-<p>Did I read that correctly? The company haven’t actually implemented the
-technology yet, but they are still fronting someone to sell it’s future
-virtues.</p>
-
-<p>Whether or not the technology is able to deliver these benefits (and I
-<a href="http://twitter.com/jasonwryan/status/839079414">doubt it</a> <a href="http://twitter.com/jasonwryan/status/839079197">very
-much</a>), shouldn’t the
-corporate communicator at least be talking about, oh let’s say for a
-whim, something <em>grounded in evidence?</em></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/03/02/patching-dwm/">Patching dwm</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-03-02T20:16:00+13:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/patching-dwm.png" alt="image" /></p>
-
-<p>I had posted <a href="http://jasonwryan.com/blog/2009-12-19-patching-dwm-with-pertag-and-bstack" title="Patching dwm with pertag &amp; bstack">a while back</a>
-about my (failed) attempt to patch <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>
-with both pertag and some of the other layout patches. I had been able to get it to work with
-<a href="http://dwm.suckless.org/patches/bottom_stack" title="dwm wiki: bstack">bottomstack</a>,
-but adding another patch caused some of the chunks to fail. It seems
-pertag moves the code around to the point that – using
-<a href="http://dwm.suckless.org/patches/" title="patches: dwm wiki">the standard patching method</a> –
-any further patches won’t take.</p>
-
-<p>Further investigation, and some trial and a tolerable amount of error,
-have however demonstrated to me that it is quite possible to patch dwm
-to your heart’s content; or at least to my meagre needs. Which in the
-case of <a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="EeePC configs">my EeePC</a>
-is pertag, cycle and push, with the addition of bstack on
-<a href="https://bitbucket.org/jasonwryan/workstation/src/" title="Workstation configs">my workstation</a>.</p>
-
-<p>The solution, as I have found in almost every instance of my tinkering
-with dwm, is stunningly simple. Start with a new version of dwm and
-apply the
-<a href="http://dwm.suckless.org/patches/pertag" title="dwm wiki: pertag">pertag diff</a>. Then
-manually add all of the chunks of the subsequent patches.</p>
-
-<p>All of the changes are now in dwm.c and your config.h should only have
-the necessary keybindings to activate the functionality you have added
-to this amazing window manager.</p>
-
-<p>If you want to see what changes this makes, you can take a peek at
-<a href="https://bitbucket.org/jasonwryan/workstation/src/tip/dwm-5.7.2-2/" title="diff in mercurial repo">my .diff</a>
-(for bstack, cycle, pertag and push). You are equally welcome to apply
-it if that is the functionality that you are looking for in 5.7.2.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -1153,23 +1221,23 @@ it if that is the functionality that you are looking for in 5.7.2.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2011/12/01/readline/">Readline Bindings in Vi Mode</a>
+        <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2011/11/29/rtorrent/">Building rtorrent on Debian Squeeze</a>
+        <a href="/blog/2012/03/17/vampires/">A Taxonomy of Help Vampires</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2011/11/28/rsync/">rsync + SSH Backups</a>
+        <a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2011/11/18/microserver/">Microserver</a>
+        <a href="/blog/2012/02/13/chroot/">Chroot in LVM on LUKS on Raid: Arch Linux</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2011/11/07/irc-dzen/">IRC Notifications with dzen2</a>
+        <a href="/blog/2012/02/11/lvm/">LVM on LUKS on RAID1 on Arch Linux</a>
       </li>
     
   </ul>

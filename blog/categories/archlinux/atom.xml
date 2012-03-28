@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T17:32:39+13:00</updated>
+  <updated>2012-03-28T19:52:53+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -14,195 +14,30 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Archwiki elvis for Surfraw]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/04/13/archwiki-elvis-for-surfraw/"/>
-    <updated>2011-04-13T19:29:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/04/13/archwiki-elvis-for-surfraw</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/arch-elvis.png" alt="image" /></p>
+    <title type="html"><![CDATA[Signing Your Own Key]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/03/23/key/"/>
+    <updated>2012-03-23T11:36:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/03/23/key</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/key.jpg" alt="image" /></p>
 
-<p>I have been using
-<a href="http://surfraw.alioth.debian.org/" title="Surfraw manifesto">Surfraw</a> for the
-better part of eighteen months, and I think that it is a perfect Unix
-tool: it does <em>one</em> thing, extremely well… If you haven’t come across
-it, Surfraw is a command-line interface to a couple of dozen
-repositories of knowledge. It is described thus:</p>
+<p>Some time in the last couple of days, the last of the packages in the
+Community repository were signed and, thanks to the tremendous work of
+the Arch developers and Trusted Users, you can fully implement package
+signing in your <span class="file">/etc/pacman.conf</span>.</p>
 
-<blockquote><p>It reclaims google, altavista, babelfish, dejanews, freshmeat,
-research index, slashdot and many others from the false-prophet,
-pox-infested heathen lands of html-forms, placing these wonders where
-they belong, deep in unix heartland, as god loving extensions to the
-shell.<sup>1</sup></p></blockquote>
-
-<p>The shell scripts that power the searches of the repositories are called
-<em>elvi</em>, the singular being <em>elvis</em>. Currently, in
-<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=summary" title="Debian Git Repo: Surfraw">the git repo</a>,
-there are
-<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=tree;f=elvi;hb=HEAD" title="elvi in the git repo">over 100 elvi</a>,
-ranging from Wikipedia through to the CIA website (yes, the project was
-founded by <a href="http://en.wikipedia.org/wiki/Julian_Assange" title="Julian's Wikipedia page">Julian Assange</a>),
-Slashdot and The Wayback Machine.</p>
-
-<p>As comprehensive as the list of elvi is, there was one glaring hole.
-Arch Linux is represented in terms of elvi to search the
-<a href="http://aur.archlinux.org/" title="Arch User Repository">AUR</a> and the
-<a href="http://www.archlinux.org/packages/" title="Arch Package Database">official package repositories</a>,
-but nothing for the
-<a href="https://wiki.archlinux.org/index.php/Main_Page" title="Definitive Arch Linux documentation">Arch Wiki</a>,
-perhaps the best GNU/Linux reference wiki on the web.</p>
-
-<p>So I thought I would rectify that.</p>
-
-<p>You can grab the archwiki elvis from my
-<a href="http://beta.intuxication.org/jasonwryan/longbow/file/tip/scripts/archwiki" title="Intuxication repo">mercurial repo</a>,
-copy it into your local directory at <span class="file">$XDG_CONFIG_HOME/surfraw/elvi/</span> or
-in the system folder at <span class="file">$XDG_CONFIG_DIRS/surfraw/</span> and you can surf the
-Arch Wiki, or any one of the nine other language wikis, from the command
-line.</p>
-
-<blockquote><p>Surfrawize the soul of your favourite internet wonder. Join the
-<strong>S</strong>hell <strong>U</strong>sers’ <strong>R</strong>evolutionary <strong>F</strong>ront <strong>A</strong>gainst the
-WW<strong>W</strong> by submitting code. Reclaim heathen lands. Bear witness to the
-truth. Its love will set you free.</p></blockquote>
-
-<h5>Notes</h5>
-
-<ol>
-<li>A bonus: all of the documentation is written like Unix
-<a href="http://en.wikipedia.org/wiki/Agitprop" title="Wikipedia entry">agitprop</a>…</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Setting Urgent Hints in dwm]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/01/25/setting-urgent-hints-in-dwm/"/>
-    <updated>2011-01-25T17:45:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/01/25/setting-urgent-hints-in-dwm</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5379701719/#/photos/jasonwryan/5379701719/lightbox/" title="Arch Linux: dwm with statuscolors patch"><img src="http://dl.dropbox.com/u/261312/Blog-images/dwm-urgent.png" alt="image" /></a></p>
-
-<p>After nearly 12 months of running a pretty stable
-<a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>, with a consistent
-patchset (cycle,
-<a href="http://dwm.suckless.org/patches/push" title="Push on suckless wiki">push</a>,
-and init pertag<sup>1</sup>) I finally added another one:
-statuscolours<sup>2</sup>…</p>
-
-<p>I have been experimenting with
-<a href="http://jasonwryan.com/blog/2010-12-26-wmfs-window-manager-from-scratch" title="My post on using WMFS">WMFS</a>,
-which is another very nice, minimal tiling window manager and was really
-enjoying the urgency hints in the status bar, so I decided to patch that
-functionality into dwm.</p>
-
-<p>Most terminal applications will send a bell when your attention is
-required; in my case, I was looking for a way to trigger notifications
-for new mail in
-<a href="http://www.mutt.org/" title="If you are using another mail user agent, you are doing it wrong...">mutt</a>
-or highlights in <a href="http://irssi.org/" title="IRC client">irssi</a>. In mutt, it
-was just a case of setting a bell for when mail arrived:</p>
+<p>You can check the state of the signed packages with this expac
+one-liner; it will return a list of any <em>unsigned</em> packages:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span>beep_new             <span class="c"># bell on new mail</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>And in irssi:</p>
+<p>Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
+take advantage of this. My overall <code>SigLevel</code> setting requires signed
+packages, and—as of yesterday—I was able to move the last repository
+entry over to do the same:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">beep_msg_level</span> <span class="o">=</span> <span class="s2">&quot;NOTICE MSGS HILIGHT&quot;</span>;
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>In <a href="http://tmux.sourceforge.net/" title="terminal mulitplexer">tmux</a>, to cover
-all your terminal bases, add:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set</span> -g bell-action any <span class="c"># listen for activity on all windows</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The next step is to pass those beeps to your terminal. The entry for
-Urxvt is one I picked up after a quick search turned up
-<a href="http://rsontech.net/articles/2008/11/17/1/handling-urgency-hints" title="Post on reson.tech">this post by rson</a>
-which had the .Xdefaults line I was looking for:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>URxvt*urgentOnBell: <span class="nb">true</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Now, whenever a bell is triggered in irssi or mutt, that is passed to
-the terminal as an urgent hint. The final step was patching statuscolors
-into dwm.c to change the tag colour when the hint was received.</p>
-
-<p>You can see my
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Build/dwm/5.8.2-2.diff" title="dwm.c patched">patched dwm.c</a>
-in my intuxication repo.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>These patches are from the extremely helpful Arch Forum thread:
-<a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a></li>
-<li>I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
-from the suckless mailing list. It irons out the padding issues in the one on the wiki.</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mail Checking Script]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/01/08/mail-checking-script/"/>
-    <updated>2011-01-08T11:04:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/01/08/mail-checking-script</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/mailcheck.png" alt="image" /></p>
-
-<p>I use <a href="http://www.mutt.org/" title="Mutt homepage">mutt</a> and
-<a href="https://github.com/jgoerzen/offlineimap/wiki" title="Offlineimap on github">offlineimap</a>
-to manage email on my Arch Linux machines. I like the simplicity and the
-power that this approach offers; that’s power in the sense of
-extensibility and customization, by the way…</p>
-
-<p>Using <a href="http://dwm.suckless.org/" title="dwm homepage">dwm</a> as my window
-manager, I had relied on
-<a href="http://jasonwryan.com/blog/2009-11-21-dzen2-and-conky-cli-in-dwm" title="My post on setting this up">conky and dzen2</a>
-to pipe system information into my status bar. Unfortunately, conky only
-supports one mail spool so if, like me, you use offlineimap to
-synchronize multiple mailboxes, conky would only show new mail in your
-primary box. I had asked in #conky about multiple mail spools, but it
-doesn’t seem to be supported.</p>
-
-<p>When I recently started using
-<a href="http://jasonwryan.com/blog/2010-12-26-wmfs-window-manager-from-scratch" title="My post on Window Manager From Scratch">WMFS</a>
-I decided to move to a
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/wmfs-status" title="Script in intuxication repo">bash script for my status information</a>.
-So I approached the problem afresh and decided to write a script to poll
-the new mail directories and update my status bar when mail arrived.</p>
-
-<p>Offlineimap creates a directory structure like so:</p>
-
-<pre><code>   Mail/ -------
-      |         |
-      |     Mail_Account_1
-      |         |
-      |         | --  INBOX 
-      |         |       | -- cur
-      |         |       | -- new
-      |         |       | -- temp
-      |         |
-      |         | -- INBOX.Drafts
-      |         |       | -- cur
-</code></pre>
-
-<p>As I was only interested in checking the <span class="file">INBOX/new</span>
-directory of each account, I had imagined that it would be necessary to set up some
-elaborate array to effectively check each of the requisite sub-directories…</p>
-
-<p>No, it was pretty simple. Just
-<a href="http://www.faqs.org/docs/abs/HTML/globbingref.html" title="ABS entry on globing">globbing</a>
-and
-<a href="http://linuxmanpages.com/man1/find.1.php" title="man page for find">find</a>,
-actually.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>mailcheck.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -212,194 +47,676 @@ actually.</p>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">[</span>core<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">[</span>extra<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">[</span>community<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">[</span>multilib<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The next step was to add my key to pacman’s keychain so that I could
+sign the packages that I build using ABS or from the
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>. Allan has an
+<a href="http://allanmcrae.com/2011/08/pacman-package-signing-1-makepkg-and-repo-add/" title="The first in a series of four posts on signing: read them all">excellent post on setting this up</a>.</p>
+
+<p>First, import your key into pacman’s keyring:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then follow the prompts as you edit the key to sign, set a trust level
+and save your key:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
+</span><span class='line'>gpg&gt; lsign
+</span><span class='line'>...
+</span><span class='line'>gpg&gt; trust
+</span><span class='line'>...
+</span><span class='line'>gpg&gt; save
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then it is just a matter of changing the <code>BUILDENV</code> option in your
+<span class="file">/etc/makepkg.conf</span>, which is set to <code>!sign</code>
+by default. Remove the bang and include the details of the key you wish to use:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
 </pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>&lt;h1&gt;-- Packager: name/email of the person or organization building packages&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Set maildirs&lt;/h1&gt;
+</span><span class='line'>&lt;p&gt;PACKAGER<span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;a href=&quot;</span>&amp;#109;&amp;#97;&amp;#x69;&amp;#x6c;&amp;#x74;&amp;#111;&amp;#x3a;&amp;#x6a;&amp;#x61;&amp;#115;&amp;#x6f;&amp;#x6e;&amp;#119;&amp;#x72;&amp;#x79;&amp;#x61;&amp;#110;&amp;#x40;&amp;#103;&amp;#109;&amp;#97;&amp;#x69;&amp;#x6c;&amp;#46;&amp;#x63;&amp;#111;&amp;#x6d;<span class="s2">&quot;&gt;&amp;#x6a;&amp;#97;&amp;#115;&amp;#x6f;&amp;#x6e;&amp;#x77;&amp;#x72;&amp;#121;&amp;#97;&amp;#x6e;&amp;#x40;&amp;#x67;&amp;#x6d;&amp;#97;&amp;#x69;&amp;#108;&amp;#46;&amp;#99;&amp;#x6f;&amp;#x6d;&lt;/a&gt;&quot;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;maildirs<span class="o">=</span><span class="s2">&quot;$HOME/Mail/*/INBOX/new/&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;h1&gt;-- Specify a key to use <span class="k">for </span>package signing&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;find <span class="nv">$maildirs</span> -type f | wc -l
-</span><span class='line'><span class="nb">exit </span>0
+</span><span class='line'>&lt;p&gt;GPGKEY<span class="o">=</span><span class="s2">&quot;B1BD4E40&quot;</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>The glob (<code>*</code>) takes care of the different mail account names, and has
-the added bonus of being portable, and find returns any files (<code>-type f</code>)
-with <code>wc</code> counting the number of lines (the <code>-l</code> switch).</p>
+<p>Now, when you build a package, you will be prompted for your key’s
+passphrase:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;You need a passphrase to unlock the secret key <span class="k">for</span>
+</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;a href=&quot;</span>&amp;#109;&amp;#97;&amp;#105;&amp;#108;&amp;#116;&amp;#x6f;&amp;#x3a;&amp;#106;&amp;#97;&amp;#115;&amp;#x6f;&amp;#x6e;&amp;#119;&amp;#114;&amp;#x79;&amp;#x61;&amp;#x6e;&amp;#64;&amp;#x67;&amp;#x6d;&amp;#x61;&amp;#x69;&amp;#108;&amp;#46;&amp;#x63;&amp;#x6f;&amp;#109;<span class="s2">&quot;&gt;&amp;#x6a;&amp;#x61;&amp;#x73;&amp;#x6f;&amp;#x6e;&amp;#x77;&amp;#x72;&amp;#121;&amp;#x61;&amp;#110;&amp;#x40;&amp;#x67;&amp;#109;&amp;#x61;&amp;#x69;&amp;#108;&amp;#46;&amp;#x63;&amp;#x6f;&amp;#x6d;&lt;/a&gt;&quot;</span>
+</span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;Enter passphrase:
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Enter the correct passphrase and your package is built and signed:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/donovan_beeson/3185668524/" title="Coraline key on Flickr">donovanbeeson</a>
+on Flickr.</p>
 ]]></content>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[WMFS - Window Manager From Scratch]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/12/26/wmfs-window-manager-from-scratch/"/>
-    <updated>2010-12-26T11:08:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/12/26/wmfs-window-manager-from-scratch</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5289976238/lightbox/" title="Screenshot on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/wmfs.png" alt="image" /></a></p>
+    <title type="html"><![CDATA[Simple aurphan notifier]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/03/09/aurphan/"/>
+    <updated>2012-03-09T16:52:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/03/09/aurphan</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
 
-<p>I have been experimenting with a couple of new window managers over the
-last week or so. Not that I am in any way dissatisfied with
-<a href="http://dwm.suckless.org/" title="suckless page for dwm">dwm</a> — far from it; I
-do from time to time, however, like to see what else is on offer.</p>
+<p>If you are an Arch Linux user and you are not using
+<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
+you can take a moment to hang your head in shame before you click on to
+whatever the next thing is. The package description sums up perfectly
+what aurphan does:</p>
 
-<p><a href="http://wmfs.info/projects/wmfs" title="WMFS homepage">WMFS</a> is a fairly new
-entrant in the window manager marketplace. The developers describe it
-as:</p>
+<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
+today!</p></blockquote>
 
-<blockquote><p>a lightweight and highly configurable tiling window manager for X… It
-supports Xft (Freetype) fonts and is compliant with the Extended
-Window Manager Hints (EWMH) specifications, Xinerama and Xrandr.</p></blockquote>
+<p>Running aurphan -a, for example, will identify any
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
+database that are not currently maintained; allowing you to log in to
+the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
+fulfilled.<sup>1</sup></p>
 
-<p>The <a href="http://aur.archlinux.org/packages.php?ID=26924" title="AUR page">git version is available</a> in
-AUR, and is straightforward to build and install. The fun, as always,
-comes with customization…</p>
+<p>If, like most Archers, you have a compulsive desire to automate
+<em>everything</em> then clearly typing (or even remembering to type) aurphan
+-a into a terminal periodically is as ludicrous as it is onerous. The
+obvious answer is some shell script and a cron job.</p>
 
-<p>As is says on the box, WMFS is highly configurable. The configuration is
-all done (initially) in one file, which you will need to copy to your
-<span class="file">~/.config/wmfs/directory</span>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cp /etc/xdg/wmfs/wmfsrc ~/.config/wmfs/
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Even the default config is relatively fully featured. There are nine
-default layouts (about five more than I usually need, but it is always
-better to over cater). The <span class="file">wmfsrc</span> is quite well
-commented, so most of the options are self explanatory.</p>
-
-<p>One thing I did note about editing this file, which is probably more a
-reflection of my haste rather than the wm itself, is that it seemed
-<em>very</em> unforgiving of any errors. More than once I had to copy the
-default wmfsrc back across and start again. My advice is to make any
-changes cumulatively, and test by reloading before continuing.</p>
-
-<p>You can see my config file in my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/.config/wmfs/wmfsrc" title="Mercurial repository for EeePC">bitbucket repo</a>.
-Most of the changes have been made in setting up my preferred tags and
-keybindings – so they are consistent with my dwm and
-<a href="http://plhk.ru/" title="Echinus window manager home">echinus</a> setups.</p>
-
-<p>One of the great features of WMFS is the status bar. You can pipe all
-sorts of information into it with a bash script, and you can use colours
-and icons (if that is your thing). Simply sourcing the bash script from
-within wmfsrc will see it up and running:</p>
+<p>First, the <code>cron</code> job:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">background_command</span> <span class="o">=</span> <span class="s2">&quot;$HOME/.config/wmfs/autostart.sh&quot;</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>Or, if you prefer to use conky:</p>
+<p>Then, as part of my
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="Script in intuxication repo">dwm-status script</a>,
+a function to check that there are no new additions to the file and, if
+there are, flash a highlight:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>conky | <span class="k">while </span><span class="nb">read</span> -r; <span class="k">do </span>wmfs -s -name <span class="s2">&quot;$REPLY&quot;</span>; <span class="k">done</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;aurphans<span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>I use the status bar to display some basic system information. You can
-see from
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/Scripts/wmfs-status" title="Script in bitbucket repo">my status script</a>
-that most of it is simply piping commands through the awesomeness that
-is <a href="http://awk.info/" title="Awk Community Portal">awk</a>.</p>
-
-<p>I hadn’t thought that I would find a replacement for dwm, but WMFS is a
-serious contender. It has all of the functionality out-of-the-box,
-including:</p>
-
-<ul>
-<li>pre-set layout per tag</li>
-<li>rules to send applications to specific tags</li>
-<li>completely customizable keybinds, and – as a bonus,</li>
-<li><a href="http://en.wikipedia.org/wiki/Vi" title="Wikipedia page">Vi</a>-driven
-command interface</li>
-</ul>
-
-
-<p>Unlike dwm, it requires no patching for any of this. It has been
-completely stable while I have been using it and, while not as light as
-dwm, it is still in the minimalist camp in terms of size.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Vimprobable]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/10/07/vimprobable/"/>
-    <updated>2010-10-07T16:23:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/10/07/vimprobable</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5055695051/" title="Vimprobable on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable.png" title="Hacked Vimprobable2" alt="image" /></a></p>
-
-<p>After just posting details of <a href="http://jasonwryan.com/blog/2010-10-04-the-setup">my setup</a>,
-I have made a reasonably significant (and it goes almost without saying, unplanned)
-change: after <a href="http://www.uzbl.org/">uzbl</a> began unaccountably maxxing
-out my CPU, I decided to give <a href="http://www.vimprobable.org/">Vimprobable</a>
-a go.</p>
-
-<p>I covered it briefly in my review of <a href="http://jasonwryan.com/blog/2010-5-21-5-alternate-browsers">5 alternate browsers</a> and liked the
-idea of another vim-based browsing experience.</p>
-
-<p>There are two versions of Vimprobable; the differences, as described on
-the website:</p>
-
-<blockquote><p>Both versions are actively maintained. The first version can only be
-customised by editing config.h before compiling. It is pretty stable
-and very usable. Version 2 has grown fairly stable already as well,
-but it’s still seeing bigger changes, of course. It aims at allowing
-more customisation, for example through :set and :map commands.</p></blockquote>
-
-<p>I downloaded the tarball for
-<a href="http://aur.archlinux.org/packages.php?ID=33779" title="Arch User Repository: Vimprobable2">Vimprobable2 from the AUR</a>,
-extracted the files and built the package.</p>
-
-<p>Customization occurs in 3 files<sup>1</sup>: the first two,
-<span class="file">config.h</span> and <span class="file">keymap.h</span>
-both require you to recompile after editing, which is a trivial task
-given the size of the programme.</p>
-
-<p>Vimprobable2 also features a third configuration option that doesn’t
-require compiling after changes, <span class="file">vimprobablerc</span>.
-Should you wish to use it, you will need to create this file in
-<span class="file">~/.config/vimprobable/</span>.
-Helpfully, there is a man page for all of the options in this file, to
-read it issue:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>man vimprobablerc
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Despite it’s spartan appearance, Vimprobable is a full-featured browser
-— with the advantage of being driven solely from the keyboard. It
-handles bookmarks (and the tagging thereof, which is impressive and
-handy), multiple search engines, cookies, history, etc…</p>
-
-<p>I have made a number of changes to the defaults, including moving some
-of the keybindings to be closer to uzbl’s (habit, really). The other
-area where I made some minor changes was to the hinting style. Hinting
-is just the way Vimprobable (and other browsers like uzbl and
-<a href="http://conkeror.org/">Conkeror</a>) follow links; the default is, to put
-it mildly, garish<sup>2</sup>, so I hacked around in <span class="file">hinting.js</span>
-to make it more attractive.</p>
-
-<p>If you are interested, my vimprobable files are in
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/vimprobable2-git/">bitbucket</a>,
-including the modified hinting.js.</p>
-
-<h3>Update</h3>
-
-<p>I think this is a keeper. I installed
-<a href="http://tools.suckless.org/tabbed" title="suckless' tabbed">tabbed</a> and now
-open Vimprobable in tabbed for tab management. A quick addition to my
-keybinds in <a href="http://dwm.suckless.org/" title="dynamic window manager">dwm</a> and
-I have a minimalist and powerful browser…</p>
+<p>The awk filter excludes a null return, which is “No aurphans found.”
+Now, if any of the packages that I use from the AUR are disowned, I’ll
+be the first to know about it.</p>
 
 <h5>Notes</h5>
 
 <ol>
-<li><p>Of course, you are not limited to these files; the beauty of free
-and open-source software is that you can change any of it…</p></li>
-<li><p>To support this claim, I searched google for an image of the default
-Vimprobable hinting style, and I could only find this
-<a href="http://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/103/10387/10387f2.jpg">screenshot of conkeror</a>,
-which will give you an idea…</p></li>
+<li>Actual feeling may differ depending on the package you have adopted
+and the amount of prescription painkillers that you are currently
+ingesting…</li>
 </ol>
 
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Chroot in LVM on LUKS on Raid: Arch Linux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/02/13/chroot/"/>
+    <updated>2012-02-13T10:25:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/02/13/chroot</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/chroot-lvm.jpg" alt="image" /></p>
+
+<p>In <a href="http://jasonwryan.com/blog/2012-02-11-lvm" title="Post on setting this system up">my previous post describing this setup</a>
+I made the point that grub won’t be installed and that it is necessary
+to <code>chroot</code> in to install grub on both drives. This is the procedure I use
+to do that—and to perfrom any other maintenance that requires working
+from a live environment.</p>
+
+<p>Again, most of this information is on the
+<a href="https://wiki.archlinux.org/index.php/Chroot" title="Arch wiki page">Arch Wiki chroot page</a>, I
+am just going to fill in the detail around this setup: LVM on LUKS on
+Raid1.</p>
+
+<p>Once you have booted into your live environment, load the modules that
+are required; in this case: <code>raid1</code>, <code>dm-mod</code> and <code>dm-crypt</code>.</p>
+
+<p>Check that udev hasn’t helpfully read the superblock of your Raid drives
+and assembled phantom arrays:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat /proc/mdstat
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>I find that there are a couple there generally assigned the names
+<span class="file">/dev/md126</span> and <span class="file">/dev/md127</span>.
+These need to be stopped before assembling the correct arrays:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
+</span><span class='line'>mdadm --assemble /dev/md0 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
+</span><span class='line'>mdadm --assemble /dev/md1 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>You should now have both your arrays up and running. The next step is to
+unlock your encrypted device:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>After entering your passphrase, your device will be unlocked. Next, make
+the logical volumes available, and then check they are correct:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>vgchange --available y vgroup
+</span><span class='line'>lvscan
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>At this point, you are ready to mount the devices and <code>chroot</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir /mnt/arch
+</span><span class='line'>mount /dev/mapper/vgroup-lvroot /mnt/arch
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The next steps are straight from the wiki:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
+</span><span class='line'>mount -t proc proc proc/
+</span><span class='line'>mount -t sysfs sys sys/
+</span><span class='line'>mount -o <span class="nb">bind</span> /dev dev/
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Mount the other parts of the system that you need to use in your
+recovery – in this case, I need my <span class="file">/boot</span> partition:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now <code>chroot</code> to the device and define your shell:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>chroot . /bin/bash
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The wiki has some good advice about customizing your prompt to reinforce
+the fact that you are in a chroot:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>With everything mounted, it is just a matter of performing your
+maintenance. To reinstall <code>grub</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;grub&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;grub&gt; find /grub/stage1
+</span><span class='line'>grub&gt; device <span class="o">(</span>hd0<span class="o">)</span> /dev/sda
+</span><span class='line'>grub&gt; root <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>grub&gt; setup <span class="o">(</span>hd0<span class="o">)</span>
+</span><span class='line'>grub&gt; quit
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Repeat for <span class="file">/dev/sdb</span> and both your drives will be bootable in the event
+that one fails.</p>
+
+<p>With the maintenance accomplished, all that remains is to exit the
+<code>chroot</code> and unmount the devices cleanly:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">exit</span>
+</span><span class='line'>umount <span class="o">{</span>proc,sys,dev,boot...<span class="o">}</span>
+</span><span class='line'><span class="nb">cd</span> ..
+</span><span class='line'>umount arch/
+</span><span class='line'>reboot
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Simple.</p>
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/mpd01605/4152508668/" title="Rescue Engine 6 on Flickr">MPD01605</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[LVM on LUKS on RAID1 on Arch Linux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/02/11/lvm/"/>
+    <updated>2012-02-11T15:58:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/02/11/lvm</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/lvm-luks-raid.png" alt="image" /></p>
+
+<p>After much procrastination, I finally got around to moving the last of
+my machines to Arch Linux:
+<a href="http://jasonwryan.com/blog/2010-10-04-the-setup" title="The Setup post">my home desktop</a>,
+which has been running Ubuntu since the end of 2007. I’d like to share a
+few thoughts about why I finally walked away from Ubuntu, but I’ll save
+that for another long post.</p>
+
+<p>Anyway, the setup I decided on was reasonably straightforward: two 1TB
+drives comprising two Raid1 devices, one for a small (150Mb)
+<span class="file">/boot</span> andthe other holding three logical volumes
+in a LUKS crypt. This way, I have the flexibility to grow the volumes as
+needed, and only require thesingle passphrase at boot to unlock the
+enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
+and <span class="file">/home</span>.</p>
+
+<p>Almost all of the information here has been gleaned gratefully from
+other sources; principally the Arch Wiki entries on
+<a href="https://wiki.archlinux.org/index.php/LUKS" title="Arch wiki entry">LUKS</a> and
+<a href="https://wiki.archlinux.org/index.php/Lvm" title="Arch LVM article">LVM</a> and
+this <a href="http://www.pindarsign.de/webblog/?p=767" title="Blog post on LUKS and LVM">helpful blog post</a>.
+This post (and the next) are notes to remind me how I got here and, in
+the follow-up, what I need to do to restore this build…</p>
+
+<p>First up, prepare the two hard drives. This took roughly \~90 hours for
+the 1TB drives, so allow some time:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Once the drives are scrubbed (read the Arch Wiki on why that is
+necessary), you can move to the actual installation business. I used a
+256Mb thumb drive with the most recent x86_64 netinstall image burned
+to it. Boot into the live environment and set up the initial partitions
+using <code>cfdisk</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cfdisk /dev/sda
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>I created a 150Mb partition for /boot - marked with the boot flag, and
+then partitoned the rest of the drive. Both partitons should be primary
+and be FSType linux_raid (the FD option). Write the partition tabel to
+a file and then import it to the second drive so both are exactly the
+same:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
+</span><span class='line'>sfdisk /dev/sdb &amp;lt; part-table
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now, set up the Raid arrays. Start by loading the required modules and
+then create the two arrays. The metadata flag is important: if you are
+using legacy grub, as I did, you must use the 0.90 type or your MBR will
+get overwritten:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe raid1 &amp;amp;&amp;amp; modprobe dm-mod
+</span><span class='line'>mdadm --create /dev/md0 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;--metadata<span class="o">=</span>0.90 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mdadm --create /dev/md1 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup></p>
+
+<p>At this point, you can switch to another TTY to watch the disks
+sync—again, this could take some time, depending on the size of the
+drives.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Check that it all went to plan…</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Once the drives are synched and pronounced clean, it it time to encrypt
+the second Raid device, /dev/md1. You can’t encrypt the array that
+contains /boot, but having it duplicated in a Raid array means that, if
+one drive goes down, you can still boot the other.</p>
+
+<p>Load the module for encryption, and then set it up:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe dm-crypt
+</span><span class='line'>cryptsetup --cipher<span class="o">=</span>aes-xts-plain --verify-passphrase <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;--key-size<span class="o">=</span>512 luksFormat /dev/md1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now, open the encrypted device to create the logical volumes:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The three next steps create, in this order, the physical volume (the
+container, if you will), the group and then the individual volumes
+contained in the group. Choose simple, memorable names and do not
+hypenate them. The {pv,vg,lv}display commands print out the details of
+the devices once created.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk&lt;br/&gt;
+</span><span class='line'>pvdisplay&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;vgcreate vgroup /dev/mapper/cryptdisk&lt;br/&gt;
+</span><span class='line'>vgdisplay&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;lvcreate --size 20G --name lvroot vgroup
+</span><span class='line'>lvcreate --contiguous y --size 2G --name lvswap vgroup
+</span><span class='line'>lvcreate --extents +100%FREE --name lvdata vgroup
+</span><span class='line'>lvdisplay
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>It should be pointed out that the
+<a href="https://github.com/Dieterbe/aif" title="AIF on Github">Arch Installer Framework</a> supports
+LUKS and LVM, so you can accomplish these last two steps from within the
+installer. I tried both and I found that I had a little more control
+doing it manually, but YMMV.</p>
+
+<p>At this point, you are ready to enter the installer and complete the
+install. Run /arch/setup and move through the early setup until you
+reach the 'Prepare Hard Drives' section. Select option 3, 'Configure block
+devices, mountpoints and filesystems'. Make sure that the only “raw”
+device that you configure is <span class="file">/dev/md0</span>, your
+<span class="file">/boot</span> partition. Otherwise,
+you are configuring the logical volumes, <em>not</em> the devices they are
+built on.</p>
+
+<p>After succesfully setting up the drives, install the base packages and
+then, once that is complete, switch TTYs and update your Raid
+configuration <em>prior to configuring your system</em>. This means that when
+your <code>initrd</code> is regenerated, it will inlcude the correct Raid
+information:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>When you are done, move to configure your system and make sure to add
+the relevant details to both your <span class="file">/etc/rc.conf</span> and your
+<span class="file">/etc/mkinitcpio.conf</span>. In the former:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</span><span class='line'><span class="nv">USEDMRAID</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>and in /etc/mkinitcpio.conf:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
+</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>That is the straightforward part of the install over. The final step is
+a little more tricky: installing a bootloader. My experience, and I
+tried a number of times using different approaches, is that this <em>won’t
+work</em>. The installer doesn’t seem to like the Raid setup, so it
+complains about it:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>It’s not all bad, as this is the final hurdle and it is not a
+particularly high one.</p>
+
+<p>The important step is to ensure that your <span class="file">/boot/grub/menu.lst</span> is setup
+correctly. Given the names I chose above for my devices, mine looks like
+this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;<span class="o">(</span>0<span class="o">)</span> Arch&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;title  Arch Linux
+</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
+</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
+</span><span class='line'>initrd /kernel26.img&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;<span class="o">(</span>1<span class="o">)</span> Arch Fallback&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;title  Arch Linux Fallback
+</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
+</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
+</span><span class='line'>initrd /kernel26-fallback.img
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Once it is all setup, simply exit the installer. At this point, you have
+a perfectly secure, redundant, new Arch Linux install that you can’t
+boot into. You have two choices; chroot in and manually install grub
+now, or reboot and do it then. I opted for the latter as it would be
+more like a recovery mission—and I wanted to make sure that I was
+capable enough to manage that before committing all of my backed-up data
+to the machine.</p>
+
+<p>I’ll post the details of the relatively straightforward steps required
+to chroot into the system and install grub on both hard drives in a
+couple of days.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>The name <code>cryptdisk</code> is arbitrary - just make it memorable and use it
+consistently…</p></li>
+<li><p>I am not sure how necessary it is to have the Raid modules included
+here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
+warranted.</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[monsterwm]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/01/18/monsterwm/"/>
+    <updated>2012-01-18T10:03:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/01/18/monsterwm</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/monster.jpg" alt="image" /></p>
+
+<p>If you have visited here at all over the last couple of weeks, you would
+have seen some screenshots from
+<a href="http://www.flickr.com/photos/jasonwryan/" title="All of my screenshots on Flickr">my Flickr stream</a>
+of a new window manager,
+<a href="https://github.com/c00kiemon5ter/monsterwm" title="Project on Github">monsterwm</a>.
+Over the break, I have been playing around with it and, despite the fact
+that the project is only really a few weeks old, it is well worth a
+look.</p>
+
+<p>Originally a fork of
+<a href="https://github.com/moetunes/dminiwm" title="dminiwm on Github">dminiwm</a>,
+which was in turn based on
+<a href="https://github.com/pyknite/catwm" title="Project on Github">catwm</a> and
+<a href="http://dwm.suckless.org" title="dwm on suckless">dwm</a><sup>1</sup>, monsterwm for
+me—having used dwm for years—feels very much like a stripped down
+version of dwm, with a few of the patches (like pertag, for example)
+built in.</p>
+
+<p>One of the projects goals, like it’s antecedents, is to keep the SLOC
+low. By way of comparison, dwm’s long-standing goal has been to keep the
+SLOC below 2000<sup>2</sup>. monsterwm’s current count is under 700. One of the
+ways that monsterwm achieves this is <em>not</em> to incorporate a status bar;
+as the README says:</p>
+
+<blockquote><p>Monsterwm does not provide a panel and/or statusbar itself. Instead it
+adheres to the <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="Wikipedia entry">UNIX philosophy</a>
+and outputs information about the existent desktop, the number of
+windows on each, the mode of each desktop, the current desktop and
+urgent hints whenever needed. The user can use whatever tool or panel
+suits him best (dzen2, conky, w/e), to process and display that
+information.</p></blockquote>
+
+<p>So, what is it like to run? Obviously it is fast. It comes with four
+tiling modes: standard tile, backstack, grid and monocle and, as
+mentioned above, the ability to define different layouts per desktop.
+There are still a couple of features to be implemented; floating mode
+being one of the more significant and a couple of minor bugs—as you
+would expect for a project still in its relative infancy.</p>
+
+<p>Overall, it is a very nice, minimalist window manager. If you don’t use
+the <a href="http://lubutu.com/rant/dwm-faq" title="CLS on dwm's tagging feature">dynamic tagging feature of dwm</a>,
+then this would be a window manager to consider switching to. The
+developer, Ivan “c00kiemon5ter” Kanakarakis, has been extremely
+responsive to user’s suggestions and requests (the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=132122" title="Arch Linux forums: monsterwm thread">thread on the Arch boards</a>
+is quite active) and has been admirably clear about his vision for the
+wm.</p>
+
+<p>You can see my monsterwm configs in
+<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/Build/monsterwm-git" title="Intuxication repo: monsterwm">my mercurial repository</a>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>Updated with the correct genealogy…</p></li>
+<li><p>“dwm is only a single binary, and its source code is intended to
+never exceed 2000 SLOC.” <a href="http:..dwm.suckless.org" title="dwm homepage">dwm.suckless.org</a></p></li>
+</ol>
+
+
+<p>Cookie Monster image from <a href="http://www.flickr.com/photos/nathaninsandiego/3757033518/" title="Creative Commons image on Flickr">San Diego Shooter</a>.</p>
 ]]></content>
   </entry>
   

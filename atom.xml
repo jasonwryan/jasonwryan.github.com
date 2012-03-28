@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T17:32:39+13:00</updated>
+  <updated>2012-03-28T19:52:53+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,920 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Signing Your Own Key]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/03/23/key/"/>
+    <updated>2012-03-23T11:36:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/03/23/key</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/key.jpg" alt="image" /></p>
+
+<p>Some time in the last couple of days, the last of the packages in the
+Community repository were signed and, thanks to the tremendous work of
+the Arch developers and Trusted Users, you can fully implement package
+signing in your <span class="file">/etc/pacman.conf</span>.</p>
+
+<p>You can check the state of the signed packages with this expac
+one-liner; it will return a list of any <em>unsigned</em> packages:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
+take advantage of this. My overall <code>SigLevel</code> setting requires signed
+packages, and—as of yesterday—I was able to move the last repository
+entry over to do the same:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>core<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>extra<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>community<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>multilib<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next step was to add my key to pacman’s keychain so that I could
+sign the packages that I build using ABS or from the
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>. Allan has an
+<a href="http://allanmcrae.com/2011/08/pacman-package-signing-1-makepkg-and-repo-add/" title="The first in a series of four posts on signing: read them all">excellent post on setting this up</a>.</p>
+
+<p>First, import your key into pacman’s keyring:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then follow the prompts as you edit the key to sign, set a trust level
+and save your key:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
+</span><span class='line'>gpg&gt; lsign
+</span><span class='line'>...
+</span><span class='line'>gpg&gt; trust
+</span><span class='line'>...
+</span><span class='line'>gpg&gt; save
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then it is just a matter of changing the <code>BUILDENV</code> option in your
+<span class="file">/etc/makepkg.conf</span>, which is set to <code>!sign</code>
+by default. Remove the bang and include the details of the key you wish to use:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#-- Packager: name/email of the person or organization building packages</span>
+</span><span class='line'><span class="nv">PACKAGER</span><span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
+</span><span class='line'><span class="c">#-- Specify a key to use for package signing</span>
+</span><span class='line'><span class="nv">GPGKEY</span><span class="o">=</span><span class="s2">&quot;B1BD4E40&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, when you build a package, you will be prompted for your key’s
+passphrase:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...
+</span><span class='line'>
+</span><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
+</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
+</span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21
+</span><span class='line'>
+</span><span class='line'>Enter passphrase:
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Enter the correct passphrase and your package is built and signed:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/donovan_beeson/3185668524/" title="Coraline key on Flickr">donovanbeeson</a>
+on Flickr.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[A Taxonomy of Help Vampires]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/03/17/vampires/"/>
+    <updated>2012-03-17T16:25:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/03/17/vampires</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vampire1.jpg" alt="image" /></p>
+
+<p>If you have spent any time at all amongst online (or, for that matter,
+off-line) communities, you will be familiar with the help vampire. If,
+by some combination of fortune and ignorance, you haven’t come across
+this term before, read Amy Hoy’s original—and definitive—
+<a href="http://slash7.com/2006/12/22/vampires/" title="Amy's blog on help vampires">post on this scourge</a>,
+<em>now</em>.</p>
+
+<p>Amy has some excellent tips on identifying help vampires, however, since
+she originally shed some sunlight on this odious species, they have
+become even more cunning and have adapted; to the point where there are
+now several varieties that you should be wary of if you are determined
+to prevent your online community from becoming overrun with them.</p>
+
+<p><strong>The Infant</strong> The easiest to spot because, due to their nascent form,
+they have not developed sophisticated anti-detection strategies as yet.
+Also, encouragingly, these are the most likely to respond to the
+corrective measures Amy outlines in her post.</p>
+
+<p>The infant has probably learned their dependant ways in some other
+online community with a higher tolerance for their spoonfeeding needs.
+Corrective measures, vigorously and repeatedly applied <em>can</em> turn them
+around; but even small amounts of reinforcement of this behaviour can
+quickly see them morph into one of the more sinister types…</p>
+
+<p><img src="http://media.tumblr.com/tumblr_m10ce18Jda1qz8s9s.jpg" alt="image" /></p>
+
+<p><strong>The Leech</strong> This reprehensible lifeform just sucks and sucks and
+<em>sucks</em> until there is nothing left. Some of their forum threads may
+even appear reasonable, but looking at their profile in totality tells a
+shocking story. All of their posts are in their own threads, they are
+not interested in helping anyone else with a problem. They will move
+remorselessly from issue to issue, expecting the community to provide
+answers for them at a hemorrhagic rate.</p>
+
+<p>They won’t have made any edits to
+<a href="https://wiki.archlinux.org" title="The BEST godamn GNU/Linux wiki on the web">the Wiki</a>,
+no matter how trivial. They won’t
+<a href="https://aur.archlinux.org" title="Arch User repository">maintain any packages</a> or donate
+any time or
+<a href="http://www.archlinux.org/donate/" title="Donate now and recieve a FREE package update!">money</a>
+to your community. But they will be there night after night, posting
+their problems and waiting for the hapless to expend their time and
+energy on them. Like all parasites, they will adapt over time so remain
+vigilant.</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vampire3.jpg" alt="image" /></p>
+
+<p><strong>The Fanger</strong> The out-and-out help vampire, unabashed and unashamed of
+their <em>needs</em>. Their sense of entitlement will be telegraphed by needy
+and demanding thread titles, often featuring exhortations like “HELP”
+and “URGENT” and almost always embellished with a liberal—and, at times
+of “real crises,” exclusive—use of all caps and exclamation marks.</p>
+
+<p>The Fanger will also occasionally table (sadly, almost inevitably empty)
+threats about leaving your community and going off to use some other
+software; as if the dependency relationship is somehow reversed and it
+is you, the community, that will suffer if they leave.</p>
+
+<p>The other classic trait of the hardcore vampire is that, like their
+fictional avatars, they see nothing when a mirror is held up to them.
+You can call their behaviour as much as you like, it will have no
+effect. Your only solution here is technology:
+<a href="http://www.codinghorror.com/blog/2011/06/suspension-ban-or-hellban.html" title="Coding Horror on the Hell Ban">the hell ban</a>.</p>
+
+<hr />
+
+<p>The Arch Linux community has grown considerably since it emerged
+<a href="http://www.archlinux.org/news/arch-linux-turns-10/" title="w00t!">ten years ago this month</a>. Over
+the last couple of years, the forums in particular have seen a lot of
+new users signing up to participate. This is unquestionably a good
+thing™</p>
+
+<p>However, Arch is clearly labelled as being for
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric" title="The Arch Way: user-centric">competent users</a>
+(and here competent can equally mean accomplished – or prepared to
+invest in themselves and the community to become competent) and that
+means not enabling these sorts of vampiric behaviours, in whatever form
+they manifest.</p>
+
+<h5>Notes</h5>
+
+<p>Photography is all Creative Commons licensed on Flickr by, in order of
+appearance:</p>
+
+<ul>
+<li><a href="http://www.flickr.com/photos/randaldroher/2161723492/" title="The Count, by Randall Drohrer on Flickr">Randall Drohrer</a></li>
+<li><a href="http://www.flickr.com/photos/phatcontroller/2620032517" title="Leech, by phatcontroler on Flickr">phatcontroller</a></li>
+<li><a href="http://www.flickr.com/photos/sandrafalkevik/4465039571" title="Vampire, by Sandra Falkevik on Flickr">Sandra Falkevik</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Simple aurphan notifier]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/03/09/aurphan/"/>
+    <updated>2012-03-09T16:52:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/03/09/aurphan</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
+
+<p>If you are an Arch Linux user and you are not using
+<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
+you can take a moment to hang your head in shame before you click on to
+whatever the next thing is. The package description sums up perfectly
+what aurphan does:</p>
+
+<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
+today!</p></blockquote>
+
+<p>Running aurphan -a, for example, will identify any
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
+database that are not currently maintained; allowing you to log in to
+the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
+fulfilled.<sup>1</sup></p>
+
+<p>If, like most Archers, you have a compulsive desire to automate
+<em>everything</em> then clearly typing (or even remembering to type) aurphan
+-a into a terminal periodically is as ludicrous as it is onerous. The
+obvious answer is some shell script and a cron job.</p>
+
+<p>First, the <code>cron</code> job:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then, as part of my
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="Script in intuxication repo">dwm-status script</a>,
+a function to check that there are no new additions to the file and, if
+there are, flash a highlight:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>
+</span><span class='line'>    <span class="nv">aurphans</span><span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">        </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
+</span><span class='line'>    <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The awk filter excludes a null return, which is “No aurphans found.”
+Now, if any of the packages that I use from the AUR are disowned, I’ll
+be the first to know about it.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Actual feeling may differ depending on the package you have adopted
+and the amount of prescription painkillers that you are currently
+ingesting…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Chroot in LVM on LUKS on Raid: Arch Linux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/02/13/chroot/"/>
+    <updated>2012-02-13T10:25:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/02/13/chroot</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/chroot-lvm.jpg" alt="image" /></p>
+
+<p>In <a href="http://jasonwryan.com/blog/2012-02-11-lvm" title="Post on setting this system up">my previous post describing this setup</a>
+I made the point that grub won’t be installed and that it is necessary
+to <code>chroot</code> in to install grub on both drives. This is the procedure I use
+to do that—and to perfrom any other maintenance that requires working
+from a live environment.</p>
+
+<p>Again, most of this information is on the
+<a href="https://wiki.archlinux.org/index.php/Chroot" title="Arch wiki page">Arch Wiki chroot page</a>, I
+am just going to fill in the detail around this setup: LVM on LUKS on
+Raid1.</p>
+
+<p>Once you have booted into your live environment, load the modules that
+are required; in this case: <code>raid1</code>, <code>dm-mod</code> and <code>dm-crypt</code>.</p>
+
+<p>Check that udev hasn’t helpfully read the superblock of your Raid drives
+and assembled phantom arrays:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat /proc/mdstat
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I find that there are a couple there generally assigned the names
+<span class="file">/dev/md126</span> and <span class="file">/dev/md127</span>.
+These need to be stopped before assembling the correct arrays:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
+</span><span class='line'>mdadm --assemble /dev/md0 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
+</span><span class='line'>mdadm --assemble /dev/md1 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You should now have both your arrays up and running. The next step is to
+unlock your encrypted device:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After entering your passphrase, your device will be unlocked. Next, make
+the logical volumes available, and then check they are correct:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>vgchange --available y vgroup
+</span><span class='line'>lvscan
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At this point, you are ready to mount the devices and <code>chroot</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir /mnt/arch
+</span><span class='line'>mount /dev/mapper/vgroup-lvroot /mnt/arch
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next steps are straight from the wiki:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
+</span><span class='line'>mount -t proc proc proc/
+</span><span class='line'>mount -t sysfs sys sys/
+</span><span class='line'>mount -o <span class="nb">bind</span> /dev dev/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Mount the other parts of the system that you need to use in your
+recovery – in this case, I need my <span class="file">/boot</span> partition:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now <code>chroot</code> to the device and define your shell:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>chroot . /bin/bash
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The wiki has some good advice about customizing your prompt to reinforce
+the fact that you are in a chroot:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With everything mounted, it is just a matter of performing your
+maintenance. To reinstall <code>grub</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># grub</span>
+</span><span class='line'>grub&gt; find /grub/stage1
+</span><span class='line'>grub&gt; device <span class="o">(</span>hd0<span class="o">)</span> /dev/sda
+</span><span class='line'>grub&gt; root <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>grub&gt; setup <span class="o">(</span>hd0<span class="o">)</span>
+</span><span class='line'>grub&gt; quit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Repeat for <span class="file">/dev/sdb</span> and both your drives will be bootable in the event
+that one fails.</p>
+
+<p>With the maintenance accomplished, all that remains is to exit the
+<code>chroot</code> and unmount the devices cleanly:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">exit</span>
+</span><span class='line'>umount <span class="o">{</span>proc,sys,dev,boot...<span class="o">}</span>
+</span><span class='line'><span class="nb">cd</span> ..
+</span><span class='line'>umount arch/
+</span><span class='line'>reboot
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Simple.</p>
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/mpd01605/4152508668/" title="Rescue Engine 6 on Flickr">MPD01605</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[LVM on LUKS on RAID1 on Arch Linux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/02/11/lvm/"/>
+    <updated>2012-02-11T15:58:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/02/11/lvm</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/lvm-luks-raid.png" alt="image" /></p>
+
+<p>After much procrastination, I finally got around to moving the last of
+my machines to Arch Linux:
+<a href="http://jasonwryan.com/blog/2010-10-04-the-setup" title="The Setup post">my home desktop</a>,
+which has been running Ubuntu since the end of 2007. I’d like to share a
+few thoughts about why I finally walked away from Ubuntu, but I’ll save
+that for another long post.</p>
+
+<p>Anyway, the setup I decided on was reasonably straightforward: two 1TB
+drives comprising two Raid1 devices, one for a small (150Mb)
+<span class="file">/boot</span> andthe other holding three logical volumes
+in a LUKS crypt. This way, I have the flexibility to grow the volumes as
+needed, and only require thesingle passphrase at boot to unlock the
+enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
+and <span class="file">/home</span>.</p>
+
+<p>Almost all of the information here has been gleaned gratefully from
+other sources; principally the Arch Wiki entries on
+<a href="https://wiki.archlinux.org/index.php/LUKS" title="Arch wiki entry">LUKS</a> and
+<a href="https://wiki.archlinux.org/index.php/Lvm" title="Arch LVM article">LVM</a> and
+this <a href="http://www.pindarsign.de/webblog/?p=767" title="Blog post on LUKS and LVM">helpful blog post</a>.
+This post (and the next) are notes to remind me how I got here and, in
+the follow-up, what I need to do to restore this build…</p>
+
+<p>First up, prepare the two hard drives. This took roughly \~90 hours for
+the 1TB drives, so allow some time:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the drives are scrubbed (read the Arch Wiki on why that is
+necessary), you can move to the actual installation business. I used a
+256Mb thumb drive with the most recent x86_64 netinstall image burned
+to it. Boot into the live environment and set up the initial partitions
+using <code>cfdisk</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cfdisk /dev/sda
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I created a 150Mb partition for /boot - marked with the boot flag, and
+then partitoned the rest of the drive. Both partitons should be primary
+and be FSType linux_raid (the FD option). Write the partition tabel to
+a file and then import it to the second drive so both are exactly the
+same:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
+</span><span class='line'>sfdisk /dev/sdb &lt; part-table
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, set up the Raid arrays. Start by loading the required modules and
+then create the two arrays. The metadata flag is important: if you are
+using legacy grub, as I did, you must use the 0.90 type or your MBR will
+get overwritten:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe raid1 <span class="o">&amp;&amp;</span> modprobe dm-mod
+</span><span class='line'>mdadm --create /dev/md0 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 <span class="se">\</span>
+</span><span class='line'>    --metadata<span class="o">=</span>0.90 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
+</span><span class='line'>mdadm --create /dev/md1 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup></p>
+
+<p>At this point, you can switch to another TTY to watch the disks
+sync—again, this could take some time, depending on the size of the
+drives.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Check that it all went to plan…</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the drives are synched and pronounced clean, it it time to encrypt
+the second Raid device, /dev/md1. You can’t encrypt the array that
+contains /boot, but having it duplicated in a Raid array means that, if
+one drive goes down, you can still boot the other.</p>
+
+<p>Load the module for encryption, and then set it up:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe dm-crypt
+</span><span class='line'>cryptsetup --cipher<span class="o">=</span>aes-xts-plain --verify-passphrase <span class="se">\</span>
+</span><span class='line'>    --key-size<span class="o">=</span>512 luksFormat /dev/md1
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, open the encrypted device to create the logical volumes:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The three next steps create, in this order, the physical volume (the
+container, if you will), the group and then the individual volumes
+contained in the group. Choose simple, memorable names and do not
+hypenate them. The {pv,vg,lv}display commands print out the details of
+the devices once created.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk
+</span><span class='line'>pvdisplay
+</span><span class='line'>
+</span><span class='line'>vgcreate vgroup /dev/mapper/cryptdisk
+</span><span class='line'>vgdisplay
+</span><span class='line'>
+</span><span class='line'>lvcreate --size 20G --name lvroot vgroup
+</span><span class='line'>lvcreate --contiguous y --size 2G --name lvswap vgroup
+</span><span class='line'>lvcreate --extents +100%FREE --name lvdata vgroup
+</span><span class='line'>lvdisplay
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It should be pointed out that the
+<a href="https://github.com/Dieterbe/aif" title="AIF on Github">Arch Installer Framework</a> supports
+LUKS and LVM, so you can accomplish these last two steps from within the
+installer. I tried both and I found that I had a little more control
+doing it manually, but YMMV.</p>
+
+<p>At this point, you are ready to enter the installer and complete the
+install. Run /arch/setup and move through the early setup until you
+reach the &#8216;Prepare Hard Drives&#8217; section. Select option 3, &#8216;Configure block
+devices, mountpoints and filesystems&#8217;. Make sure that the only “raw”
+device that you configure is <span class="file">/dev/md0</span>, your
+<span class="file">/boot</span> partition. Otherwise,
+you are configuring the logical volumes, <em>not</em> the devices they are
+built on.</p>
+
+<p>After succesfully setting up the drives, install the base packages and
+then, once that is complete, switch TTYs and update your Raid
+configuration <em>prior to configuring your system</em>. This means that when
+your <code>initrd</code> is regenerated, it will inlcude the correct Raid
+information:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you are done, move to configure your system and make sure to add
+the relevant details to both your <span class="file">/etc/rc.conf</span> and your
+<span class="file">/etc/mkinitcpio.conf</span>. In the former:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</span><span class='line'><span class="nv">USEDMRAID</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and in /etc/mkinitcpio.conf:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
+</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That is the straightforward part of the install over. The final step is
+a little more tricky: installing a bootloader. My experience, and I
+tried a number of times using different approaches, is that this <em>won’t
+work</em>. The installer doesn’t seem to like the Raid setup, so it
+complains about it:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It’s not all bad, as this is the final hurdle and it is not a
+particularly high one.</p>
+
+<p>The important step is to ensure that your <span class="file">/boot/grub/menu.lst</span> is setup
+correctly. Given the names I chose above for my devices, mine looks like
+this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># (0) Arch</span>
+</span><span class='line'>title  Arch Linux
+</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
+</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
+</span><span class='line'>initrd /kernel26.img
+</span><span class='line'>
+</span><span class='line'><span class="c"># (1) Arch Fallback</span>
+</span><span class='line'>title  Arch Linux Fallback
+</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
+</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
+</span><span class='line'>initrd /kernel26-fallback.img
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once it is all setup, simply exit the installer. At this point, you have
+a perfectly secure, redundant, new Arch Linux install that you can’t
+boot into. You have two choices; chroot in and manually install grub
+now, or reboot and do it then. I opted for the latter as it would be
+more like a recovery mission—and I wanted to make sure that I was
+capable enough to manage that before committing all of my backed-up data
+to the machine.</p>
+
+<p>I’ll post the details of the relatively straightforward steps required
+to chroot into the system and install grub on both hard drives in a
+couple of days.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>The name <code>cryptdisk</code> is arbitrary - just make it memorable and use it
+consistently…</p></li>
+<li><p>I am not sure how necessary it is to have the Raid modules included
+here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
+warranted.</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[monsterwm]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/01/18/monsterwm/"/>
+    <updated>2012-01-18T10:03:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/01/18/monsterwm</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/monster.jpg" alt="image" /></p>
+
+<p>If you have visited here at all over the last couple of weeks, you would
+have seen some screenshots from
+<a href="http://www.flickr.com/photos/jasonwryan/" title="All of my screenshots on Flickr">my Flickr stream</a>
+of a new window manager,
+<a href="https://github.com/c00kiemon5ter/monsterwm" title="Project on Github">monsterwm</a>.
+Over the break, I have been playing around with it and, despite the fact
+that the project is only really a few weeks old, it is well worth a
+look.</p>
+
+<p>Originally a fork of
+<a href="https://github.com/moetunes/dminiwm" title="dminiwm on Github">dminiwm</a>,
+which was in turn based on
+<a href="https://github.com/pyknite/catwm" title="Project on Github">catwm</a> and
+<a href="http://dwm.suckless.org" title="dwm on suckless">dwm</a><sup>1</sup>, monsterwm for
+me—having used dwm for years—feels very much like a stripped down
+version of dwm, with a few of the patches (like pertag, for example)
+built in.</p>
+
+<p>One of the projects goals, like it’s antecedents, is to keep the SLOC
+low. By way of comparison, dwm’s long-standing goal has been to keep the
+SLOC below 2000<sup>2</sup>. monsterwm’s current count is under 700. One of the
+ways that monsterwm achieves this is <em>not</em> to incorporate a status bar;
+as the README says:</p>
+
+<blockquote><p>Monsterwm does not provide a panel and/or statusbar itself. Instead it
+adheres to the <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="Wikipedia entry">UNIX philosophy</a>
+and outputs information about the existent desktop, the number of
+windows on each, the mode of each desktop, the current desktop and
+urgent hints whenever needed. The user can use whatever tool or panel
+suits him best (dzen2, conky, w/e), to process and display that
+information.</p></blockquote>
+
+<p>So, what is it like to run? Obviously it is fast. It comes with four
+tiling modes: standard tile, backstack, grid and monocle and, as
+mentioned above, the ability to define different layouts per desktop.
+There are still a couple of features to be implemented; floating mode
+being one of the more significant and a couple of minor bugs—as you
+would expect for a project still in its relative infancy.</p>
+
+<p>Overall, it is a very nice, minimalist window manager. If you don’t use
+the <a href="http://lubutu.com/rant/dwm-faq" title="CLS on dwm's tagging feature">dynamic tagging feature of dwm</a>,
+then this would be a window manager to consider switching to. The
+developer, Ivan “c00kiemon5ter” Kanakarakis, has been extremely
+responsive to user’s suggestions and requests (the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=132122" title="Arch Linux forums: monsterwm thread">thread on the Arch boards</a>
+is quite active) and has been admirably clear about his vision for the
+wm.</p>
+
+<p>You can see my monsterwm configs in
+<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/Build/monsterwm-git" title="Intuxication repo: monsterwm">my mercurial repository</a>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>Updated with the correct genealogy…</p></li>
+<li><p>“dwm is only a single binary, and its source code is intended to
+never exceed 2000 SLOC.” <a href="http:..dwm.suckless.org" title="dwm homepage">dwm.suckless.org</a></p></li>
+</ol>
+
+
+<p>Cookie Monster image from <a href="http://www.flickr.com/photos/nathaninsandiego/3757033518/" title="Creative Commons image on Flickr">San Diego Shooter</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Logging Straight Into X]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/12/18/login/"/>
+    <updated>2011-12-18T22:13:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/12/18/login</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/login.png" alt="image" /></p>
+
+<p>I have been using
+<a href="https://wiki.archlinux.org/index.php/CDM" title="Arcjh Wiki entry on CDM">CDM</a>
+to log into X on my Arch machines and, if I were to continue to require
+the ability to access different window managers with any frequency, I
+would use this approach. However, on my EeePC, I really only ever login
+to a <a href="http://dwm.suckless.org/" title="dwm at suckless.org">dwm</a> session or
+the console, so having a login manager seemed like an unnecessary step.</p>
+
+<p>Consequently, over the weekend, with the help of the
+<a href="https://wiki.archlinux.org/index.php/Start_X_at_Boot" title="Arch Linux wiki entry">Start X at Boot</a>
+article on the Arch Wiki, I removed CDM and arrived at a secure,
+flexible approach to logging into X (or the console).</p>
+
+<p>My <span class="file">/etc/inittab</span> already boots me into runlevel 5:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Boot to X11</span>
+</span><span class='line'>id:5:initdefault:
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So it was just a case of putting a couple of lines in the correct
+<a href="http://www.gnu.org/software/bash/manual/bashref.html#Bash-Startup-Files" title="GNU Bash reference: startup files">invocation file</a>.
+I chose <span class="file">$HOME/.bash_profile</span> because I only use Bash; if you use another
+shell you should probably go with <span class="file">$HOME/.profile</span>. The recommended lines
+from the Arch Wiki are:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="nv">$DISPLAY</span> <span class="o">&amp;&amp;</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">exec </span>startx
+</span><span class='line'>  <span class="c"># Could use xinit instead of startx</span>
+</span><span class='line'>  <span class="c">#exec xinit -- /usr/bin/X -nolisten tcp vt7</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>…and this works as advertised. If you are in TTY1 and you login, X is
+started. The disadvantage for me, though, was that when you shutdown,
+you must manually change to TTY7 (if that is your last
+<a href="http://tldp.org/HOWTO/Remote-Serial-Console-HOWTO/getty-agetty.html" title="agetty remote serial console">agetty</a>)
+to see the shutdown messages.</p>
+
+<p>After rummaging around through various man and web pages, I finally
+alighted on this helpful option: <code>-novtswitch</code>. So, my entry to start X
+now looked like:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">exec </span>xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
+</span><span class='line'>    <span class="nb">logout</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, on shutdown and reboot, I see all of the shutdown messages. All
+that remained was to add an option to log into a tmux session if I
+didn’t want to use X. The final code looks like this:</p>
+
+<figure class='code'><figcaption><span>~/.profile </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1 and tmux on tty2</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">exec </span>xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
+</span><span class='line'>    <span class="nb">logout</span>
+</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty2 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>tmux -f <span class="nv">$HOME</span>/.tmux/conf new -s secured
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Logging in from TTY1 takes me into my dwm session, if I switch to TTY2 I
+am logged into a tmux session with keychain running. To start consolekit
+with dwm, I have this in my <span class="file">$HOME/.xinitrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">exec </span>ck-launch-session <span class="nv">$HOME</span>/Scripts/dwm-start.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can see my full <span class="file">$HOME/.bash_profile</span> in
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.bash_profile" title="bash_profile in intuxication">my intuxication repo</a>.</p>
+
+<h4>Updated 4/2/12</h4>
+
+<p>For various reasons, I moved my environment variables from <span class="file">$HOME/.bashrc</span>
+into <span class="file">$HOME/.profile</span>; this meant that these variables were only inherited in
+interactive shells if <code>xinit</code> was called with <code>exec</code>.</p>
+
+<p>I have also ditched <code>consolekit</code> - for all of the processes it was
+spawning, it actually wasn’t performing any critical functions; or
+indeed any functions that I really needed at all…</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Readline Bindings in Vi Mode]]></title>
@@ -1252,658 +2166,6 @@ a very powerful tool…</p>
 <h5>Notes</h5>
 
 <p>1.<a href="http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux">Sessions in tmux</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Network Flooding on Ubuntu]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu/"/>
-    <updated>2011-06-06T13:40:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/06/06/network-flooding-on-ubuntu</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-logo.png" alt="image" /></p>
-
-<p>I have been experiencing problems with my wifi LAN when playing music
-through
-<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
-or watching movies. My upload speeds would climb to around 120-130Kb/s
-and my wifi would just go down.</p>
-
-<p>Apart from being frustrating, this was inconvenient as it meant that if
-I was doing either of those things, my stereo in the living room
-couldn’t stream music from my
-<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
-other members of the family (or guests) couldn’t connect to the access
-point to get online.</p>
-
-<p>After asking on
-<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
-(which, like many of the Ubuntu-related fora is populated with people
-who are more well-intentioned than they are knowledgeable - which seems
-to me one of the fundamental problems the distro has; but I’ll save that
-rant for another day), one helpful user suggested I use
-<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
-the network traffic.</p>
-
-<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
-immediately instructive. Wireshark quickly identified that, as soon as I
-started mpd, one of my ports was being flooded: 46560</p>
-
-<p><code>lsof</code> showed that pulse audio was the culprit:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Quelle surprise… When software engineers want a case study of opacity
-and abstraction from the user, this should be their first port of call.</p>
-
-<p>Worse, it is a known bug.
-<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
-And apparently insufficiently serious to warrant any attention. Fair
-enough, I suppose, given the fix is easy enough <em>if you know what you
-are trying to fix…</em></p>
-
-<p>Install the Pulse audio preferences tool:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install papref
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>…and disable Multicast/RTP.</p>
-
-<p>Another example for me of Ubuntu’s fast waning utility as a distribution
-for people that want to be able to exercize some control over their
-system. It is only still installed on this machine because there isn’t
-an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
-here and, with my international traffic capped to 30Kb/s until last
-month, I wasn’t prepared to try and run a distro on that sort of
-bandwidth. Now that has changed, I suspect that Ubuntu’s days are
-numbered on this box.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Quora's Quandary]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/05/28/quoras-quandary/"/>
-    <updated>2011-05-28T10:05:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/05/28/quoras-quandary</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora1.png" alt="image" /></p>
-
-<p>I joined <a href="http://www.quora.com/" title="Quora: Q&amp;A site">Quora</a> early in the
-new year and, while
-<a href="http://techcrunch.com/2011/01/23/why-i-don%E2%80%99t-buy-the-quora-hype/" title="TC article on the hype">the hype has in no way abated</a>,
-I have found that increasingly over the months that I have been
-visiting, there is less and less reason for me to return on any regular
-basis. And this puzzles me as I think the concept is, for me, an
-attractive one.</p>
-
-<p>In the five-odd months I have been visiting the site, I have managed to
-<a href="http://www.quora.com/Jason-Ryan" title="My Quora profile">contribute 58 answers</a>
-and over one hundred edits (more on that below); this strikes me as a reasonable
-commitment on my part and one that should return some dividend to me –
-at least in terms of satisfaction with the site. Alas, no.</p>
-
-<p>And why not? For several reasons. And reasons that have only really
-become apparent over the last month as I started to spend time on the
-<a href="http://unix.stackexchange.com/" title="Unix and Linux Stack Exchange">Unix &amp; Linux Stack Exchange site</a>.
-The contrast between the <em>experience</em> of the two sites, that are in
-essence very similar, couldn’t be more striking.</p>
-
-<p>The primary difference between the two is that Unix.SE isn’t a social
-site: you don’t follow anyone. Which, when you think about Q&amp;A sites,
-makes a lot more sense than Quora’s model. I still don’t understand the
-point of following people on Quora. Perhaps I am not following enough
-people, or the wrong ones, but I have yet to see <em>any benefit</em> in
-following on the site.</p>
-
-<p>One other area of seeming similarity between the sites is the ability to
-vote up (or down) questions and answers. On Unix.SE, this is implemented
-as a real strength as these votes determine contributor’s reputation,
-described thus:</p>
-
-<blockquote><p>Reputation is a rough measurement of how much the community trusts
-you. Reputation is never given, it is earned by convincing fellow
-users that you know what you’re talking about.</p></blockquote>
-
-<p>This has a twofold effect: it motivates contributors to provide quality
-answers (and
-<a href="http://unix.stackexchange.com/badges" title="StackExchange badges">rewards</a>
-them when they do), and more importantly, gives you a heuristic for how
-credible an answer may be. Quora doesn’t have this concept and, for me,
-is much the poorer for it.</p>
-
-<p>Reputation has consequences on Unix.SE: the more you accrue, the more
-privileges on the site you are granted. Again, this builds the
-community’s capability while encouraging individual contributors.</p>
-
-<p>Some of the other areas where Quora is really left wanting in comparison
-to Unix.SE are around the design of the site. The text box where you
-enter your answers or edits is a case in point:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora2.png" alt="image" /></p>
-
-<p>On Quora, it is like trying to change a car battery through a letterbox.
-The single, overriding impression is that entering information into the
-site is neither a priority nor pleasurable which, for a site aspiring to
-be a knowledge repository is incredibly perverse.</p>
-
-<p>This is compounded by the fact that the tools for presenting the
-information that you want to add to the site can charitably be described
-as rudimentary (one of the reasons that I have 100-odd edits is that it
-takes at least two to three attempts to present information in a
-semi-acceptable fashion). Searching for
-“<a href="http://www.quora.com/Quora-product/Are-there-any-markup-tags-when-writing-a-question?q=quora+markup+tools" title="Recursion alert">quora markup tools</a>”
-is as disappointing as it is frustrating.</p>
-
-<p>Being able to present information appropriately is critical. The
-StackExchange sites
-<a href="http://unix.stackexchange.com/editing-help" title="Unix.SE editing guidleines">allow all sorts</a>
-of HTML tags and
-<a href="http://daringfireball.net/projects/markdown/syntax" title="markdown syntax">markdown</a>,
-without apparently any additional
-<a href="http://en.wikipedia.org/wiki/Cross-site_scripting" title="Wikipedia page on Cross site scripting">XSS risk</a><sup>1</sup>.
-The result is questions and answers that are formatted in a way that
-enhances their legibility, rather than detracting from it.</p>
-
-<p>There are some other areas where Quora is not measuring up for me:
-opaque editorial and moderation policies and practices and an
-unwillingness to more actively curate the questions – and no, those two
-statements are not contradictory.</p>
-
-<p>The overall impression I am left with is that while both sites have
-similar aims (albeit Unix.SE’s is much more specific in terms of the
-subject matter), Quora seems to me to be really failing at building a
-community around it. Unless, of course, you count social media experts…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>God knows if that is actually the reason they refuse to allow
-potential contributors the ability to adequately format their
-information, but it seems plausible enough.</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Tyrs: ncurses Twitter Client]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/05/24/tyrs-ncurses-twitter-client/"/>
-    <updated>2011-05-24T20:17:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/05/24/tyrs-ncurses-twitter-client</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5754227102/in/photostream" title="Tyrs photo on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/tyrs.png" alt="image" /></a></p>
-
-<p>I have been a solid user of
-<a href="http://www.floodgap.com/software/ttytter/" title="TTYtter homepage">TTYtter</a>
-for a couple of years now, much preferring the speed and power of a
-command line Twitter client. And, after having tried–at one time or
-another–most of the Linux or cross-platform Twitter clients, I can
-safely say that for me TTYtter is easily the best.</p>
-
-<p>There is, however, a new
-<a href="http://www.gnu.org/software/ncurses/" title="ncurses page">ncurses</a> client
-that is showing a lot of promise:
-<a href="http://tyrs.nicosphere.net/index.html" title="Tyrs homepage">Tyrs</a>. Only at
-the 0.2.1.1 stage, and with a fraction of the functionality that TTYtter
-has, it is nevertheless a very nice client.</p>
-
-<p>Requiring little in the way of dependencies, only python-twitter and
-python-oauth2, both available in the
-<a href="http://aur.archlinux.org/" title="Arch Linux User Repository">AUR</a> or in the
-debian/Ubuntu repos (if you are using debian/Ubuntu, you will need the
-newer python-twitter-0.8.2 for it to run).</p>
-
-<p>Tyrs is easy to configure, with good documentation and a simple
-configuration file, located by default at
-$XDG_CONFIG_HOME/tyrs/tyrs.cfg. The default keybinds are
-<a href="http://www.vim.org/" title="THE editor">Vim-centric</a>, naturally…</p>
-
-<p>My config is pretty straightforward at this point:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'>[keys]
-</span><span class='line'>retweet           <span class="p">=</span> <span class="k">p</span>
-</span><span class='line'>retweet_and_edit  <span class="p">=</span> <span class="k">P</span>
-</span><span class='line'>mentions          <span class="p">=</span> <span class="k">a</span>
-</span><span class='line'>reply             <span class="p">=</span> <span class="k">r</span>
-</span><span class='line'>
-</span><span class='line'>[<span class="k">colors</span>]
-</span><span class='line'><span class="nb">highlight</span>         <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>header            <span class="p">=</span> <span class="m">6</span>
-</span><span class='line'>hashtag           <span class="p">=</span> <span class="m">4</span>
-</span><span class='line'>attag             <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'>text              <span class="p">=</span> <span class="m">7</span>
-</span><span class='line'>warning_msg       <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>info_msg          <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'>
-</span><span class='line'>[params]
-</span><span class='line'>refresh           <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>tweet_border      <span class="p">=</span> <span class="m">0</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Written in Python, the code is well commented and relatively easy to
-find your way around if your are keen on hacking.</p>
-
-<p>The developer, Nicolas Paris, is both approachable and helpful and is
-actively developing Tyrs. With some more functionality in the pipeline,
-it looks to be a very nice application.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[w3m, Surfraw and Yanking URLs]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/05/05/w3m/"/>
-    <updated>2011-05-05T19:57:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/05/05/w3m</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/w3m.png" alt="image" /></p>
-
-<p>I posted a couple of weeks ago about
-<a href="http://jasonwryan.com/blog/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
-to the point of writing a couple of my own <em>elvi</em>. As part of the
-ongoing tweaking of my Surfraw experience, I have been experimenting
-with different
-<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
-to see which one best fits my workflow.</p>
-
-<p>I have previously been using both
-<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
-and it’s homonym,
-<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
-these have been perfectly acceptable, they weren’t quite providing the
-level of functionality —and integration with my vim-oriented workflow—
-that I was looking for. Enter
-<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
-
-<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
-`less’. With w3m you can browse web pages through a terminal emulator
-window (xterm, rxvt or something like that). Moreover, w3m can be used
-as a text formatting tool which typesets HTML into plain text.</p></blockquote>
-
-<p>w3m is a step up from the other two for a variety of reasons. It
-supports tables, frames, SSL connections, color and inline images. It
-also renders pages in a form as true to their original layout as
-possible. The killer features on top of that are, for me, the above
-mentioned rendering of HTML as text (meaning you can save content
-easily), and the customizable keybinds.</p>
-
-<p>There was however, one significant sticking point. After countless hours
-fruitlessly searching, I was unable to find a way to yank URLs to the
-clipboard. As I have been spending a little time of late on
-<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
-I thought I would ask the good folk there…</p>
-
-<p>Less than fourty hours later, I had an answer so simple and elegant,
-that I was literally grinning when I read it. It deserves quoting in
-full. It is that ingenious.</p>
-
-<blockquote><p>Set the “External Browser” option to
-<code>sh -c 'echo "$0" | xsel'</code></p>
-
-<p>You can use xsel -b to use the clipboard instead of the primary
-selection. An alternative to
-<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
-is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
-(xclip for the primary selection, xclip -selection CLIPBOARD for the
-clipboard).</p>
-
-<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
-Then press M to copy (yank) the URL of the current page, or ESCM to
-copy the URL of the link under the cursor.</p>
-
-<p>You can use the second or third external browser for that instead;
-then the key combination is 2M or 3M or 2ESCM or 3ESCM.
-<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
-
-<p>This simple hack means that it is now trivial to yank either the URL of
-the current page, or of the link under the cursor to primary selection.
-It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
-and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
-<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN
-</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
-
-<h4>Updated 8/5/11</h4>
-
-<p>Gilles has edited and updated his answer with a slight change:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This prevents a new line being appended.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Archwiki elvis for Surfraw]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/04/13/archwiki-elvis-for-surfraw/"/>
-    <updated>2011-04-13T19:29:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/04/13/archwiki-elvis-for-surfraw</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/arch-elvis.png" alt="image" /></p>
-
-<p>I have been using
-<a href="http://surfraw.alioth.debian.org/" title="Surfraw manifesto">Surfraw</a> for the
-better part of eighteen months, and I think that it is a perfect Unix
-tool: it does <em>one</em> thing, extremely well… If you haven’t come across
-it, Surfraw is a command-line interface to a couple of dozen
-repositories of knowledge. It is described thus:</p>
-
-<blockquote><p>It reclaims google, altavista, babelfish, dejanews, freshmeat,
-research index, slashdot and many others from the false-prophet,
-pox-infested heathen lands of html-forms, placing these wonders where
-they belong, deep in unix heartland, as god loving extensions to the
-shell.<sup>1</sup></p></blockquote>
-
-<p>The shell scripts that power the searches of the repositories are called
-<em>elvi</em>, the singular being <em>elvis</em>. Currently, in
-<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=summary" title="Debian Git Repo: Surfraw">the git repo</a>,
-there are
-<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=tree;f=elvi;hb=HEAD" title="elvi in the git repo">over 100 elvi</a>,
-ranging from Wikipedia through to the CIA website (yes, the project was
-founded by <a href="http://en.wikipedia.org/wiki/Julian_Assange" title="Julian's Wikipedia page">Julian Assange</a>),
-Slashdot and The Wayback Machine.</p>
-
-<p>As comprehensive as the list of elvi is, there was one glaring hole.
-Arch Linux is represented in terms of elvi to search the
-<a href="http://aur.archlinux.org/" title="Arch User Repository">AUR</a> and the
-<a href="http://www.archlinux.org/packages/" title="Arch Package Database">official package repositories</a>,
-but nothing for the
-<a href="https://wiki.archlinux.org/index.php/Main_Page" title="Definitive Arch Linux documentation">Arch Wiki</a>,
-perhaps the best GNU/Linux reference wiki on the web.</p>
-
-<p>So I thought I would rectify that.</p>
-
-<p>You can grab the archwiki elvis from my
-<a href="http://beta.intuxication.org/jasonwryan/longbow/file/tip/scripts/archwiki" title="Intuxication repo">mercurial repo</a>,
-copy it into your local directory at <span class="file">$XDG_CONFIG_HOME/surfraw/elvi/</span> or
-in the system folder at <span class="file">$XDG_CONFIG_DIRS/surfraw/</span> and you can surf the
-Arch Wiki, or any one of the nine other language wikis, from the command
-line.</p>
-
-<blockquote><p>Surfrawize the soul of your favourite internet wonder. Join the
-<strong>S</strong>hell <strong>U</strong>sers’ <strong>R</strong>evolutionary <strong>F</strong>ront <strong>A</strong>gainst the
-WW<strong>W</strong> by submitting code. Reclaim heathen lands. Bear witness to the
-truth. Its love will set you free.</p></blockquote>
-
-<h5>Notes</h5>
-
-<ol>
-<li>A bonus: all of the documentation is written like Unix
-<a href="http://en.wikipedia.org/wiki/Agitprop" title="Wikipedia entry">agitprop</a>…</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Vim Colours in the Console]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/04/06/vim-colours-in-the-console/"/>
-    <updated>2011-04-06T21:19:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/04/06/vim-colours-in-the-console</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours1.png" alt="image" /></p>
-
-<p>I have spent the last couple of days trying to understand why I couldn’t
-get <a href="http://www.vim.org/" title="Vim: the _only_ editor">Vim</a> to display the
-correct 16 colours in the console. Not in a terminal emulator in X, like
-<a href="http://invisible-island.net/xterm/xterm.html" title="XTerm homepage">xterm</a>
-or
-<a href="http://software.schmorp.de/pkg/rxvt-unicode.html" title="Homepage for urxvt">rxvt-unicode</a>,
-but in the consoles, TTY1-6.</p>
-
-<p>After a lot of searching, more reading into the
-<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-16.html" title="The Linux terminal...">arcane documentation</a>
-of Linux terminals than I was either prepared for or keen on and some
-experimentation, I have it working. With one caveat; I wasn’t prepared
-to set the <code>TERM</code> environment in my <span class="file">.vimrc</span>. Apart from being
-<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-10.html#ss10.5" title="Console documentation">cautioned against</a>,
-as I <em>do</em> set it for tmux, I was anxious to avoid any clashes when
-running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
-(which I do most of the time).</p>
-
-<p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
-colours, gave me the default:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> <span class="o">&amp;&amp;</span> tput colors
-</span><span class='line'>linux
-</span><span class='line'>8
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Which, under my current configuration of Vim, rendered colours like so:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours2.png" alt="image" /></p>
-
-<p>Hardly satisfactory.</p>
-
-<p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
-colours:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then I had to rewrite my colourscheme to change all of the references to
-the terminal colour numbers to colour <em>names</em>, as apparently that is
-what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
-</span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
-</span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
-</span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>…to the more literal:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
-</span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
-</span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Once I had made the necessary changes, I saved this new colourscheme as
-<span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
-have included it in an <code>if</code> condition in my original colourscheme<sup>2</sup>,
-but I was intent on keeping things compartmentalized until I had it working…</p>
-
-<p>Running Vim in the console was now starting to look promising:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours3.png" alt="image" /></p>
-
-<p>The final piece of the puzzle was to pass my
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.colours/dark" title="jwr dark colours: mercurial repo">X colours</a>
-to the console. Fortunately,
-<a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
-made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Linux console colors (jwr dark) </span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
-</span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then it was just a case of setting the relevant colourscheme in my
-<span class="file">.vimrc</span>:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;<span class="nb">t_Co</span> <span class="p">&lt;</span> <span class="m">256</span>
-</span><span class='line'>    <span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'>    <span class="k">colorscheme</span> miromiro
-</span><span class='line'><span class="k">endif</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And you can see
-<a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>
-of the finished product on Flickr.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p><a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miro8.vim" title="Mercurial repo: miro8 colourscheme">miro8.vim</a></p></li>
-<li><p><a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a></p></li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Setting Urgent Hints in dwm]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/01/25/setting-urgent-hints-in-dwm/"/>
-    <updated>2011-01-25T17:45:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/01/25/setting-urgent-hints-in-dwm</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5379701719/#/photos/jasonwryan/5379701719/lightbox/" title="Arch Linux: dwm with statuscolors patch"><img src="http://dl.dropbox.com/u/261312/Blog-images/dwm-urgent.png" alt="image" /></a></p>
-
-<p>After nearly 12 months of running a pretty stable
-<a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>, with a consistent
-patchset (cycle,
-<a href="http://dwm.suckless.org/patches/push" title="Push on suckless wiki">push</a>,
-and init pertag<sup>1</sup>) I finally added another one:
-statuscolours<sup>2</sup>…</p>
-
-<p>I have been experimenting with
-<a href="http://jasonwryan.com/blog/2010-12-26-wmfs-window-manager-from-scratch" title="My post on using WMFS">WMFS</a>,
-which is another very nice, minimal tiling window manager and was really
-enjoying the urgency hints in the status bar, so I decided to patch that
-functionality into dwm.</p>
-
-<p>Most terminal applications will send a bell when your attention is
-required; in my case, I was looking for a way to trigger notifications
-for new mail in
-<a href="http://www.mutt.org/" title="If you are using another mail user agent, you are doing it wrong...">mutt</a>
-or highlights in <a href="http://irssi.org/" title="IRC client">irssi</a>. In mutt, it
-was just a case of setting a bell for when mail arrived:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span>beep_new             <span class="c"># bell on new mail</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And in irssi:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">beep_msg_level</span> <span class="o">=</span> <span class="s2">&quot;NOTICE MSGS HILIGHT&quot;</span>;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In <a href="http://tmux.sourceforge.net/" title="terminal mulitplexer">tmux</a>, to cover
-all your terminal bases, add:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set</span> -g bell-action any <span class="c"># listen for activity on all windows</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The next step is to pass those beeps to your terminal. The entry for
-Urxvt is one I picked up after a quick search turned up
-<a href="http://rsontech.net/articles/2008/11/17/1/handling-urgency-hints" title="Post on reson.tech">this post by rson</a>
-which had the .Xdefaults line I was looking for:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>URxvt*urgentOnBell: <span class="nb">true</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now, whenever a bell is triggered in irssi or mutt, that is passed to
-the terminal as an urgent hint. The final step was patching statuscolors
-into dwm.c to change the tag colour when the hint was received.</p>
-
-<p>You can see my
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Build/dwm/5.8.2-2.diff" title="dwm.c patched">patched dwm.c</a>
-in my intuxication repo.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>These patches are from the extremely helpful Arch Forum thread:
-<a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a></li>
-<li>I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
-from the suckless mailing list. It irons out the padding issues in the one on the wiki.</li>
-</ol>
-
 ]]></content>
   </entry>
   

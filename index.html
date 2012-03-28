@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I recently threw caution to the wind and
-changed my shell over to vi mode.
-I wanted to take advantage of the superior command editing ability that &hellip;">
+  <meta name="description" content="Some time in the last couple of days, the last of the packages in the
+Community repository were signed and, thanks to the tremendous work of
+the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +67,1109 @@ I wanted to take advantage of the superior command editing ability that &hellip;
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/23/key/">Signing Your Own Key</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-23T11:36:00+13:00" pubdate data-updated="true">Mar 23<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/key.jpg" alt="image" /></p>
+
+<p>Some time in the last couple of days, the last of the packages in the
+Community repository were signed and, thanks to the tremendous work of
+the Arch developers and Trusted Users, you can fully implement package
+signing in your <span class="file">/etc/pacman.conf</span>.</p>
+
+<p>You can check the state of the signed packages with this expac
+one-liner; it will return a list of any <em>unsigned</em> packages:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
+take advantage of this. My overall <code>SigLevel</code> setting requires signed
+packages, and—as of yesterday—I was able to move the last repository
+entry over to do the same:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>core<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>extra<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>community<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>multilib<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next step was to add my key to pacman’s keychain so that I could
+sign the packages that I build using ABS or from the
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>. Allan has an
+<a href="http://allanmcrae.com/2011/08/pacman-package-signing-1-makepkg-and-repo-add/" title="The first in a series of four posts on signing: read them all">excellent post on setting this up</a>.</p>
+
+<p>First, import your key into pacman’s keyring:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then follow the prompts as you edit the key to sign, set a trust level
+and save your key:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
+</span><span class='line'>gpg&gt; lsign
+</span><span class='line'>...
+</span><span class='line'>gpg&gt; trust
+</span><span class='line'>...
+</span><span class='line'>gpg&gt; save
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then it is just a matter of changing the <code>BUILDENV</code> option in your
+<span class="file">/etc/makepkg.conf</span>, which is set to <code>!sign</code>
+by default. Remove the bang and include the details of the key you wish to use:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#-- Packager: name/email of the person or organization building packages</span>
+</span><span class='line'><span class="nv">PACKAGER</span><span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
+</span><span class='line'><span class="c">#-- Specify a key to use for package signing</span>
+</span><span class='line'><span class="nv">GPGKEY</span><span class="o">=</span><span class="s2">&quot;B1BD4E40&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, when you build a package, you will be prompted for your key’s
+passphrase:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...
+</span><span class='line'>
+</span><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
+</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
+</span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21
+</span><span class='line'>
+</span><span class='line'>Enter passphrase:
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Enter the correct passphrase and your package is built and signed:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/donovan_beeson/3185668524/" title="Coraline key on Flickr">donovanbeeson</a>
+on Flickr.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/17/vampires/">A Taxonomy of Help Vampires</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-17T16:25:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/vampire1.jpg" alt="image" /></p>
+
+<p>If you have spent any time at all amongst online (or, for that matter,
+off-line) communities, you will be familiar with the help vampire. If,
+by some combination of fortune and ignorance, you haven’t come across
+this term before, read Amy Hoy’s original—and definitive—
+<a href="http://slash7.com/2006/12/22/vampires/" title="Amy's blog on help vampires">post on this scourge</a>,
+<em>now</em>.</p>
+
+<p>Amy has some excellent tips on identifying help vampires, however, since
+she originally shed some sunlight on this odious species, they have
+become even more cunning and have adapted; to the point where there are
+now several varieties that you should be wary of if you are determined
+to prevent your online community from becoming overrun with them.</p>
+
+<p><strong>The Infant</strong> The easiest to spot because, due to their nascent form,
+they have not developed sophisticated anti-detection strategies as yet.
+Also, encouragingly, these are the most likely to respond to the
+corrective measures Amy outlines in her post.</p>
+
+<p>The infant has probably learned their dependant ways in some other
+online community with a higher tolerance for their spoonfeeding needs.
+Corrective measures, vigorously and repeatedly applied <em>can</em> turn them
+around; but even small amounts of reinforcement of this behaviour can
+quickly see them morph into one of the more sinister types…</p>
+
+<p><img src="http://media.tumblr.com/tumblr_m10ce18Jda1qz8s9s.jpg" alt="image" /></p>
+
+<p><strong>The Leech</strong> This reprehensible lifeform just sucks and sucks and
+<em>sucks</em> until there is nothing left. Some of their forum threads may
+even appear reasonable, but looking at their profile in totality tells a
+shocking story. All of their posts are in their own threads, they are
+not interested in helping anyone else with a problem. They will move
+remorselessly from issue to issue, expecting the community to provide
+answers for them at a hemorrhagic rate.</p>
+
+<p>They won’t have made any edits to
+<a href="https://wiki.archlinux.org" title="The BEST godamn GNU/Linux wiki on the web">the Wiki</a>,
+no matter how trivial. They won’t
+<a href="https://aur.archlinux.org" title="Arch User repository">maintain any packages</a> or donate
+any time or
+<a href="http://www.archlinux.org/donate/" title="Donate now and recieve a FREE package update!">money</a>
+to your community. But they will be there night after night, posting
+their problems and waiting for the hapless to expend their time and
+energy on them. Like all parasites, they will adapt over time so remain
+vigilant.</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vampire3.jpg" alt="image" /></p>
+
+<p><strong>The Fanger</strong> The out-and-out help vampire, unabashed and unashamed of
+their <em>needs</em>. Their sense of entitlement will be telegraphed by needy
+and demanding thread titles, often featuring exhortations like “HELP”
+and “URGENT” and almost always embellished with a liberal—and, at times
+of “real crises,” exclusive—use of all caps and exclamation marks.</p>
+
+<p>The Fanger will also occasionally table (sadly, almost inevitably empty)
+threats about leaving your community and going off to use some other
+software; as if the dependency relationship is somehow reversed and it
+is you, the community, that will suffer if they leave.</p>
+
+<p>The other classic trait of the hardcore vampire is that, like their
+fictional avatars, they see nothing when a mirror is held up to them.
+You can call their behaviour as much as you like, it will have no
+effect. Your only solution here is technology:
+<a href="http://www.codinghorror.com/blog/2011/06/suspension-ban-or-hellban.html" title="Coding Horror on the Hell Ban">the hell ban</a>.</p>
+
+<hr />
+
+<p>The Arch Linux community has grown considerably since it emerged
+<a href="http://www.archlinux.org/news/arch-linux-turns-10/" title="w00t!">ten years ago this month</a>. Over
+the last couple of years, the forums in particular have seen a lot of
+new users signing up to participate. This is unquestionably a good
+thing™</p>
+
+<p>However, Arch is clearly labelled as being for
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric" title="The Arch Way: user-centric">competent users</a>
+(and here competent can equally mean accomplished – or prepared to
+invest in themselves and the community to become competent) and that
+means not enabling these sorts of vampiric behaviours, in whatever form
+they manifest.</p>
+
+<h5>Notes</h5>
+
+<p>Photography is all Creative Commons licensed on Flickr by, in order of
+appearance:</p>
+
+<ul>
+<li><a href="http://www.flickr.com/photos/randaldroher/2161723492/" title="The Count, by Randall Drohrer on Flickr">Randall Drohrer</a></li>
+<li><a href="http://www.flickr.com/photos/phatcontroller/2620032517" title="Leech, by phatcontroler on Flickr">phatcontroller</a></li>
+<li><a href="http://www.flickr.com/photos/sandrafalkevik/4465039571" title="Vampire, by Sandra Falkevik on Flickr">Sandra Falkevik</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T16:52:00+13:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
+
+<p>If you are an Arch Linux user and you are not using
+<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
+you can take a moment to hang your head in shame before you click on to
+whatever the next thing is. The package description sums up perfectly
+what aurphan does:</p>
+
+<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
+today!</p></blockquote>
+
+<p>Running aurphan -a, for example, will identify any
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
+database that are not currently maintained; allowing you to log in to
+the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
+fulfilled.<sup>1</sup></p>
+
+<p>If, like most Archers, you have a compulsive desire to automate
+<em>everything</em> then clearly typing (or even remembering to type) aurphan
+-a into a terminal periodically is as ludicrous as it is onerous. The
+obvious answer is some shell script and a cron job.</p>
+
+<p>First, the <code>cron</code> job:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then, as part of my
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="Script in intuxication repo">dwm-status script</a>,
+a function to check that there are no new additions to the file and, if
+there are, flash a highlight:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>
+</span><span class='line'>    <span class="nv">aurphans</span><span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">        </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
+</span><span class='line'>    <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The awk filter excludes a null return, which is “No aurphans found.”
+Now, if any of the packages that I use from the AUR are disowned, I’ll
+be the first to know about it.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Actual feeling may differ depending on the package you have adopted
+and the amount of prescription painkillers that you are currently
+ingesting…</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/13/chroot/">Chroot in LVM on LUKS on Raid: Arch Linux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-13T10:25:00+13:00" pubdate data-updated="true">Feb 13<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/chroot-lvm.jpg" alt="image" /></p>
+
+<p>In <a href="http://jasonwryan.com/blog/2012-02-11-lvm" title="Post on setting this system up">my previous post describing this setup</a>
+I made the point that grub won’t be installed and that it is necessary
+to <code>chroot</code> in to install grub on both drives. This is the procedure I use
+to do that—and to perfrom any other maintenance that requires working
+from a live environment.</p>
+
+<p>Again, most of this information is on the
+<a href="https://wiki.archlinux.org/index.php/Chroot" title="Arch wiki page">Arch Wiki chroot page</a>, I
+am just going to fill in the detail around this setup: LVM on LUKS on
+Raid1.</p>
+
+<p>Once you have booted into your live environment, load the modules that
+are required; in this case: <code>raid1</code>, <code>dm-mod</code> and <code>dm-crypt</code>.</p>
+
+<p>Check that udev hasn’t helpfully read the superblock of your Raid drives
+and assembled phantom arrays:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat /proc/mdstat
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I find that there are a couple there generally assigned the names
+<span class="file">/dev/md126</span> and <span class="file">/dev/md127</span>.
+These need to be stopped before assembling the correct arrays:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
+</span><span class='line'>mdadm --assemble /dev/md0 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
+</span><span class='line'>mdadm --assemble /dev/md1 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You should now have both your arrays up and running. The next step is to
+unlock your encrypted device:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After entering your passphrase, your device will be unlocked. Next, make
+the logical volumes available, and then check they are correct:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>vgchange --available y vgroup
+</span><span class='line'>lvscan
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At this point, you are ready to mount the devices and <code>chroot</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir /mnt/arch
+</span><span class='line'>mount /dev/mapper/vgroup-lvroot /mnt/arch
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next steps are straight from the wiki:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
+</span><span class='line'>mount -t proc proc proc/
+</span><span class='line'>mount -t sysfs sys sys/
+</span><span class='line'>mount -o <span class="nb">bind</span> /dev dev/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Mount the other parts of the system that you need to use in your
+recovery – in this case, I need my <span class="file">/boot</span> partition:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now <code>chroot</code> to the device and define your shell:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>chroot . /bin/bash
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The wiki has some good advice about customizing your prompt to reinforce
+the fact that you are in a chroot:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With everything mounted, it is just a matter of performing your
+maintenance. To reinstall <code>grub</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># grub</span>
+</span><span class='line'>grub&gt; find /grub/stage1
+</span><span class='line'>grub&gt; device <span class="o">(</span>hd0<span class="o">)</span> /dev/sda
+</span><span class='line'>grub&gt; root <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>grub&gt; setup <span class="o">(</span>hd0<span class="o">)</span>
+</span><span class='line'>grub&gt; quit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Repeat for <span class="file">/dev/sdb</span> and both your drives will be bootable in the event
+that one fails.</p>
+
+<p>With the maintenance accomplished, all that remains is to exit the
+<code>chroot</code> and unmount the devices cleanly:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">exit</span>
+</span><span class='line'>umount <span class="o">{</span>proc,sys,dev,boot...<span class="o">}</span>
+</span><span class='line'><span class="nb">cd</span> ..
+</span><span class='line'>umount arch/
+</span><span class='line'>reboot
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Simple.</p>
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/mpd01605/4152508668/" title="Rescue Engine 6 on Flickr">MPD01605</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/11/lvm/">LVM on LUKS on RAID1 on Arch Linux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-11T15:58:00+13:00" pubdate data-updated="true">Feb 11<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/lvm-luks-raid.png" alt="image" /></p>
+
+<p>After much procrastination, I finally got around to moving the last of
+my machines to Arch Linux:
+<a href="http://jasonwryan.com/blog/2010-10-04-the-setup" title="The Setup post">my home desktop</a>,
+which has been running Ubuntu since the end of 2007. I’d like to share a
+few thoughts about why I finally walked away from Ubuntu, but I’ll save
+that for another long post.</p>
+
+<p>Anyway, the setup I decided on was reasonably straightforward: two 1TB
+drives comprising two Raid1 devices, one for a small (150Mb)
+<span class="file">/boot</span> andthe other holding three logical volumes
+in a LUKS crypt. This way, I have the flexibility to grow the volumes as
+needed, and only require thesingle passphrase at boot to unlock the
+enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
+and <span class="file">/home</span>.</p>
+
+<p>Almost all of the information here has been gleaned gratefully from
+other sources; principally the Arch Wiki entries on
+<a href="https://wiki.archlinux.org/index.php/LUKS" title="Arch wiki entry">LUKS</a> and
+<a href="https://wiki.archlinux.org/index.php/Lvm" title="Arch LVM article">LVM</a> and
+this <a href="http://www.pindarsign.de/webblog/?p=767" title="Blog post on LUKS and LVM">helpful blog post</a>.
+This post (and the next) are notes to remind me how I got here and, in
+the follow-up, what I need to do to restore this build…</p>
+
+<p>First up, prepare the two hard drives. This took roughly \~90 hours for
+the 1TB drives, so allow some time:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the drives are scrubbed (read the Arch Wiki on why that is
+necessary), you can move to the actual installation business. I used a
+256Mb thumb drive with the most recent x86_64 netinstall image burned
+to it. Boot into the live environment and set up the initial partitions
+using <code>cfdisk</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cfdisk /dev/sda
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I created a 150Mb partition for /boot - marked with the boot flag, and
+then partitoned the rest of the drive. Both partitons should be primary
+and be FSType linux_raid (the FD option). Write the partition tabel to
+a file and then import it to the second drive so both are exactly the
+same:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
+</span><span class='line'>sfdisk /dev/sdb &lt; part-table
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, set up the Raid arrays. Start by loading the required modules and
+then create the two arrays. The metadata flag is important: if you are
+using legacy grub, as I did, you must use the 0.90 type or your MBR will
+get overwritten:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe raid1 <span class="o">&amp;&amp;</span> modprobe dm-mod
+</span><span class='line'>mdadm --create /dev/md0 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 <span class="se">\</span>
+</span><span class='line'>    --metadata<span class="o">=</span>0.90 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
+</span><span class='line'>mdadm --create /dev/md1 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup></p>
+
+<p>At this point, you can switch to another TTY to watch the disks
+sync—again, this could take some time, depending on the size of the
+drives.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Check that it all went to plan…</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the drives are synched and pronounced clean, it it time to encrypt
+the second Raid device, /dev/md1. You can’t encrypt the array that
+contains /boot, but having it duplicated in a Raid array means that, if
+one drive goes down, you can still boot the other.</p>
+
+<p>Load the module for encryption, and then set it up:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe dm-crypt
+</span><span class='line'>cryptsetup --cipher<span class="o">=</span>aes-xts-plain --verify-passphrase <span class="se">\</span>
+</span><span class='line'>    --key-size<span class="o">=</span>512 luksFormat /dev/md1
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, open the encrypted device to create the logical volumes:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The three next steps create, in this order, the physical volume (the
+container, if you will), the group and then the individual volumes
+contained in the group. Choose simple, memorable names and do not
+hypenate them. The {pv,vg,lv}display commands print out the details of
+the devices once created.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk
+</span><span class='line'>pvdisplay
+</span><span class='line'>
+</span><span class='line'>vgcreate vgroup /dev/mapper/cryptdisk
+</span><span class='line'>vgdisplay
+</span><span class='line'>
+</span><span class='line'>lvcreate --size 20G --name lvroot vgroup
+</span><span class='line'>lvcreate --contiguous y --size 2G --name lvswap vgroup
+</span><span class='line'>lvcreate --extents +100%FREE --name lvdata vgroup
+</span><span class='line'>lvdisplay
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It should be pointed out that the
+<a href="https://github.com/Dieterbe/aif" title="AIF on Github">Arch Installer Framework</a> supports
+LUKS and LVM, so you can accomplish these last two steps from within the
+installer. I tried both and I found that I had a little more control
+doing it manually, but YMMV.</p>
+
+<p>At this point, you are ready to enter the installer and complete the
+install. Run /arch/setup and move through the early setup until you
+reach the &#8216;Prepare Hard Drives&#8217; section. Select option 3, &#8216;Configure block
+devices, mountpoints and filesystems&#8217;. Make sure that the only “raw”
+device that you configure is <span class="file">/dev/md0</span>, your
+<span class="file">/boot</span> partition. Otherwise,
+you are configuring the logical volumes, <em>not</em> the devices they are
+built on.</p>
+
+<p>After succesfully setting up the drives, install the base packages and
+then, once that is complete, switch TTYs and update your Raid
+configuration <em>prior to configuring your system</em>. This means that when
+your <code>initrd</code> is regenerated, it will inlcude the correct Raid
+information:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you are done, move to configure your system and make sure to add
+the relevant details to both your <span class="file">/etc/rc.conf</span> and your
+<span class="file">/etc/mkinitcpio.conf</span>. In the former:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</span><span class='line'><span class="nv">USEDMRAID</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and in /etc/mkinitcpio.conf:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
+</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That is the straightforward part of the install over. The final step is
+a little more tricky: installing a bootloader. My experience, and I
+tried a number of times using different approaches, is that this <em>won’t
+work</em>. The installer doesn’t seem to like the Raid setup, so it
+complains about it:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It’s not all bad, as this is the final hurdle and it is not a
+particularly high one.</p>
+
+<p>The important step is to ensure that your <span class="file">/boot/grub/menu.lst</span> is setup
+correctly. Given the names I chose above for my devices, mine looks like
+this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># (0) Arch</span>
+</span><span class='line'>title  Arch Linux
+</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
+</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
+</span><span class='line'>initrd /kernel26.img
+</span><span class='line'>
+</span><span class='line'><span class="c"># (1) Arch Fallback</span>
+</span><span class='line'>title  Arch Linux Fallback
+</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
+</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
+</span><span class='line'>initrd /kernel26-fallback.img
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once it is all setup, simply exit the installer. At this point, you have
+a perfectly secure, redundant, new Arch Linux install that you can’t
+boot into. You have two choices; chroot in and manually install grub
+now, or reboot and do it then. I opted for the latter as it would be
+more like a recovery mission—and I wanted to make sure that I was
+capable enough to manage that before committing all of my backed-up data
+to the machine.</p>
+
+<p>I’ll post the details of the relatively straightforward steps required
+to chroot into the system and install grub on both hard drives in a
+couple of days.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>The name <code>cryptdisk</code> is arbitrary - just make it memorable and use it
+consistently…</p></li>
+<li><p>I am not sure how necessary it is to have the Raid modules included
+here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
+warranted.</p></li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/01/18/monsterwm/">monsterwm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-01-18T10:03:00+13:00" pubdate data-updated="true">Jan 18<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/monster.jpg" alt="image" /></p>
+
+<p>If you have visited here at all over the last couple of weeks, you would
+have seen some screenshots from
+<a href="http://www.flickr.com/photos/jasonwryan/" title="All of my screenshots on Flickr">my Flickr stream</a>
+of a new window manager,
+<a href="https://github.com/c00kiemon5ter/monsterwm" title="Project on Github">monsterwm</a>.
+Over the break, I have been playing around with it and, despite the fact
+that the project is only really a few weeks old, it is well worth a
+look.</p>
+
+<p>Originally a fork of
+<a href="https://github.com/moetunes/dminiwm" title="dminiwm on Github">dminiwm</a>,
+which was in turn based on
+<a href="https://github.com/pyknite/catwm" title="Project on Github">catwm</a> and
+<a href="http://dwm.suckless.org" title="dwm on suckless">dwm</a><sup>1</sup>, monsterwm for
+me—having used dwm for years—feels very much like a stripped down
+version of dwm, with a few of the patches (like pertag, for example)
+built in.</p>
+
+<p>One of the projects goals, like it’s antecedents, is to keep the SLOC
+low. By way of comparison, dwm’s long-standing goal has been to keep the
+SLOC below 2000<sup>2</sup>. monsterwm’s current count is under 700. One of the
+ways that monsterwm achieves this is <em>not</em> to incorporate a status bar;
+as the README says:</p>
+
+<blockquote><p>Monsterwm does not provide a panel and/or statusbar itself. Instead it
+adheres to the <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="Wikipedia entry">UNIX philosophy</a>
+and outputs information about the existent desktop, the number of
+windows on each, the mode of each desktop, the current desktop and
+urgent hints whenever needed. The user can use whatever tool or panel
+suits him best (dzen2, conky, w/e), to process and display that
+information.</p></blockquote>
+
+<p>So, what is it like to run? Obviously it is fast. It comes with four
+tiling modes: standard tile, backstack, grid and monocle and, as
+mentioned above, the ability to define different layouts per desktop.
+There are still a couple of features to be implemented; floating mode
+being one of the more significant and a couple of minor bugs—as you
+would expect for a project still in its relative infancy.</p>
+
+<p>Overall, it is a very nice, minimalist window manager. If you don’t use
+the <a href="http://lubutu.com/rant/dwm-faq" title="CLS on dwm's tagging feature">dynamic tagging feature of dwm</a>,
+then this would be a window manager to consider switching to. The
+developer, Ivan “c00kiemon5ter” Kanakarakis, has been extremely
+responsive to user’s suggestions and requests (the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=132122" title="Arch Linux forums: monsterwm thread">thread on the Arch boards</a>
+is quite active) and has been admirably clear about his vision for the
+wm.</p>
+
+<p>You can see my monsterwm configs in
+<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/Build/monsterwm-git" title="Intuxication repo: monsterwm">my mercurial repository</a>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>Updated with the correct genealogy…</p></li>
+<li><p>“dwm is only a single binary, and its source code is intended to
+never exceed 2000 SLOC.” <a href="http:..dwm.suckless.org" title="dwm homepage">dwm.suckless.org</a></p></li>
+</ol>
+
+
+<p>Cookie Monster image from <a href="http://www.flickr.com/photos/nathaninsandiego/3757033518/" title="Creative Commons image on Flickr">San Diego Shooter</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/18/login/">Logging Straight Into X</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-18T22:13:00+13:00" pubdate data-updated="true">Dec 18<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/login.png" alt="image" /></p>
+
+<p>I have been using
+<a href="https://wiki.archlinux.org/index.php/CDM" title="Arcjh Wiki entry on CDM">CDM</a>
+to log into X on my Arch machines and, if I were to continue to require
+the ability to access different window managers with any frequency, I
+would use this approach. However, on my EeePC, I really only ever login
+to a <a href="http://dwm.suckless.org/" title="dwm at suckless.org">dwm</a> session or
+the console, so having a login manager seemed like an unnecessary step.</p>
+
+<p>Consequently, over the weekend, with the help of the
+<a href="https://wiki.archlinux.org/index.php/Start_X_at_Boot" title="Arch Linux wiki entry">Start X at Boot</a>
+article on the Arch Wiki, I removed CDM and arrived at a secure,
+flexible approach to logging into X (or the console).</p>
+
+<p>My <span class="file">/etc/inittab</span> already boots me into runlevel 5:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Boot to X11</span>
+</span><span class='line'>id:5:initdefault:
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So it was just a case of putting a couple of lines in the correct
+<a href="http://www.gnu.org/software/bash/manual/bashref.html#Bash-Startup-Files" title="GNU Bash reference: startup files">invocation file</a>.
+I chose <span class="file">$HOME/.bash_profile</span> because I only use Bash; if you use another
+shell you should probably go with <span class="file">$HOME/.profile</span>. The recommended lines
+from the Arch Wiki are:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="nv">$DISPLAY</span> <span class="o">&amp;&amp;</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">exec </span>startx
+</span><span class='line'>  <span class="c"># Could use xinit instead of startx</span>
+</span><span class='line'>  <span class="c">#exec xinit -- /usr/bin/X -nolisten tcp vt7</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>…and this works as advertised. If you are in TTY1 and you login, X is
+started. The disadvantage for me, though, was that when you shutdown,
+you must manually change to TTY7 (if that is your last
+<a href="http://tldp.org/HOWTO/Remote-Serial-Console-HOWTO/getty-agetty.html" title="agetty remote serial console">agetty</a>)
+to see the shutdown messages.</p>
+
+<p>After rummaging around through various man and web pages, I finally
+alighted on this helpful option: <code>-novtswitch</code>. So, my entry to start X
+now looked like:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">exec </span>xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
+</span><span class='line'>    <span class="nb">logout</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, on shutdown and reboot, I see all of the shutdown messages. All
+that remained was to add an option to log into a tmux session if I
+didn’t want to use X. The final code looks like this:</p>
+
+<figure class='code'><figcaption><span>~/.profile </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1 and tmux on tty2</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">exec </span>xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
+</span><span class='line'>    <span class="nb">logout</span>
+</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty2 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>tmux -f <span class="nv">$HOME</span>/.tmux/conf new -s secured
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Logging in from TTY1 takes me into my dwm session, if I switch to TTY2 I
+am logged into a tmux session with keychain running. To start consolekit
+with dwm, I have this in my <span class="file">$HOME/.xinitrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">exec </span>ck-launch-session <span class="nv">$HOME</span>/Scripts/dwm-start.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can see my full <span class="file">$HOME/.bash_profile</span> in
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.bash_profile" title="bash_profile in intuxication">my intuxication repo</a>.</p>
+
+<h4>Updated 4/2/12</h4>
+
+<p>For various reasons, I moved my environment variables from <span class="file">$HOME/.bashrc</span>
+into <span class="file">$HOME/.profile</span>; this meant that these variables were only inherited in
+interactive shells if <code>xinit</code> was called with <code>exec</code>.</p>
+
+<p>I have also ditched <code>consolekit</code> - for all of the processes it was
+spawning, it actually wasn’t performing any critical functions; or
+indeed any functions that I really needed at all…</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -423,870 +1526,6 @@ the server. The rsync command in the script:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/18/microserver/">Microserver</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-18T17:13:00+13:00" pubdate data-updated="true">Nov 18<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/microserver.png" alt="image" /></p>
-
-<p>I recently picked up a
-<a href="http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html" title="HP specs page">HP Microserver</a>;
-a small, silent server to use primarily to back up
-<a href="http://jasonwryan.com/blog/2010-10-04-the-setup" title="Slightly out-of-date setup post">my other boxes</a>.
-I went for the 2GB version without any preinstalled operating system.</p>
-
-<p>As I want this machine to just sit quietly in my garage for the next 5
-or 6 years, I opted for
-<a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
-base system. After installing two 1TB drives, I set them up as an
-<a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
-RAID 1 array, in a i
-<a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
-
-<p><strong>Pro tip</strong> when you get to the part of the partitioning where you
-configure the volume for encryption, make sure you select <em>No</em> for
-<em>erase data</em>. It took close to 90 hours to scrub both the hard drives.
-And, as I am not really expecting
-<a href="http://www.extremetech.com/computing/105931-full-disk-encryption-is-too-good-says-us-intelligence-agency" title="FDE defeats the NSA">a visit from the spooks</a>,
-that seems a little like overkill…</p>
-
-<p>Once the base install was complete, I set up my SSH keys,
-<a href="http://tmux.sourceforge.net/" title="tmux page">tmux</a>, configured the
-firewall and forwarded the necessary ports, set up
-<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia page: network file system">NFS</a>,
-and that was it. The box is deathly quite, can be mounted locally for
-<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync entry">rsync backups</a> and
-accessed remotely (for a tmux session running
-<a href="http://irssi.org/" title="Irssi homepage">irssi</a>), and all for less than
-NZD700.</p>
-
-<p>I knocked together a quick script<sup>1</sup> to manage the backing up; currently
-I run it manually, but once I have the excludes file tweaked properly,
-I’ll set up a
-<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
-automate the task.</p>
-
-<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># Backup to remote server over NFS</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
-</span><span class='line'>     <span class="nb">exit </span>1
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'><span class="k"> </span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then </span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
-</span><span class='line'> <span class="k">else</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
-</span><span class='line'>     mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
-</span><span class='line'> <span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># sync directories</span>
-</span><span class='line'> <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>
-</span><span class='line'>
-</span><span class='line'> rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\</span>
-</span><span class='line'>     --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
-</span><span class='line'>     /home/jason /etc /media/Sentinel/Backups/Centurion
-</span><span class='line'>
-</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
-</span><span class='line'>     umount /media/Sentinel
-</span><span class='line'> <span class="k">else</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
-</span><span class='line'> <span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h5>Notes</h5>
-
-<ol>
-<li>Any faults aside, it should be reasonably portable…</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/07/irc-dzen/">IRC Notifications with dzen2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-07T19:48:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
-
-<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
-session running on a server connected to IRC and I wanted to get
-notifications whenever someone addressed me, irrespective of whether I
-was connected to the session, or that particular machine at the time.</p>
-
-<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
-and there is a script called
-<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
-that will print any mentions in a channel to a file. I then configured
-the fnotify script to write to a folder in Dropbox. Now, whenever I am
-mentioned in freenode, the file is updated across all my machines.</p>
-
-<p>The next challenge was to translate the updating of the fnotify file
-into a notification on my current machine. As I don’t use
-<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
-on my Arch machines, I wanted to make it work with
-<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
-Enter a simple shell script:</p>
-
-<figure class='code'><figcaption><span>highlights.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">while </span>inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>
-</span><span class='line'><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
-</span><span class='line'><span class="k">done</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
-so that it runs in the background after login. Whenever the metadata
-(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
-written to my
-<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
-with the message.</p>
-
-<p>Simple; but does what I need…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Dropbox’s API won’t work with dzen2—or with other lightweight
-notifications like
-<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
-<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
-(that was closed without any progress)—hence my having to resort to a
-home-cooked solution…</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/10/01/pinboard-elvis/">Pinboard Elvis</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-10-01T10:29:00+13:00" pubdate data-updated="true">Oct 1<span>st</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/pinboard-elvis.png" alt="image" /></p>
-
-<p>After recovering from
-<a href="http://jasonwryan.com/blog/2011-09-28-delicious" title="My post on the delicious fiasco">the shock of the botched delicious relaunch</a>,
-I have switched to
-<a href="http://pinboard.in/u:jasonwryan/" title="My bookmarks on Pinboard">Pinboard</a>
-for my bookmarking. Previously, I was just synching my bookmarks from
-delicious, but now I have abandoned that trainwreck completely.</p>
-
-<p>Two things made the transition painless. The first was the
-<a href="http://www.appbrain.com/app/me.mitnworb.save.to.pinboard/" title="Save to Pinboard page">Pinboard Android app</a>
-so I could access and manage bookmarks from my phone; the second was a
-little trickier.</p>
-
-<p>As I have previously mentioned, I use bookmarking not just to retrieve
-my own saved pages, but as a search repository for material that other
-people have decided is interesting or valuable enough to want to save.
-And there is no better tool for this sort of searching than
-<a href="http://surfraw.alioth.debian.org/" title="Surfraw - Shell Users' Revolutionary Front Rage Against the Web">Surfraw</a><sup>1</sup></p>
-
-<p>I had written an elvis to search delicious bookmarks, so to complete the
-transition to Pinboard, I needed to do the same. It was a little
-trickier than I had anticipated, as some of the URLs (particularly when
-searching across multiple tags) were reasonably complex given my modest
-scripting skills. But
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.config/surfraw/elvi/pin" title="Pinboard elvis in mercurial repo">I got there in the end…</a></p>
-
-<p>Now searching for web pages that I or anyone else has saved to Pinboard
-is as simple as typing:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pin -t<span class="o">=</span>unix+linux+vim
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Which will return all saved pages that share those three tags. I can
-also refine my search to a particular user with the <code>-u</code>{ser} switch, or
-just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Previous posts on Surfraw:
-
-<ul>
-<li> <a href="http://jasonwryan.com/blog/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">Arch Wiki elvis for Surfraw</a></li>
-<li> <a href="http://jasonwryan.com/blog/2011-05-05-w3m" title="Yanking links in w3m">w3m, Surfraw and yanking  URLs</a></li>
-</ul>
-</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/09/28/delicious/">Delicious? Not after the first bite…</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-09-28T09:27:00+13:00" pubdate data-updated="true">Sep 28<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/delicious1.png" alt="image" /></p>
-
-<p>I have used
-<a href="http://delicious.com" title="Once great social bookmarking site...">delicious</a>,
-the bookmarking service, for just on five years now and over that time
-added around 1500 bookmarks. This suggests to me that I am a heavy, but
-not compulsive boomarker—I tend to only add pages that I think I will
-have a reasonably good chance of wanting to reference in the future.</p>
-
-<p>I am (or rather, was) an unabashed fan of the service. To the point
-where earlier this year I wrote
-<a href="http://anonscm.debian.org/gitweb/?p=surfraw/surfraw.git;a=blob_plain;f=elvi/deli;hb=8e32f5edaf26b7a65e5535d81b513f6d63e82847" title="Elvis in the Surfraw CVS tree">a Surfraw elvis to search the site</a>.
-As this would suggest, I use the site frequently, not just to bookmark
-or retrieve my own pages, but to search for other pages that people have
-considered “bookmark-worthy” (which is generally a pretty good indicator
-of quality).</p>
-
-<p>Like many comitted users, when the news leaked out late last year that
-<a href="http://www.readwriteweb.com/archives/rip_delicious_you_were_so_beautiful_to_me.php" title="RWW">Yahoo was shuttering delicious</a>,
-I jumped to Pinboard and have been
-<a href="http://pinboard.in/u:jasonwryan/" title="My boomarks on Pinboard">synching my bookmarks</a>
-between the two sites since. In retrospect, that turned out to be an
-excellent decision.</p>
-
-<p>The “new” delicious was launched overnight and I think it is fair to say
-that it has been completely and utterly eviscerated. It has gone from
-being a site that served a very specific (and incredibly useful)
-purpose—saving and tagging web pages for future use—to a bland,
-lowest-common-denominator, generic “social” site, like countless others
-that have arrived and disappeared with quirky names like Plurk, Plonker,
-etc..</p>
-
-<p>The site <em>looks good</em>; all light and airy and spacious (that space will,
-I am sure, be quickly filled with advertising), but they have stripped
-all the utility from the site. You can no longer actually access and
-manage your bookmarks. It is a colossal failure.</p>
-
-<p>I have 757 tags. I know that tag clouds are considered old hat, but on a
-site built on taxonomies, they are still an incredibly effective way of
-presenting information. The new delicious has dispensed with them. They
-have also decided that I don’t need to see all of my tags, so I can now
-only view 50 of them. <strong>Fifty out of seven hundred and fifty</strong>.
-Presumably I am expected to guess all the rest…</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/delicious2.png" alt="image" /></p>
-
-<p><sup>The new tag display on the left and the old, as a cloud, on the right.</sup></p>
-
-<p>These aren’t options, though. All of the settings to display tags, tag
-bundles, etc., and the options to edit tags have been removed. You can’t
-access any of the tools to manage your bookmarks. The designers have
-decreed that you can no longer manage your information in a useful way.
-Morons.</p>
-
-<p>The clueless mediocrities responsible for this will probably think that
-they are reinventing the site and making it relevant for a broader, less
-geeky market. And they are probably right. The fact that the site looks
-remarkably like a phone app suggests that sort of studied rush to the
-bottom.</p>
-
-<p>What they have done is something of an achievement on one level, though.
-They have made Yahoo look good. In all the time that Yahoo owned
-delicious, they were only able to neglect it; these new clowns have
-completely fscked it…</p>
-
-<p>If you bookmark sites because you are semi-intelligent and you recognize
-that being able to easily access and manage information effectively is
-critical to your intellectual and social wellbeing, then head over to
-<a href="http://pinboard.in/" title="A real boomarking site">Pinboard</a> and sign up
-now.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/09/10/tmux-and-ssh-keys/">tmux &amp; SSH Keys</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-09-10T16:46:00+12:00" pubdate data-updated="true">Sep 10<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-ssh.jpg" alt="image" /></p>
-
-<p>I have posted before about tmux<sup>1</sup>, the terminal multiplexer. One of the
-(minor) frustrations that I have to-date done nothing about was setting
-up persistent SSH key management across sessions. The ability to enter
-the passphrase for my public keys once, and then to be able to access
-remote hosts—or {git,hg} push—without having to re-enter a passphrase.</p>
-
-<p>My solution is quite hackish, but it works and, given
-<a href="http://duckduckgo.com/?q=tmux+ssh-agent" title="tmux and ssh-agent on DDG">the only other solutions</a>
-I was able to find by searching seem even more convoluted, I thought I
-would share it.</p>
-
-<p>There are a couple of separate steps, none of them of any real
-consequence, but each necessary.</p>
-
-<p>First, in your <span class="file">$HOME/.tmux.conf</span> you need to enable update-environment:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set</span> -g update-environment <span class="s2">&quot;DISPLAY SSH_ASKPASS SSH_AUTH_SOCK</span>
-</span><span class='line'><span class="s2">SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>From the <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="tmux manual">man page</a>:</p>
-
-<blockquote><p>Set a space-separated string containing a list of environment
-variables to be copied into the session environment when a new session
-is created or an existing session is attached. Any variables that do
-not exist in the source environment are set to be removed from the
-session environment (as if -r was given to the set-environment
-command).</p></blockquote>
-
-<p>The next step is to create a script (mine is bound to a key sequence to
-launch from scratch, you can adopt a simpler approach) that starts tmux
-and initializes ssh-agent:<sup>2</sup></p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="nv">PID</span><span class="o">=</span><span class="k">$(</span>pgrep tmux<span class="k">)</span>
-</span><span class='line'><span class="nv">new</span><span class="o">=</span><span class="s2">&quot;tmux -f $HOME/.tmux/conf new -s secured&quot;</span>
-</span><span class='line'><span class="nv">old</span><span class="o">=</span><span class="s2">&quot;tmux attach -t secured -d&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$SSH\_AUTH\_SOCK&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nb">eval</span> <span class="sb">`</span>ssh-agent<span class="sb">`</span>
-</span><span class='line'>    <span class="nb">trap</span> <span class="s2">&quot;kill $SSH\_AGENT\_PID&quot;</span> 0
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$PID&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span>urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${new}&quot;</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">    </span>urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${old}&quot;</span>
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'>ssh-add
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The final step is to install
-<a href="http://www.funtoo.org/wiki/Keychain" title="Keychain homepage">keychain</a>, and
-set it up. I followed the
-<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Using_keychain" title="...because it rocks!">instructions on the Arch Wiki</a>
-and opted for a couple of lines in <span class="file">$HOME/.bash_profile</span><sup>3</sup>, like so:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id<span class="se">\_</span>rsa
-</span><span class='line'><span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span> <span class="o">&amp;&amp;</span>
-</span><span class='line'>    <span class="nb">source</span> <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That’s it. Now, hitting a key sequence opens a terminal, I am prompted
-for my passphrase and then, if I open another window, or another tmux
-session <em>as long is the first session is still running, attached or
-not</em>, I am authenticated and can SSH or push without a prompt.</p>
-
-<h4>Updated 7/10/11</h4>
-
-<p>I refined the sequence to provide me a little more flexibility: now the
-keychain is only called if I start a specific named tmux session. To do
-this, I changed my <span class="file">$HOME/.bash_profile</span> to test for that session:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">tsess</span><span class="o">=</span><span class="k">$(</span>tmux ls<span class="k">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;${tsess%%:*}&quot;</span> <span class="o">=</span> <span class="s2">&quot;secured&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span>
-</span><span class='line'>   <span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'>    <span class="c"># start keychain</span>
-</span><span class='line'>    /usr/bin/keychain -Q -q --nogui ~/.ssh/id<span class="se">\_</span>rsa
-</span><span class='line'>    . <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>Previous posts:</p>
-
-<ul>
-<li><a href="http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer" title="First post on tmux">tmux: terminal multiplexer</a></li>
-<li><a href="http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux" title="tmux sessions">Sessions in tmux</a></li>
-<li><a href="http://jasonwryan.com/blog/2011-06-07-copy-and-paste-in-tmux" title="Copy and paste in tmux">Copy &amp; paste in tmux</a></li>
-<li><a href="http://jasonwryan.com/blog/2011-06-10-setting-tmux-status-bar-if-in-x" title="tmux status bars">Setting tmux status bar if in X</a></li>
-</ul>
-</li>
-<li><p>Updated to include session test. Changes <a href="http://beta.intuxication.org/jasonwryan/archer/rev/e1762094c1b7/" title="Mercurial changelog">here</a>.</p></li>
-<li>Alternatively, placing the script in <span class="file">/etc/profile.d/keychain.sh</span> will
-start the agent when you login, as opposed to starting a specific
-shell. Your call on security versus convenience…</li>
-</ol>
-
-
-<p>Creative Commons image from <a href="http://www.flickr.com/photos/marts-pics/2292588212/in/photostream/" title="Public Key on Flickr">mer de glace</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/09/08/tarsnap/">Tarsnap</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-09-08T17:55:00+12:00" pubdate data-updated="true">Sep 8<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap.jpg" alt="image" /></p>
-
-<p>I have been using <a href="http://www.tarsnap.com/" title="Tarsnap homepage">Tarsnap</a>
-for a couple of months now to backup
-<a href="http://jasonwryan.com/blog/2010-10-04-the-setup" title="My setup">my EeePC</a>.
-Tarsnap’s (superb) tagline is: <code>online backups for the truly paranoid.</code></p>
-
-<p>Essentially, Tarsnap stores your encrypted backups on
-<a href="http://aws.amazon.com/s3//192-5766046-6455343/" title="Amazon page">Amazon’s S3 servers</a>,
-recognizes duplicate data and avoids storing it again, and only deletes
-data once no remaining archives require it. I can recommend it as a
-terrific service for a number of reasons.</p>
-
-<p>It is <em><a href="http://www.tarsnap.com/security.html" title="Security page">secure</a></em>.
-Developed by the FreeBSD Security Officer, there is a
-<a href="http://www.tarsnap.com/bugbounty.html" title="Bug bounty details">bug bounty</a> for
-anyone who does discover bugs or security holes. It is very reasonably
-priced. It is reliable. And most importantly,
-<a href="http://www.tarsnap.com/about.html" title="Tarsnap about page">Dr Colin Percival</a>,
-erstwhile child prodigy and developer, is extremely helpful either on
-the mailing list or IRC if you have any questions or need help.</p>
-
-<p>If, however, you have a quick look at the
-<a href="http://www.tarsnap.com/man-tarsnap.1.html" title="tarsnap(1)">man page</a>, you will
-see that it is not exactly a simple application. After a couple of
-months of trying to remember all of the relevant flags, I searched for a
-script that would simplify the process for me. There are
-<a href="http://duckduckgo.com/?q=tarsnap+%2B+bash+script" title="DDG results">a few online</a>,
-but they are all intended to fully automate the process (which makes
-sense for something like backups)…</p>
-
-<p>What I was looking for, however, was something more interactive: more
-along the lines of a prompt. So, realizing I would have to scratch my
-own itch, I wrote a wrapper script to assist my failing memory.</p>
-
-<p>The script prints out a menu of the available options and, once you have
-selected the activity that you would like (creating a new snapshot,
-deleting an old one etc.,), then the script checks if any further input
-is required, for example, the name of the snapshot to delete, and then
-executes it. It is nothing flash, but it works…</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap2.png" alt="image" /></p>
-
-<p>You can <a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/snap" title="Snap script on Intuxication">grab the script</a>
-from my mercurial repo. It’s written in bash, but if you require
-<a href="http://tldp.org/LDP/abs/html/portabilityissues.html" title="Advanced Bash Scripting Guide">portability</a>,
-it shouldn’t be too hard to tweak.</p>
-
-<h4>Updated 3/10/11</h4>
-
-<p>I have rewritten the script to be
-<a href="http://pubs.opengroup.org/onlinepubs/9699919799/" title="POSIX Standard at the Open Group">POSIX compliant</a>
-and also to better conform to basic UNIX behaviours, in terms of the
-options etc. It should now be good to run in most shells.</p>
-
-<h5>Notes</h5>
-
-<p>Creative Commons licensed image by
-<a href="http://www.flickr.com/photos/declanjewell/2447653142/" title="Flickr image credit">Declan TM</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/07/19/script-to-edit-config-files/">Script to Edit Config Files</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-07-19T19:34:00+12:00" pubdate data-updated="true">Jul 19<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/xdg-script.png" alt="image" /></p>
-
-<p>Even with bash completion, endlessly typing and tabbing through the
-directory tree to make a simple change to a config file quickly becomes
-tedious, so I concocted this script to make it somewhat more
-straightforward.</p>
-
-<figure class='code'><figcaption><span>xdg.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>; <span class="k">then </span>
-</span><span class='line'><span class="k">    for </span>f in <span class="nv">$dir</span>/* ; <span class="k">do</span>
-</span><span class='line'><span class="k">    </span><span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
-</span><span class='line'>        <span class="k">case</span> <span class="nv">$file</span> in
-</span><span class='line'>        conf | config | *.cfg | *rc<span class="o">)</span>  <span class="nv">$EDITOR</span> <span class="s2">&quot;$f&quot;</span> ;;
-</span><span class='line'>        *<span class="o">)</span>  :  ;;
-</span><span class='line'>        <span class="k">esac</span>
-</span><span class='line'><span class="k">    done</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>A relatively simple script, with a nice feature or two, it does a couple
-of things. First, it
-<a href="http://wiki.bash-hackers.org/commands/classictest" title="Bash Hackers: test">tests</a>
-that the directory actually exists:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>    <span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>and then loops through all of the files in the directory using a
-<a href="http://mywiki.wooledge.org/glob" title="Entry on Greg's Wiki">glob</a> and
-checks for a pattern match.</p>
-
-<p>In order for the
-<a href="http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_03.html" title="Cases on Bash Guide">case statement</a>
-to work, however, the directory path has to be stripped from the file
-name.</p>
-
-<p>Rather than run another process with
-<a href="http://www.gnu.org/software/coreutils/manual/html_node/basename-invocation.html" title="GNU basename in coreutils">basename</a>,
-I used
-<a href="http://wiki.bash-hackers.org/syntax/pe#substring_removal" title="Bash Hackers Wiki">parameter expansion</a>
-to remove the substring:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>which turns, for example, <span class="file">$XDG_CONGIG_HOME/newsbeuter/conf</span> into a
-simple conf. This can then be evaluated for a match with the file names
-in the case statement and passed to the <code>$EDITOR</code>.</p>
-
-<p>If no match is found, nothing (<code>:</code>) is done.</p>
-
-<p>Now, it is simply a matter of entering <code>xdg vimprobable</code> and
-<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span> is opened in Vim.</p>
-
-<h4>Updated 19/10/11</h4>
-
-<p>After using this script for a while it became clear to me that it has a
-significant drawback: too many applications place their config files in
-directories other than <span class="file">$XDG_CONFIG_HOME</span>. So,
-<a href="https://bbs.archlinux.org/viewtopic.php?id=128585" title="Post on the Arch boards">with some help</a>,
-I updated the script. It now covers all of the directories where you are
-likely to find dotfiles.</p>
-
-<figure class='code'><figcaption><span>xdg.sh v2 </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="nb">dirs</span><span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
-</span><span class='line'><span class="nv">IFS</span><span class="o">=</span><span class="s1">$&#39;\n&#39;</span>
-</span><span class='line'><span class="nb">read</span> -r -d <span class="s1">&#39;&#39;</span> -a files &lt; <span class="se">\</span>
-</span><span class='line'>    &lt;<span class="o">(</span>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
-</span><span class='line'>           -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>        -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>        -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
-</span><span class='line'>        -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
-</span><span class='line'>        -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> 2&gt;/dev/null<span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">((</span> <span class="k">${#</span><span class="nv">files</span><span class="p">[*]</span><span class="k">}</span> <span class="o">))</span> <span class="o">&amp;&amp;</span> <span class="s2">&quot;$EDITOR&quot;</span> <span class="s2">&quot;${files}&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you would prefer a more portable version—which still relies on GNU
-find—then you could simplify it like so:</p>
-
-<figure class='code'><figcaption><span>xdg.sh v3 </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="nb">dirs</span><span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
-</span><span class='line'>       -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> <span class="se">\</span>
-</span><span class='line'>    -exec <span class="s2">&quot;$EDITOR&quot;</span> <span class="o">{}</span> +
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -1302,23 +1541,23 @@ find—then you could simplify it like so:</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2011/12/01/readline/">Readline Bindings in Vi Mode</a>
+        <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2011/11/29/rtorrent/">Building rtorrent on Debian Squeeze</a>
+        <a href="/blog/2012/03/17/vampires/">A Taxonomy of Help Vampires</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2011/11/28/rsync/">rsync + SSH Backups</a>
+        <a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2011/11/18/microserver/">Microserver</a>
+        <a href="/blog/2012/02/13/chroot/">Chroot in LVM on LUKS on Raid: Arch Linux</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2011/11/07/irc-dzen/">IRC Notifications with dzen2</a>
+        <a href="/blog/2012/02/11/lvm/">LVM on LUKS on RAID1 on Arch Linux</a>
       </li>
     
   </ul>

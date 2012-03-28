@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/bash/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-28T17:32:39+13:00</updated>
+  <updated>2012-03-28T19:52:53+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,229 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Simple aurphan notifier]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/03/09/aurphan/"/>
+    <updated>2012-03-09T16:52:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/03/09/aurphan</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
+
+<p>If you are an Arch Linux user and you are not using
+<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
+you can take a moment to hang your head in shame before you click on to
+whatever the next thing is. The package description sums up perfectly
+what aurphan does:</p>
+
+<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
+today!</p></blockquote>
+
+<p>Running aurphan -a, for example, will identify any
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
+database that are not currently maintained; allowing you to log in to
+the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
+fulfilled.<sup>1</sup></p>
+
+<p>If, like most Archers, you have a compulsive desire to automate
+<em>everything</em> then clearly typing (or even remembering to type) aurphan
+-a into a terminal periodically is as ludicrous as it is onerous. The
+obvious answer is some shell script and a cron job.</p>
+
+<p>First, the <code>cron</code> job:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then, as part of my
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/dwm-status" title="Script in intuxication repo">dwm-status script</a>,
+a function to check that there are no new additions to the file and, if
+there are, flash a highlight:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;aurphans<span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The awk filter excludes a null return, which is “No aurphans found.”
+Now, if any of the packages that I use from the AUR are disowned, I’ll
+be the first to know about it.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Actual feeling may differ depending on the package you have adopted
+and the amount of prescription painkillers that you are currently
+ingesting…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Logging Straight Into X]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/12/18/login/"/>
+    <updated>2011-12-18T22:13:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/12/18/login</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/login.png" alt="image" /></p>
+
+<p>I have been using
+<a href="https://wiki.archlinux.org/index.php/CDM" title="Arcjh Wiki entry on CDM">CDM</a>
+to log into X on my Arch machines and, if I were to continue to require
+the ability to access different window managers with any frequency, I
+would use this approach. However, on my EeePC, I really only ever login
+to a <a href="http://dwm.suckless.org/" title="dwm at suckless.org">dwm</a> session or
+the console, so having a login manager seemed like an unnecessary step.</p>
+
+<p>Consequently, over the weekend, with the help of the
+<a href="https://wiki.archlinux.org/index.php/Start_X_at_Boot" title="Arch Linux wiki entry">Start X at Boot</a>
+article on the Arch Wiki, I removed CDM and arrived at a secure,
+flexible approach to logging into X (or the console).</p>
+
+<p>My <span class="file">/etc/inittab</span> already boots me into runlevel 5:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Boot to X11&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;id:5:initdefault:
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>So it was just a case of putting a couple of lines in the correct
+<a href="http://www.gnu.org/software/bash/manual/bashref.html#Bash-Startup-Files" title="GNU Bash reference: startup files">invocation file</a>.
+I chose <span class="file">$HOME/.bash_profile</span> because I only use Bash; if you use another
+shell you should probably go with <span class="file">$HOME/.profile</span>. The recommended lines
+from the Arch Wiki are:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="nv">$DISPLAY</span> &amp;amp;&amp;amp; <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">exec </span>startx
+</span><span class='line'>  <span class="c"># Could use xinit instead of startx</span>
+</span><span class='line'>  <span class="c">#exec xinit -- /usr/bin/X -nolisten tcp vt7</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>…and this works as advertised. If you are in TTY1 and you login, X is
+started. The disadvantage for me, though, was that when you shutdown,
+you must manually change to TTY7 (if that is your last
+<a href="http://tldp.org/HOWTO/Remote-Serial-Console-HOWTO/getty-agetty.html" title="agetty remote serial console">agetty</a>)
+to see the shutdown messages.</p>
+
+<p>After rummaging around through various man and web pages, I finally
+alighted on this helpful option: <code>-novtswitch</code>. So, my entry to start X
+now looked like:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;startx <span class="k">if </span>on tty1&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> &amp;amp;&amp;amp; <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;exec xinit -- :0 -novtswitch &amp;amp;&amp;gt;/dev/null &amp;amp;
+</span><span class='line'><span class="nb">logout</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now, on shutdown and reboot, I see all of the shutdown messages. All
+that remained was to add an option to log into a tmux session if I
+didn’t want to use X. The final code looks like this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/.profile </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;startx <span class="k">if </span>on tty1 and tmux on tty2&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> &amp;amp;&amp;amp; <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;exec xinit -- :0 -novtswitch &amp;amp;&amp;gt;/dev/null &amp;amp;
+</span><span class='line'><span class="nb">logout</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty2 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;tmux -f <span class="nv">$HOME</span>/.tmux/conf new -s secured
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Logging in from TTY1 takes me into my dwm session, if I switch to TTY2 I
+am logged into a tmux session with keychain running. To start consolekit
+with dwm, I have this in my <span class="file">$HOME/.xinitrc</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">exec </span>ck-launch-session <span class="nv">$HOME</span>/Scripts/dwm-start.
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>You can see my full <span class="file">$HOME/.bash_profile</span> in
+<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.bash_profile" title="bash_profile in intuxication">my intuxication repo</a>.</p>
+
+<h4>Updated 4/2/12</h4>
+
+<p>For various reasons, I moved my environment variables from <span class="file">$HOME/.bashrc</span>
+into <span class="file">$HOME/.profile</span>; this meant that these variables were only inherited in
+interactive shells if <code>xinit</code> was called with <code>exec</code>.</p>
+
+<p>I have also ditched <code>consolekit</code> - for all of the processes it was
+spawning, it actually wasn’t performing any critical functions; or
+indeed any functions that I really needed at all…</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Readline Bindings in Vi Mode]]></title>
@@ -369,140 +592,6 @@ automate the task.</p>
 
 <ol>
 <li>Any faults aside, it should be reasonably portable…</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[IRC Notifications with dzen2]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/11/07/irc-dzen/"/>
-    <updated>2011-11-07T19:48:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/11/07/irc-dzen</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
-
-<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
-session running on a server connected to IRC and I wanted to get
-notifications whenever someone addressed me, irrespective of whether I
-was connected to the session, or that particular machine at the time.</p>
-
-<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
-and there is a script called
-<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
-that will print any mentions in a channel to a file. I then configured
-the fnotify script to write to a folder in Dropbox. Now, whenever I am
-mentioned in freenode, the file is updated across all my machines.</p>
-
-<p>The next challenge was to translate the updating of the fnotify file
-into a notification on my current machine. As I don’t use
-<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
-on my Arch machines, I wanted to make it work with
-<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
-Enter a simple shell script:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;echo <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;done
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
-so that it runs in the background after login. Whenever the metadata
-(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
-written to my
-<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
-with the message.</p>
-
-<p>Simple; but does what I need…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Dropbox’s API won’t work with dzen2—or with other lightweight
-notifications like
-<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
-<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
-(that was closed without any progress)—hence my having to resort to a
-home-cooked solution…</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Pinboard Elvis]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/10/01/pinboard-elvis/"/>
-    <updated>2011-10-01T10:29:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/10/01/pinboard-elvis</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/pinboard-elvis.png" alt="image" /></p>
-
-<p>After recovering from
-<a href="http://jasonwryan.com/blog/2011-09-28-delicious" title="My post on the delicious fiasco">the shock of the botched delicious relaunch</a>,
-I have switched to
-<a href="http://pinboard.in/u:jasonwryan/" title="My bookmarks on Pinboard">Pinboard</a>
-for my bookmarking. Previously, I was just synching my bookmarks from
-delicious, but now I have abandoned that trainwreck completely.</p>
-
-<p>Two things made the transition painless. The first was the
-<a href="http://www.appbrain.com/app/me.mitnworb.save.to.pinboard/" title="Save to Pinboard page">Pinboard Android app</a>
-so I could access and manage bookmarks from my phone; the second was a
-little trickier.</p>
-
-<p>As I have previously mentioned, I use bookmarking not just to retrieve
-my own saved pages, but as a search repository for material that other
-people have decided is interesting or valuable enough to want to save.
-And there is no better tool for this sort of searching than
-<a href="http://surfraw.alioth.debian.org/" title="Surfraw - Shell Users' Revolutionary Front Rage Against the Web">Surfraw</a><sup>1</sup></p>
-
-<p>I had written an elvis to search delicious bookmarks, so to complete the
-transition to Pinboard, I needed to do the same. It was a little
-trickier than I had anticipated, as some of the URLs (particularly when
-searching across multiple tags) were reasonably complex given my modest
-scripting skills. But
-<a href="http://beta.intuxication.org/jasonwryan/archer/file/tip/.config/surfraw/elvi/pin" title="Pinboard elvis in mercurial repo">I got there in the end…</a></p>
-
-<p>Now searching for web pages that I or anyone else has saved to Pinboard
-is as simple as typing:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pin -t<span class="o">=</span>unix+linux+vim
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Which will return all saved pages that share those three tags. I can
-also refine my search to a particular user with the <code>-u</code>{ser} switch, or
-just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Previous posts on Surfraw:
-
-<ul>
-<li> <a href="http://jasonwryan.com/blog/2011-04-13-archwiki-elvis-for-surfraw" title="My post on the Arch Wiki elvis">Arch Wiki elvis for Surfraw</a></li>
-<li> <a href="http://jasonwryan.com/blog/2011-05-05-w3m" title="Yanking links in w3m">w3m, Surfraw and yanking  URLs</a></li>
-</ul>
-</li>
 </ol>
 
 ]]></content>

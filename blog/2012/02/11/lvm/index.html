@@ -1,0 +1,521 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>LVM on LUKS on RAID1 on Arch Linux - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="After much procrastination, I finally got around to moving the last of
+my machines to Arch Linux:
+my home desktop,
+which has been running Ubuntu &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/02/11/lvm">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jasonwryan.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">LVM on LUKS on RAID1 on Arch Linux</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-11T15:58:00+13:00" pubdate data-updated="true">Feb 11<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/lvm-luks-raid.png" alt="image" /></p>
+
+<p>After much procrastination, I finally got around to moving the last of
+my machines to Arch Linux:
+<a href="http://jasonwryan.com/blog/2010-10-04-the-setup" title="The Setup post">my home desktop</a>,
+which has been running Ubuntu since the end of 2007. I’d like to share a
+few thoughts about why I finally walked away from Ubuntu, but I’ll save
+that for another long post.</p>
+
+<p>Anyway, the setup I decided on was reasonably straightforward: two 1TB
+drives comprising two Raid1 devices, one for a small (150Mb)
+<span class="file">/boot</span> andthe other holding three logical volumes
+in a LUKS crypt. This way, I have the flexibility to grow the volumes as
+needed, and only require thesingle passphrase at boot to unlock the
+enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
+and <span class="file">/home</span>.</p>
+
+<p>Almost all of the information here has been gleaned gratefully from
+other sources; principally the Arch Wiki entries on
+<a href="https://wiki.archlinux.org/index.php/LUKS" title="Arch wiki entry">LUKS</a> and
+<a href="https://wiki.archlinux.org/index.php/Lvm" title="Arch LVM article">LVM</a> and
+this <a href="http://www.pindarsign.de/webblog/?p=767" title="Blog post on LUKS and LVM">helpful blog post</a>.
+This post (and the next) are notes to remind me how I got here and, in
+the follow-up, what I need to do to restore this build…</p>
+
+<p>First up, prepare the two hard drives. This took roughly \~90 hours for
+the 1TB drives, so allow some time:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the drives are scrubbed (read the Arch Wiki on why that is
+necessary), you can move to the actual installation business. I used a
+256Mb thumb drive with the most recent x86_64 netinstall image burned
+to it. Boot into the live environment and set up the initial partitions
+using <code>cfdisk</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cfdisk /dev/sda
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I created a 150Mb partition for /boot - marked with the boot flag, and
+then partitoned the rest of the drive. Both partitons should be primary
+and be FSType linux_raid (the FD option). Write the partition tabel to
+a file and then import it to the second drive so both are exactly the
+same:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
+</span><span class='line'>sfdisk /dev/sdb &lt; part-table
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, set up the Raid arrays. Start by loading the required modules and
+then create the two arrays. The metadata flag is important: if you are
+using legacy grub, as I did, you must use the 0.90 type or your MBR will
+get overwritten:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe raid1 <span class="o">&amp;&amp;</span> modprobe dm-mod
+</span><span class='line'>mdadm --create /dev/md0 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 <span class="se">\</span>
+</span><span class='line'>    --metadata<span class="o">=</span>0.90 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
+</span><span class='line'>mdadm --create /dev/md1 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup></p>
+
+<p>At this point, you can switch to another TTY to watch the disks
+sync—again, this could take some time, depending on the size of the
+drives.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Check that it all went to plan…</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the drives are synched and pronounced clean, it it time to encrypt
+the second Raid device, /dev/md1. You can’t encrypt the array that
+contains /boot, but having it duplicated in a Raid array means that, if
+one drive goes down, you can still boot the other.</p>
+
+<p>Load the module for encryption, and then set it up:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe dm-crypt
+</span><span class='line'>cryptsetup --cipher<span class="o">=</span>aes-xts-plain --verify-passphrase <span class="se">\</span>
+</span><span class='line'>    --key-size<span class="o">=</span>512 luksFormat /dev/md1
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, open the encrypted device to create the logical volumes:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The three next steps create, in this order, the physical volume (the
+container, if you will), the group and then the individual volumes
+contained in the group. Choose simple, memorable names and do not
+hypenate them. The {pv,vg,lv}display commands print out the details of
+the devices once created.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk
+</span><span class='line'>pvdisplay
+</span><span class='line'>
+</span><span class='line'>vgcreate vgroup /dev/mapper/cryptdisk
+</span><span class='line'>vgdisplay
+</span><span class='line'>
+</span><span class='line'>lvcreate --size 20G --name lvroot vgroup
+</span><span class='line'>lvcreate --contiguous y --size 2G --name lvswap vgroup
+</span><span class='line'>lvcreate --extents +100%FREE --name lvdata vgroup
+</span><span class='line'>lvdisplay
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It should be pointed out that the
+<a href="https://github.com/Dieterbe/aif" title="AIF on Github">Arch Installer Framework</a> supports
+LUKS and LVM, so you can accomplish these last two steps from within the
+installer. I tried both and I found that I had a little more control
+doing it manually, but YMMV.</p>
+
+<p>At this point, you are ready to enter the installer and complete the
+install. Run /arch/setup and move through the early setup until you
+reach the &#8216;Prepare Hard Drives&#8217; section. Select option 3, &#8216;Configure block
+devices, mountpoints and filesystems&#8217;. Make sure that the only “raw”
+device that you configure is <span class="file">/dev/md0</span>, your
+<span class="file">/boot</span> partition. Otherwise,
+you are configuring the logical volumes, <em>not</em> the devices they are
+built on.</p>
+
+<p>After succesfully setting up the drives, install the base packages and
+then, once that is complete, switch TTYs and update your Raid
+configuration <em>prior to configuring your system</em>. This means that when
+your <code>initrd</code> is regenerated, it will inlcude the correct Raid
+information:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you are done, move to configure your system and make sure to add
+the relevant details to both your <span class="file">/etc/rc.conf</span> and your
+<span class="file">/etc/mkinitcpio.conf</span>. In the former:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</span><span class='line'><span class="nv">USEDMRAID</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and in /etc/mkinitcpio.conf:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
+</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That is the straightforward part of the install over. The final step is
+a little more tricky: installing a bootloader. My experience, and I
+tried a number of times using different approaches, is that this <em>won’t
+work</em>. The installer doesn’t seem to like the Raid setup, so it
+complains about it:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It’s not all bad, as this is the final hurdle and it is not a
+particularly high one.</p>
+
+<p>The important step is to ensure that your <span class="file">/boot/grub/menu.lst</span> is setup
+correctly. Given the names I chose above for my devices, mine looks like
+this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># (0) Arch</span>
+</span><span class='line'>title  Arch Linux
+</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
+</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
+</span><span class='line'>initrd /kernel26.img
+</span><span class='line'>
+</span><span class='line'><span class="c"># (1) Arch Fallback</span>
+</span><span class='line'>title  Arch Linux Fallback
+</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
+</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
+</span><span class='line'>initrd /kernel26-fallback.img
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once it is all setup, simply exit the installer. At this point, you have
+a perfectly secure, redundant, new Arch Linux install that you can’t
+boot into. You have two choices; chroot in and manually install grub
+now, or reboot and do it then. I opted for the latter as it would be
+more like a recovery mission—and I wanted to make sure that I was
+capable enough to manage that before committing all of my backed-up data
+to the machine.</p>
+
+<p>I’ll post the details of the relatively straightforward steps required
+to chroot into the system and install grub on both hard drives in a
+couple of days.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>The name <code>cryptdisk</code> is arbitrary - just make it memorable and use it
+consistently…</p></li>
+<li><p>I am not sure how necessary it is to have the Raid modules included
+here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
+warranted.</p></li>
+</ol>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-11T15:58:00+13:00" pubdate data-updated="true">Feb 11<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/01/18/monsterwm/" title="Previous Post: monsterwm">&laquo; monsterwm</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/02/13/chroot/" title="Next Post: Chroot in LVM on LUKS on Raid: Arch Linux">Chroot in LVM on LUKS on Raid: Arch Linux &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/17/vampires/">A Taxonomy of Help Vampires</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/02/13/chroot/">Chroot in LVM on LUKS on Raid: Arch Linux</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/02/11/lvm/">LVM on LUKS on RAID1 on Arch Linux</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("jasonwryan", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <p>Follow <a href="http://twitter.com/jasonwryan">@jasonwryan</a></p>
+  
+</section>
+
+
+<section>
+  <h1>My Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2012 - Jason Ryan -
+<span class="credit">Site powered by <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/02/11/lvm/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2012/02/11/lvm/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
