@@ -61,4 +61,4 @@ your terminal, and copy and paste it anywhere. Once you set it up, it is
 a very powerful tool…
 
 ##### Notes
-1.[tmux - Terminal-multiplexer](http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer) &amp; [Sessions in tmux](http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux)
+1.[tmux - Terminal-multiplexer](http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer/) &amp; [Sessions in tmux](http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux/)

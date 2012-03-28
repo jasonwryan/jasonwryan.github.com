@@ -68,10 +68,10 @@ All the relevant files are in
 [my mercurial repo](http://beta.intuxication.org/jasonwryan/archer/browse/tip/.tmux "My intuxication repository").
 
 ##### Notes
-1. [Copy & paste in tmux](http://jasonwryan.com/blog/2011-06-07-copy-and-paste-in-tmux "Post on copy & paste in tmux"), 
-[Sessions in tmux](http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux "Sessions in tmux")
-&amp; [Introduction to tmux](http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer "Intro to tmux")
+1. [Copy & paste in tmux](http://jasonwryan.com/blog/2011-06-07-copy-and-paste-in-tmux/ "Post on copy & paste in tmux"), 
+[Sessions in tmux](http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux/ "Sessions in tmux")
+&amp; [Introduction to tmux](http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer/ "Intro to tmux")
 
-2. [Vim colours in the console](http://jasonwryan.com/blog/2011-04-06-vim-colours-in-the-console "Setting Vim colours in the console")
+2. [Vim colours in the console](http://jasonwryan.com/blog/2011-04-06-vim-colours-in-the-console/ "Setting Vim colours in the console")
 
 3. Image squashed to fit the requirements of this blog…

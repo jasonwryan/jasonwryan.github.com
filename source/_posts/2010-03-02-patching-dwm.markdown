@@ -7,7 +7,7 @@ categories: [dwm, archlinux]
 ---
 ![image](http://dl.dropbox.com/u/261312/Blog-images/patching-dwm.png)
 
-I had posted [a while back](http://jasonwryan.com/blog/2009-12-19-patching-dwm-with-pertag-and-bstack "Patching dwm with pertag & bstack")
+I had posted [a while back](http://jasonwryan.com/blog/2009-12-19-patching-dwm-with-pertag-and-bstack/ "Patching dwm with pertag & bstack")
 about my (failed) attempt to patch [dwm](http://dwm.suckless.org "dwm homepage") 
 with both pertag and some of the other layout patches. I had been able to get it to work with
 [bottomstack](http://dwm.suckless.org/patches/bottom_stack "dwm wiki: bstack"),

@@ -97,10 +97,10 @@ fi
 
 ##### Notes
 1.  Previous posts:
-    -   [tmux: terminal multiplexer](http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer "First post on tmux")
-    -   [Sessions in tmux](http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux "tmux sessions")
-    -   [Copy & paste in tmux](http://jasonwryan.com/blog/2011-06-07-copy-and-paste-in-tmux "Copy and paste in tmux")
-    -   [Setting tmux status bar if in X](http://jasonwryan.com/blog/2011-06-10-setting-tmux-status-bar-if-in-x "tmux status bars")
+    -   [tmux: terminal multiplexer](http://jasonwryan.com/blog/2010-01-07-tmux-terminal-multiplexer/ "First post on tmux")
+    -   [Sessions in tmux](http://jasonwryan.com/blog/2010-10-03-sessions-in-tmux/ "tmux sessions")
+    -   [Copy & paste in tmux](http://jasonwryan.com/blog/2011-06-07-copy-and-paste-in-tmux/ "Copy and paste in tmux")
+    -   [Setting tmux status bar if in X](http://jasonwryan.com/blog/2011-06-10-setting-tmux-status-bar-if-in-x/ "tmux status bars")
 
 2.  Updated to include session test. Changes [here](http://beta.intuxication.org/jasonwryan/archer/rev/e1762094c1b7/ "Mercurial changelog").
 3.  Alternatively, placing the script in <span class="file">/etc/profile.d/keychain.sh</span> will

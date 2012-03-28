@@ -15,7 +15,7 @@ extensibility and customization, by the way…
 
 Using [dwm](http://dwm.suckless.org/ "dwm homepage") as my window
 manager, I had relied on
-[conky and dzen2](http://jasonwryan.com/blog/2009-11-21-dzen2-and-conky-cli-in-dwm "My post on setting this up")
+[conky and dzen2](http://jasonwryan.com/blog/2009-11-21-dzen2-and-conky-cli-in-dwm/ "My post on setting this up")
 to pipe system information into my status bar. Unfortunately, conky only
 supports one mail spool so if, like me, you use offlineimap to
 synchronize multiple mailboxes, conky would only show new mail in your
@@ -23,7 +23,7 @@ primary box. I had asked in \#conky about multiple mail spools, but it
 doesn’t seem to be supported.
 
 When I recently started using
-[WMFS](http://jasonwryan.com/blog/2010-12-26-wmfs-window-manager-from-scratch "My post on Window Manager From Scratch")
+[WMFS](http://jasonwryan.com/blog/2010-12-26-wmfs-window-manager-from-scratch/ "My post on Window Manager From Scratch")
 I decided to move to a 
 [bash script for my status information](http://beta.intuxication.org/jasonwryan/archer/file/tip/Scripts/wmfs-status "Script in intuxication repo").
 So I approached the problem afresh and decided to write a script to poll
