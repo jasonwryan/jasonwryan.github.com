@@ -4,7 +4,7 @@
   <title><![CDATA[Category: hack | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/hack/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-29T20:04:16+13:00</updated>
+  <updated>2012-03-30T12:34:00+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,147 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Moving to Octopress]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/03/30/octopress/"/>
+    <updated>2012-03-30T12:30:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/03/30/octopress</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
+
+<p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
+a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
+the static site generator powering <a href="http://pages.github.com/">Github Pages</a>. I had previously
+been posting to a <a href="https://www.tumblr.com/">tumblr</a> page and, over the nearly four years that
+I had been doing that I had somehow racked up just over 4000 posts. I was <em>not</em>
+looking forward to migrating across.</p>
+
+<p>However, the fact that the Jekyll project has a number of scripts for
+<a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">migrating from other platforms</a>
+assuaged my concerns about the difficulty of this task. That sense of relief was shortlived.
+Neither of the two tumblr migration scripts were of any assistance: both would die during their
+initial runs, probably due to some funky characters in the post titles, or perhaps the posts themselves.</p>
+
+<p>I certainly had no intention of trying to wade through the entire back catalogue identifying the
+rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the
+“straightforward” nature of thre task, I saw this setback as an opportunity to cull all of the
+cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
+some interest.</p>
+
+<p>Being an assiduous record keeper, all of the posts were helpfully bookmarked on
+<a href="https://pinboard.in/u:jasonwryan/t:jwr/">Pinboard under one tag</a>, and therefore it was
+simple enough to create a list of the required <acronym title="Unique Resource Locator">URLs</acronym>.
+Armed with this list, it was just a matter of cobbling together a script to do the bulk of
+the work for me.</p>
+
+<p>The first task was to retrieve the posts from the list:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;grab files&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;while <span class="nb">read </span>url; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done &amp;lt; /home/jason/Scripts/list
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
+surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;strip HTML cruft&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;for file in &lt;em&gt;.html; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&amp;lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.&lt;/em&gt;}&quot;</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>mkdir html &amp;amp;&amp;amp; mv *.html html/
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The final task of this part of the migration was to convert the HTML into
+<a href="http://daringfireball.net/projects/markdown/">markdown</a>,
+the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
+the "universal document converter" handled that job:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;convert to markdown format&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;for file in *; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &amp;gt; <span class="s2">&quot;$file&quot;</span>.md
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The final result was fifty markdown files holding all of my posts, almost ready to
+be committed to github. I say “almost” because the files still required what turned out to
+be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would
+inexpicably break <a href="http://www.notareallink.com">multi word
+hyperlinks</a> over two lines. Similarly all of the internal
+links to my other posts pointed to the (meaningless) tumblr URLs.</p>
+
+<p>Setting up Octopress was extremely simple and quick by comparison: the
+<a href="http://octopress.org/docs/">documentation is very helpful</a>. There was one slight
+hitch, a <a href="https://github.com/tmm1/pygments.rb/issues/10">known issue on Arch x86_64</a>,
+which was simple enough to deal with.</p>
+
+<p>While the migration was not entirely pain-free, I am pleased that I have done it. Tumblr's service
+increasingly <a href="https://twitter.com/#!/jasonwryan/statuses/176543962276954112">left a lot to be desired</a>
+but as it was a free service, I couldn't complain too much. Or, more accurately, when I did complain,
+no-one actually listened…</p>
+
+<p>Indeed, moving to a paid service like Github
+(yes, it's free at first, but once you have enough data there you need to pay a small amount
+every month) <a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/">makes a lot of sense</a>.
+The paid services I do use, like <a href="http://pinboard.in/">Pinboard</a> and
+<a href="http://www.tarsnap.com/">Tarsnap</a> are both inexpensive and much more
+reliable than their free counterparts<sup>2</sup>; and you get to invest in great
+software that is a pleasure to use.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Initially, I had set up the site as a simple holding page and dumped a whole lot
+of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
+mostly just that sort of internet detritus…</li>
+<li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Simple aurphan notifier]]></title>
@@ -422,138 +563,6 @@ find—then you could simplify it like so:</p>
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Vimprobable]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/06/26/using-vimprobable/"/>
-    <updated>2011-06-26T14:08:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/06/26/using-vimprobable</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable2.png" alt="image" /></p>
-
-<p>I <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/" title="Post on using Vimprobable">posted last year about Vimprobable</a>
-a <a href="http://www.webkit.org/" title="Webkit site">webkit browser</a> that uses
-Vim-like keybinds and can be run completely without the rodent.</p>
-
-<p>Over the last couple of months I have become increasingly comfortable
-with it, and with the addition of
-<a href="http://vimprobable.org/pipermail/vimprobable-users/2011-June/000800.html" title="External handlers patch on ML">some great recent functionality</a>,
-it has become my default browser.</p>
-
-<p>The project has good documentation, in the form of two man pages:
-<code>vimprobable</code> and <code>vimprobablerc</code>, but I thought I’d share some of my
-customizations and working methods.</p>
-
-<h3>Copy &amp; Paste</h3>
-
-<p>The only time I have been tempted to take my hand off the keyboard was
-to insert the cursor at the correct character to begin a selection to
-copy and paste. This is unnecessary. With the right options in
-<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span>,
-you can do it all from the keyboard.</p>
-
-<p>Map the keys you would like to use to enter and exit caret mode. I use
-<kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
-return to normal mode:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
-</span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then, it is just a matter of identifying the text that you wish to copy
-(in the photo above I was copying a script to launch <code>tabbed</code>), and
-highlighting it via search. So the sequence is:</p>
-
-<pre>
-1.  <kbd>/</kbd> - to enter search mode
-2.  <kbd>#</kbd><kbd>!</kbd> <kbd>Enter</kbd> - the shebang and then enter to highlight the correct
-    sequence
-3.  <kbd>Ctrl</kbd><kbd>c</kbd> to enter caret mode
-4.  and then <kbd>Shift</kbd><kbd>Up</kbd> or <kbd>Shift</kbd><kbd>Down</kbd> to highlight the following or
-    preceding lines
-5.  yanking the selected text is <kbd>Shift</kbd><kbd>y</kbd>, and the text is now stored in
-    your clipboard.
-</pre>
-
-
-<h3>Opening new instances in tabbed</h3>
-
-<p>I highlighted the section on tabbed from the
-<a href="http://www.vimprobable.org/" title="Vimprobable website">Vimprobable site</a> for a reason.
-The second tip is how to set up
-<a href="http://tools.suckless.org/tabbed" title="tabbed on suckless.org">tabbed</a> to
-work well with other applications.</p>
-
-<p>By default, any new windows (ie., instances of Vimprobable) opened from
-within Vimprobable are “caught”—and managed— by <code>tabbed</code>. However, if you
-open a link from, say
-<a href="http://newsbeuter.org/" title="ncurses rss reader">newsbeuter</a> or
-<a href="http://tyrs.nicosphere.net/index.html" title="ncurses twitter/identi.ca client">Tyrs</a>,
-this will open an instance outside <code>tabbed</code> which, if you are using a
-tiling window manager like
-<a href="http://dwm.suckless.org/" title="THE titling wm">dwm</a>, means this window gets
-pushed to master in your stack. This is not entirely satisfactory.</p>
-
-<p>Thanks to
-<a href="http://lists.suckless.org/dev/1106/8761.html" title="Tabbed thread on suckless ML">Connor Lane Smith on the suckless ML</a>,
-I have a solution to have all new instances of Vimprobable sent to
-<code>tabbed</code>, whether opened in another application, or if I click on a link
-in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
-
-<p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
-<psan class="file">/tmp</span>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&amp;lt;/tmp/tabbed.xid)&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Then it is just a matter of setting up other applications to pass links
-to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
-<span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> %s
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The workaround for Urxvtc was a little trickier. I finally got there
-with some help from
-<a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
-In my <span class="file">~/.Xdefaults</span> I have:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
-</span><span class='line'>URxvt.perl-ext-common: default,matcher
-</span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
-</span><span class='line'>URxvt.matcher.button: 1
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Script to open Vimprobable instances in tabbed&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;exec vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Now whenever I open a link in an application or by clicking a link in
-the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
-it is passed to Vimprobable in <code>tabbed</code>.</p>
 ]]></content>
   </entry>
   

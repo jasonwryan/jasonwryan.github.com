@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Invariably, an Ubuntu
-upgrade only ever brings me pain in one area: the framebuffer. Granted,
-most Ubuntu users probably don’t care about the &hellip;">
+  <meta name="description" content="I have been experimenting with a couple of new window managers over the
+last week or so. Not that I am in any way dissatisfied with
+dwm — far from &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -80,6 +80,125 @@ most Ubuntu users probably don’t care about the &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/12/26/wmfs-window-manager-from-scratch/">WMFS - Window Manager From Scratch</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-12-26T11:08:00+13:00" pubdate data-updated="true">Dec 26<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5289976238/lightbox/" title="Screenshot on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/wmfs.png" alt="image" /></a></p>
+
+<p>I have been experimenting with a couple of new window managers over the
+last week or so. Not that I am in any way dissatisfied with
+<a href="http://dwm.suckless.org/" title="suckless page for dwm">dwm</a> — far from it; I
+do from time to time, however, like to see what else is on offer.</p>
+
+<p><a href="http://wmfs.info/projects/wmfs" title="WMFS homepage">WMFS</a> is a fairly new
+entrant in the window manager marketplace. The developers describe it
+as:</p>
+
+<blockquote><p>a lightweight and highly configurable tiling window manager for X… It
+supports Xft (Freetype) fonts and is compliant with the Extended
+Window Manager Hints (EWMH) specifications, Xinerama and Xrandr.</p></blockquote>
+
+<p>The <a href="http://aur.archlinux.org/packages.php?ID=26924" title="AUR page">git version is available</a> in
+AUR, and is straightforward to build and install. The fun, as always,
+comes with customization…</p>
+
+<p>As is says on the box, WMFS is highly configurable. The configuration is
+all done (initially) in one file, which you will need to copy to your
+<span class="file">~/.config/wmfs/directory</span>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cp /etc/xdg/wmfs/wmfsrc ~/.config/wmfs/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Even the default config is relatively fully featured. There are nine
+default layouts (about five more than I usually need, but it is always
+better to over cater). The <span class="file">wmfsrc</span> is quite well
+commented, so most of the options are self explanatory.</p>
+
+<p>One thing I did note about editing this file, which is probably more a
+reflection of my haste rather than the wm itself, is that it seemed
+<em>very</em> unforgiving of any errors. More than once I had to copy the
+default wmfsrc back across and start again. My advice is to make any
+changes cumulatively, and test by reloading before continuing.</p>
+
+<p>You can see my config file in my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/.config/wmfs/wmfsrc" title="Mercurial repository for EeePC">bitbucket repo</a>.
+Most of the changes have been made in setting up my preferred tags and
+keybindings – so they are consistent with my dwm and
+<a href="http://plhk.ru/" title="Echinus window manager home">echinus</a> setups.</p>
+
+<p>One of the great features of WMFS is the status bar. You can pipe all
+sorts of information into it with a bash script, and you can use colours
+and icons (if that is your thing). Simply sourcing the bash script from
+within wmfsrc will see it up and running:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">background_command</span> <span class="o">=</span> <span class="s2">&quot;$HOME/.config/wmfs/autostart.sh&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Or, if you prefer to use conky:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>conky | <span class="k">while </span><span class="nb">read</span> -r; <span class="k">do </span>wmfs -s -name <span class="s2">&quot;$REPLY&quot;</span>; <span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I use the status bar to display some basic system information. You can
+see from
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/Scripts/wmfs-status" title="Script in bitbucket repo">my status script</a>
+that most of it is simply piping commands through the awesomeness that
+is <a href="http://awk.info/" title="Awk Community Portal">awk</a>.</p>
+
+<p>I hadn’t thought that I would find a replacement for dwm, but WMFS is a
+serious contender. It has all of the functionality out-of-the-box,
+including:</p>
+
+<ul>
+<li>pre-set layout per tag</li>
+<li>rules to send applications to specific tags</li>
+<li>completely customizable keybinds, and – as a bonus,</li>
+<li><a href="http://en.wikipedia.org/wiki/Vi" title="Wikipedia page">Vi</a>-driven
+command interface</li>
+</ul>
+
+
+<p>Unlike dwm, it requires no patching for any of this. It has been
+completely stable while I have been using it and, while not as light as
+dwm, it is still in the minimalist camp in terms of size.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -949,101 +1068,6 @@ it if that is the functionality that you are looking for in 5.7.2.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/02/27/using-uzbl/">Using Uzbl</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-02-27T10:19:00+13:00" pubdate data-updated="true">Feb 27<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/4352140405/" title="Arch &amp; uzbl by jasonwryan, on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/uzbl.jpg" alt="Arch &amp;
-uzbl" /></a></p>
-
-<p>A couple of weeks ago, I switched my default browser from
-<a href="http://conkeror.org/" title="Conkeror homepage">Conkeror</a> to
-<a href="http://www.uzbl.org/" title="uzbl homepage">uzbl</a>. It wasn’t that I was
-dissatisfied with Conkeror <em>per se</em>; more that as I was almost
-exclusively using vim-like applications, it seemed almost perverse to be
-browsing with an application that used Emacs-style keybindings. Over
-time, the simplest operations seemed—in comparison to
-<a href="http://www.vim.org/" title="THE $EDITOR">Vim</a>— to demand ridiculously complex
-key strokes.</p>
-
-<p>So, I installed uzbl.</p>
-
-<blockquote><p>Uzbl follows the UNIX philosophy - “Write programs that do one thing
-and do it well. Write programs to work together. Write programs to
-handle text streams, because that is a universal interface.”
-<a href="http://www.uzbl.org/">uzbl homepage</a></p></blockquote>
-
-<p>Consequently, the default uzbl version is designed to do little more
-than browse web pages. It doesn’t handle cookies, manage downloads,
-block ads, save bookmarks, or do any of the things that you would expect
-of its WebKit kin, <del>Firefox</del> Safari and Chrome.</p>
-
-<p>This isn’t to say that it <em>can’t</em> do any of these things; like any
-well-designed
-<a href="http://en.wikipedia.org/wiki/UNIX" title="Wikipedia entry">UNIX</a> program, it
-is extensible and interoperable with programs through a range of
-scripts. The difference is that you get to choose which functionality
-matters to you, and implement it on an as-needs basis. This makes uzbl
-very light, very fast, and very powerful.</p>
-
-<p>The version I installed, uzbl-tabbed, ships with a number of default
-scripts that perform most of the functions that you will need. There is
-also a <a href="http://www.uzbl.org/wiki/scripts" title="uzbl wiki: scripts">scripts page</a>
-on the wiki that has a growing number of scripts contributed by users.</p>
-
-<p>I installed a couple of <a href="http://pbrisbin.com:8080/pages/scripts.html" title="Pat's scripts page">Pat Brisbin’s scripts</a>;
-an ingenious bash script for bookmarking that creates an HTML page of
-your bookmarks that you can serve locally or remotely (I keep mine on
-<a href="http://www.dropbox.com" title="Dropbox home">Dropbox</a> so I can access it from
-my phone as well), and a tidy little download manager.</p>
-
-<p>Like Vim, uzbl is modal; you switch between command and insert mode. By
-configuring uzbl to use Vim key bindings, you can seamless integrate it
-into your desktop environment. Here you can see the status bar showing
-uzbl in command mode, on the Arch forums home page, which has completely
-loaded (the other figure is the X root window number).</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/uzbl-bar.png" alt="image" /></p>
-
-<p>As an Arch Linux user, I’m keen to support a project that has been
-developed by the Arch community (if you want to see the history of the
-project, there is a <a href="http://bbs.archlinux.org/viewtopic.php?id=70700&amp;p=1" title="uzbl history">long thread</a>
-on the Arch boards); but ultimately this software appeals because it is
-so configurable: you can customize it to your heart’s content (see my
-config file on my <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/uzbl/" title="uzbl file on bitbucket">mercurial repo</a>).</p>
-
-<p>There are packages for most of the major distros: <a href="http://www.uzbl.org/get.php" title="Download and install details on the wiki">give it a go</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -1061,6 +1085,10 @@ config file on my <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/uzbl/"
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/30/octopress/">Moving to Octopress</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
       </li>
     
@@ -1074,10 +1102,6 @@ config file on my <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/uzbl/"
     
       <li class="post">
         <a href="/blog/2012/02/13/chroot/">Chroot in LVM on LUKS on Raid: Arch Linux</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/02/11/lvm/">LVM on LUKS on RAID1 on Arch Linux</a>
       </li>
     
   </ul>

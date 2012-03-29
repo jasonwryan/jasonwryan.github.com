@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/bash/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-03-29T20:04:16+13:00</updated>
+  <updated>2012-03-30T12:34:00+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,147 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Moving to Octopress]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/03/30/octopress/"/>
+    <updated>2012-03-30T12:30:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/03/30/octopress</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
+
+<p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
+a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
+the static site generator powering <a href="http://pages.github.com/">Github Pages</a>. I had previously
+been posting to a <a href="https://www.tumblr.com/">tumblr</a> page and, over the nearly four years that
+I had been doing that I had somehow racked up just over 4000 posts. I was <em>not</em>
+looking forward to migrating across.</p>
+
+<p>However, the fact that the Jekyll project has a number of scripts for
+<a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">migrating from other platforms</a>
+assuaged my concerns about the difficulty of this task. That sense of relief was shortlived.
+Neither of the two tumblr migration scripts were of any assistance: both would die during their
+initial runs, probably due to some funky characters in the post titles, or perhaps the posts themselves.</p>
+
+<p>I certainly had no intention of trying to wade through the entire back catalogue identifying the
+rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the
+“straightforward” nature of thre task, I saw this setback as an opportunity to cull all of the
+cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
+some interest.</p>
+
+<p>Being an assiduous record keeper, all of the posts were helpfully bookmarked on
+<a href="https://pinboard.in/u:jasonwryan/t:jwr/">Pinboard under one tag</a>, and therefore it was
+simple enough to create a list of the required <acronym title="Unique Resource Locator">URLs</acronym>.
+Armed with this list, it was just a matter of cobbling together a script to do the bulk of
+the work for me.</p>
+
+<p>The first task was to retrieve the posts from the list:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;grab files&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;while <span class="nb">read </span>url; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done &amp;lt; /home/jason/Scripts/list
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
+surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;strip HTML cruft&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;for file in &lt;em&gt;.html; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&amp;lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.&lt;/em&gt;}&quot;</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>mkdir html &amp;amp;&amp;amp; mv *.html html/
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The final task of this part of the migration was to convert the HTML into
+<a href="http://daringfireball.net/projects/markdown/">markdown</a>,
+the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
+the "universal document converter" handled that job:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;convert to markdown format&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;for file in *; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &amp;gt; <span class="s2">&quot;$file&quot;</span>.md
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The final result was fifty markdown files holding all of my posts, almost ready to
+be committed to github. I say “almost” because the files still required what turned out to
+be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would
+inexpicably break <a href="http://www.notareallink.com">multi word
+hyperlinks</a> over two lines. Similarly all of the internal
+links to my other posts pointed to the (meaningless) tumblr URLs.</p>
+
+<p>Setting up Octopress was extremely simple and quick by comparison: the
+<a href="http://octopress.org/docs/">documentation is very helpful</a>. There was one slight
+hitch, a <a href="https://github.com/tmm1/pygments.rb/issues/10">known issue on Arch x86_64</a>,
+which was simple enough to deal with.</p>
+
+<p>While the migration was not entirely pain-free, I am pleased that I have done it. Tumblr's service
+increasingly <a href="https://twitter.com/#!/jasonwryan/statuses/176543962276954112">left a lot to be desired</a>
+but as it was a free service, I couldn't complain too much. Or, more accurately, when I did complain,
+no-one actually listened…</p>
+
+<p>Indeed, moving to a paid service like Github
+(yes, it's free at first, but once you have enough data there you need to pay a small amount
+every month) <a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/">makes a lot of sense</a>.
+The paid services I do use, like <a href="http://pinboard.in/">Pinboard</a> and
+<a href="http://www.tarsnap.com/">Tarsnap</a> are both inexpensive and much more
+reliable than their free counterparts<sup>2</sup>; and you get to invest in great
+software that is a pleasure to use.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Initially, I had set up the site as a simple holding page and dumped a whole lot
+of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
+mostly just that sort of internet detritus…</li>
+<li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Simple aurphan notifier]]></title>
@@ -440,160 +581,6 @@ the server. The rsync command in the script:</p>
 
 <p>Creative Commons image from
 <a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Microserver]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/11/18/microserver/"/>
-    <updated>2011-11-18T17:13:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/11/18/microserver</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/microserver.png" alt="image" /></p>
-
-<p>I recently picked up a
-<a href="http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html" title="HP specs page">HP Microserver</a>;
-a small, silent server to use primarily to back up
-<a href="http://jasonwryan.com/blog/2010/10/04/the-setup" title="Slightly out-of-date setup post">my other boxes</a>.
-I went for the 2GB version without any preinstalled operating system.</p>
-
-<p>As I want this machine to just sit quietly in my garage for the next 5
-or 6 years, I opted for
-<a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
-base system. After installing two 1TB drives, I set them up as an
-<a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
-RAID 1 array, in a i
-<a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
-
-<p><strong>Pro tip</strong> when you get to the part of the partitioning where you
-configure the volume for encryption, make sure you select <em>No</em> for
-<em>erase data</em>. It took close to 90 hours to scrub both the hard drives.
-And, as I am not really expecting
-<a href="http://www.extremetech.com/computing/105931-full-disk-encryption-is-too-good-says-us-intelligence-agency" title="FDE defeats the NSA">a visit from the spooks</a>,
-that seems a little like overkill…</p>
-
-<p>Once the base install was complete, I set up my SSH keys,
-<a href="http://tmux.sourceforge.net/" title="tmux page">tmux</a>, configured the
-firewall and forwarded the necessary ports, set up
-<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia page: network file system">NFS</a>,
-and that was it. The box is deathly quite, can be mounted locally for
-<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync entry">rsync backups</a> and
-accessed remotely (for a tmux session running
-<a href="http://irssi.org/" title="Irssi homepage">irssi</a>), and all for less than
-NZD700.</p>
-
-<p>I knocked together a quick script<sup>1</sup> to manage the backing up; currently
-I run it manually, but once I have the excludes file tweaked properly,
-I’ll set up a
-<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
-automate the task.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Backup to remote server over NFS&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
-</span><span class='line'> <span class="nb">exit </span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
-</span><span class='line'> mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">fi</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;sync directories&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
-</span><span class='line'> /home/jason /etc /media/Sentinel/Backups/Centurion
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
-</span><span class='line'> umount /media/Sentinel
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Any faults aside, it should be reasonably portable…</li>
-</ol>
-
 ]]></content>
   </entry>
   

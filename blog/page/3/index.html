@@ -9,10 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have been experiencing problems with my wifi LAN when playing music
-through
-mpd
-or watching movies. My upload speeds would climb to around 120- &hellip;">
+  <meta name="description" content="I’ve posted a couple of times1 about
+tmux, the brilliant
+terminal mutliplexer. One question I see raised a lot in #tmux is how
+to copy and paste. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -81,6 +81,107 @@ or watching movies. My upload speeds would climb to around 120- &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/07/copy-and-paste-in-tmux/">Copy &amp; Paste in tmux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-07T19:54:00+12:00" pubdate data-updated="true">Jun 7<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-copy.png" alt="image" /></p>
+
+<p>I’ve posted a couple of times<sup>1</sup> about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
+terminal mutliplexer. One question I see raised a lot in #tmux is how
+to copy and paste.</p>
+
+<p>The documentation for tmux is excellent: the
+<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
+one of the most clear and thorough I have read. And while it is
+explained there, I thought I would share my approach anyway.</p>
+
+<p>First, I set tmux to use vi keys:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>setw -g mode-keys vi
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then I change the default keybinds to suit my workflow. As explained in
+the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
+and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
+to more intuitive and Vim-like keys:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
+</span><span class='line'><span class="nb">bind </span>Escape copy-mode
+</span><span class='line'>unbind p
+</span><span class='line'><span class="nb">bind </span>p paste-buffer
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This seems a lot closer to all of the other Vim-like apps that I run -
+where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
+<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
+
+<p>So, to string it all together, the command sequence necessary to copy
+some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
+
+<pre>
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
+# move cursor to the start or end of the desired text string
+<kbd>v</kbd>                        # to activate highlighting
+# move cursor to cover the requisite string
+<kbd>y</kbd>                        # to capture the string
+<kbd>q</kbd>                        # exit copy mode
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
+</pre>
+
+
+<p>Simple.</p>
+
+<p>This means that you can scroll back through the output of <em>anything</em> in
+your terminal, and copy and paste it anywhere. Once you set it up, it is
+a very powerful tool…</p>
+
+<h5>Notes</h5>
+
+<p>1.<a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/">Sessions in tmux</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1098,125 +1199,6 @@ with <code>wc</code> counting the number of lines (the <code>-l</code> switch).<
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/12/26/wmfs-window-manager-from-scratch/">WMFS - Window Manager From Scratch</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-12-26T11:08:00+13:00" pubdate data-updated="true">Dec 26<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5289976238/lightbox/" title="Screenshot on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/wmfs.png" alt="image" /></a></p>
-
-<p>I have been experimenting with a couple of new window managers over the
-last week or so. Not that I am in any way dissatisfied with
-<a href="http://dwm.suckless.org/" title="suckless page for dwm">dwm</a> — far from it; I
-do from time to time, however, like to see what else is on offer.</p>
-
-<p><a href="http://wmfs.info/projects/wmfs" title="WMFS homepage">WMFS</a> is a fairly new
-entrant in the window manager marketplace. The developers describe it
-as:</p>
-
-<blockquote><p>a lightweight and highly configurable tiling window manager for X… It
-supports Xft (Freetype) fonts and is compliant with the Extended
-Window Manager Hints (EWMH) specifications, Xinerama and Xrandr.</p></blockquote>
-
-<p>The <a href="http://aur.archlinux.org/packages.php?ID=26924" title="AUR page">git version is available</a> in
-AUR, and is straightforward to build and install. The fun, as always,
-comes with customization…</p>
-
-<p>As is says on the box, WMFS is highly configurable. The configuration is
-all done (initially) in one file, which you will need to copy to your
-<span class="file">~/.config/wmfs/directory</span>:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cp /etc/xdg/wmfs/wmfsrc ~/.config/wmfs/
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Even the default config is relatively fully featured. There are nine
-default layouts (about five more than I usually need, but it is always
-better to over cater). The <span class="file">wmfsrc</span> is quite well
-commented, so most of the options are self explanatory.</p>
-
-<p>One thing I did note about editing this file, which is probably more a
-reflection of my haste rather than the wm itself, is that it seemed
-<em>very</em> unforgiving of any errors. More than once I had to copy the
-default wmfsrc back across and start again. My advice is to make any
-changes cumulatively, and test by reloading before continuing.</p>
-
-<p>You can see my config file in my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/.config/wmfs/wmfsrc" title="Mercurial repository for EeePC">bitbucket repo</a>.
-Most of the changes have been made in setting up my preferred tags and
-keybindings – so they are consistent with my dwm and
-<a href="http://plhk.ru/" title="Echinus window manager home">echinus</a> setups.</p>
-
-<p>One of the great features of WMFS is the status bar. You can pipe all
-sorts of information into it with a bash script, and you can use colours
-and icons (if that is your thing). Simply sourcing the bash script from
-within wmfsrc will see it up and running:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">background_command</span> <span class="o">=</span> <span class="s2">&quot;$HOME/.config/wmfs/autostart.sh&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Or, if you prefer to use conky:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>conky | <span class="k">while </span><span class="nb">read</span> -r; <span class="k">do </span>wmfs -s -name <span class="s2">&quot;$REPLY&quot;</span>; <span class="k">done</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I use the status bar to display some basic system information. You can
-see from
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/Scripts/wmfs-status" title="Script in bitbucket repo">my status script</a>
-that most of it is simply piping commands through the awesomeness that
-is <a href="http://awk.info/" title="Awk Community Portal">awk</a>.</p>
-
-<p>I hadn’t thought that I would find a replacement for dwm, but WMFS is a
-serious contender. It has all of the functionality out-of-the-box,
-including:</p>
-
-<ul>
-<li>pre-set layout per tag</li>
-<li>rules to send applications to specific tags</li>
-<li>completely customizable keybinds, and – as a bonus,</li>
-<li><a href="http://en.wikipedia.org/wiki/Vi" title="Wikipedia page">Vi</a>-driven
-command interface</li>
-</ul>
-
-
-<p>Unlike dwm, it requires no patching for any of this. It has been
-completely stable while I have been using it and, while not as light as
-dwm, it is still in the minimalist camp in terms of size.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -1234,6 +1216,10 @@ dwm, it is still in the minimalist camp in terms of size.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/30/octopress/">Moving to Octopress</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
       </li>
     
@@ -1247,10 +1233,6 @@ dwm, it is still in the minimalist camp in terms of size.</p>
     
       <li class="post">
         <a href="/blog/2012/02/13/chroot/">Chroot in LVM on LUKS on Raid: Arch Linux</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/02/11/lvm/">LVM on LUKS on RAID1 on Arch Linux</a>
       </li>
     
   </ul>

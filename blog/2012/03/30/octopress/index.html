@@ -5,12 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Mapping CapsLock to Escape in Ubuntu - jasonwryan.com</title>
+  <title>Moving to Octopress - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="The CapsLock key is one of the best examples of persistent usability failure;
-it continues to appear on just about every English-language keyboard, &hellip;">
+  <meta name="description" content="Over the last week I have been moving my blog over to Octopress,
+a lightweight blogging framework for Jekyll,
+the static site generator powering &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +20,7 @@ it continues to appear on just about every English-language keyboard, &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2010/02/21/capslock">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/03/30/octopress">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -82,7 +83,7 @@ it continues to appear on just about every English-language keyboard, &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Mapping CapsLock to Escape in Ubuntu</h1>
+      <h1 class="entry-title">Moving to Octopress</h1>
     
     
       <p class="meta">
@@ -98,76 +99,119 @@ it continues to appear on just about every English-language keyboard, &hellip;">
   
 
 
-<time datetime="2010-02-21T16:11:00+13:00" pubdate data-updated="true">Feb 21<span>st</span>, 2010</time>
+<time datetime="2012-03-30T12:30:00+13:00" pubdate data-updated="true">Mar 30<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>The <kbd>CapsLock</kbd> key is one of the best examples of persistent usability failure;
-it continues to appear on just about every English-language keyboard, despite
-the fact that —aside from no-one ever uses it— it is an active hindrance to
-both the average typist and the sedulous coder…</p>
+<div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
 
-<p>As a matter of course, I remove it in my Arch machines with an entry in my
-<span class="file"><a href="https://bitbucket.org/jasonwryan/workstation/src/tip/.xinitrc"
-title="My xinitrc on bitbucket">.xinitrc</a></span>, but in Ubuntu/Gnome, there is no
-such file. Consequently, there is this equally effective way of dispatching the
-<kbd>CapsLock</kbd>, or in my case, mapping it to something
-actually useful, <kbd>Esc</kbd>.</p>
+<p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
+a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
+the static site generator powering <a href="http://pages.github.com/">Github Pages</a>. I had previously
+been posting to a <a href="https://www.tumblr.com/">tumblr</a> page and, over the nearly four years that
+I had been doing that I had somehow racked up just over 4000 posts. I was <em>not</em>
+looking forward to migrating across.</p>
 
-<p>First, create the <code>mapkey</code> file in your home directory:</p>
+<p>However, the fact that the Jekyll project has a number of scripts for
+<a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">migrating from other platforms</a>
+assuaged my concerns about the difficulty of this task. That sense of relief was shortlived.
+Neither of the two tumblr migration scripts were of any assistance: both would die during their
+initial runs, probably due to some funky characters in the post titles, or perhaps the posts themselves.</p>
+
+<p>I certainly had no intention of trying to wade through the entire back catalogue identifying the
+rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the
+“straightforward” nature of thre task, I saw this setback as an opportunity to cull all of the
+cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
+some interest.</p>
+
+<p>Being an assiduous record keeper, all of the posts were helpfully bookmarked on
+<a href="https://pinboard.in/u:jasonwryan/t:jwr/">Pinboard under one tag</a>, and therefore it was
+simple enough to create a list of the required <acronym title="Unique Resource Locator">URLs</acronym>.
+Armed with this list, it was just a matter of cobbling together a script to do the bulk of
+the work for me.</p>
+
+<p>The first task was to retrieve the posts from the list:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>xmodmap -pke &gt; ~/.xmodmap.mapkey
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># grab files</span>
+</span><span class='line'><span class="k">while </span><span class="nb">read </span>url; <span class="k">do </span>
+</span><span class='line'><span class="k">    </span>wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
+</span><span class='line'><span class="k">done</span> &lt; /home/jason/Scripts/list
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Then open the file and edit it:</p>
+<p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
+surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>vim ~/.xmodmap.mapkey
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># strip HTML cruft</span>
+</span><span class='line'><span class="k">for </span>file in *.html; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.*}&quot;</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>mkdir html <span class="o">&amp;&amp;</span> mv *.html html/
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Look for the <kbd>CapsLock</kbd> key, on my machine it is 66 (you can use
-<a href="http://www.x.org/archive/X11R7.5/doc/man/man1/xev.1.html" title="xev man page">xev</a>
-to locate all of your key codes), and then wreak your revenge. Just deleting
-everything after <code>keycode 66 =</code></p>
-
-<p>will render it useless, which may suit your style. I change the entry to make
-it another <kbd>Escape</kbd> key:</p>
+<p>The final task of this part of the migration was to convert the HTML into
+<a href="http://daringfireball.net/projects/markdown/">markdown</a>,
+the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
+the &#8220;universal document converter&#8221; handled that job:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>keycode <span class="nv">66</span> <span class="o">=</span> Escape NoSymbol Escape NoSymbol Escape
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># convert to markdown format</span>
+</span><span class='line'><span class="k">for </span>file in *; <span class="k">do </span>
+</span><span class='line'><span class="k">    </span>pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;$file&quot;</span>.md
+</span><span class='line'><span class="k">done</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Log out and when you log back in, you have a useful key.</p>
+<p>The final result was fifty markdown files holding all of my posts, almost ready to
+be committed to github. I say “almost” because the files still required what turned out to
+be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would
+inexpicably break <a href="http://www.notareallink.com">multi word
+hyperlinks</a> over two lines. Similarly all of the internal
+links to my other posts pointed to the (meaningless) tumblr URLs.</p>
 
-<h3>Updated for 10.04</h3>
+<p>Setting up Octopress was extremely simple and quick by comparison: the
+<a href="http://octopress.org/docs/">documentation is very helpful</a>. There was one slight
+hitch, a <a href="https://github.com/tmm1/pygments.rb/issues/10">known issue on Arch x86_64</a>,
+which was simple enough to deal with.</p>
 
-<p>The above hack was for 9.10 and earlier versions of Ubuntu.
-I have no idea why, but it (alone) doesn&#8217;t work in Lucid Lynx.
-You need a couple of extra steps:</p>
+<p>While the migration was not entirely pain-free, I am pleased that I have done it. Tumblr&#8217;s service
+increasingly <a href="https://twitter.com/#!/jasonwryan/statuses/176543962276954112">left a lot to be desired</a>
+but as it was a free service, I couldn&#8217;t complain too much. Or, more accurately, when I did complain,
+no-one actually listened…</p>
 
-<p>Open <code>System &gt; Preferences &gt; Startup Applications</code>  and add
-two new items:</p>
+<p>Indeed, moving to a paid service like Github
+(yes, it&#8217;s free at first, but once you have enough data there you need to pay a small amount
+every month) <a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/">makes a lot of sense</a>.
+The paid services I do use, like <a href="http://pinboard.in/">Pinboard</a> and
+<a href="http://www.tarsnap.com/">Tarsnap</a> are both inexpensive and much more
+reliable than their free counterparts<sup>2</sup>; and you get to invest in great
+software that is a pleasure to use.</p>
 
-<ul>
-<li>Clear the <kbd>CapsLock</kbd> key with <code>xmodmap -e "clear Lock</code></li>
-<li>Map it to <kbd>Escape</kbd> by pointing to your xmodmap file</li>
-</ul>
+<h5>Notes</h5>
 
+<ol>
+<li>Initially, I had set up the site as a simple holding page and dumped a whole lot
+of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
+mostly just that sort of internet detritus…</li>
+<li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
+</ol>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>xmodmap ~/.xmodmap.mapkeys
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now, whenever you login the script(s) will run and your <kbd>CapsLock</kbd> will map
-to something actually useful, like <kbd>Escape</kbd>.</p>
 </div>
 
 
@@ -190,12 +234,12 @@ to something actually useful, like <kbd>Escape</kbd>.</p>
   
 
 
-<time datetime="2010-02-21T16:11:00+13:00" pubdate data-updated="true">Feb 21<span>st</span>, 2010</time>
+<time datetime="2012-03-30T12:30:00+13:00" pubdate data-updated="true">Mar 30<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/ubuntu/'>ubuntu</a>
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/hack/'>hack</a>
   
 </span>
 
@@ -211,10 +255,8 @@ to something actually useful, like <kbd>Escape</kbd>.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2010/02/10/using-mercurial-to-share-dotfiles/" title="Previous Post: Using Mercurial to Share Dotfiles">&laquo; Using Mercurial to Share Dotfiles</a>
+        <a class="basic-alignment left" href="/blog/2012/03/23/key/" title="Previous Post: Signing Your Own Key">&laquo; Signing Your Own Key</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2010/02/25/wikipedia-discriminates-against-foss/" title="Next Post: Wikipedia Discriminates Against FOSS">Wikipedia Discriminates Against FOSS &raquo;</a>
       
     </p>
   </footer>
@@ -359,8 +401,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2010/02/21/capslock/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2010/02/21/capslock/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/03/30/octopress/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2012/03/30/octopress/';
         var disqus_script = 'embed.js';
       
     (function () {
