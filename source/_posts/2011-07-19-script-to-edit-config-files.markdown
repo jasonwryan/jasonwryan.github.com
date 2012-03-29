@@ -55,8 +55,8 @@ to remove the substring:
 {% endcodeblock %}
 
 which turns, for example, <span class="file">$XDG\_CONGIG\_HOME/newsbeuter/conf</span> into a
-simple conf. This can then be evaluated for a match with the file names
-in the case statement and passed to the `$EDITOR`.
+simple <span class="file">conf</span>. This can then be evaluated for a match with the file names
+in the `case` statement and passed to the `$EDITOR`.
 
 If no match is found, nothing (`:`) is done.
 
