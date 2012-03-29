@@ -5,14 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Simple aurphan notifier - jasonwryan.com</title>
+  <title>404 - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="If you are an Arch Linux user and you are not using
-aurphan,
-you can take a moment to hang your head in shame before you click on to
-whatever the &hellip;">
+  <meta name="description" content="404 Well, that didn&#8217;t work! Try browsing the Archive to find what it was you were looking for… Creative Commons image by brionv on Flickr &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +18,7 @@ whatever the &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/03/09/aurphan">
+  <link rel="canonical" href="http://jasonwryan.github.com/404.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -68,153 +65,41 @@ whatever the &hellip;">
   <div id="main">
     <div id="content">
       <div>
-<article class="hentry" role="article">
+<article role="article">
   
   <header>
-    
-      <h1 class="entry-title">Simple aurphan notifier</h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-09T16:52:00+13:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
-        
-      </p>
+    <h1 class="entry-title">404</h1>
     
   </header>
+  
+  <h3>Well, that didn&#8217;t work!</h3>
 
+<img src="http://dl.dropbox.com/u/261312/Blog-images/404.jpg" title="Page Not Found…" >
 
-<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
+<br />
+<br />
 
-<p>If you are an Arch Linux user and you are not using
-<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
-you can take a moment to hang your head in shame before you click on to
-whatever the next thing is. The package description sums up perfectly
-what aurphan does:</p>
+<p>Try browsing <a href="http://jasonwryan.com/blog/archives/" title="Previous posts, helpfully arranged">the Archive</a> to find what it was you were looking for…</p>
 
-<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
-today!</p></blockquote>
+<br />
+<br />
 
-<p>Running <code>aurphan -a</code>, for example, will identify any
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
-database that are not currently maintained; allowing you to log in to
-the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
-fulfilled.<sup>1</sup></p>
+<sup>Creative Commons image by <a href="http://www.flickr.com/photos/brionv/238264380/lightbox/" title="404 on Flickr">brionv on Flickr</a></sup>
 
-<p>If, like most Archers, you have a compulsive desire to automate
-<em>everything</em> then clearly typing (or even remembering to type) <code>aurphan
--a</code> into a terminal periodically is as ludicrous as it is onerous. The
-obvious answer is some shell script and a cron job.</p>
-
-<p>First, the <code>cron</code> job:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
-</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then, as part of my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="Script in mercurial repo">dwm-status script</a>,
-a function to check that there are no new additions to the file and, if
-there are, flash a highlight:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>
-</span><span class='line'>    <span class="nv">aurphans</span><span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">        </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
-</span><span class='line'>    <span class="k">fi</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The awk filter excludes a null return, which is “No aurphans found.”
-Now, if any of the packages that I use from the AUR are disowned, I’ll
-be the first to know about it.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Actual feeling may differ depending on the package you have adopted
-and the amount of prescription painkillers that you are currently
-ingesting…</li>
-</ol>
-
-</div>
-
-
-  <footer>
-    <p class="meta">
+  
+    <footer>
       
-  
-
-<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
-
       
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-09T16:52:00+13:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
-      
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/hack/'>hack</a>
-  
-</span>
-
-
-    </p>
-    
-      <div class="sharing">
+        <div class="sharing">
   
   
   
 </div>
 
-    
-    <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/02/13/chroot/" title="Previous Post: Chroot in LVM on LUKS on Raid: Arch Linux">&laquo; Chroot in LVM on LUKS on Raid: Arch Linux</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2012/03/17/vampires/" title="Next Post: A Taxonomy of Help Vampires">A Taxonomy of Help Vampires &raquo;</a>
-      
-    </p>
-  </footer>
+    </footer>
+  
 </article>
-
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-</div>
-  </section>
 
 </div>
 
@@ -348,10 +233,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       var disqus_shortname = 'jasonwryan';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/03/09/aurphan/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2012/03/09/aurphan/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
