@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Archwiki elvis for Surfraw"
+alias: /post/4575299833/surfraw
 date: 2011-04-13 19:29
 comments: true
 categories: [archlinux, surfraw, bash]

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Changing Karmic's Login Screen"
+alias: /post/235687709/changing-karmics-login-screen 
 date: 2009-11-07 18:46
 comments: true
 categories: [ubuntu,linux,hack]

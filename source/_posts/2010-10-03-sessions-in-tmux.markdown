@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Sessions in tmux"
+alias: /post/1233829137/tmux-a
 date: 2010-10-03 20:15
 comments: true
 categories: [tmux, archlinux, hack]

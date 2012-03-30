@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Pinboard Elvis"
+alias: /post/10860316800/pinboard
 date: 2011-10-01 10:29
 comments: true
 categories: [surfraw, linux, bash]

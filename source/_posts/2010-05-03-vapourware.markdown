@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Vapourware"
+alias: /post/566999075/vapourware
 date: 2010-04-03 13:18
 comments: true
 categories: [media]

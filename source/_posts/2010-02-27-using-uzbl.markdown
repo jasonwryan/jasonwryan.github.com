@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Using Uzbl"
+alias: /post/413898557/uzbl
 date: 2010-02-27 10:19
 comments: true
 categories: [archlinux, browser]

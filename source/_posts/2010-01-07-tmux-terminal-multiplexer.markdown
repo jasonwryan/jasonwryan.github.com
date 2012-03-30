@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "tmux - terminal multiplexer"
+alias: /post/320721668/tmux-terminal-multiplexer
 date: 2010-01-07 15:10
 comments: true
 categories: [tmux, linux]

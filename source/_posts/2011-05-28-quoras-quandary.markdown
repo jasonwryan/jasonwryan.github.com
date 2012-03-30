@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Quora's Quandary"
+alias: /post/5925805350/quora
 date: 2011-05-28 10:05
 comments: true
 categories: [media]

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Wikipedia Discriminates Against FOSS"
+alias: /post/409379904/wikipedia
 date: 2010-02-25 06:59
 comments: true
 categories: [linux, dwm]

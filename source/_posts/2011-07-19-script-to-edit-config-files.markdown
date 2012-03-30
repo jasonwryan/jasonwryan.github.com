@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Script to Edit Config Files"
+alias: /post/7796086618/bash
 date: 2011-07-19 19:34
 comments: true
 categories: [linux, bash, hack]

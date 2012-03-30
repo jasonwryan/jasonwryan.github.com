@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Console Fonts in Ubuntu"
+alias: /post/1364783597/fonts
 date: 2010-10-21 20:38
 comments: true
 categories: [ubuntu, linux]

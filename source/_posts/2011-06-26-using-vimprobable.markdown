@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Using Vimprobable"
+alias: /post/6922753155/vimprobable2
 date: 2011-06-26 14:08
 comments: true
 categories: [linux, browser, hack]

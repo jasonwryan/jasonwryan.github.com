@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Patching dwm with pertag and bstack"
+alias: /post/289830140/patching-dwm-with-pertag-and-bstack
 date: 2009-12-19 17:40
 comments: true
 categories: [dwm, archlinux]

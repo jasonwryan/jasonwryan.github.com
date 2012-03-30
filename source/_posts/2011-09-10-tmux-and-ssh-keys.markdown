@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "tmux &amp; SSH Keys"
+alias: /post/10024794419/ssh
 date: 2011-09-10 16:46
 comments: true
 categories: [tmux, linux, bash]

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Vim Colours in the Console"
+alias: /post/4387273119/vim-console
 date: 2011-04-06 21:19
 comments: true
 categories: [vim, linux, tmux]

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Network Flooding on Ubuntu"
+alias: /post/6234399965/ubuntu-pulse
 date: 2011-06-06 13:40
 comments: true
 categories: [ubuntu, linux]

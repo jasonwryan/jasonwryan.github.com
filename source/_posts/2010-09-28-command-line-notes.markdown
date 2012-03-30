@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Command Line Notes"
+alias: /post/1203000683/awk-notes
 date: 2010-09-28 17:56
 comments: true
 categories: [linux, hack, bash]
