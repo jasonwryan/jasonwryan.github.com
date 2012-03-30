@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Moving to Octopress"
-date: 2012-03-30 10:58
+date: 2012-03-30 12:30
 comments: true
 categories: [archlinux, bash, hack]
 ---
