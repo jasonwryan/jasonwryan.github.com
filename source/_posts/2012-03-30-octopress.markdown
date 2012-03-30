@@ -69,7 +69,7 @@ be committed to github. I say “almost” because the files still required what
 be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would 
 inexpicably break [multi word
 hyperlinks](http://www.notareallink.com) over two lines. Similarly all of the internal
-links to my other posts pointed to the (meaningless) tumblr URLs.
+links to my other posts pointed to the (meaningless) tumblr URLs<sup>2</sup>.
 
 Setting up Octopress was extremely simple and quick by comparison: the
 [documentation is very helpful](http://octopress.org/docs/). There was one slight 
@@ -86,12 +86,16 @@ Indeed, moving to a paid service like Github
 every month) [makes a lot of sense](http://blog.pinboard.in/2011/12/don_t_be_a_free_user/).
 The paid services I do use, like [Pinboard](http://pinboard.in/) and 
 [Tarsnap](http://www.tarsnap.com/) are both inexpensive and much more 
-reliable than their free counterparts<sup>2</sup>; and you get to invest in great
+reliable than their free counterparts<sup>3</sup>; and you get to invest in great
 software that is a pleasure to use.
 
 ##### Notes
 1. Initially, I had set up the site as a simple holding page and dumped a whole lot
 of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
 mostly just that sort of internet detritus…
-2. And **much** more scrupulous about how they use your personal data.
+2. For creating redirections (Github pages do *not* support <span class="file">.htaccess</span>)
+I can't recommend enough the 
+[Jekyll Alias Generator](https://github.com/rawsyntax/jekyll_alias_generator/blob/master/_plugins/alias_generator.rb).
+Just. Brilliant.
+3. And **much** more scrupulous about how they use your personal data.
 
