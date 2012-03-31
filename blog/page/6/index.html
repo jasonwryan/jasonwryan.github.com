@@ -169,9 +169,9 @@ and initializes ssh-agent:<sup>2</sup></p>
 </span><span class='line'><span class="nv">new</span><span class="o">=</span><span class="s2">&quot;tmux -f $HOME/.tmux/conf new -s secured&quot;</span>
 </span><span class='line'><span class="nv">old</span><span class="o">=</span><span class="s2">&quot;tmux attach -t secured -d&quot;</span>
 </span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$SSH\_AUTH\_SOCK&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$SSH_AUTH_SOCK&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
 </span><span class='line'><span class="k">    </span><span class="nb">eval</span> <span class="sb">`</span>ssh-agent<span class="sb">`</span>
-</span><span class='line'>    <span class="nb">trap</span> <span class="s2">&quot;kill $SSH\_AGENT\_PID&quot;</span> 0
+</span><span class='line'>    <span class="nb">trap</span> <span class="s2">&quot;kill $SSH_AGENT_PID&quot;</span> 0
 </span><span class='line'><span class="k">fi</span>
 </span><span class='line'>
 </span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$PID&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
@@ -193,7 +193,7 @@ and opted for a couple of lines in <span class="file">$HOME/.bash_profile</span>
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id<span class="se">\_</span>rsa
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
 </span><span class='line'><span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span> <span class="o">&amp;&amp;</span>
 </span><span class='line'>    <span class="nb">source</span> <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
 </span></code></pre></td></tr></table></div></figure>
@@ -223,7 +223,7 @@ this, I changed my <span class="file">$HOME/.bash_profile</span> to test for tha
 </span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;${tsess%%:*}&quot;</span> <span class="o">=</span> <span class="s2">&quot;secured&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span>
 </span><span class='line'>   <span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span>; <span class="k">then</span>
 </span><span class='line'>    <span class="c"># start keychain</span>
-</span><span class='line'>    /usr/bin/keychain -Q -q --nogui ~/.ssh/id<span class="se">\_</span>rsa
+</span><span class='line'>    /usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
 </span><span class='line'>    . <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
 </span><span class='line'><span class="k">fi</span>
 </span></code></pre></td></tr></table></div></figure>
