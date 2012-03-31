@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="OpenOffice won’t recognize TrueType fonts with the extension .otf, so you need to convert them to .ttf
-in order to use them in that suite. 1
-sudo apt &hellip;">
+  <meta name="description" content="I have posted before about tmux1, the terminal multiplexer. One of the
+(minor) frustrations that I have to-date done nothing about was setting
+up &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,7 +86,7 @@ sudo apt &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2009/03/17/install-otf-fonts-in-openoffice/">Install .otf Fonts in OpenOffice</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/09/10/tmux-and-ssh-keys/">tmux &amp; SSH Keys</a></h1>
     
     
       <p class="meta">
@@ -102,26 +102,290 @@ sudo apt &hellip;">
   
 
 
-<time datetime="2009-03-17T19:51:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2009</time>
+<time datetime="2011-09-10T16:46:00+12:00" pubdate data-updated="true">Sep 10<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>OpenOffice won’t recognize TrueType fonts with the extension <code>.otf</code>, so you need to convert them to <code>.ttf</code>
-in order to use them in that suite.</p>
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-ssh.jpg" alt="image" /></p>
+
+<p>I have posted before about tmux<sup>1</sup>, the terminal multiplexer. One of the
+(minor) frustrations that I have to-date done nothing about was setting
+up persistent SSH key management across sessions. The ability to enter
+the passphrase for my public keys once, and then to be able to access
+remote hosts—or {git,hg} push—without having to re-enter a passphrase.</p>
+
+<p>My solution is quite hackish, but it works and, given
+<a href="http://duckduckgo.com/?q=tmux+ssh-agent" title="tmux and ssh-agent on DDG">the only other solutions</a>
+I was able to find by searching seem even more convoluted, I thought I
+would share it.</p>
+
+<p>There are a couple of separate steps, none of them of any real
+consequence, but each necessary.</p>
+
+<p>First, in your <span class="file">$HOME/.tmux.conf</span> you need to enable update-environment:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install fontforge
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set</span> -g update-environment <span class="s2">&quot;DISPLAY SSH_ASKPASS SSH_AUTH_SOCK</span>
+</span><span class='line'><span class="s2">SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>If all the <code>.otf</code> files are in the same folder, then you are good to go.</p>
+<p>From the <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="tmux manual">man page</a>:</p>
 
-<p>First, you need the conversion script, which I found in <a href="url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this%20post[/url">this post</a>:</p>
+<blockquote><p>Set a space-separated string containing a list of environment
+variables to be copied into the session environment when a new session
+is created or an existing session is attached. Any variables that do
+not exist in the source environment are set to be removed from the
+session environment (as if -r was given to the set-environment
+command).</p></blockquote>
 
-<figure class='code'><figcaption><span>otf2ttf.sh </span></figcaption>
+<p>The next step is to create a script (mine is bound to a key sequence to
+launch from scratch, you can adopt a simpler approach) that starts tmux
+and initializes ssh-agent:<sup>2</sup></p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nv">PID</span><span class="o">=</span><span class="k">$(</span>pgrep tmux<span class="k">)</span>
+</span><span class='line'><span class="nv">new</span><span class="o">=</span><span class="s2">&quot;tmux -f $HOME/.tmux/conf new -s secured&quot;</span>
+</span><span class='line'><span class="nv">old</span><span class="o">=</span><span class="s2">&quot;tmux attach -t secured -d&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$SSH\_AUTH\_SOCK&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">eval</span> <span class="sb">`</span>ssh-agent<span class="sb">`</span>
+</span><span class='line'>    <span class="nb">trap</span> <span class="s2">&quot;kill $SSH\_AGENT\_PID&quot;</span> 0
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$PID&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${new}&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">    </span>urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${old}&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'>ssh-add
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The final step is to install
+<a href="http://www.funtoo.org/wiki/Keychain" title="Keychain homepage">keychain</a>, and
+set it up. I followed the
+<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Using_keychain" title="...because it rocks!">instructions on the Arch Wiki</a>
+and opted for a couple of lines in <span class="file">$HOME/.bash_profile</span><sup>3</sup>, like so:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id<span class="se">\_</span>rsa
+</span><span class='line'><span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span> <span class="o">&amp;&amp;</span>
+</span><span class='line'>    <span class="nb">source</span> <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That’s it. Now, hitting a key sequence opens a terminal, I am prompted
+for my passphrase and then, if I open another window, or another tmux
+session <em>as long is the first session is still running, attached or
+not</em>, I am authenticated and can SSH or push without a prompt.</p>
+
+<h4>Updated 7/10/11</h4>
+
+<p>I refined the sequence to provide me a little more flexibility: now the
+keychain is only called if I start a specific named tmux session. To do
+this, I changed my <span class="file">$HOME/.bash_profile</span> to test for that session:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">tsess</span><span class="o">=</span><span class="k">$(</span>tmux ls<span class="k">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;${tsess%%:*}&quot;</span> <span class="o">=</span> <span class="s2">&quot;secured&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span>
+</span><span class='line'>   <span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'>    <span class="c"># start keychain</span>
+</span><span class='line'>    /usr/bin/keychain -Q -q --nogui ~/.ssh/id<span class="se">\_</span>rsa
+</span><span class='line'>    . <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>Previous posts:</p>
+
+<ul>
+<li><a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/" title="First post on tmux">tmux: terminal multiplexer</a></li>
+<li><a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/" title="tmux sessions">Sessions in tmux</a></li>
+<li><a href="http://jasonwryan.com/blog/2011/06/07/copy-and-paste-in-tmux/" title="Copy and paste in tmux">Copy &amp; paste in tmux</a></li>
+<li><a href="http://jasonwryan.com/blog/2011/06/10/setting-tmux-status-bar-if-in-x/" title="tmux status bars">Setting tmux status bar if in X</a></li>
+</ul>
+</li>
+<li><p>Updated to include session test.</p></li>
+<li>Alternatively, placing the script in <span class="file">/etc/profile.d/keychain.sh</span> will
+start the agent when you login, as opposed to starting a specific
+shell. Your call on security versus convenience…</li>
+</ol>
+
+
+<p>Creative Commons image from <a href="http://www.flickr.com/photos/marts-pics/2292588212/in/photostream/" title="Public Key on Flickr">mer de glace</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/09/08/tarsnap/">Tarsnap</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-09-08T17:55:00+12:00" pubdate data-updated="true">Sep 8<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap.jpg" alt="image" /></p>
+
+<p>I have been using <a href="http://www.tarsnap.com/" title="Tarsnap homepage">Tarsnap</a>
+for a couple of months now to backup
+<a href="http://jasonwryan.com/blog/2010/10/04/the-setup/" title="My setup">my EeePC</a>.
+Tarsnap’s (superb) tagline is: <code>online backups for the truly paranoid.</code></p>
+
+<p>Essentially, Tarsnap stores your encrypted backups on
+<a href="http://aws.amazon.com/s3//192-5766046-6455343/" title="Amazon page">Amazon’s S3 servers</a>,
+recognizes duplicate data and avoids storing it again, and only deletes
+data once no remaining archives require it. I can recommend it as a
+terrific service for a number of reasons.</p>
+
+<p>It is <em><a href="http://www.tarsnap.com/security.html" title="Security page">secure</a></em>.
+Developed by the FreeBSD Security Officer, there is a
+<a href="http://www.tarsnap.com/bugbounty.html" title="Bug bounty details">bug bounty</a> for
+anyone who does discover bugs or security holes. It is very reasonably
+priced. It is reliable. And most importantly,
+<a href="http://www.tarsnap.com/about.html" title="Tarsnap about page">Dr Colin Percival</a>,
+erstwhile child prodigy and developer, is extremely helpful either on
+the mailing list or IRC if you have any questions or need help.</p>
+
+<p>If, however, you have a quick look at the
+<a href="http://www.tarsnap.com/man-tarsnap.1.html" title="tarsnap(1)">man page</a>, you will
+see that it is not exactly a simple application. After a couple of
+months of trying to remember all of the relevant flags, I searched for a
+script that would simplify the process for me. There are
+<a href="http://duckduckgo.com/?q=tarsnap+%2B+bash+script" title="DDG results">a few online</a>,
+but they are all intended to fully automate the process (which makes
+sense for something like backups)…</p>
+
+<p>What I was looking for, however, was something more interactive: more
+along the lines of a prompt. So, realizing I would have to scratch my
+own itch, I wrote a wrapper script to assist my failing memory.</p>
+
+<p>The script prints out a menu of the available options and, once you have
+selected the activity that you would like (creating a new snapshot,
+deleting an old one etc.,), then the script checks if any further input
+is required, for example, the name of the snapshot to delete, and then
+executes it. It is nothing flash, but it works…</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap2.png" alt="image" /></p>
+
+<p>You can <a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/snap" title="Snap script in mercurial repo">grab the script</a>
+from my mercurial repo. It’s written in bash, but if you require
+<a href="http://tldp.org/LDP/abs/html/portabilityissues.html" title="Advanced Bash Scripting Guide">portability</a>,
+it shouldn’t be too hard to tweak.</p>
+
+<h4>Updated 3/10/11</h4>
+
+<p>I have rewritten the script to be
+<a href="http://pubs.opengroup.org/onlinepubs/9699919799/" title="POSIX Standard at the Open Group">POSIX compliant</a>
+and also to better conform to basic UNIX behaviours, in terms of the
+options etc. It should now be good to run in most shells.</p>
+
+<h5>Notes</h5>
+
+<p>Creative Commons licensed image by
+<a href="http://www.flickr.com/photos/declanjewell/2447653142/" title="Flickr image credit">Declan TM</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/07/19/script-to-edit-config-files/">Script to Edit Config Files</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-07-19T19:34:00+12:00" pubdate data-updated="true">Jul 19<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/xdg-script.png" alt="image" /></p>
+
+<p>Even with bash completion, endlessly typing and tabbing through the
+directory tree to make a simple change to a config file quickly becomes
+tedious, so I concocted this script to make it somewhat more
+straightforward.</p>
+
+<figure class='code'><figcaption><span>xdg.sh </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -129,44 +393,128 @@ in order to use them in that suite.</p>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/usr/local/bin/fontforge</span>
-</span><span class='line'><span class="c"># Quick and dirty hack: converts a font to truetype (.ttf)</span>
-</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Opening &quot;</span>+<span class="nv">$1</span><span class="o">)</span>;
-</span><span class='line'>Open<span class="o">(</span><span class="nv">$1</span><span class="o">)</span>;
-</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Saving &quot;</span>+<span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
-</span><span class='line'>Generate<span class="o">(</span><span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
-</span><span class='line'>Quit<span class="o">(</span>0<span class="o">)</span>;
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>; <span class="k">then </span>
+</span><span class='line'><span class="k">    for </span>f in <span class="nv">$dir</span>/* ; <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nv">$file</span> in
+</span><span class='line'>        conf | config | *.cfg | *rc<span class="o">)</span>  <span class="nv">$EDITOR</span> <span class="s2">&quot;$f&quot;</span> ;;
+</span><span class='line'>        *<span class="o">)</span>  :  ;;
+</span><span class='line'>        <span class="k">esac</span>
+</span><span class='line'><span class="k">    done</span>
+</span><span class='line'><span class="k">fi</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Save it as <code>otf2ttf.sh</code> into the folder with the <code>.otf</code> files.</p>
-
-<p>Then run:</p>
+<p>A relatively simple script, with a nice feature or two, it does a couple
+of things. First, it
+<a href="http://wiki.bash-hackers.org/commands/classictest" title="Bash Hackers: test">tests</a>
+that the directory actually exists:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">for </span>i in *.otf; <span class="k">do </span>fontforge -script otf2ttf.sh <span class="nv">$i</span>; <span class="k">done</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>    <span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Move all the converted fonts to your your shared directory:</p>
+<p>and then loops through all of the files in the directory using a
+<a href="http://mywiki.wooledge.org/glob" title="Entry on Greg's Wiki">glob</a> and
+checks for a pattern match.</p>
+
+<p>In order for the
+<a href="http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_03.html" title="Cases on Bash Guide">case statement</a>
+to work, however, the directory path has to be stripped from the file
+name.</p>
+
+<p>Rather than run another process with
+<a href="http://www.gnu.org/software/coreutils/manual/html_node/basename-invocation.html" title="GNU basename in coreutils">basename</a>,
+I used
+<a href="http://wiki.bash-hackers.org/syntax/pe#substring_removal" title="Bash Hackers Wiki">parameter expansion</a>
+to remove the substring:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo mv *ttf /usr/share/fonts/truetype/myfonts/
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>And then change the permissions and reload the cache:</p>
+<p>which turns, for example, <span class="file">$XDG_CONGIG_HOME/newsbeuter/conf</span> into a
+simple <span class="file">conf</span>. This can then be evaluated for a match with the file names
+in the <code>case</code> statement and passed to the <code>$EDITOR</code>.</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>If no match is found, nothing (<code>:</code>) is done.</p>
+
+<p>Now, it is simply a matter of entering <code>xdg vimprobable</code> and
+<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span> is opened in Vim.</p>
+
+<h4>Updated 19/10/11</h4>
+
+<p>After using this script for a while it became clear to me that it has a
+significant drawback: too many applications place their config files in
+directories other than <span class="file">$XDG_CONFIG_HOME</span>. So,
+<a href="https://bbs.archlinux.org/viewtopic.php?id=128585" title="Post on the Arch boards">with some help</a>,
+I updated the script. It now covers all of the directories where you are
+likely to find dotfiles.</p>
+
+<figure class='code'><figcaption><span>xdg.sh v2 </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/
-</span><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/*.ttf
-</span><span class='line'>sudo <span class="nb">fc</span>-cache -f -v
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nb">dirs</span><span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
+</span><span class='line'><span class="nv">IFS</span><span class="o">=</span><span class="s1">$&#39;\n&#39;</span>
+</span><span class='line'><span class="nb">read</span> -r -d <span class="s1">&#39;&#39;</span> -a files &lt; <span class="se">\</span>
+</span><span class='line'>    &lt;<span class="o">(</span>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
+</span><span class='line'>           -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>        -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>        -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
+</span><span class='line'>        -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
+</span><span class='line'>        -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> 2&gt;/dev/null<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">((</span> <span class="k">${#</span><span class="nv">files</span><span class="p">[*]</span><span class="k">}</span> <span class="o">))</span> <span class="o">&amp;&amp;</span> <span class="s2">&quot;$EDITOR&quot;</span> <span class="s2">&quot;${files}&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>And the fonts will now appear in OpenOffice. Easy.</p>
+<p>If you would prefer a more portable version—which still relies on GNU
+find—then you could simplify it like so:</p>
+
+<figure class='code'><figcaption><span>xdg.sh v3 </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="nb">dirs</span><span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
+</span><span class='line'>       -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> <span class="se">\</span>
+</span><span class='line'>    -exec <span class="s2">&quot;$EDITOR&quot;</span> <span class="o">{}</span> +
+</span></code></pre></td></tr></table></div></figure>
+
+
+
 </div>
   
   
@@ -175,6 +523,8 @@ in order to use them in that suite.</p>
     </article>
   
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/7/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
