@@ -22,7 +22,7 @@ initial runs, probably due to some funky characters in the post titles, or perha
 
 I certainly had no intention of trying to wade through the entire back catalogue identifying the
 rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the 
-“straightforward” nature of thre task, I saw this setback as an opportunity to cull all of the
+“straightforward” nature of the task, I saw this setback as an opportunity to cull all of the
 cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
 some interest.
 

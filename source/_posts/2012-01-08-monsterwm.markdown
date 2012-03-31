@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "monsterwm"
-alias: /post/15468357815/monster
+alias: /post/14503389901/monster
 date: 2012-01-18 10:03
 comments: true
 categories: [archlinux]
