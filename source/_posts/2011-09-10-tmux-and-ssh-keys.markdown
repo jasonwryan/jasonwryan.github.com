@@ -48,9 +48,9 @@ PID=$(pgrep tmux)
 new="tmux -f $HOME/.tmux/conf new -s secured"
 old="tmux attach -t secured -d"
 
-if [[ -z "$SSH\_AUTH\_SOCK" ]]; then
+if [[ -z "$SSH_AUTH_SOCK" ]]; then
     eval `ssh-agent`
-    trap "kill $SSH\_AGENT\_PID" 0
+    trap "kill $SSH_AGENT_PID" 0
 fi
 
 if [[ -z "$PID" ]]; then
@@ -69,7 +69,7 @@ set it up. I followed the
 and opted for a couple of lines in <span class="file">$HOME/.bash\_profile</span><sup>3</sup>, like so:
 
 {% codeblock lang:sh %}
-/usr/bin/keychain -Q -q --nogui ~/.ssh/id\_rsa
+/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
 [[ -f $HOME/.keychain/$HOSTNAME-sh ]] && 
     source $HOME/.keychain/$HOSTNAME-sh
 {% endcodeblock %}
@@ -83,7 +83,7 @@ not*, I am authenticated and can SSH or push without a prompt.
 
 I refined the sequence to provide me a little more flexibility: now the
 keychain is only called if I start a specific named tmux session. To do
-this, I changed my <span class="file">$HOME/.bash\_profile</span> to test for that session:
+this, I changed my <span class="file">$HOME/.bash_profile</span> to test for that session:
 
 {% codeblock lang:sh %}
 tsess=$(tmux ls)
@@ -91,7 +91,7 @@ tsess=$(tmux ls)
 if [[ "${tsess%%:*}" = "secured" ]] && 
    [[ -f $HOME/.keychain/$HOSTNAME-sh ]]; then
     # start keychain
-    /usr/bin/keychain -Q -q --nogui ~/.ssh/id\_rsa
+    /usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
     . $HOME/.keychain/$HOSTNAME-sh
 fi
 {% endcodeblock %}
