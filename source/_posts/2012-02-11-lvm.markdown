@@ -164,7 +164,7 @@ and in /etc/mkinitcpio.conf:
 
 {% codeblock lang:sh %}
 MODULES="... dm_mod dm_crypt aes_x86_64 raid1 ..."
-HOOKS="... udev mdadm encrypt lvm2 filesystems ..."  [2]
+HOOKS="... udev mdadm_udev encrypt lvm2 filesystems ..."  [2]
 {% endcodeblock %}
 
 That is the straightforward part of the install over. The final step is
@@ -218,4 +218,6 @@ consistently…
 
 2. I am not sure how necessary it is to have the Raid modules included
 here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
-warranted.
+warranted. **UPDATED 12/4/12** as per the [mkinitcpio article on the Wiki](https://wiki.archlinux.org/index.php/Mkinitcpio#HOOKS)
+the `mdadm_udev` hook is preferred over the plain `mdadm` hook in your
+<span class="file">/etc/mkinitcpio.conf</span>.
