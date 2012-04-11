@@ -300,7 +300,7 @@ the relevant details to both your <span class="file">/etc/rc.conf</span> and you
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
-</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
+</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm_udev encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -370,7 +370,9 @@ couple of days.</p>
 consistently…</p></li>
 <li><p>I am not sure how necessary it is to have the Raid modules included
 here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
-warranted.</p></li>
+warranted. <strong>UPDATED 12/4/12</strong> as per the <a href="https://wiki.archlinux.org/index.php/Mkinitcpio#HOOKS">mkinitcpio article on the Wiki</a>
+the <code>mdadm_udev</code> hook is preferred over the plain <code>mdadm</code> hook in your
+<span class="file">/etc/mkinitcpio.conf</span>.</p></li>
 </ol>
 
 </div>
