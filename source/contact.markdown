@@ -9,9 +9,13 @@ footer: true
 ## Standard ##
 You can email me at this domain using **mail@**...
 
-or find me on IRC in #freenode
+#### GPG
+If you'd like to send me encrypted mail, you can use:
 
-If you'd like to send me encrypted mail, you can use [my GPG Key](http://dl.dropbox.com/u/261312/jwr_public.key)
+* [my personal GPG Key](http://dl.dropbox.com/u/261312/jwr_public.key)
+* or [my work key](http://dl.dropbox.com/u/261312/catalyst.asc) for <jason@catalyst.net.nz>
+
+or find me on IRC in #freenode
 
 ## Other venues ##
 You will find me in a couple of other places around the web:
