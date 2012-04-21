@@ -5,13 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Chroot in LVM on LUKS on Raid: Arch Linux - jasonwryan.com</title>
+  <title>Using mutt, LDAP and SSL - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="In my previous post describing this setup
-I made the point that grub won’t be installed and that it is necessary
-to chroot in to install grub on &hellip;">
+  <meta name="description" content="One of the great things about starting a new job at
+an open source company
+is having the freedom to use the tools that suit your workflow, rather &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +20,7 @@ to chroot in to install grub on &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/02/13/chroot">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/04/21/lbdb">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -87,7 +87,7 @@ to chroot in to install grub on &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Chroot in LVM on LUKS on Raid: Arch Linux</h1>
+      <h1 class="entry-title">Using mutt, LDAP and SSL</h1>
     
     
       <p class="meta">
@@ -103,115 +103,87 @@ to chroot in to install grub on &hellip;">
   
 
 
-<time datetime="2012-02-13T10:25:00+13:00" pubdate data-updated="true">Feb 13<span>th</span>, 2012</time>
+<time datetime="2012-04-21T11:23:00+12:00" pubdate data-updated="true">Apr 21<span>st</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/chroot-lvm.jpg" alt="image" /></p>
+<div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/addressbook.png" title="'Address Book Icon by bertop on Flickr'" ></p>
 
-<p>In <a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on setting this system up">my previous post describing this setup</a>
-I made the point that grub won’t be installed and that it is necessary
-to <code>chroot</code> in to install grub on both drives. This is the procedure I use
-to do that—and to perfrom any other maintenance that requires working
-from a live environment.</p>
+<p>One of the great things about starting a new job at
+<a href="http://jasonwryan.com/blog/2012/04/05/catalyst/" title="My post on joining Catalyst IT">an open source company</a>
+is having the freedom to use the tools that suit your workflow, rather than
+having to suffer the indignity of whatever the IT department consider to be the
+lowest comon denominator. Suffice to say, I have had a lot of fun this week
+setting up my working environment—and the ocassional hiccough as I was forced to learn
+something new…</p>
 
-<p>Again, most of this information is on the
-<a href="https://wiki.archlinux.org/index.php/Chroot" title="Arch wiki page">Arch Wiki chroot page</a>, I
-am just going to fill in the detail around this setup: LVM on LUKS on
-Raid1.</p>
+<p>One of those “learning opportunities” consisted of trying to get my mail client,
+<a href="http://www.mutt.org/" title="All mail clients suck. This one just sucks less.">mutt</a>
+to talk to the <acronym title="Lightweight Directory Acces Protocol">LDAP</acronym>
+directory over <acronym title="Secure Sockets Layer">SSL</acronym> so that I could
+query the shared address book. There are a number of helpful blog posts that describe
+using <a href="http://www.spinnaker.de/lbdb/" title="The Little Brother Database homepage">lbdb</a>
+to achieve this<sup>1</sup>.</p>
 
-<p>Once you have booted into your live environment, load the modules that
-are required; in this case: <code>raid1</code>, <code>dm-mod</code> and <code>dm-crypt</code>.</p>
-
-<p>Check that udev hasn’t helpfully read the superblock of your Raid drives
-and assembled phantom arrays:</p>
+<p>Unfortunately, after a lot of searching, I was unable to find any documentation on
+achieving this integration over a secure connection. I kept seeing this error:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat /proc/mdstat
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>Error: Search failed. LDAP server returned an error : 13, description: TLS
+</span><span class='line'>confidentiality required at /usr/lib/mutt_ldap_query line 198, &lt;DATA&gt; line 558.
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>I find that there are a couple there generally assigned the names
-<span class="file">/dev/md126</span> and <span class="file">/dev/md127</span>.
-These need to be stopped before assembling the correct arrays:</p>
+<p>Several hours later, and with some
+help from <a href="https://twitter.com/#!/ibeardslee" title="Ian on Twitter: follow him…">@ibeardslee</a>,
+I managed to set it up, and it was definitely worth the effort.</p>
+
+<p>You will need to install <code>lbdb</code> from
+<a href="http://aur.archlinux.org/packages.php?ID=10225" title="AUR package">the AUR</a>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cower -d lbdb
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>…and a couple of packages from the repos to make it all work:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S perl-ldap perl-io-socket-ssl netkit-bsd-finger
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then it is a matter of configuring <code>lbdb</code> to both
+query the LDAP directory and be able to be called from <code>mutt</code>.
+First, copy the config files into your <span class="file">$HOME</span>:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
-</span><span class='line'>mdadm --assemble /dev/md0 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
-</span><span class='line'>mdadm --assemble /dev/md1 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir .lbdb
+</span><span class='line'>cp /etc/lbdb.rc .lbdb/lbdbrc
+</span><span class='line'>cp /etc/lbdb_ldap.rc .lbdb/ldap.rc
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>You should now have both your arrays up and running. The next step is to
-unlock your encrypted device:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After entering your passphrase, your device will be unlocked. Next, make
-the logical volumes available, and then check they are correct:</p>
+<p>And then modify the two configuration files to suit your setup:
+The first, <span class="file">$HOME/.lbdb/lbdbrc</span>, is well commented and
+self-explanatory; add <code>ldap</code> to the methods and the
+nickname of your server:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>vgchange --available y vgroup
-</span><span class='line'>lvscan
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">METHODS</span><span class="o">=</span><span class="s2">&quot;m_abook m_ldap&quot;</span>
+</span><span class='line'><span class="nv">LDAP_NICKS</span><span class="o">=</span><span class="s2">&quot;catalyst&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>At this point, you are ready to mount the devices and <code>chroot</code>:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir /mnt/arch
-</span><span class='line'>mount /dev/mapper/vgroup-lvroot /mnt/arch
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The next steps are straight from the wiki:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
-</span><span class='line'>mount -t proc proc proc/
-</span><span class='line'>mount -t sysfs sys sys/
-</span><span class='line'>mount -o <span class="nb">bind</span> /dev dev/
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Mount the other parts of the system that you need to use in your
-recovery – in this case, I need my <span class="file">/boot</span> partition:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now <code>chroot</code> to the device and define your shell:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>chroot . /bin/bash
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The wiki has some good advice about customizing your prompt to reinforce
-the fact that you are in a chroot:</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>With everything mounted, it is just a matter of performing your
-maintenance. To reinstall <code>grub</code>:</p>
+<p>The second config file, <span class="file">$HOME/.lbdb/ldap.rc</span>
+is written in Perl and is a bit of a shocker:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -219,38 +191,77 @@ maintenance. To reinstall <code>grub</code>:</p>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># grub</span>
-</span><span class='line'>grub&gt; find /grub/stage1
-</span><span class='line'>grub&gt; device <span class="o">(</span>hd0<span class="o">)</span> /dev/sda
-</span><span class='line'>grub&gt; root <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>grub&gt; setup <span class="o">(</span>hd0<span class="o">)</span>
-</span><span class='line'>grub&gt; quit
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nv">%ldap_server_db</span> <span class="o">=</span> <span class="p">(</span>
+</span><span class='line'>    <span class="s">&#39;catalyst&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;${mail}&#39;</span><span class="p">,</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># hostname of your ldap server</span>
+</span><span class='line'><span class="nv">$ldap_server</span> <span class="o">=</span> <span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$search_base</span> <span class="o">=</span> <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_search_fields</span>    <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_expected_answers</span> <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_result_email</span>     <span class="o">=</span> <span class="s">&#39;${mail}&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_result_realname</span>  <span class="o">=</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ignorant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_bind_dn</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_bind_password</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="mi">1</span><span class="p">;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Repeat for <span class="file">/dev/sdb</span> and both your drives will be bootable in the event
-that one fails.</p>
+<p>The key is to ensure that you use both the <code>ldaps</code>
+prefix <strong>and</strong> explicitely specify the SSL port, 636. Without both of these, you will
+get the TLS confidentiality error.</p>
 
-<p>With the maintenance accomplished, all that remains is to exit the
-<code>chroot</code> and unmount the devices cleanly:</p>
+<p>You can then test that it is working correctly by running a query:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">exit</span>
-</span><span class='line'>umount <span class="o">{</span>proc,sys,dev,boot...<span class="o">}</span>
-</span><span class='line'><span class="nb">cd</span> ..
-</span><span class='line'>umount arch/
-</span><span class='line'>reboot
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>lbdbq jemima
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Simple.</p>
+<p>All going well, if there is indeed a Jemima in the shared address book, you will see her
+contact details miraculously appear before you. If there is more than one, you will have a
+list to choose from.</p>
 
-<p>Creative Commons image by
-<a href="http://www.flickr.com/photos/mpd01605/4152508668/" title="Rescue Engine 6 on Flickr">MPD01605</a></p>
+<p>Finally, you just need to set up <code>mutt</code> to query <code>lbdb</code>.
+In your <span class="file">muttrc</span>, add the following:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">query_command</span> <span class="o">=</span> <span class="s2">&quot;lbdbq %s 2&gt;/dev/null&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I found that suppressing the errors made the whole experience a little smoother. You
+may not require it… Now, hitting <kbd>Shift</kbd><kbd>q</kbd> in <code>mutt</code>
+brings up a prompt to query the LDAP directory (and my <a href="http://abook.sourceforge.net/" title="abook homepage">abook</a> address book that I share via
+<a href="https://www.dropbox.com/" title="Dropbox homepage">dropbox</a>). You can also access the directory
+by starting to type an email address and then hitting <kbd>Ctrl</kbd><kbd>t</kbd> to see
+a list of possible completions.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk&#8217;s post</a> got me started.</li>
+</ol>
+
+
+<p>Creative Commons image <a href="http://www.flickr.com/photos/bertop/2530620838/">by bertop on Flickr</a></p>
 </div>
 
 
@@ -273,12 +284,12 @@ that one fails.</p>
   
 
 
-<time datetime="2012-02-13T10:25:00+13:00" pubdate data-updated="true">Feb 13<span>th</span>, 2012</time>
+<time datetime="2012-04-21T11:23:00+12:00" pubdate data-updated="true">Apr 21<span>st</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/hack/'>hack</a>
   
 </span>
 
@@ -294,10 +305,8 @@ that one fails.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/02/11/lvm/" title="Previous Post: LVM on LUKS on RAID1 on Arch Linux">&laquo; LVM on LUKS on RAID1 on Arch Linux</a>
+        <a class="basic-alignment left" href="/blog/2012/04/05/catalyst/" title="Previous Post: The Next Thing">&laquo; The Next Thing</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/03/09/aurphan/" title="Next Post: Simple aurphan notifier">Simple aurphan notifier &raquo;</a>
       
     </p>
   </footer>
@@ -445,8 +454,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/02/13/chroot/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2012/02/13/chroot/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/04/21/lbdb/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2012/04/21/lbdb/';
         var disqus_script = 'embed.js';
       
     (function () {

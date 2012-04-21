@@ -9,9 +9,8 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="OpenOffice won’t recognize TrueType fonts with the extension .otf, so you need to convert them to .ttf
-in order to use them in that suite. 1
-sudo apt &hellip;">
+  <meta name="description" content="With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
+accelerate boot time. This has made for a faster boot, but a side effect &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +83,99 @@ sudo apt &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/11/07/changing-karmics-login-screen/">Changing Karmic&#8217;s Login Screen</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-11-07T18:46:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
+accelerate boot time. This has made for a faster boot, but a side effect has
+been that there is no longer a straightforward way to theme your login - and
+the default isn’t just ugly, it’s fugly…</p>
+
+<p>Fear not. It can be fixed.</p>
+
+<p>The first thing you want to do is replace the background image. You can find it
+at <code>/usr/share/images/xsplash</code>.</p>
+
+<p>Before doing anything rash, make a copy of the directory:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then delete all of the images that begin with <code>bg_</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo rm /usr/share/images/xsplash/bg_*
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Use the gimp to create a background image for your desktop and save it into
+this directory, and name it <code>bg_2560x1600.jpg</code> …irrespective of the resolution
+of your screen. Leave the other images as they are: the logo and the
+marvellously named throbber will sit over your new background as you boot up…</p>
+
+<p>Next you can change the colours of the login box to complement your new
+background. This is all controlled in
+<code>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc</code>.</p>
+
+<p>Again, make a copy:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc <span class="se">\</span>
+</span><span class='line'>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc-backup
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then open the file and edit the relevant lines of code at the beginning of the
+file:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/karmic-text.png" title="'Screenshot of editing text'" ></p>
+
+<p>As you can see, the colour scheme I have chosen uses dark grey to match my
+desktop. Feel free to experiment, you can’t really break anything…</p>
+
+<p><a href="http://www.flickr.com/photos/jasonwryan/4081800113/" title="Customized Karmic Login Screen by jasonwryan, on Flickr"><img src="http://farm3.staticflickr.com/2536/4081800113_d4b98a9b3c.jpg" width="500" height="313" alt="Customized Karmic Login Screen"></a></p>
+
+<p>Simple, really.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -193,6 +285,10 @@ in order to use them in that suite.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/04/05/catalyst/">The Next Thing</a>
       </li>
     
@@ -206,10 +302,6 @@ in order to use them in that suite.</p>
     
       <li class="post">
         <a href="/blog/2012/03/17/vampires/">A Taxonomy of Help Vampires</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a>
       </li>
     
   </ul>

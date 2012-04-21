@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-04-19T09:43:30+12:00</updated>
+  <updated>2012-04-21T12:30:04+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,166 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using mutt, LDAP and SSL]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/04/21/lbdb/"/>
+    <updated>2012-04-21T11:23:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/04/21/lbdb</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/addressbook.png" title="'Address Book Icon by bertop on Flickr'" ></p>
+
+<p>One of the great things about starting a new job at
+<a href="http://jasonwryan.com/blog/2012/04/05/catalyst/" title="My post on joining Catalyst IT">an open source company</a>
+is having the freedom to use the tools that suit your workflow, rather than
+having to suffer the indignity of whatever the IT department consider to be the
+lowest comon denominator. Suffice to say, I have had a lot of fun this week
+setting up my working environment—and the ocassional hiccough as I was forced to learn
+something new…</p>
+
+<p>One of those “learning opportunities” consisted of trying to get my mail client,
+<a href="http://www.mutt.org/" title="All mail clients suck. This one just sucks less.">mutt</a>
+to talk to the <acronym title="Lightweight Directory Acces Protocol">LDAP</acronym>
+directory over <acronym title="Secure Sockets Layer">SSL</acronym> so that I could
+query the shared address book. There are a number of helpful blog posts that describe
+using <a href="http://www.spinnaker.de/lbdb/" title="The Little Brother Database homepage">lbdb</a>
+to achieve this<sup>1</sup>.</p>
+
+<p>Unfortunately, after a lot of searching, I was unable to find any documentation on
+achieving this integration over a secure connection. I kept seeing this error:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>Error: Search failed. LDAP server returned an error : 13, description: TLS
+</span><span class='line'>confidentiality required at /usr/lib/mutt_ldap_query line 198, &lt;DATA&gt; line 558.
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Several hours later, and with some
+help from <a href="https://twitter.com/#!/ibeardslee" title="Ian on Twitter: follow him…">@ibeardslee</a>,
+I managed to set it up, and it was definitely worth the effort.</p>
+
+<p>You will need to install <code>lbdb</code> from
+<a href="http://aur.archlinux.org/packages.php?ID=10225" title="AUR package">the AUR</a>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cower -d lbdb
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>…and a couple of packages from the repos to make it all work:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S perl-ldap perl-io-socket-ssl netkit-bsd-finger
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then it is a matter of configuring <code>lbdb</code> to both
+query the LDAP directory and be able to be called from <code>mutt</code>.
+First, copy the config files into your <span class="file">$HOME</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir .lbdb
+</span><span class='line'>cp /etc/lbdb.rc .lbdb/lbdbrc
+</span><span class='line'>cp /etc/lbdb_ldap.rc .lbdb/ldap.rc
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And then modify the two configuration files to suit your setup:
+The first, <span class="file">$HOME/.lbdb/lbdbrc</span>, is well commented and
+self-explanatory; add <code>ldap</code> to the methods and the
+nickname of your server:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">METHODS</span><span class="o">=</span><span class="s2">&quot;m_abook m_ldap&quot;</span>
+</span><span class='line'><span class="nv">LDAP_NICKS</span><span class="o">=</span><span class="s2">&quot;catalyst&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The second config file, <span class="file">$HOME/.lbdb/ldap.rc</span>
+is written in Perl and is a bit of a shocker:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nv">%ldap_server_db</span> <span class="o">=</span> <span class="p">(</span><span class="sr">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;</span><span class="s">&#39;catalyst&#39;</span> <span class="o">=&amp;</span><span class="ow">gt</span><span class="p">;</span> <span class="p">[</span><span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">,</span>
+</span><span class='line'>                <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">,</span>
+</span><span class='line'>                <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span>
+</span><span class='line'>                <span class="s">&#39;${mail}&#39;</span><span class="p">,</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="sr">&lt;/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;</span><span class="p">);</span><span class="sr">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;h1&gt;</span><span class="n">hostname</span> <span class="n">of</span> <span class="n">your</span> <span class="n">ldap</span> <span class="n">server</span><span class="sr">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;</span><span class="nv">$ldap_server</span> <span class="o">=</span> <span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$search_base</span> <span class="o">=</span> <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_search_fields</span>    <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_expected_answers</span> <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_result_email</span>     <span class="o">=</span> <span class="s">&#39;${mail}&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_result_realname</span>  <span class="o">=</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ignorant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_bind_dn</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_bind_password</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="mi">1</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The key is to ensure that you use both the <code>ldaps</code>
+prefix <strong>and</strong> explicitely specify the SSL port, 636. Without both of these, you will
+get the TLS confidentiality error.</p>
+
+<p>You can then test that it is working correctly by running a query:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>lbdbq jemima
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>All going well, if there is indeed a Jemima in the shared address book, you will see her
+contact details miraculously appear before you. If there is more than one, you will have a
+list to choose from.</p>
+
+<p>Finally, you just need to set up <code>mutt</code> to query <code>lbdb</code>.
+In your <span class="file">muttrc</span>, add the following:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">query_command</span> <span class="o">=</span> <span class="s2">&quot;lbdbq %s 2&gt;/dev/null&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>I found that suppressing the errors made the whole experience a little smoother. You
+may not require it… Now, hitting <kbd>Shift</kbd><kbd>q</kbd> in <code>mutt</code>
+brings up a prompt to query the LDAP directory (and my <a href="http://abook.sourceforge.net/" title="abook homepage">abook</a> address book that I share via
+<a href="https://www.dropbox.com/" title="Dropbox homepage">dropbox</a>). You can also access the directory
+by starting to type an email address and then hitting <kbd>Ctrl</kbd><kbd>t</kbd> to see
+a list of possible completions.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk's post</a> got me started.</li>
+</ol>
+
+
+<p>Creative Commons image <a href="http://www.flickr.com/photos/bertop/2530620838/">by bertop on Flickr</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Moving to Octopress]]></title>
@@ -263,7 +423,7 @@ by default. Remove the bang and include the details of the key you wish to use:<
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;-- Packager: name/email of the person or organization building packages&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;PACKAGER<span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;a href=&quot;</span>&amp;#x6d;&amp;#97;&amp;#x69;&amp;#x6c;&amp;#x74;&amp;#x6f;&amp;#58;&amp;#106;&amp;#97;&amp;#x73;&amp;#111;&amp;#110;&amp;#x77;&amp;#x72;&amp;#x79;&amp;#x61;&amp;#x6e;&amp;#64;&amp;#103;&amp;#x6d;&amp;#x61;&amp;#x69;&amp;#x6c;&amp;#46;&amp;#x63;&amp;#111;&amp;#109;<span class="s2">&quot;&gt;&amp;#x6a;&amp;#97;&amp;#x73;&amp;#x6f;&amp;#110;&amp;#x77;&amp;#114;&amp;#x79;&amp;#x61;&amp;#x6e;&amp;#x40;&amp;#x67;&amp;#109;&amp;#97;&amp;#x69;&amp;#108;&amp;#46;&amp;#99;&amp;#x6f;&amp;#x6d;&lt;/a&gt;&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;PACKAGER<span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;a href=&quot;</span>&amp;#x6d;&amp;#97;&amp;#x69;&amp;#x6c;&amp;#x74;&amp;#111;&amp;#x3a;&amp;#106;&amp;#x61;&amp;#x73;&amp;#x6f;&amp;#x6e;&amp;#x77;&amp;#x72;&amp;#x79;&amp;#97;&amp;#110;&amp;#x40;&amp;#x67;&amp;#109;&amp;#97;&amp;#x69;&amp;#x6c;&amp;#46;&amp;#99;&amp;#x6f;&amp;#109;<span class="s2">&quot;&gt;&amp;#106;&amp;#x61;&amp;#115;&amp;#x6f;&amp;#110;&amp;#119;&amp;#x72;&amp;#121;&amp;#97;&amp;#x6e;&amp;#x40;&amp;#103;&amp;#x6d;&amp;#97;&amp;#x69;&amp;#108;&amp;#x2e;&amp;#x63;&amp;#111;&amp;#109;&lt;/a&gt;&quot;</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;-- Specify a key to use <span class="k">for </span>package signing&lt;/h1&gt;
 </span><span class='line'>
@@ -283,7 +443,7 @@ passphrase:</p>
 </pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;You need a passphrase to unlock the secret key <span class="k">for</span>
-</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;a href=&quot;</span>&amp;#x6d;&amp;#x61;&amp;#x69;&amp;#108;&amp;#x74;&amp;#111;&amp;#x3a;&amp;#x6a;&amp;#x61;&amp;#x73;&amp;#x6f;&amp;#110;&amp;#x77;&amp;#x72;&amp;#x79;&amp;#x61;&amp;#110;&amp;#x40;&amp;#103;&amp;#x6d;&amp;#x61;&amp;#105;&amp;#108;&amp;#x2e;&amp;#99;&amp;#x6f;&amp;#x6d;<span class="s2">&quot;&gt;&amp;#106;&amp;#x61;&amp;#x73;&amp;#x6f;&amp;#110;&amp;#119;&amp;#114;&amp;#121;&amp;#x61;&amp;#110;&amp;#x40;&amp;#x67;&amp;#x6d;&amp;#97;&amp;#105;&amp;#108;&amp;#46;&amp;#x63;&amp;#x6f;&amp;#x6d;&lt;/a&gt;&quot;</span>
+</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;a href=&quot;</span>&amp;#x6d;&amp;#x61;&amp;#x69;&amp;#x6c;&amp;#x74;&amp;#x6f;&amp;#x3a;&amp;#106;&amp;#x61;&amp;#115;&amp;#111;&amp;#x6e;&amp;#x77;&amp;#x72;&amp;#x79;&amp;#97;&amp;#x6e;&amp;#64;&amp;#103;&amp;#x6d;&amp;#x61;&amp;#x69;&amp;#108;&amp;#46;&amp;#99;&amp;#x6f;&amp;#x6d;<span class="s2">&quot;&gt;&amp;#x6a;&amp;#97;&amp;#x73;&amp;#x6f;&amp;#x6e;&amp;#119;&amp;#x72;&amp;#x79;&amp;#x61;&amp;#110;&amp;#64;&amp;#x67;&amp;#x6d;&amp;#97;&amp;#105;&amp;#108;&amp;#x2e;&amp;#x63;&amp;#x6f;&amp;#x6d;&lt;/a&gt;&quot;</span>
 </span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;Enter passphrase:
@@ -517,283 +677,6 @@ that one fails.</p>
 
 <p>Creative Commons image by
 <a href="http://www.flickr.com/photos/mpd01605/4152508668/" title="Rescue Engine 6 on Flickr">MPD01605</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[LVM on LUKS on RAID1 on Arch Linux]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/02/11/lvm/"/>
-    <updated>2012-02-11T15:58:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/02/11/lvm</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/lvm-luks-raid.png" alt="image" /></p>
-
-<p>After much procrastination, I finally got around to moving the last of
-my machines to Arch Linux:
-<a href="http://jasonwryan.com/blog/2010/10/04/the-setup/" title="The Setup post">my home desktop</a>,
-which has been running Ubuntu since the end of 2007. I’d like to share a
-few thoughts about why I finally walked away from Ubuntu, but I’ll save
-that for another long post.</p>
-
-<p>Anyway, the setup I decided on was reasonably straightforward: two 1TB
-drives comprising two Raid1 devices, one for a small (150Mb)
-<span class="file">/boot</span> and the other holding three logical volumes
-in a LUKS crypt. This way, I have the flexibility to grow the volumes as
-needed, and only require thesingle passphrase at boot to unlock the
-enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
-and <span class="file">/home</span>.</p>
-
-<p>Almost all of the information here has been gleaned gratefully from
-other sources; principally the Arch Wiki entries on
-<a href="https://wiki.archlinux.org/index.php/LUKS" title="Arch wiki entry">LUKS</a> and
-<a href="https://wiki.archlinux.org/index.php/Lvm" title="Arch LVM article">LVM</a> and
-this <a href="http://www.pindarsign.de/webblog/?p=767" title="Blog post on LUKS and LVM">helpful blog post</a>.
-This post (and the next) are notes to remind me how I got here and, in
-the follow-up, what I need to do to restore this build…</p>
-
-<p>First up, prepare the two hard drives. This took roughly ~90 hours for
-the 1TB drives, so allow some time:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Once the drives are scrubbed (read the Arch Wiki on why that is
-necessary), you can move to the actual installation business. I used a
-256Mb thumb drive with the most recent x86_64 netinstall image burned
-to it. Boot into the live environment and set up the initial partitions
-using <code>cfdisk</code>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cfdisk /dev/sda
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>I created a 150Mb partition for <span class="file">/boot</span> - marked
-with the boot flag, and then partitoned the rest of the drive. Both partitons
-should be primary and be <code>FSType linux_raid</code> (the FD option). Write the
-partition tabel toa file and then import it to the second drive so both are exactly the
-same:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
-</span><span class='line'>sfdisk /dev/sdb &amp;lt; part-table
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Now, set up the Raid arrays. Start by loading the required modules and
-then create the two arrays. The metadata flag is important: if you are
-using legacy grub, as I did, you must use the 0.90 type or your MBR will
-get overwritten:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe raid1 &amp;amp;&amp;amp; modprobe dm-mod
-</span><span class='line'>mdadm --create /dev/md0 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;--metadata<span class="o">=</span>0.90 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;mdadm --create /dev/md1 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p><sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup></p>
-
-<p>At this point, you can switch to another TTY to watch the disks
-sync—again, this could take some time, depending on the size of the
-drives.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Check that it all went to plan…</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Once the drives are synched and pronounced clean, it it time to encrypt
-the second Raid device, <span class="file">dev/md1</span>. You can’t encrypt
-the array that contains <span class="file">/boot</span>,
-but having it duplicated in a Raid array means that, ifone drive goes down,
-you can still boot the other.</p>
-
-<p>Load the module for encryption, and then set it up:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe dm-crypt
-</span><span class='line'>cryptsetup --cipher<span class="o">=</span>aes-xts-plain --verify-passphrase <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;--key-size<span class="o">=</span>512 luksFormat /dev/md1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Now, open the encrypted device to create the logical volumes:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>The three next steps create, in this order, the physical volume (the
-container, if you will), the group and then the individual volumes
-contained in the group. Choose simple, memorable names and do not
-hypenate them. The {pv,vg,lv}display commands print out the details of
-the devices once created.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk&lt;br/&gt;
-</span><span class='line'>pvdisplay&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;vgcreate vgroup /dev/mapper/cryptdisk&lt;br/&gt;
-</span><span class='line'>vgdisplay&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;lvcreate --size 20G --name lvroot vgroup
-</span><span class='line'>lvcreate --contiguous y --size 2G --name lvswap vgroup
-</span><span class='line'>lvcreate --extents +100%FREE --name lvdata vgroup
-</span><span class='line'>lvdisplay
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>It should be pointed out that the
-<a href="https://github.com/Dieterbe/aif" title="AIF on Github">Arch Installer Framework</a> supports
-LUKS and LVM, so you can accomplish these last two steps from within the
-installer. I tried both and I found that I had a little more control
-doing it manually, but YMMV.</p>
-
-<p>At this point, you are ready to enter the installer and complete the
-install. Run /arch/setup and move through the early setup until you
-reach the 'Prepare Hard Drives' section. Select option 3, 'Configure block
-devices, mountpoints and filesystems'. Make sure that the only “raw”
-device that you configure is <span class="file">/dev/md0</span>, your
-<span class="file">/boot</span> partition. Otherwise,
-you are configuring the logical volumes, <em>not</em> the devices they are
-built on.</p>
-
-<p>After succesfully setting up the drives, install the base packages and
-then, once that is complete, switch TTYs and update your Raid
-configuration <em>prior to configuring your system</em>. This means that when
-your <code>initrd</code> is regenerated, it will inlcude the correct Raid
-information:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>When you are done, move to configure your system and make sure to add
-the relevant details to both your <span class="file">/etc/rc.conf</span> and your
-<span class="file">/etc/mkinitcpio.conf</span>. In the former:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
-</span><span class='line'><span class="nv">USEDMRAID</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>and in /etc/mkinitcpio.conf:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
-</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm_udev encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>That is the straightforward part of the install over. The final step is
-a little more tricky: installing a bootloader. My experience, and I
-tried a number of times using different approaches, is that this <em>won’t
-work</em>. The installer doesn’t seem to like the Raid setup, so it
-complains about it:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>It’s not all bad, as this is the final hurdle and it is not a
-particularly high one.</p>
-
-<p>The important step is to ensure that your <span class="file">/boot/grub/menu.lst</span> is setup
-correctly. Given the names I chose above for my devices, mine looks like
-this:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;<span class="o">(</span>0<span class="o">)</span> Arch&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;title  Arch Linux
-</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
-</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
-</span><span class='line'>initrd /kernel26.img&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;<span class="o">(</span>1<span class="o">)</span> Arch Fallback&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;title  Arch Linux Fallback
-</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
-</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
-</span><span class='line'>initrd /kernel26-fallback.img
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-
-<p>Once it is all setup, simply exit the installer. At this point, you have
-a perfectly secure, redundant, new Arch Linux install that you can’t
-boot into. You have two choices; chroot in and manually install grub
-now, or reboot and do it then. I opted for the latter as it would be
-more like a recovery mission—and I wanted to make sure that I was
-capable enough to manage that before committing all of my backed-up data
-to the machine.</p>
-
-<p>I’ll post the details of the relatively straightforward steps required
-to chroot into the system and install grub on both hard drives in a
-couple of days.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>The name <code>cryptdisk</code> is arbitrary - just make it memorable and use it
-consistently…</p></li>
-<li><p>I am not sure how necessary it is to have the Raid modules included
-here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
-warranted. <strong>UPDATED 12/4/12</strong> as per the <a href="https://wiki.archlinux.org/index.php/Mkinitcpio#HOOKS">mkinitcpio article on the Wiki</a>
-the <code>mdadm_udev</code> hook is preferred over the plain <code>mdadm</code> hook in your
-<span class="file">/etc/mkinitcpio.conf</span>.</p></li>
-</ol>
-
 ]]></content>
   </entry>
   

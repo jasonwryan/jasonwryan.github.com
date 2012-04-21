@@ -9,10 +9,11 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have used
-delicious,
-the bookmarking service, for just on five years now and over that time
-added around 1500 bookmarks. This suggests to me that &hellip;">
+  <meta name="description" content="After recovering from
+the shock of the botched delicious relaunch,
+I have switched to
+Pinboard
+for my bookmarking. Previously, I was just synching &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +86,92 @@ added around 1500 bookmarks. This suggests to me that &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/10/01/pinboard-elvis/">Pinboard Elvis</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-10-01T10:29:00+13:00" pubdate data-updated="true">Oct 1<span>st</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/pinboard-elvis.png" alt="image" /></p>
+
+<p>After recovering from
+<a href="http://jasonwryan.com/blog/2011/09/28/delicious/" title="My post on the delicious fiasco">the shock of the botched delicious relaunch</a>,
+I have switched to
+<a href="http://pinboard.in/u:jasonwryan/" title="My bookmarks on Pinboard">Pinboard</a>
+for my bookmarking. Previously, I was just synching my bookmarks from
+delicious, but now I have abandoned that trainwreck completely.</p>
+
+<p>Two things made the transition painless. The first was the
+<a href="http://www.appbrain.com/app/me.mitnworb.save.to.pinboard/" title="Save to Pinboard page">Pinboard Android app</a>
+so I could access and manage bookmarks from my phone; the second was a
+little trickier.</p>
+
+<p>As I have previously mentioned, I use bookmarking not just to retrieve
+my own saved pages, but as a search repository for material that other
+people have decided is interesting or valuable enough to want to save.
+And there is no better tool for this sort of searching than
+<a href="http://surfraw.alioth.debian.org/" title="Surfraw - Shell Users' Revolutionary Front Rage Against the Web">Surfraw</a><sup>1</sup></p>
+
+<p>I had written an elvis to search delicious bookmarks, so to complete the
+transition to Pinboard, I needed to do the same. It was a little
+trickier than I had anticipated, as some of the URLs (particularly when
+searching across multiple tags) were reasonably complex given my modest
+scripting skills. But
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.config/surfraw/elvi/pin" title="Pinboard elvis in mercurial repo">I got there in the end…</a></p>
+
+<p>Now searching for web pages that I or anyone else has saved to Pinboard
+is as simple as typing:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pin -t<span class="o">=</span>unix+linux+vim
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which will return all saved pages that share those three tags. I can
+also refine my search to a particular user with the <code>-u</code>{ser} switch, or
+just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Previous posts on Surfraw:
+
+<ul>
+<li> <a href="http://jasonwryan.com/blog/2011/04/13/archwiki-elvis-for-surfraw/" title="My post on the Arch Wiki elvis">Arch Wiki elvis for Surfraw</a></li>
+<li> <a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Yanking links in w3m">w3m, Surfraw and yanking  URLs</a></li>
+</ul>
+</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -366,100 +453,6 @@ shell. Your call on security versus convenience…</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/09/08/tarsnap/">Tarsnap</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-09-08T17:55:00+12:00" pubdate data-updated="true">Sep 8<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap.jpg" alt="image" /></p>
-
-<p>I have been using <a href="http://www.tarsnap.com/" title="Tarsnap homepage">Tarsnap</a>
-for a couple of months now to backup
-<a href="http://jasonwryan.com/blog/2010/10/04/the-setup/" title="My setup">my EeePC</a>.
-Tarsnap’s (superb) tagline is: <code>online backups for the truly paranoid.</code></p>
-
-<p>Essentially, Tarsnap stores your encrypted backups on
-<a href="http://aws.amazon.com/s3//192-5766046-6455343/" title="Amazon page">Amazon’s S3 servers</a>,
-recognizes duplicate data and avoids storing it again, and only deletes
-data once no remaining archives require it. I can recommend it as a
-terrific service for a number of reasons.</p>
-
-<p>It is <em><a href="http://www.tarsnap.com/security.html" title="Security page">secure</a></em>.
-Developed by the FreeBSD Security Officer, there is a
-<a href="http://www.tarsnap.com/bugbounty.html" title="Bug bounty details">bug bounty</a> for
-anyone who does discover bugs or security holes. It is very reasonably
-priced. It is reliable. And most importantly,
-<a href="http://www.tarsnap.com/about.html" title="Tarsnap about page">Dr Colin Percival</a>,
-erstwhile child prodigy and developer, is extremely helpful either on
-the mailing list or IRC if you have any questions or need help.</p>
-
-<p>If, however, you have a quick look at the
-<a href="http://www.tarsnap.com/man-tarsnap.1.html" title="tarsnap(1)">man page</a>, you will
-see that it is not exactly a simple application. After a couple of
-months of trying to remember all of the relevant flags, I searched for a
-script that would simplify the process for me. There are
-<a href="http://duckduckgo.com/?q=tarsnap+%2B+bash+script" title="DDG results">a few online</a>,
-but they are all intended to fully automate the process (which makes
-sense for something like backups)…</p>
-
-<p>What I was looking for, however, was something more interactive: more
-along the lines of a prompt. So, realizing I would have to scratch my
-own itch, I wrote a wrapper script to assist my failing memory.</p>
-
-<p>The script prints out a menu of the available options and, once you have
-selected the activity that you would like (creating a new snapshot,
-deleting an old one etc.,), then the script checks if any further input
-is required, for example, the name of the snapshot to delete, and then
-executes it. It is nothing flash, but it works…</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap2.png" alt="image" /></p>
-
-<p>You can <a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/snap" title="Snap script in mercurial repo">grab the script</a>
-from my mercurial repo. It’s written in bash, but if you require
-<a href="http://tldp.org/LDP/abs/html/portabilityissues.html" title="Advanced Bash Scripting Guide">portability</a>,
-it shouldn’t be too hard to tweak.</p>
-
-<h4>Updated 3/10/11</h4>
-
-<p>I have rewritten the script to be
-<a href="http://pubs.opengroup.org/onlinepubs/9699919799/" title="POSIX Standard at the Open Group">POSIX compliant</a>
-and also to better conform to basic UNIX behaviours, in terms of the
-options etc. It should now be good to run in most shells.</p>
-
-<h5>Notes</h5>
-
-<p>Creative Commons licensed image by
-<a href="http://www.flickr.com/photos/declanjewell/2447653142/" title="Flickr image credit">Declan TM</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; Older</a>
@@ -477,6 +470,10 @@ options etc. It should now be good to run in most shells.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/04/05/catalyst/">The Next Thing</a>
       </li>
     
@@ -490,10 +487,6 @@ options etc. It should now be good to run in most shells.</p>
     
       <li class="post">
         <a href="/blog/2012/03/17/vampires/">A Taxonomy of Help Vampires</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a>
       </li>
     
   </ul>
