@@ -21,10 +21,9 @@ to talk to the <acronym title="Lightweight Directory Acces Protocol">LDAP</acron
 directory over <acronym title="Secure Sockets Layer">SSL</acronym> so that I could 
 query the shared address book. There are a number of helpful blog posts that describe
 using [lbdb](http://www.spinnaker.de/lbdb/ 'The Little Brother Database homepage')
-to achieve this<sup>1</sup>.
-
-Unfortunately, after a lot of searching, I was unable to find any documentation on
-achieving this integration over a secure connection. I kept seeing this error:
+with `mutt`<sup>1</sup>. Unfortunately, after a lot of searching, I was unable to find 
+any documentation on achieving this integration over a secure connection. 
+I kept seeing this error:
 
 {% codeblock lang:sh %}
 Error: Search failed. LDAP server returned an error : 13, description: TLS
@@ -39,7 +38,7 @@ You will need to install `lbdb` from
 [the AUR](http://aur.archlinux.org/packages.php?ID=10225 'AUR package'):
 
 {% codeblock lang:sh %}
-cower -d lbdb
+cowerd lbdb     # 2
 {% endcodeblock %}
 
 …and a couple of packages from the repos to make it all work:
@@ -124,6 +123,9 @@ a list of possible completions.
 #### Notes
 1. [Christian Schenk's post](http://www.christianschenk.org/blog/integrating-ldap-into-mutt/ 
 'Integrating LDAP into Mutt') got me started.
+
+2. A [wrapper script for cower](https://bitbucket.org/jasonwryan/eeepc/src/f15bf6e51e62/Scripts/cowerd 
+'Script in bitbucket repo')
 
 Creative Commons image [by bertop on Flickr](http://www.flickr.com/photos/bertop/2530620838/)
 
