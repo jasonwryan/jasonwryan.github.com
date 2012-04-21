@@ -4,7 +4,7 @@
   <title><![CDATA[Category: hack | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/hack/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-04-21T12:30:04+12:00</updated>
+  <updated>2012-04-21T16:27:46+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -34,10 +34,9 @@ to talk to the <acronym title="Lightweight Directory Acces Protocol">LDAP</acron
 directory over <acronym title="Secure Sockets Layer">SSL</acronym> so that I could
 query the shared address book. There are a number of helpful blog posts that describe
 using <a href="http://www.spinnaker.de/lbdb/" title="The Little Brother Database homepage">lbdb</a>
-to achieve this<sup>1</sup>.</p>
-
-<p>Unfortunately, after a lot of searching, I was unable to find any documentation on
-achieving this integration over a secure connection. I kept seeing this error:</p>
+with <code>mutt</code><sup>1</sup>. Unfortunately, after a lot of searching, I was unable to find
+any documentation on achieving this integration over a secure connection.
+I kept seeing this error:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -53,7 +52,7 @@ I managed to set it up, and it was definitely worth the effort.</p>
 <a href="http://aur.archlinux.org/packages.php?ID=10225" title="AUR package">the AUR</a>:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cower -d lbdb
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cowerd lbdb     <span class="c"># 2</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>…and a couple of packages from the repos to make it all work:</p>
@@ -165,7 +164,8 @@ a list of possible completions.</p>
 <h4>Notes</h4>
 
 <ol>
-<li><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk's post</a> got me started.</li>
+<li><p><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk's post</a> got me started.</p></li>
+<li><p>A <a href="https://bitbucket.org/jasonwryan/eeepc/src/f15bf6e51e62/Scripts/cowerd" title="Script in bitbucket repo">wrapper script for cower</a></p></li>
 </ol>
 
 
