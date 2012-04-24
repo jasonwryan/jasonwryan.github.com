@@ -4,7 +4,7 @@
   <title><![CDATA[Category: hack | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/hack/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-04-21T16:27:46+12:00</updated>
+  <updated>2012-04-24T21:15:45+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -38,11 +38,9 @@ with <code>mutt</code><sup>1</sup>. Unfortunately, after a lot of searching, I w
 any documentation on achieving this integration over a secure connection.
 I kept seeing this error:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>Error: Search failed. LDAP server returned an error : 13, description: TLS
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>Error: Search failed. LDAP server returned an error : 13, description: TLS
 </span><span class='line'>confidentiality required at /usr/lib/mutt_ldap_query line 198, &lt;DATA&gt; line 558.
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Several hours later, and with some
 help from <a href="https://twitter.com/#!/ibeardslee" title="Ian on Twitter: follow him…">@ibeardslee</a>,
@@ -51,65 +49,36 @@ I managed to set it up, and it was definitely worth the effort.</p>
 <p>You will need to install <code>lbdb</code> from
 <a href="http://aur.archlinux.org/packages.php?ID=10225" title="AUR package">the AUR</a>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cowerd lbdb     <span class="c"># 2</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cowerd lbdb     <span class="c"># 2</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>…and a couple of packages from the repos to make it all work:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman -S perl-ldap perl-io-socket-ssl netkit-bsd-finger
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl-ldap perl-io-socket-ssl netkit-bsd-finger
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Then it is a matter of configuring <code>lbdb</code> to both
 query the LDAP directory and be able to be called from <code>mutt</code>.
 First, copy the config files into your <span class="file">$HOME</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir .lbdb
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir .lbdb
 </span><span class='line'>cp /etc/lbdb.rc .lbdb/lbdbrc
 </span><span class='line'>cp /etc/lbdb_ldap.rc .lbdb/ldap.rc
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>And then modify the two configuration files to suit your setup:
 The first, <span class="file">$HOME/.lbdb/lbdbrc</span>, is well commented and
 self-explanatory; add <code>ldap</code> to the methods and the
 nickname of your server:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">METHODS</span><span class="o">=</span><span class="s2">&quot;m_abook m_ldap&quot;</span>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">METHODS</span><span class="o">=</span><span class="s2">&quot;m_abook m_ldap&quot;</span>
 </span><span class='line'><span class="nv">LDAP_NICKS</span><span class="o">=</span><span class="s2">&quot;catalyst&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The second config file, <span class="file">$HOME/.lbdb/ldap.rc</span>
 is written in Perl and is a bit of a shocker:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nv">%ldap_server_db</span> <span class="o">=</span> <span class="p">(</span><span class="sr">&lt;/p&gt;</span>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='perl'><span class='line'><span class="nv">%ldap_server_db</span> <span class="o">=</span> <span class="p">(</span><span class="sr">&lt;/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;</span><span class="s">&#39;catalyst&#39;</span> <span class="o">=&amp;</span><span class="ow">gt</span><span class="p">;</span> <span class="p">[</span><span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">,</span>
 </span><span class='line'>                <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">,</span>
@@ -131,7 +100,7 @@ is written in Perl and is a bit of a shocker:</p>
 </span><span class='line'><span class="nv">$ldap_bind_dn</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
 </span><span class='line'><span class="nv">$ldap_bind_password</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
 </span><span class='line'><span class="mi">1</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The key is to ensure that you use both the <code>ldaps</code>
 prefix <strong>and</strong> explicitely specify the SSL port, 636. Without both of these, you will
@@ -139,9 +108,8 @@ get the TLS confidentiality error.</p>
 
 <p>You can then test that it is working correctly by running a query:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>lbdbq jemima
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>lbdbq jemima
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>All going well, if there is indeed a Jemima in the shared address book, you will see her
 contact details miraculously appear before you. If there is more than one, you will have a
@@ -150,9 +118,8 @@ list to choose from.</p>
 <p>Finally, you just need to set up <code>mutt</code> to query <code>lbdb</code>.
 In your <span class="file">muttrc</span>, add the following:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">query_command</span> <span class="o">=</span> <span class="s2">&quot;lbdbq %s 2&gt;/dev/null&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">query_command</span> <span class="o">=</span> <span class="s2">&quot;lbdbq %s 2&gt;/dev/null&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>I found that suppressing the errors made the whole experience a little smoother. You
 may not require it… Now, hitting <kbd>Shift</kbd><kbd>q</kbd> in <code>mutt</code>
@@ -207,17 +174,7 @@ the work for me.</p>
 
 <p>The first task was to retrieve the posts from the list:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;grab files&lt;/h1&gt;
 </span><span class='line'>
@@ -227,20 +184,12 @@ the work for me.</p>
 </span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;done &amp;lt; /home/jason/Scripts/list
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
 surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;strip HTML cruft&lt;/h1&gt;
 </span><span class='line'>
@@ -248,24 +197,14 @@ surrounding the actual posts: an <code>awk</code> one-liner took care of that.</
 </span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&amp;lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.&lt;/em&gt;}&quot;</span>
 </span><span class='line'><span class="k">done</span>
 </span><span class='line'>mkdir html &amp;amp;&amp;amp; mv *.html html/
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The final task of this part of the migration was to convert the HTML into
 <a href="http://daringfireball.net/projects/markdown/">markdown</a>,
 the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
 the "universal document converter" handled that job:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;convert to markdown format&lt;/h1&gt;
 </span><span class='line'>
@@ -275,7 +214,7 @@ the "universal document converter" handled that job:</p>
 </span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;done
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The final result was fifty markdown files holding all of my posts, almost ready to
 be committed to github. I say “almost” because the files still required what turned out to
@@ -347,27 +286,16 @@ obvious answer is some shell script and a cron job.</p>
 
 <p>First, the <code>cron</code> job:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
 </span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Then, as part of my
 <a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="Script in mercurial repo">dwm-status script</a>,
 a function to check that there are no new additions to the file and, if
 there are, flash a highlight:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>&lt;/p&gt;
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;pre&gt;&lt;code&gt;aurphans<span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
 </span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
@@ -376,7 +304,7 @@ there are, flash a highlight:</p>
 </span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;<span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The awk filter excludes a null return, which is “No aurphans found.”
 Now, if any of the packages that I use from the AUR are disowned, I’ll
@@ -420,19 +348,7 @@ on my Arch machines, I wanted to make it work with
 Enter a simple shell script:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
 </span><span class='line'>
@@ -444,7 +360,7 @@ Enter a simple shell script:</p>
 </span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;done
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>I have included this in my <span class="file">$HOME/.xinitrc</span>
 so that it runs in the background after login. Whenever the metadata

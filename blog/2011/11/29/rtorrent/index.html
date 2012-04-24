@@ -127,29 +127,21 @@ anyway—I thought I’d patch in colour support.</p>
 <p>This is a straightforward two-step process. First, build the current
 version of libtorrent, 0.12.9:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
 </span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
 </span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
 </span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
 </span><span class='line'>sudo checkinstall
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Once libtorrent is successfully built and installed, you can begin the
 rtorrent build:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
 </span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
 </span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Then, if you want colour support, you need the patch. I used the version
@@ -157,25 +149,19 @@ in the
 <a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
 but you can also grab a copy from a paste site:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
 </span><span class='line'>mv canvas_colour.patch src/
 </span><span class='line'>patch -uNp1 -i canvas_colour.patch
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>The patch should apply cleanly. Then specify where libtorrent is
 installed to ensure that it is linked during the rtorrent build:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
 </span><span class='line'>make
 </span><span class='line'>sudo checkinstall
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Once again, this should compile cleanly and you will now have rtorrent

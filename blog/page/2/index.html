@@ -123,9 +123,8 @@ signing in your <span class="file">/etc/pacman.conf</span>.</p>
 <p>You can check the state of the signed packages with this <code>expac</code>
 one-liner; it will return a list of any <em>unsigned</em> packages:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
+</span></code></pre></div></figure>
 
 
 <p>Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
@@ -133,24 +132,7 @@ take advantage of this. My overall <code>SigLevel</code> setting requires signed
 packages, and—as of yesterday—I was able to move the last repository
 entry over to do the same:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly
 </span><span class='line'>
 </span><span class='line'><span class="o">[</span>core<span class="o">]</span>
 </span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
@@ -167,7 +149,7 @@ entry over to do the same:</p>
 </span><span class='line'><span class="o">[</span>multilib<span class="o">]</span>
 </span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
 </span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>The next step was to add my key to pacman’s keychain so that I could
@@ -177,69 +159,50 @@ sign the packages that I build using ABS or from the
 
 <p>First, import your key into pacman’s keyring:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
+</span></code></pre></div></figure>
 
 
 <p>Then follow the prompts as you edit the key to sign, set a trust level
 and save your key:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
 </span><span class='line'>gpg&gt; lsign
 </span><span class='line'>...
 </span><span class='line'>gpg&gt; trust
 </span><span class='line'>...
 </span><span class='line'>gpg&gt; save
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Then it is just a matter of changing the <code>BUILDENV</code> option in your
 <span class="file">/etc/makepkg.conf</span>, which is set to <code>!sign</code>
 by default. Remove the bang and include the details of the key you wish to use:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#-- Packager: name/email of the person or organization building packages</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#-- Packager: name/email of the person or organization building packages</span>
 </span><span class='line'><span class="nv">PACKAGER</span><span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
 </span><span class='line'><span class="c">#-- Specify a key to use for package signing</span>
 </span><span class='line'><span class="nv">GPGKEY</span><span class="o">=</span><span class="s2">&quot;B1BD4E40&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Now, when you build a package, you will be prompted for your key’s
 passphrase:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...
 </span><span class='line'>
 </span><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
 </span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
 </span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21
 </span><span class='line'>
 </span><span class='line'>Enter passphrase:
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Enter the correct passphrase and your package is built and signed:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
+</span></code></pre></div></figure>
 
 
 <p>Creative Commons image by
@@ -431,11 +394,9 @@ obvious answer is some shell script and a cron job.</p>
 
 <p>First, the <code>cron</code> job:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
 </span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Then, as part of my
@@ -443,19 +404,13 @@ obvious answer is some shell script and a cron job.</p>
 a function to check that there are no new additions to the file and, if
 there are, flash a highlight:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>
 </span><span class='line'>    <span class="nv">aurphans</span><span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
 </span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
 </span><span class='line'><span class="k">        </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
 </span><span class='line'>    <span class="k">fi</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>The awk filter excludes a null return, which is “No aurphans found.”

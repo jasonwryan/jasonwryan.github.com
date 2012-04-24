@@ -4,7 +4,7 @@
   <title><![CDATA[Category: dwm | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/dwm/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-04-21T16:27:46+12:00</updated>
+  <updated>2012-04-24T21:15:45+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -40,31 +40,27 @@ for new mail in
 or highlights in <a href="http://irssi.org/" title="IRC client">irssi</a>. In mutt, it
 was just a case of setting a bell for when mail arrived:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span>beep_new             <span class="c"># bell on new mail</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span>beep_new             <span class="c"># bell on new mail</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>And in irssi:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">beep_msg_level</span> <span class="o">=</span> <span class="s2">&quot;NOTICE MSGS HILIGHT&quot;</span>;
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">beep_msg_level</span> <span class="o">=</span> <span class="s2">&quot;NOTICE MSGS HILIGHT&quot;</span>;
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>In <a href="http://tmux.sourceforge.net/" title="terminal mulitplexer">tmux</a>, to cover
 all your terminal bases, add:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set</span> -g bell-action any <span class="c"># listen for activity on all windows</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set</span> -g bell-action any <span class="c"># listen for activity on all windows</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The next step is to pass those beeps to your terminal. The entry for
 Urxvt is one I picked up after a quick search turned up
 <a href="http://rsontech.net/articles/2008/11/17/1/handling-urgency-hints" title="Post on reson.tech">this post by rson</a>
 which had the .Xdefaults line I was looking for:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>URxvt*urgentOnBell: <span class="nb">true</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>URxvt*urgentOnBell: <span class="nb">true</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Now, whenever a bell is triggered in irssi or mutt, that is passed to
 the terminal as an urgent hint. The final step was patching statuscolors
@@ -141,17 +137,7 @@ and
 actually.</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>mailcheck.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
 </span><span class='line'>
@@ -161,7 +147,7 @@ actually.</p>
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;find <span class="nv">$maildirs</span> -type f | wc -l
 </span><span class='line'><span class="nb">exit </span>0
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The glob (<code>*</code>) takes care of the different mail account names, and has
 the added bonus of being portable, and find returns any files (<code>-type f</code>)

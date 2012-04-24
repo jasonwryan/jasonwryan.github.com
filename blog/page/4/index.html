@@ -131,11 +131,9 @@ flexible approach to logging into X (or the console).</p>
 
 <p>My <span class="file">/etc/inittab</span> already boots me into runlevel 5:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Boot to X11</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Boot to X11</span>
 </span><span class='line'>id:5:initdefault:
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>So it was just a case of putting a couple of lines in the correct
@@ -144,17 +142,12 @@ I chose <span class="file">$HOME/.bash_profile</span> because I only use Bash; i
 shell you should probably go with <span class="file">$HOME/.profile</span>. The recommended lines
 from the Arch Wiki are:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="nv">$DISPLAY</span> <span class="o">&amp;&amp;</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="nv">$DISPLAY</span> <span class="o">&amp;&amp;</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
 </span><span class='line'><span class="k">  </span><span class="nb">exec </span>startx
 </span><span class='line'>  <span class="c"># Could use xinit instead of startx</span>
 </span><span class='line'>  <span class="c">#exec xinit -- /usr/bin/X -nolisten tcp vt7</span>
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>…and this works as advertised. If you are in TTY1 and you login, X is
@@ -167,17 +160,12 @@ to see the shutdown messages.</p>
 alighted on this helpful option: <code>-novtswitch</code>. So, my entry to start X
 now looked like:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1</span>
 </span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
 </span><span class='line'><span class="k">    </span><span class="nb">exec </span>xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
 </span><span class='line'>    <span class="nb">logout</span>
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Now, on shutdown and reboot, I see all of the shutdown messages. All
@@ -185,30 +173,22 @@ that remained was to add an option to log into a tmux session if I
 didn’t want to use X. The final code looks like this:</p>
 
 <figure class='code'><figcaption><span>~/.profile </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1 and tmux on tty2</span>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1 and tmux on tty2</span>
 </span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
 </span><span class='line'><span class="k">    </span><span class="nb">exec </span>xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
 </span><span class='line'>    <span class="nb">logout</span>
 </span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty2 <span class="o">]]</span>; <span class="k">then</span>
 </span><span class='line'><span class="k">    </span>tmux -f <span class="nv">$HOME</span>/.tmux/conf new -s secured
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Logging in from TTY1 takes me into my dwm session, if I switch to TTY2 I
 am logged into a tmux session with keychain running. To start consolekit
 with dwm, I have this in my <span class="file">$HOME/.xinitrc</span>:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">exec </span>ck-launch-session <span class="nv">$HOME</span>/Scripts/dwm-start.
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">exec </span>ck-launch-session <span class="nv">$HOME</span>/Scripts/dwm-start.
+</span></code></pre></div></figure>
 
 
 <p>You can see my full <span class="file">$HOME/.bash_profile</span> in
@@ -292,27 +272,7 @@ it was a trivial exercize to restore this functionality to my bash shell
 in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
 
 <figure class='code'><figcaption><span>~/inputrc </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$include /etc/inputrc
+<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc
 </span><span class='line'>
 </span><span class='line'># for vi mode
 </span><span class='line'>set editing-mode vi
@@ -331,7 +291,7 @@ in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the re
 </span><span class='line'>"\e[B": history-search-forward
 </span><span class='line'>"\ep": yank-last-arg
 </span><span class='line'>Control-l: clear-screen
-</span><span class='line'>$endif</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>$endif</span></code></pre></div></figure>
 
 
 <p>There is an extensive list of
@@ -388,29 +348,21 @@ anyway—I thought I’d patch in colour support.</p>
 <p>This is a straightforward two-step process. First, build the current
 version of libtorrent, 0.12.9:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
 </span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
 </span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
 </span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
 </span><span class='line'>sudo checkinstall
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Once libtorrent is successfully built and installed, you can begin the
 rtorrent build:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
 </span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
 </span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Then, if you want colour support, you need the patch. I used the version
@@ -418,25 +370,19 @@ in the
 <a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
 but you can also grab a copy from a paste site:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
 </span><span class='line'>mv canvas_colour.patch src/
 </span><span class='line'>patch -uNp1 -i canvas_colour.patch
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>The patch should apply cleanly. Then specify where libtorrent is
 installed to ensure that it is linked during the rtorrent build:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
 </span><span class='line'>make
 </span><span class='line'>sudo checkinstall
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Once again, this should compile cleanly and you will now have rtorrent

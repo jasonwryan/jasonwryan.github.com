@@ -216,18 +216,7 @@ tedious, so I concocted this script to make it somewhat more
 straightforward.</p>
 
 <figure class='code'><figcaption><span>xdg.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
 </span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>
 </span><span class='line'><span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>; <span class="k">then </span>
 </span><span class='line'><span class="k">    for </span>f in <span class="nv">$dir</span>/* ; <span class="k">do</span>
@@ -238,7 +227,7 @@ straightforward.</p>
 </span><span class='line'>        <span class="k">esac</span>
 </span><span class='line'><span class="k">    done</span>
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>A relatively simple script, with a nice feature or two, it does a couple
@@ -246,9 +235,8 @@ of things. First, it
 <a href="http://wiki.bash-hackers.org/commands/classictest" title="Bash Hackers: test">tests</a>
 that the directory actually exists:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>    <span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>    <span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>
+</span></code></pre></div></figure>
 
 
 <p>and then loops through all of the files in the directory using a
@@ -266,9 +254,8 @@ I used
 <a href="http://wiki.bash-hackers.org/syntax/pe#substring_removal" title="Bash Hackers Wiki">parameter expansion</a>
 to remove the substring:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
+</span></code></pre></div></figure>
 
 
 <p>which turns, for example, <span class="file">$XDG_CONGIG_HOME/newsbeuter/conf</span> into a
@@ -290,19 +277,7 @@ I updated the script. It now covers all of the directories where you are
 likely to find dotfiles.</p>
 
 <figure class='code'><figcaption><span>xdg.sh v2 </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
 </span><span class='line'><span class="nb">dirs</span><span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
 </span><span class='line'><span class="nv">IFS</span><span class="o">=</span><span class="s1">$&#39;\n&#39;</span>
 </span><span class='line'><span class="nb">read</span> -r -d <span class="s1">&#39;&#39;</span> -a files &lt; <span class="se">\</span>
@@ -314,24 +289,14 @@ likely to find dotfiles.</p>
 </span><span class='line'>        -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> 2&gt;/dev/null<span class="o">)</span>
 </span><span class='line'>
 </span><span class='line'><span class="o">((</span> <span class="k">${#</span><span class="nv">files</span><span class="p">[*]</span><span class="k">}</span> <span class="o">))</span> <span class="o">&amp;&amp;</span> <span class="s2">&quot;$EDITOR&quot;</span> <span class="s2">&quot;${files}&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>If you would prefer a more portable version—which still relies on GNU
 find—then you could simplify it like so:</p>
 
 <figure class='code'><figcaption><span>xdg.sh v3 </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
 </span><span class='line'><span class="nb">dirs</span><span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
 </span><span class='line'>
 </span><span class='line'>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
@@ -341,7 +306,7 @@ find—then you could simplify it like so:</p>
 </span><span class='line'>    -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
 </span><span class='line'>    -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> <span class="se">\</span>
 </span><span class='line'>    -exec <span class="s2">&quot;$EDITOR&quot;</span> <span class="o">{}</span> +
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 
@@ -407,11 +372,9 @@ you can do it all from the keyboard.</p>
 <kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
 return to normal mode:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
 </span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Then, it is just a matter of identifying the text that you wish to copy
@@ -457,18 +420,16 @@ in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
 <p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
 <psan class="file">/tmp</span>:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&lt;/tmp/tabbed.xid)&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&lt;/tmp/tabbed.xid)&quot;</span>
+</span></code></pre></div></figure>
 
 
 <p>Then it is just a matter of setting up other applications to pass links
 to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
 <span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> %s
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> %s
+</span></code></pre></div></figure>
 
 
 <p>The workaround for Urxvtc was a little trickier. I finally got there
@@ -476,26 +437,19 @@ with some help from
 <a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
 In my <span class="file">~/.Xdefaults</span> I have:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
 </span><span class='line'>URxvt.perl-ext-common: default,matcher
 </span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
 </span><span class='line'>URxvt.matcher.button: 1
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
 </span><span class='line'><span class="c"># Script to open Vimprobable instances in tabbed</span>
 </span><span class='line'><span class="nb">exec </span>vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Now whenever I open a link in an application or by clicking a link in

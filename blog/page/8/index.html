@@ -126,11 +126,9 @@ and then working up from there. There is a section
 <a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
 that has always puzzled me, and so I decided to get to the bottom of it.</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># show some useful stats but only when tmux is started</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># show some useful stats but only when tmux is started</span>
 </span><span class='line'><span class="c"># outside of Xorg, otherwise dwm statusbar shows these already </span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>It is a great idea. If you are running tmux in X, then you have
@@ -153,30 +151,22 @@ source-file option in <span class="file">.tmux.conf</span> to call the relevant 
 depending if X was running or not. I just adapted Thayer’s code, like
 so:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Statusbar starting in X or not</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Statusbar starting in X or not</span>
 </span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
 </span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>And then created those files with the desired statusbar options. So, for
 example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
 loaded:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Statusbar if tmux run in console</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Statusbar if tmux run in console</span>
 </span><span class='line'><span class="c"># information normally in dwm bar</span>
 </span><span class='line'><span class="nb">set</span> -g status-right-length 50
 </span><span class='line'><span class="nb">set</span> -g status-left-length 50
 </span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
@@ -245,9 +235,8 @@ explained there, I thought I would share my approach anyway.</p>
 
 <p>First, I set tmux to use vi keys:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>setw -g mode-keys vi
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setw -g mode-keys vi
+</span></code></pre></div></figure>
 
 
 <p>Then I change the default keybinds to suit my workflow. As explained in
@@ -255,19 +244,13 @@ the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
 and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
 to more intuitive and Vim-like keys:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
 </span><span class='line'><span class="nb">bind </span>Escape copy-mode
 </span><span class='line'>unbind p
 </span><span class='line'><span class="nb">bind </span>p paste-buffer
 </span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
 </span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>This seems a lot closer to all of the other Vim-like apps that I run -
@@ -362,9 +345,8 @@ started mpd, one of my ports was being flooded: 46560</p>
 
 <p><code>lsof</code> showed that pulse audio was the culprit:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
+</span></code></pre></div></figure>
 
 
 <p>Quelle surprise… When software engineers want a case study of opacity
@@ -378,9 +360,8 @@ are trying to fix…</em></p>
 
 <p>Install the Pulse audio preferences tool:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install papref
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install papref
+</span></code></pre></div></figure>
 
 
 <p>…and disable Multicast/RTP.</p>

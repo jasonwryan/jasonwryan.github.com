@@ -132,103 +132,81 @@ are required; in this case: <code>raid1</code>, <code>dm-mod</code> and <code>dm
 <p>Check that udev hasn’t helpfully read the superblock of your Raid drives
 and assembled phantom arrays:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat /proc/mdstat
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/mdstat
+</span></code></pre></div></figure>
 
 
 <p>I find that there are a couple there generally assigned the names
 <span class="file">/dev/md126</span> and <span class="file">/dev/md127</span>.
 These need to be stopped before assembling the correct arrays:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
 </span><span class='line'>mdadm --assemble /dev/md0 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
 </span><span class='line'>mdadm --assemble /dev/md1 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>You should now have both your arrays up and running. The next step is to
 unlock your encrypted device:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
+</span></code></pre></div></figure>
 
 
 <p>After entering your passphrase, your device will be unlocked. Next, make
 the logical volumes available, and then check they are correct:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>vgchange --available y vgroup
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vgchange --available y vgroup
 </span><span class='line'>lvscan
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>At this point, you are ready to mount the devices and <code>chroot</code>:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir /mnt/arch
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir /mnt/arch
 </span><span class='line'>mount /dev/mapper/vgroup-lvroot /mnt/arch
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>The next steps are straight from the wiki:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
 </span><span class='line'>mount -t proc proc proc/
 </span><span class='line'>mount -t sysfs sys sys/
 </span><span class='line'>mount -o <span class="nb">bind</span> /dev dev/
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Mount the other parts of the system that you need to use in your
 recovery – in this case, I need my <span class="file">/boot</span> partition:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
+</span></code></pre></div></figure>
 
 
 <p>Now <code>chroot</code> to the device and define your shell:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>chroot . /bin/bash
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>chroot . /bin/bash
+</span></code></pre></div></figure>
 
 
 <p>The wiki has some good advice about customizing your prompt to reinforce
 the fact that you are in a chroot:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
+</span></code></pre></div></figure>
 
 
 <p>With everything mounted, it is just a matter of performing your
 maintenance. To reinstall <code>grub</code>:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># grub</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grub</span>
 </span><span class='line'>grub&gt; find /grub/stage1
 </span><span class='line'>grub&gt; device <span class="o">(</span>hd0<span class="o">)</span> /dev/sda
 </span><span class='line'>grub&gt; root <span class="o">(</span>hd0,0<span class="o">)</span>
 </span><span class='line'>grub&gt; setup <span class="o">(</span>hd0<span class="o">)</span>
 </span><span class='line'>grub&gt; quit
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Repeat for <span class="file">/dev/sdb</span> and both your drives will be bootable in the event
@@ -237,17 +215,12 @@ that one fails.</p>
 <p>With the maintenance accomplished, all that remains is to exit the
 <code>chroot</code> and unmount the devices cleanly:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">exit</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">exit</span>
 </span><span class='line'>umount <span class="o">{</span>proc,sys,dev,boot...<span class="o">}</span>
 </span><span class='line'><span class="nb">cd</span> ..
 </span><span class='line'>umount arch/
 </span><span class='line'>reboot
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Simple.</p>
@@ -317,9 +290,8 @@ the follow-up, what I need to do to restore this build…</p>
 <p>First up, prepare the two hard drives. This took roughly ~90 hours for
 the 1TB drives, so allow some time:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
+</span></code></pre></div></figure>
 
 
 <p>Once the drives are scrubbed (read the Arch Wiki on why that is
@@ -328,9 +300,8 @@ necessary), you can move to the actual installation business. I used a
 to it. Boot into the live environment and set up the initial partitions
 using <code>cfdisk</code>:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cfdisk /dev/sda
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cfdisk /dev/sda
+</span></code></pre></div></figure>
 
 
 <p>I created a 150Mb partition for <span class="file">/boot</span> - marked
@@ -339,11 +310,9 @@ should be primary and be <code>FSType linux_raid</code> (the FD option). Write t
 partition tabel toa file and then import it to the second drive so both are exactly the
 same:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
 </span><span class='line'>sfdisk /dev/sdb &lt; part-table
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Now, set up the Raid arrays. Start by loading the required modules and
@@ -351,15 +320,11 @@ then create the two arrays. The metadata flag is important: if you are
 using legacy grub, as I did, you must use the 0.90 type or your MBR will
 get overwritten:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe raid1 <span class="o">&amp;&amp;</span> modprobe dm-mod
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>modprobe raid1 <span class="o">&amp;&amp;</span> modprobe dm-mod
 </span><span class='line'>mdadm --create /dev/md0 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 <span class="se">\</span>
 </span><span class='line'>    --metadata<span class="o">=</span>0.90 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
 </span><span class='line'>mdadm --create /dev/md1 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p><sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup></p>
@@ -368,16 +333,14 @@ get overwritten:</p>
 sync—again, this could take some time, depending on the size of the
 drives.</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
+</span></code></pre></div></figure>
 
 
 <p>Check that it all went to plan…</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
+</span></code></pre></div></figure>
 
 
 <p>Once the drives are synched and pronounced clean, it it time to encrypt
@@ -388,20 +351,16 @@ you can still boot the other.</p>
 
 <p>Load the module for encryption, and then set it up:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>modprobe dm-crypt
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>modprobe dm-crypt
 </span><span class='line'>cryptsetup --cipher<span class="o">=</span>aes-xts-plain --verify-passphrase <span class="se">\</span>
 </span><span class='line'>    --key-size<span class="o">=</span>512 luksFormat /dev/md1
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Now, open the encrypted device to create the logical volumes:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
+</span></code></pre></div></figure>
 
 
 <p>The three next steps create, in this order, the physical volume (the
@@ -410,17 +369,7 @@ contained in the group. Choose simple, memorable names and do not
 hypenate them. The {pv,vg,lv}display commands print out the details of
 the devices once created.</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk
 </span><span class='line'>pvdisplay
 </span><span class='line'>
 </span><span class='line'>vgcreate vgroup /dev/mapper/cryptdisk
@@ -430,7 +379,7 @@ the devices once created.</p>
 </span><span class='line'>lvcreate --contiguous y --size 2G --name lvswap vgroup
 </span><span class='line'>lvcreate --extents +100%FREE --name lvdata vgroup
 </span><span class='line'>lvdisplay
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>It should be pointed out that the
@@ -454,29 +403,24 @@ configuration <em>prior to configuring your system</em>. This means that when
 your <code>initrd</code> is regenerated, it will inlcude the correct Raid
 information:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
+</span></code></pre></div></figure>
 
 
 <p>When you are done, move to configure your system and make sure to add
 the relevant details to both your <span class="file">/etc/rc.conf</span> and your
 <span class="file">/etc/mkinitcpio.conf</span>. In the former:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
 </span><span class='line'><span class="nv">USEDMRAID</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>and in /etc/mkinitcpio.conf:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
 </span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm_udev encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>That is the straightforward part of the install over. The final step is
@@ -485,9 +429,8 @@ tried a number of times using different approaches, is that this <em>won’t
 work</em>. The installer doesn’t seem to like the Raid setup, so it
 complains about it:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
+</span></code></pre></div></figure>
 
 
 <p>It’s not all bad, as this is the final hurdle and it is not a
@@ -497,20 +440,7 @@ particularly high one.</p>
 correctly. Given the names I chose above for my devices, mine looks like
 this:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># (0) Arch</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># (0) Arch</span>
 </span><span class='line'>title  Arch Linux
 </span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
 </span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
@@ -523,7 +453,7 @@ this:</p>
 </span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
 </span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
 </span><span class='line'>initrd /kernel26-fallback.img
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Once it is all setup, simply exit the installer. At this point, you have

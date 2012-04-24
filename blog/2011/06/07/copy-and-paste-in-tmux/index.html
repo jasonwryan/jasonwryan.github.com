@@ -125,9 +125,8 @@ explained there, I thought I would share my approach anyway.</p>
 
 <p>First, I set tmux to use vi keys:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>setw -g mode-keys vi
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setw -g mode-keys vi
+</span></code></pre></div></figure>
 
 
 <p>Then I change the default keybinds to suit my workflow. As explained in
@@ -135,19 +134,13 @@ the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
 and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
 to more intuitive and Vim-like keys:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
 </span><span class='line'><span class="nb">bind </span>Escape copy-mode
 </span><span class='line'>unbind p
 </span><span class='line'><span class="nb">bind </span>p paste-buffer
 </span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
 </span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>This seems a lot closer to all of the other Vim-like apps that I run -

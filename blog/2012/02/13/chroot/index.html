@@ -129,103 +129,81 @@ are required; in this case: <code>raid1</code>, <code>dm-mod</code> and <code>dm
 <p>Check that udev hasn’t helpfully read the superblock of your Raid drives
 and assembled phantom arrays:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat /proc/mdstat
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/mdstat
+</span></code></pre></div></figure>
 
 
 <p>I find that there are a couple there generally assigned the names
 <span class="file">/dev/md126</span> and <span class="file">/dev/md127</span>.
 These need to be stopped before assembling the correct arrays:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
 </span><span class='line'>mdadm --assemble /dev/md0 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
 </span><span class='line'>mdadm --assemble /dev/md1 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>You should now have both your arrays up and running. The next step is to
 unlock your encrypted device:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
+</span></code></pre></div></figure>
 
 
 <p>After entering your passphrase, your device will be unlocked. Next, make
 the logical volumes available, and then check they are correct:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>vgchange --available y vgroup
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vgchange --available y vgroup
 </span><span class='line'>lvscan
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>At this point, you are ready to mount the devices and <code>chroot</code>:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir /mnt/arch
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir /mnt/arch
 </span><span class='line'>mount /dev/mapper/vgroup-lvroot /mnt/arch
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>The next steps are straight from the wiki:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
 </span><span class='line'>mount -t proc proc proc/
 </span><span class='line'>mount -t sysfs sys sys/
 </span><span class='line'>mount -o <span class="nb">bind</span> /dev dev/
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Mount the other parts of the system that you need to use in your
 recovery – in this case, I need my <span class="file">/boot</span> partition:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
+</span></code></pre></div></figure>
 
 
 <p>Now <code>chroot</code> to the device and define your shell:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>chroot . /bin/bash
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>chroot . /bin/bash
+</span></code></pre></div></figure>
 
 
 <p>The wiki has some good advice about customizing your prompt to reinforce
 the fact that you are in a chroot:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
+</span></code></pre></div></figure>
 
 
 <p>With everything mounted, it is just a matter of performing your
 maintenance. To reinstall <code>grub</code>:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># grub</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grub</span>
 </span><span class='line'>grub&gt; find /grub/stage1
 </span><span class='line'>grub&gt; device <span class="o">(</span>hd0<span class="o">)</span> /dev/sda
 </span><span class='line'>grub&gt; root <span class="o">(</span>hd0,0<span class="o">)</span>
 </span><span class='line'>grub&gt; setup <span class="o">(</span>hd0<span class="o">)</span>
 </span><span class='line'>grub&gt; quit
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Repeat for <span class="file">/dev/sdb</span> and both your drives will be bootable in the event
@@ -234,17 +212,12 @@ that one fails.</p>
 <p>With the maintenance accomplished, all that remains is to exit the
 <code>chroot</code> and unmount the devices cleanly:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">exit</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">exit</span>
 </span><span class='line'>umount <span class="o">{</span>proc,sys,dev,boot...<span class="o">}</span>
 </span><span class='line'><span class="nb">cd</span> ..
 </span><span class='line'>umount arch/
 </span><span class='line'>reboot
-</span></code></pre></td></tr></table></div></figure>
+</span></code></pre></div></figure>
 
 
 <p>Simple.</p>
