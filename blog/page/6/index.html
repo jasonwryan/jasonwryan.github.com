@@ -9,11 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="After recovering from
-the shock of the botched delicious relaunch,
-I have switched to
-Pinboard
-for my bookmarking. Previously, I was just synching &hellip;">
+  <meta name="description" content="I have a persistent tmux
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +84,92 @@ for my bookmarking. Previously, I was just synching &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/07/irc-dzen/">IRC Notifications with dzen2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-07T19:48:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
+
+<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective of whether I
+was connected to the session, or that particular machine at the time.</p>
+
+<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
+and there is a script called
+<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
+that will print any mentions in a channel to a file. I then configured
+the fnotify script to write to a folder in Dropbox. Now, whenever I am
+mentioned in freenode, the file is updated across all my machines.</p>
+
+<p>The next challenge was to translate the updating of the fnotify file
+into a notification on my current machine. As I don’t use
+<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
+on my Arch machines, I wanted to make it work with
+<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
+Enter a simple shell script:</p>
+
+<figure class='code'><figcaption><span>highlights.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">while </span>inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></div></figure>
+
+
+<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
+so that it runs in the background after login. Whenever the metadata
+(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
+written to my
+<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
+with the message.</p>
+
+<p>Simple; but does what I need…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Dropbox’s API won’t work with dzen2—or with other lightweight
+notifications like
+<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
+<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
+(that was closed without any progress)—hence my having to resort to a
+home-cooked solution…</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -277,151 +361,6 @@ now.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/09/10/tmux-and-ssh-keys/">tmux &amp; SSH Keys</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-09-10T16:46:00+12:00" pubdate data-updated="true">Sep 10<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-ssh.jpg" alt="image" /></p>
-
-<p>I have posted before about tmux<sup>1</sup>, the terminal multiplexer. One of the
-(minor) frustrations that I have to-date done nothing about was setting
-up persistent SSH key management across sessions. The ability to enter
-the passphrase for my public keys once, and then to be able to access
-remote hosts—or {git,hg} push—without having to re-enter a passphrase.</p>
-
-<p>My solution is quite hackish, but it works and, given
-<a href="http://duckduckgo.com/?q=tmux+ssh-agent" title="tmux and ssh-agent on DDG">the only other solutions</a>
-I was able to find by searching seem even more convoluted, I thought I
-would share it.</p>
-
-<p>There are a couple of separate steps, none of them of any real
-consequence, but each necessary.</p>
-
-<p>First, in your <span class="file">$HOME/.tmux.conf</span> you need to enable update-environment:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set</span> -g update-environment <span class="s2">&quot;DISPLAY SSH_ASKPASS SSH_AUTH_SOCK</span>
-</span><span class='line'><span class="s2">SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>From the <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="tmux manual">man page</a>:</p>
-
-<blockquote><p>Set a space-separated string containing a list of environment
-variables to be copied into the session environment when a new session
-is created or an existing session is attached. Any variables that do
-not exist in the source environment are set to be removed from the
-session environment (as if -r was given to the set-environment
-command).</p></blockquote>
-
-<p>The next step is to create a script (mine is bound to a key sequence to
-launch from scratch, you can adopt a simpler approach) that starts tmux
-and initializes ssh-agent:<sup>2</sup></p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="nv">PID</span><span class="o">=</span><span class="k">$(</span>pgrep tmux<span class="k">)</span>
-</span><span class='line'><span class="nv">new</span><span class="o">=</span><span class="s2">&quot;tmux -f $HOME/.tmux/conf new -s secured&quot;</span>
-</span><span class='line'><span class="nv">old</span><span class="o">=</span><span class="s2">&quot;tmux attach -t secured -d&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$SSH_AUTH_SOCK&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nb">eval</span> <span class="sb">`</span>ssh-agent<span class="sb">`</span>
-</span><span class='line'>    <span class="nb">trap</span> <span class="s2">&quot;kill $SSH_AGENT_PID&quot;</span> 0
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$PID&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span>urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${new}&quot;</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">    </span>urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${old}&quot;</span>
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'>ssh-add
-</span></code></pre></div></figure>
-
-
-<p>The final step is to install
-<a href="http://www.funtoo.org/wiki/Keychain" title="Keychain homepage">keychain</a>, and
-set it up. I followed the
-<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Using_keychain" title="...because it rocks!">instructions on the Arch Wiki</a>
-and opted for a couple of lines in <span class="file">$HOME/.bash_profile</span><sup>3</sup>, like so:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
-</span><span class='line'><span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span> <span class="o">&amp;&amp;</span>
-</span><span class='line'>    <span class="nb">source</span> <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
-</span></code></pre></div></figure>
-
-
-<p>That’s it. Now, hitting a key sequence opens a terminal, I am prompted
-for my passphrase and then, if I open another window, or another tmux
-session <em>as long is the first session is still running, attached or
-not</em>, I am authenticated and can SSH or push without a prompt.</p>
-
-<h4>Updated 7/10/11</h4>
-
-<p>I refined the sequence to provide me a little more flexibility: now the
-keychain is only called if I start a specific named tmux session. To do
-this, I changed my <span class="file">$HOME/.bash_profile</span> to test for that session:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">tsess</span><span class="o">=</span><span class="k">$(</span>tmux ls<span class="k">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;${tsess%%:*}&quot;</span> <span class="o">=</span> <span class="s2">&quot;secured&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span>
-</span><span class='line'>   <span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'>    <span class="c"># start keychain</span>
-</span><span class='line'>    /usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
-</span><span class='line'>    . <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
-
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>Previous posts:</p>
-
-<ul>
-<li><a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/" title="First post on tmux">tmux: terminal multiplexer</a></li>
-<li><a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/" title="tmux sessions">Sessions in tmux</a></li>
-<li><a href="http://jasonwryan.com/blog/2011/06/07/copy-and-paste-in-tmux/" title="Copy and paste in tmux">Copy &amp; paste in tmux</a></li>
-<li><a href="http://jasonwryan.com/blog/2011/06/10/setting-tmux-status-bar-if-in-x/" title="tmux status bars">Setting tmux status bar if in X</a></li>
-</ul>
-</li>
-<li><p>Updated to include session test.</p></li>
-<li>Alternatively, placing the script in <span class="file">/etc/profile.d/keychain.sh</span> will
-start the agent when you login, as opposed to starting a specific
-shell. Your call on security versus convenience…</li>
-</ol>
-
-
-<p>Creative Commons image from <a href="http://www.flickr.com/photos/marts-pics/2292588212/in/photostream/" title="Public Key on Flickr">mer de glace</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; Older</a>
@@ -439,6 +378,10 @@ shell. Your call on security versus convenience…</li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/12/mutt/">mutt and HTML email</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a>
       </li>
     
@@ -452,10 +395,6 @@ shell. Your call on security versus convenience…</li>
     
       <li class="post">
         <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/03/17/vampires/">A Taxonomy of Help Vampires</a>
       </li>
     
   </ul>

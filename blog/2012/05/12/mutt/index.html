@@ -5,11 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>jasonwryan.com</title>
+  <title>mutt and HTML email - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Rather than just download Thunderbird, you can always install something a little more interesting that will a) provide hours of fun setting up and &hellip;">
+  <meta name="description" content="Following on from my last post about mutt,
+I have been tinkering more with the most suckless of mail clients to
+get it to deal with—of all things— &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/14">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/05/12/mutt">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -80,15 +82,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/08/06/mailers/">5 Alternate Mail Clients</a></h1>
+      <h1 class="entry-title">mutt and HTML email</h1>
     
     
       <p class="meta">
@@ -104,91 +103,95 @@
   
 
 
-<time datetime="2010-08-06T17:03:00+12:00" pubdate data-updated="true">Aug 6<span>th</span>, 2010</time>
+<time datetime="2012-05-12T15:49:00+12:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/462324481/lightbox/"><img src="http://dl.dropbox.com/u/261312/Blog-images/mail-5alts.png"/></a></p>
+<div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/mutt-1.png" title="'mutt logo'" ></p>
 
-<p>Rather than just download <a href="http://www.mozillamessaging.com/en-US/thunderbird/" title="Thunderbird homepage">Thunderbird</a>, you can always install something a little more interesting that will a) provide hours of fun setting up and configuring so that it works <em>exactly</em> the way you want it to, and b) will free you of the rodent…</p></p>
+<p>Following on from my <a href="http://jasonwryan.com/blog/2012/04/21/lbdb/" title="Using mutt, LDAP and SSL">last post about mutt</a>,
+I have been tinkering more with the most suckless of mail clients to
+get it to deal with—of all things—<acronym title="HyperText Markup Language">HTML</acronym>
+emails. I will preface this post with a remark or two that amounts to a warning about
+intemperate language, ranting and a generally cranky disposition: repeated contact with
+email marketers can do that to you…</p>
 
-<ul>
-<li><a href="http://www.mutt.org/" title="mutt homepage">Mutt</a> - a small but very powerful text-based mail client for Unix operating systems. Eminently extensible and configurable. mutt + imap + gmail ftw!</li>
-<li><a href="http://www.washington.edu/alpine/" title="Alpine homepage">Alpine</a> - based on the Pine® Message System. Not as intimidating for the novice as mutt…</li>
-<li><a href="http://sup.rubyforge.org/" title="sup homepage">Sup</a> - a console-based email client for people with a lot of email. “The goal of Sup is to become the email client of choice for nerds everywhere”</li>
-<li><a href="http://notmuchmail.org/">Notmuch</a> - an answer to Sup. Still in the early stages of development, there are two user interfaces available for it, one for <a href="http://www.vim.org/" title="THE text editor...">vim</a> and one for those poor benighted souls still using emacs…</li>
-<li><a href="http://www.courier-mta.org/cone/cone00index.html" title="Cone homepage">Cone</a> - a screen-oriented E-mail/News reader and writer. Cone contains an experimental implementation of a new remote mail access protocol, <a href="http://en.wikipedia.org/wiki/Simple_Mail_Access_Protocol" title="Wikipedia page">SMAP</a></li>
-</ul>
+<p>A further  brief digression is warranted here. HTML email is, without doubt,
+evidence of the imminent end of civilized life as we know it; much like the
+<a href="http://en.wikipedia.org/wiki/Places_in_The_Hitchhiker" title="s_Guide_to_the_Galaxy#Golgafrincham
+'Wikipedia entry on HHGTTG">Golgafrincham diaspora</a>, it attributable to a depraved cabal of marketing consultants
+and provides the same level of social good as syphilis and fistulas. Suffice to say, it is a blight.</p>
+
+<p>Sadly, it is a blight that I have to deal with. Up until now, I had done that by using the
+excellent <a href="http://w3m.sourceforge.net/" title="w3m homepage on sourceforge">w3m</a> to render
+HTML as text in mutt itself. That is accomplished easily enough with an entry in
+<span class="file">muttrc</span> and another in a <span class="file">mailcap</span> file.</p>
+
+<figure class='code'><figcaption><span>~/.mutt/muttrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>auto_view text/html                                      <span class="c"># view html automatically</span>
+</span><span class='line'>alternative_order text/plain text/enriched text/html     <span class="c"># save html for last</span>
+</span></code></pre></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>~/.mutt/mailcap </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
+</span></code></pre></div></figure>
+
+
+<p>This works for 80 percent of the HTML email I get. It is enough to confirm that the mail is useless
+and can be discarded. The other 20 percent, however, is slightly more problematic. The initial
+view in w3m is enough to tell me that, due to the outstanding incompetence of the idiots that
+generated the email, there <em>is</em> actually some information that is contained in the email that I need
+to access <strong>but it is not viewable in a text browser.</strong></p>
+
+<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/mutt-2.png" title="'An example…'" ></p>
+
+<p>For this special level of retardation, I need to be able to open the email in a ghraphical browser.
+As I use vimprobable, that means sending the file to
+<a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/" title="My post on Using vimprobable">vimprobable running in tabbed</a>. Fortunately, as you would expect with superior software,
+mutt has a way of handling this gracefully. In mutt&#8217;s extensive documentation, there is a
+<a href="http://www.mutt.org/doc/manual/manual-5.html" title="Go and read it…">page on mutt&#8217;s MIME support</a>
+that details how to set up a gradated response to this pernicious issue:</p>
+
+<blockquote><p>In addition, you can use this with Autoview to denote two commands for viewing an attachment,<br/>one to be viewed automatically, the other to be viewed interactively from the attachment menu.</p><footer><strong>mutt manual</strong> <cite><a href='http://www.mutt.org/doc/manual/manual-5.html'>www.mutt.org/doc/manual/&hellip;</a></cite></footer></blockquote>
+
+
+<p>So, you can have mutt render the HTML abomination in w3m in most cases, and when those
+instances of particularly cretinous behaviour make it to your inbox, you can choose to
+view them in your web browser. In my case, by altering the <span class="file">mailcap</span>
+entry to look like this:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>text/html; vimprobtab.sh %s &amp;amp;; <span class="nb">test</span><span class="o">=</span><span class="nb">test</span> -n <span class="s2">&quot;$DISPLAY&quot;</span>; needsterminal;
+</span><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
+</span></code></pre></div></figure>
+
+
+<p>The first entry tests that X is running, and if it is, it hands the file to vimprobable. The
+default, however, is determined by the <code>copiousoutput</code> tag. So, in <code>mutt</code> it is just a matter
+of hitting <kbd>v</kbd> to view the attached HTML and then <kbd>m</kbd> to send it to mailcap.
+For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">muttrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">bind </span>attach &lt;<span class="k">return</span>&gt;    view-mailcap
+</span></code></pre></div></figure>
+
+
 
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/05/21/browsers/">5 Alternate Browsers</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
 
-<time datetime="2010-05-21T15:22:00+12:00" pubdate data-updated="true">May 21<span>st</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/4352140405/"><img src="http://dl.dropbox.com/u/261312/Blog-images/browser-5alt.png"/></a></p>
-
-<p>Tired of Firefox&#8217;s bloated, buggy behaviour?</p>
-
-<p>Here are five alternatives that are lighter, faster and much more fun…</p>
-
-<ul>
-<li><a href="http://www.uzbl.org/" title="Uzbl homepage">Uzbl</a>. My current browser of choice. Completely customizable, integrates well with other programs and is scriptable.</li>
-<li><a href="http://surf.suckless.org/" title="Surf on the suckless wiki">Surf</a>. From suckless.org. &#8216;Nuff said.</li>
-<li><a href="http://conkeror.org/" title="Conkeror homepage">Conkeror</a>. I used this for a long time before moving to uzbl - the emacs-like keybindings are why I gave it up…</li>
-<li><a href="http://www.vimprobable.org/" title="Home of the wonderfully named  Vimprobable">Vimprobable</a>. Gets great raps on the Arch boards. One to watch (…and a homepage that telegraphs exactly what to expect).</li>
-<li><a href="http://bbs.archlinux.org/viewtopic.php?id=95589&amp;p=1" title="dwb thread on the Arch Forums">dwb</a>. Another browser, like uzbl, to come from the Arch community. As the name suggests, built for tilers…</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/04/03/vapourware/">Vapourware</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -200,64 +203,42 @@
   
 
 
-<time datetime="2010-04-03T13:18:00+13:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2010</time>
-        
-      </p>
+<time datetime="2012-05-12T15:49:00+12:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>
+  
+</span>
+
+
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>This morning I received a heap of brochures inviting me to attend
-professional development courses, training seminars and conferences. One
-in particular stood out for reasons I’d like to share with you.</p>
-
-<p>By way of context; it’s a 2 day programme (workshops on the first,
-plenary sessions on the second) of social media for internal
-communicators. As I have a keen interest in internal communications, I
-studied their offering.</p>
-
-<p>One presentation, from an “international guest speaker,” is so striking
-I’ll reprint it in its entirety, removing the name of the company to
-prevent them any (further) embarassment, (all emphasis mine):</p>
-
-<blockquote><p>[Multi-national company] is rolling out Sharepoint this year. It
-<strong>will</strong> provide the organization with an enhanced way of
-communicating, collaborating and managing content - a dynamic platform
-on which to evolve and further improve [company’s] way or working.
-From an internal communications perspective, the Microsoft Office
-product provides an <strong>updated way</strong> to engage colleagues, in order to
-drive winning culture and business performance. This session captures
-the opportunities, benefits, <strong>and realities</strong> of implementing and
-living with Sharepoint.</p>
-
-<p>[Employee name], Internal Communications Director, [company].</p></blockquote>
-
-<p>Did I read that correctly? The company haven’t actually implemented the
-technology yet, but they are still fronting someone to sell it’s future
-virtues.</p>
-
-<p>Whether or not the technology is able to deliver these benefits (and I
-<a href="http://twitter.com/jasonwryan/status/839079414">doubt it</a> <a href="http://twitter.com/jasonwryan/status/839079197">very
-much</a>), shouldn’t the
-corporate communicator at least be talking about, oh let’s say for a
-whim, something <em>grounded in evidence?</em></p>
+      <div class="sharing">
+  
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/04/21/lbdb/" title="Previous Post: Using mutt, LDAP and SSL">&laquo; Using mutt, LDAP and SSL</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/blog/page/15/">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-    <a class="next" href="/blog/page/13/">Newer &rarr;</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -290,7 +271,7 @@ whim, something <em>grounded in evidence?</em></p>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -306,7 +287,7 @@ whim, something <em>grounded in evidence?</em></p>
 
 <section>
   <h1>My Pinboard</h1>
-  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
   <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
 </section>
 <script type="text/javascript">
@@ -329,7 +310,7 @@ whim, something <em>grounded in evidence?</em></p>
   #lastfmList li{ text-align: left; }
 </style>
 <ul id="lastfmList">
-  <li class="loading">Updating tracks&#8230;</li>
+  <li class="loading">Updating tracks...</li>
 </ul>
 <p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
 
@@ -376,6 +357,7 @@ function showLastfmFeed(xml){
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -390,7 +372,10 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       var disqus_shortname = 'jasonwryan';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/05/12/mutt/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2012/05/12/mutt/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

@@ -9,11 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I posted recently about setting up a microserver
-and included a
-rsync
-script for backing up my files to the server. At the time, I was running
-it &hellip;">
+  <meta name="description" content="After setting up my server,
+I wanted to use it as a torrent box. The version of
+rtorrent
+in the Debian stable repositories is 0.8.6, which is &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +85,104 @@ it &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/29/rtorrent/">Building rtorrent on Debian Squeeze</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-29T21:21:00+13:00" pubdate data-updated="true">Nov 29<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/rtorrent.png" alt="image" /></p>
+
+<p>After <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Post on the HP microserver">setting up my server</a>,
+I wanted to use it as a torrent box. The version of
+<a href="http://libtorrent.rakshasa.no/" title="rtorrent &amp; libtorrent homepage">rtorrent</a>
+in the Debian stable repositories is 0.8.6, which is unfortunate as
+support for <a href="http://en.wikipedia.org/wiki/Magnet_URI_scheme" title="Wikipedia page on magnet URIs">magnet links</a>
+was introduced in 0.8.7.</p>
+
+<p>To remedy this, I decided to build the current stable version of
+rtorrent, 0.8.9. At the same time—seeing as I was getting my hands dirty
+anyway—I thought I’d patch in colour support.</p>
+
+<p>This is a straightforward two-step process. First, build the current
+version of libtorrent, 0.12.9:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
+</span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
+</span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
+</span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
+</span><span class='line'>sudo checkinstall
+</span></code></pre></div></figure>
+
+
+<p>Once libtorrent is successfully built and installed, you can begin the
+rtorrent build:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
+</span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
+</span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
+</span></code></pre></div></figure>
+
+
+<p>Then, if you want colour support, you need the patch. I used the version
+in the
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
+but you can also grab a copy from a paste site:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
+</span><span class='line'>mv canvas_colour.patch src/
+</span><span class='line'>patch -uNp1 -i canvas_colour.patch
+</span></code></pre></div></figure>
+
+
+<p>The patch should apply cleanly. Then specify where libtorrent is
+installed to ensure that it is linked during the rtorrent build:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
+</span><span class='line'>make
+</span><span class='line'>sudo checkinstall
+</span></code></pre></div></figure>
+
+
+<p>Once again, this should compile cleanly and you will now have rtorrent
+with colour and magnet link support installed in
+<span class="file">/usr/local/bin/rtorrent</span>.</p>
+
+<h5>Notes</h5>
+
+<p>I prefer to use
+<a href="http://asic-linux.com.mx/~izto/checkinstall/" title="checkinstall homepage">checkinstall</a>
+so that self-installed applications are tracked by
+<a href="http://wiki.debian.org/Apt" title="Debian wiki entry">Apt</a>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -311,92 +408,6 @@ automate the task.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/07/irc-dzen/">IRC Notifications with dzen2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-07T19:48:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
-
-<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
-session running on a server connected to IRC and I wanted to get
-notifications whenever someone addressed me, irrespective of whether I
-was connected to the session, or that particular machine at the time.</p>
-
-<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
-and there is a script called
-<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
-that will print any mentions in a channel to a file. I then configured
-the fnotify script to write to a folder in Dropbox. Now, whenever I am
-mentioned in freenode, the file is updated across all my machines.</p>
-
-<p>The next challenge was to translate the updating of the fnotify file
-into a notification on my current machine. As I don’t use
-<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
-on my Arch machines, I wanted to make it work with
-<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
-Enter a simple shell script:</p>
-
-<figure class='code'><figcaption><span>highlights.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">while </span>inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>
-</span><span class='line'><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
-</span><span class='line'><span class="k">done</span>
-</span></code></pre></div></figure>
-
-
-<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
-so that it runs in the background after login. Whenever the metadata
-(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
-written to my
-<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
-with the message.</p>
-
-<p>Simple; but does what I need…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Dropbox’s API won’t work with dzen2—or with other lightweight
-notifications like
-<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
-<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
-(that was closed without any progress)—hence my having to resort to a
-home-cooked solution…</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -414,6 +425,10 @@ home-cooked solution…</li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/12/mutt/">mutt and HTML email</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a>
       </li>
     
@@ -427,10 +442,6 @@ home-cooked solution…</li>
     
       <li class="post">
         <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/03/17/vampires/">A Taxonomy of Help Vampires</a>
       </li>
     
   </ul>
