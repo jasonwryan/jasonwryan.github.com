@@ -48,16 +48,16 @@ For this special level of retardation, I need to be able to open the email in a 
 As I use vimprobable, that means sending the file to 
 [vimprobable running in tabbed](http://jasonwryan.com/blog/2011/06/26/using-vimprobable/
 'My post on Using vimprobable'). Fortunately, as you would expect with superior software,
-mutt has a way of handling this gracefully. In mutt's extensive documentation, there is a 
+`mutt` has a way of handling this gracefully. In mutt's extensive documentation, there is a 
 [page on mutt's MIME support](http://www.mutt.org/doc/manual/manual-5.html 'Go and read it…')
-that details how to set up a gradated response to this pernicious issue:
+that details how to set up a graduated response to this pernicious issue:
 
 {% blockquote mutt manual http://www.mutt.org/doc/manual/manual-5.html %}
 In addition, you can use this with Autoview to denote two commands for viewing an attachment,
 one to be viewed automatically, the other to be viewed interactively from the attachment menu. 
 {% endblockquote %}
 
-So, you can have mutt render the HTML abomination in w3m in most cases, and when those
+So, you can have `mutt` render the HTML abomination in `w3m` in most cases, and when those
 instances of particularly cretinous behaviour make it to your inbox, you can choose to
 view them in your web browser. In my case, by altering the <span class="file">mailcap</span>
 entry to look like this:
@@ -67,9 +67,9 @@ text/html; vimprobtab.sh %s &amp;; test=test -n "$DISPLAY"; needsterminal;
 text/html; w3m -I %{charset} -T text/html; copiousoutput;
 {% endcodeblock %}
 
-The first entry tests that X is running, and if it is, it hands the file to vimprobable. The
+The first entry tests that X is running, and if it is, it hands the file to `vimprobable`. The
 default, however, is determined by the `copiousoutput` tag. So, in `mutt` it is just a matter
-of hitting <kbd>v</kbd> to view the attached HTML and then <kbd>m</kbd> to send it to mailcap.
+of hitting <kbd>v</kbd> to view the attached HTML and then <kbd>m</kbd> to send it to `mailcap`.
 For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">muttrc</span>:
 
 {% codeblock lang:sh %}
