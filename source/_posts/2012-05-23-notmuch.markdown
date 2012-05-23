@@ -1,0 +1,74 @@
+---
+layout: post
+title: "Using Notmuch with mutt"
+date: 2012-05-23 19:37
+comments: true
+categories: [archlinux]
+---
+
+{% img left http://dl.dropbox.com/u/261312/Blog-images/magnifier.png day 307 on Flickr %}
+Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
+[mutt](http://www.mutt.org/ 'mutt homepage') posts<sup>1</sup> with what I am assuming is the 
+final piece of the puzzle: searching `mutt's` maildirs. For a small to average size mailbox, `mutt's`
+searching works fine, but as your mail volume grows this simple search doesn't really scale. That's
+where the rather modestly named [Notmuch](http://notmuchmail.org/ 'Notmuch website') comes into play.
+
+It can be run as a standalone mail client, but you can also use it with `mutt` to provide
+a ruthlessly efficient and fast search tool for your email. I had looked at it and 
+[Sup](http://sup.rubyforge.org/ 'A console client for people with lots of mail')
+a couple of years ago, but was spurred to do something about it this week when
+[Gunnar Lundström](https://twitter.com/#!/chosig 'Chosig on Twitter') pinged me on twitter and 
+suggested I check it out. So I did.
+
+{% blockquote Notmuch website http://notmuchmail.org %}
+"Not much mail" is what Notmuch thinks about your email collection. Even if you receive 12000 
+messages per month or have on the order of  millions of messages that you've been saving for decades. 
+Regardless, Notmuch will be able to quickly search all of it. It's just plain not much mail.
+{% endblockquote %}
+
+There was previously a 
+[mutt-notmuch script](http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/)
+for integrating the two, but the functionality was included upstream at the start of this year
+so it is quite straightforward to set it up. There is a 
+[package in the AUR](http://aur.archlinux.org/packages.php?ID=36289 'Arch User Repository package') 
+but it is intended as the full mail client, complete with, *shudder*, emacs support amongst 
+other things. I have stripped out the uneeded bindings and included the relevant `perl` libraries in a
+[modified PKGBUILD](https://bitbucket.org/jasonwryan/centurion/src/6ff0f252961f/Build/notmuch/PKGBUILD '…in my bitbucket repo')
+if you just want the basic search with `mutt`.
+
+Otherwise, you'll need to step through it manually.
+
+{% codeblock lang:sh %}
+pacman -S perl perl-mailtools perl-mail-box perl-string-shellquote
+cowerd notmuch perl-term-readline-gnu
+{% endcodeblock %}
+
+As you will see from the PKGBUILD, you will need to copy the `notmuch-mutt` script 
+into your `$PATH`: you'll find it in <span class="file">contrib/notmuch-mutt/</span>.
+
+There is a simple interative setup, which you can complete before running the index the first time:
+
+{% codeblock lang:sh %}
+notmuch setup
+notmuch new
+{% endcodeblock %}
+
+The final step is to copy across the `mutt` macros included with the script:
+
+{% codeblock lang:sh %}
+cat src/notmuch-0.13/contrib/notmuch-mutt/notmuch-mutt.rc >> $HOME/.mutt/muttrc
+{% endcodeblock %}
+
+Now, from within `mutt`, <kbd>F8</kbd>, <kbd>F9</kbd> and <kbd>F6</kbd> will respectively
+search, create the relevant threads from search results, and tag mails with `notmuch`.
+
+As I use `offlineimap` to retrieve my mail, I simply added `notmuch new` to the script that
+runs as a `cron` job to synch my mail and `notmuch` reindexes all of my mail as soon as it arrives.
+
+#### Notes
+1. [Using mutt, LDAP and SSL](http://jasonwryan.com/blog/2012/04/21/lbdb/) and
+[mutt and HTML email](http://jasonwryan.com/blog/2012/05/12/mutt/)
+
+Creative Commons image by 
+[mjtmail on Flickr](http://www.flickr.com/photos/mjtmail/3008566512/in/photostream/)
+
