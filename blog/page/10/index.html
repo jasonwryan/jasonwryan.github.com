@@ -9,10 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I posted a couple of weeks ago about
-how much I was enjoying Surfraw,
-to the point of writing a couple of my own elvi. As part of the
-ongoing &hellip;">
+  <meta name="description" content="I have been a solid user of
+TTYtter
+for a couple of years now, much preferring the speed and power of a
+command line Twitter client. And, after &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,97 @@ ongoing &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/05/24/tyrs-ncurses-twitter-client/">Tyrs: ncurses Twitter Client</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-24T20:17:00+12:00" pubdate data-updated="true">May 24<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5754227102/in/photostream" title="Tyrs photo on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/tyrs.png" alt="image" /></a></p>
+
+<p>I have been a solid user of
+<a href="http://www.floodgap.com/software/ttytter/" title="TTYtter homepage">TTYtter</a>
+for a couple of years now, much preferring the speed and power of a
+command line Twitter client. And, after having tried–at one time or
+another–most of the Linux or cross-platform Twitter clients, I can
+safely say that for me TTYtter is easily the best.</p>
+
+<p>There is, however, a new
+<a href="http://www.gnu.org/software/ncurses/" title="ncurses page">ncurses</a> client
+that is showing a lot of promise:
+<a href="http://tyrs.nicosphere.net/index.html" title="Tyrs homepage">Tyrs</a>. Only at
+the 0.2.1.1 stage, and with a fraction of the functionality that TTYtter
+has, it is nevertheless a very nice client.</p>
+
+<p>Requiring little in the way of dependencies, only python-twitter and
+python-oauth2, both available in the
+<a href="http://aur.archlinux.org/" title="Arch Linux User Repository">AUR</a> or in the
+debian/Ubuntu repos (if you are using debian/Ubuntu, you will need the
+newer python-twitter-0.8.2 for it to run).</p>
+
+<p>Tyrs is easy to configure, with good documentation and a simple
+configuration file, located by default at
+$XDG_CONFIG_HOME/tyrs/tyrs.cfg. The default keybinds are
+<a href="http://www.vim.org/" title="THE editor">Vim-centric</a>, naturally…</p>
+
+<p>My config is pretty straightforward at this point:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'>[keys]
+</span><span class='line'>retweet           <span class="p">=</span> <span class="k">p</span>
+</span><span class='line'>retweet_and_edit  <span class="p">=</span> <span class="k">P</span>
+</span><span class='line'>mentions          <span class="p">=</span> <span class="k">a</span>
+</span><span class='line'>reply             <span class="p">=</span> <span class="k">r</span>
+</span><span class='line'>
+</span><span class='line'>[<span class="k">colors</span>]
+</span><span class='line'><span class="nb">highlight</span>         <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>header            <span class="p">=</span> <span class="m">6</span>
+</span><span class='line'>hashtag           <span class="p">=</span> <span class="m">4</span>
+</span><span class='line'>attag             <span class="p">=</span> <span class="m">2</span>
+</span><span class='line'>text              <span class="p">=</span> <span class="m">7</span>
+</span><span class='line'>warning_msg       <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>info_msg          <span class="p">=</span> <span class="m">2</span>
+</span><span class='line'>
+</span><span class='line'>[params]
+</span><span class='line'>refresh           <span class="p">=</span> <span class="m">1</span>
+</span><span class='line'>tweet_border      <span class="p">=</span> <span class="m">0</span>
+</span></code></pre></div></figure>
+
+
+<p>Written in Python, the code is well commented and relatively easy to
+find your way around if your are keen on hacking.</p>
+
+<p>The developer, Nicolas Paris, is both approachable and helpful and is
+actively developing Tyrs. With some more functionality in the pipeline,
+it looks to be a very nice application.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -290,163 +381,6 @@ truth. Its love will set you free.</p></blockquote>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/04/06/vim-colours-in-the-console/">Vim Colours in the Console</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-04-06T21:19:00+12:00" pubdate data-updated="true">Apr 6<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours1.png" alt="image" /></p>
-
-<p>I have spent the last couple of days trying to understand why I couldn’t
-get <a href="http://www.vim.org/" title="Vim: the _only_ editor">Vim</a> to display the
-correct 16 colours in the console. Not in a terminal emulator in X, like
-<a href="http://invisible-island.net/xterm/xterm.html" title="XTerm homepage">xterm</a>
-or
-<a href="http://software.schmorp.de/pkg/rxvt-unicode.html" title="Homepage for urxvt">rxvt-unicode</a>,
-but in the consoles, TTY1-6.</p>
-
-<p>After a lot of searching, more reading into the
-<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-16.html" title="The Linux terminal...">arcane documentation</a>
-of Linux terminals than I was either prepared for or keen on and some
-experimentation, I have it working. With one caveat; I wasn’t prepared
-to set the <code>TERM</code> environment in my <span class="file">.vimrc</span>. Apart from being
-<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-10.html#ss10.5" title="Console documentation">cautioned against</a>,
-as I <em>do</em> set it for tmux, I was anxious to avoid any clashes when
-running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
-(which I do most of the time).</p>
-
-<p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
-colours, gave me the default:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> <span class="o">&amp;&amp;</span> tput colors
-</span><span class='line'>linux
-</span><span class='line'>8
-</span></code></pre></div></figure>
-
-
-<p>Which, under my current configuration of Vim, rendered colours like so:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours2.png" alt="image" /></p>
-
-<p>Hardly satisfactory.</p>
-
-<p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
-colours:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
-</span></code></pre></div></figure>
-
-
-<p>Then I had to rewrite my colourscheme to change all of the references to
-the terminal colour numbers to colour <em>names</em>, as apparently that is
-what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
-</span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
-</span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
-</span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
-</span></code></pre></div></figure>
-
-
-<p>…to the more literal:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
-</span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
-</span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span></code></pre></div></figure>
-
-
-<p>Once I had made the necessary changes, I saved this new colourscheme as
-<span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
-have included it in an <code>if</code> condition in my original colourscheme<sup>2</sup>,
-but I was intent on keeping things compartmentalized until I had it working…</p>
-
-<p>Running Vim in the console was now starting to look promising:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vim-colours3.png" alt="image" /></p>
-
-<p>The final piece of the puzzle was to pass my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.colours/dark" title="jwr dark colours: mercurial repo">X colours</a>
-to the console. Fortunately,
-<a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
-made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Linux console colors (jwr dark) </span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
-</span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
-
-
-<p>Then it was just a case of setting the relevant colourscheme in my
-<span class="file">.vimrc</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;<span class="nb">t_Co</span> <span class="p">&lt;</span> <span class="m">256</span>
-</span><span class='line'>    <span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'>    <span class="k">colorscheme</span> miromiro
-</span><span class='line'><span class="k">endif</span>
-</span></code></pre></div></figure>
-
-
-<p>And you can see
-<a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>
-of the finished product on Flickr.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p><a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.vim/colors/miro8.vim" title="Mercurial repo: miro8 colourscheme">miro8.vim</a></p></li>
-<li><p><a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a></p></li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/11/">&larr; Older</a>
@@ -464,6 +398,10 @@ of the finished product on Flickr.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/23/notmuch/">Using Notmuch with mutt</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/12/mutt/">mutt and HTML email</a>
       </li>
     
@@ -477,10 +415,6 @@ of the finished product on Flickr.</p>
     
       <li class="post">
         <a href="/blog/2012/03/30/octopress/">Moving to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
       </li>
     
   </ul>

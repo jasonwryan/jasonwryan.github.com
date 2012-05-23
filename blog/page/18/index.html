@@ -9,7 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar. Here is how I sorted it. First, I &hellip;">
+  <meta name="description" content="Over the last several months I have been using dwm
+as my window manager on two Arch Linux
+machines: my <a href="http://www.flickr.com/photos/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -82,6 +84,109 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/">Patching dwm with pertag and bstack</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-12-19T17:40:00+13:00" pubdate data-updated="true">Dec 19<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Over the last several months I have been using <a href="http://dwm.suckless.org/">dwm</a>
+as my window manager on two <a href="http://www.archlinux.org/">Arch Linux</a>
+machines:  my <a href="http://www.flickr.com/photos/jasonwryan/4196530478/" title="Flickr image"
+target="_blank">EeePC 901</a> and an <a href="http://www.flickr.com/photos/jasonwryan/4193384965/" title="Flickr image"
+target="_blank">old Dell</a> at work.</p>
+
+<p>There is a lot to like about dwm, but the most attractive qualities for me
+are the fact that it is <a href="http://en.wikipedia.org/wiki/Source_lines_of_code">under 2000 SLOC</a>
+and is very configurable.</p>
+
+<p>The most recent version, 5.7.2, included some changes that meant that some
+of the patches wouldn&#8217;t play nicely together anymore; trying to combine
+any of the layout patches with <a href="http://dwm.suckless.org/patches/pertag">pertag</a>
+would result in the code failing to compile.</p>
+
+<p>Fortunately, there is a fix described on <a href="http://lists.suckless.org/dev/0911/2317.html">the mailing list</a>.
+Essentially, it involves manually applying the patch to the source code.</p>
+
+<p>Start with a vanilla version of the code. Move to the source directory and
+apply the pertag patch:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd</span> <span class="nv">$BUILD</span>/dwm/src/dwm-5.7.2/ patch -p1 &lt; dwm-5.7.2-pertag.diff
+</span></code></pre></div></figure>
+
+
+<p>Then manually add the <a href="http://dwm.suckless.org/patches/bottom_stack">bstack</a>
+(or any of the other layout patches) to <span class="file">dwm.c</span>:</p>
+
+<p>Include the <code>bstack</code> declaring function with the others, beginning line 153. I
+inserted it alphabetically…</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='c'><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">attachstack</span><span class="p">(</span><span class="n">Client</span> <span class="o">*</span><span class="n">c</span><span class="p">);</span>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">*</span><span class="n">m</span><span class="p">);</span>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">buttonpress</span><span class="p">(</span><span class="n">XEvent</span> <span class="o">*</span><span class="n">e</span><span class="p">);</span>
+</span><span class='line'><span class="err">…</span>
+</span></code></pre></div></figure>
+
+
+<p>And then, <em>after</em> the <code>#include “config.h”</code> declaration at
+275, add in the rest of the patch. For consistency&#8217;s sake, I included it
+at line 415:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='c'><span class='line'><span class="kt">void</span> <span class="nf">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">*</span><span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">mh</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">Client</span> <span class="o">*</span><span class="n">c</span><span class="p">;</span> <span class="k">for</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">m</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">clients</span><span class="p">);</span> <span class="n">c</span><span class="p">;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">c</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">next</span><span class="p">),</span> <span class="n">n</span><span class="o">++</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'><span class="k">return</span><span class="p">;</span>
+</span><span class='line'><span class="err">…</span>
+</span></code></pre></div></figure>
+
+
+<p>Add you keybindings into your header file (<span class="file">config.h</span>) and recompile:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>makepkg -efi
+</span></code></pre></div></figure>
+
+
+<p>Done.</p>
+
+<p>The only fly in the ointment is that, for me anyway, I have been unable to
+get any of the other layout patches to work with this setup; either by regular
+patching or using the above method. YMMV.</p>
+
+<h3>Update</h3>
+
+<p>So I was wrong: you can get pertag to work with all the
+other patches, and it is <a href="http://jasonwryan.com/blog/2010/03/02/patching-dwm/">not that difficult</a>…</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -264,87 +369,9 @@ desktop. Feel free to experiment, you can’t really break anything…</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/03/17/install-otf-fonts-in-openoffice/">Install .otf Fonts in OpenOffice</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2009-03-17T19:51:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2009</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>OpenOffice won’t recognize TrueType fonts with the extension <code>.otf</code>, so you need to convert them to <code>.ttf</code>
-in order to use them in that suite.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install fontforge
-</span></code></pre></div></figure>
-
-
-<p>If all the <code>.otf</code> files are in the same folder, then you are good to go.</p>
-
-<p>First, you need the conversion script, which I found in <a href="url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this%20post[/url">this post</a>:</p>
-
-<figure class='code'><figcaption><span>otf2ttf.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/local/bin/fontforge</span>
-</span><span class='line'><span class="c"># Quick and dirty hack: converts a font to truetype (.ttf)</span>
-</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Opening &quot;</span>+<span class="nv">$1</span><span class="o">)</span>;
-</span><span class='line'>Open<span class="o">(</span><span class="nv">$1</span><span class="o">)</span>;
-</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Saving &quot;</span>+<span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
-</span><span class='line'>Generate<span class="o">(</span><span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
-</span><span class='line'>Quit<span class="o">(</span>0<span class="o">)</span>;
-</span></code></pre></div></figure>
-
-
-<p>Save it as <code>otf2ttf.sh</code> into the folder with the <code>.otf</code> files.</p>
-
-<p>Then run:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">for </span>i in *.otf; <span class="k">do </span>fontforge -script otf2ttf.sh <span class="nv">$i</span>; <span class="k">done</span>
-</span></code></pre></div></figure>
-
-
-<p>Move all the converted fonts to your your shared directory:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo mv *ttf /usr/share/fonts/truetype/myfonts/
-</span></code></pre></div></figure>
-
-
-<p>And then change the permissions and reload the cache:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/
-</span><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/*.ttf
-</span><span class='line'>sudo <span class="nb">fc</span>-cache -f -v
-</span></code></pre></div></figure>
-
-
-<p>And the fonts will now appear in OpenOffice. Easy.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/19/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -357,6 +384,10 @@ in order to use them in that suite.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/05/23/notmuch/">Using Notmuch with mutt</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/05/12/mutt/">mutt and HTML email</a>
@@ -372,10 +403,6 @@ in order to use them in that suite.</p>
     
       <li class="post">
         <a href="/blog/2012/03/30/octopress/">Moving to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
       </li>
     
   </ul>

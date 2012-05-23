@@ -9,8 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Over the last couple of days I have been familiarising myself with tmux.
-As it says on the homepage, tmux is a terminal multiplexer: it enables a &hellip;">
+  <meta name="description" content="I regularly back up all my dotfiles to Dropbox
+as a matter of course. I had intended, at some point, to set up a
+Git repo to automate the process and &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +84,75 @@ As it says on the homepage, tmux is a terminal multiplexer: it enables a &hellip
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/01/11/using-dropbox-to-share-dotfiles/">Using Dropbox to Share Dotfiles</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-01-11T11:10:00+13:00" pubdate data-updated="true">Jan 11<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I regularly back up all my dotfiles to <a href="http://www.dropbox.com/" title="Synch your computers securely...">Dropbox</a>
+as a matter of course. I had intended, at some point, to set up a
+<a href="http://git-scm.com/" title="Online version control system">Git repo</a> to automate the process and to make it easier to share these files with others.</p>
+
+<p>However, best intentions etc., in the end it was far easier to simply extend what I was already doing using Dropbox.</p>
+
+<p>First, I created a directory in my <span class="file">Dropbox/Public</span> that would contain the dotfiles I wanted to share:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span>mkdir Dropbox/Public/Configs
+</span></code></pre></div></figure>
+
+
+<p>Then it was just a matter of creating links to the files I wanted to host there:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">cd </span>Dropbox/Public/Configs
+</span><span class='line'><span class="nv">$ </span>ln -s ../../path/to/dotfile
+</span><span class='line'>…
+</span></code></pre></div></figure>
+
+
+<p>The next step was to create a simple <acronym title="HyperText Markup Language">HTML</acronym> page
+(and a stylesheet to make it look presentable) and drop them into the same directory.</p>
+
+<p><a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="jason's dotfile repo"><img src="http://dl.dropbox.com/u/261312/Blog-images/dropbox-repo.png"></a></p>
+
+<h3>Caveat</h3>
+
+<p>Dropbox has the very handy feature of retaining versions of all the files you upload. Unfortunately, in this case, that means that the symlinks will always point to the file that you originally set them at — <em>irrespective of any updates you overwrite them with</em>.</p>
+
+<p>So, if you change any of the files significantly, you will need to recreate the symlink…</p>
+
+<h4>Update</h4>
+
+<p>It seems that the symlink system does work: Dropbox will respect the latest version. YMMV.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -325,109 +395,6 @@ in my case <kbd>;</kbd> — and save and quit.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/">Patching dwm with pertag and bstack</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2009-12-19T17:40:00+13:00" pubdate data-updated="true">Dec 19<span>th</span>, 2009</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Over the last several months I have been using <a href="http://dwm.suckless.org/">dwm</a>
-as my window manager on two <a href="http://www.archlinux.org/">Arch Linux</a>
-machines:  my <a href="http://www.flickr.com/photos/jasonwryan/4196530478/" title="Flickr image"
-target="_blank">EeePC 901</a> and an <a href="http://www.flickr.com/photos/jasonwryan/4193384965/" title="Flickr image"
-target="_blank">old Dell</a> at work.</p>
-
-<p>There is a lot to like about dwm, but the most attractive qualities for me
-are the fact that it is <a href="http://en.wikipedia.org/wiki/Source_lines_of_code">under 2000 SLOC</a>
-and is very configurable.</p>
-
-<p>The most recent version, 5.7.2, included some changes that meant that some
-of the patches wouldn&#8217;t play nicely together anymore; trying to combine
-any of the layout patches with <a href="http://dwm.suckless.org/patches/pertag">pertag</a>
-would result in the code failing to compile.</p>
-
-<p>Fortunately, there is a fix described on <a href="http://lists.suckless.org/dev/0911/2317.html">the mailing list</a>.
-Essentially, it involves manually applying the patch to the source code.</p>
-
-<p>Start with a vanilla version of the code. Move to the source directory and
-apply the pertag patch:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd</span> <span class="nv">$BUILD</span>/dwm/src/dwm-5.7.2/ patch -p1 &lt; dwm-5.7.2-pertag.diff
-</span></code></pre></div></figure>
-
-
-<p>Then manually add the <a href="http://dwm.suckless.org/patches/bottom_stack">bstack</a>
-(or any of the other layout patches) to <span class="file">dwm.c</span>:</p>
-
-<p>Include the <code>bstack</code> declaring function with the others, beginning line 153. I
-inserted it alphabetically…</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='c'><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">attachstack</span><span class="p">(</span><span class="n">Client</span> <span class="o">*</span><span class="n">c</span><span class="p">);</span>
-</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">*</span><span class="n">m</span><span class="p">);</span>
-</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">buttonpress</span><span class="p">(</span><span class="n">XEvent</span> <span class="o">*</span><span class="n">e</span><span class="p">);</span>
-</span><span class='line'><span class="err">…</span>
-</span></code></pre></div></figure>
-
-
-<p>And then, <em>after</em> the <code>#include “config.h”</code> declaration at
-275, add in the rest of the patch. For consistency&#8217;s sake, I included it
-at line 415:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='c'><span class='line'><span class="kt">void</span> <span class="nf">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">*</span><span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">mh</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">Client</span> <span class="o">*</span><span class="n">c</span><span class="p">;</span> <span class="k">for</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">m</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">clients</span><span class="p">);</span> <span class="n">c</span><span class="p">;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">c</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">next</span><span class="p">),</span> <span class="n">n</span><span class="o">++</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'><span class="k">return</span><span class="p">;</span>
-</span><span class='line'><span class="err">…</span>
-</span></code></pre></div></figure>
-
-
-<p>Add you keybindings into your header file (<span class="file">config.h</span>) and recompile:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>makepkg -efi
-</span></code></pre></div></figure>
-
-
-<p>Done.</p>
-
-<p>The only fly in the ointment is that, for me anyway, I have been unable to
-get any of the other layout patches to work with this setup; either by regular
-patching or using the above method. YMMV.</p>
-
-<h3>Update</h3>
-
-<p>So I was wrong: you can get pertag to work with all the
-other patches, and it is <a href="http://jasonwryan.com/blog/2010/03/02/patching-dwm/">not that difficult</a>…</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/18/">&larr; Older</a>
@@ -445,6 +412,10 @@ other patches, and it is <a href="http://jasonwryan.com/blog/2010/03/02/patching
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/23/notmuch/">Using Notmuch with mutt</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/12/mutt/">mutt and HTML email</a>
       </li>
     
@@ -458,10 +429,6 @@ other patches, and it is <a href="http://jasonwryan.com/blog/2010/03/02/patching
     
       <li class="post">
         <a href="/blog/2012/03/30/octopress/">Moving to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
       </li>
     
   </ul>

@@ -9,10 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have been experiencing problems with my wifi LAN when playing music
-through
-mpd
-or watching movies. My upload speeds would climb to around 120- &hellip;">
+  <meta name="description" content="I’ve posted a couple of times1 about
+tmux, the brilliant
+terminal mutliplexer. One question I see raised a lot in #tmux is how
+to copy and paste. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,100 @@ or watching movies. My upload speeds would climb to around 120- &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/07/copy-and-paste-in-tmux/">Copy &amp; Paste in tmux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-07T19:54:00+12:00" pubdate data-updated="true">Jun 7<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-copy.png" alt="image" /></p>
+
+<p>I’ve posted a couple of times<sup>1</sup> about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
+terminal mutliplexer. One question I see raised a lot in #tmux is how
+to copy and paste.</p>
+
+<p>The documentation for tmux is excellent: the
+<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
+one of the most clear and thorough I have read. And while it is
+explained there, I thought I would share my approach anyway.</p>
+
+<p>First, I set tmux to use vi keys:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setw -g mode-keys vi
+</span></code></pre></div></figure>
+
+
+<p>Then I change the default keybinds to suit my workflow. As explained in
+the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
+and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
+to more intuitive and Vim-like keys:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
+</span><span class='line'><span class="nb">bind </span>Escape copy-mode
+</span><span class='line'>unbind p
+</span><span class='line'><span class="nb">bind </span>p paste-buffer
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
+</span></code></pre></div></figure>
+
+
+<p>This seems a lot closer to all of the other Vim-like apps that I run -
+where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
+<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
+
+<p>So, to string it all together, the command sequence necessary to copy
+some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
+
+<pre>
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
+# move cursor to the start or end of the desired text string
+<kbd>v</kbd>                        # to activate highlighting
+# move cursor to cover the requisite string
+<kbd>y</kbd>                        # to capture the string
+<kbd>q</kbd>                        # exit copy mode
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
+</pre>
+
+
+<p>Simple.</p>
+
+<p>This means that you can scroll back through the output of <em>anything</em> in
+your terminal, and copy and paste it anywhere. Once you set it up, it is
+a very powerful tool…</p>
+
+<h5>Notes</h5>
+
+<p>1.<a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/">Sessions in tmux</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -311,97 +405,6 @@ information, but it seems plausible enough.</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/05/24/tyrs-ncurses-twitter-client/">Tyrs: ncurses Twitter Client</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-05-24T20:17:00+12:00" pubdate data-updated="true">May 24<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5754227102/in/photostream" title="Tyrs photo on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/tyrs.png" alt="image" /></a></p>
-
-<p>I have been a solid user of
-<a href="http://www.floodgap.com/software/ttytter/" title="TTYtter homepage">TTYtter</a>
-for a couple of years now, much preferring the speed and power of a
-command line Twitter client. And, after having tried–at one time or
-another–most of the Linux or cross-platform Twitter clients, I can
-safely say that for me TTYtter is easily the best.</p>
-
-<p>There is, however, a new
-<a href="http://www.gnu.org/software/ncurses/" title="ncurses page">ncurses</a> client
-that is showing a lot of promise:
-<a href="http://tyrs.nicosphere.net/index.html" title="Tyrs homepage">Tyrs</a>. Only at
-the 0.2.1.1 stage, and with a fraction of the functionality that TTYtter
-has, it is nevertheless a very nice client.</p>
-
-<p>Requiring little in the way of dependencies, only python-twitter and
-python-oauth2, both available in the
-<a href="http://aur.archlinux.org/" title="Arch Linux User Repository">AUR</a> or in the
-debian/Ubuntu repos (if you are using debian/Ubuntu, you will need the
-newer python-twitter-0.8.2 for it to run).</p>
-
-<p>Tyrs is easy to configure, with good documentation and a simple
-configuration file, located by default at
-$XDG_CONFIG_HOME/tyrs/tyrs.cfg. The default keybinds are
-<a href="http://www.vim.org/" title="THE editor">Vim-centric</a>, naturally…</p>
-
-<p>My config is pretty straightforward at this point:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'>[keys]
-</span><span class='line'>retweet           <span class="p">=</span> <span class="k">p</span>
-</span><span class='line'>retweet_and_edit  <span class="p">=</span> <span class="k">P</span>
-</span><span class='line'>mentions          <span class="p">=</span> <span class="k">a</span>
-</span><span class='line'>reply             <span class="p">=</span> <span class="k">r</span>
-</span><span class='line'>
-</span><span class='line'>[<span class="k">colors</span>]
-</span><span class='line'><span class="nb">highlight</span>         <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>header            <span class="p">=</span> <span class="m">6</span>
-</span><span class='line'>hashtag           <span class="p">=</span> <span class="m">4</span>
-</span><span class='line'>attag             <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'>text              <span class="p">=</span> <span class="m">7</span>
-</span><span class='line'>warning_msg       <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>info_msg          <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'>
-</span><span class='line'>[params]
-</span><span class='line'>refresh           <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>tweet_border      <span class="p">=</span> <span class="m">0</span>
-</span></code></pre></div></figure>
-
-
-<p>Written in Python, the code is well commented and relatively easy to
-find your way around if your are keen on hacking.</p>
-
-<p>The developer, Nicolas Paris, is both approachable and helpful and is
-actively developing Tyrs. With some more functionality in the pipeline,
-it looks to be a very nice application.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/10/">&larr; Older</a>
@@ -419,6 +422,10 @@ it looks to be a very nice application.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/23/notmuch/">Using Notmuch with mutt</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/12/mutt/">mutt and HTML email</a>
       </li>
     
@@ -432,10 +439,6 @@ it looks to be a very nice application.</p>
     
       <li class="post">
         <a href="/blog/2012/03/30/octopress/">Moving to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/03/23/key/">Signing Your Own Key</a>
       </li>
     
   </ul>

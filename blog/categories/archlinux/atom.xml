@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-05-12T19:02:42+12:00</updated>
+  <updated>2012-05-23T20:51:37+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,76 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Notmuch with mutt]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/05/23/notmuch/"/>
+    <updated>2012-05-23T19:37:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/05/23/notmuch</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/magnifier.png" title="day 307 on Flickr" >
+Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
+<a href="http://www.mutt.org/" title="mutt homepage">mutt</a> posts<sup>1</sup> with what I am assuming is the
+final piece of the puzzle: searching <code>mutt's</code> maildirs. For a small to average size mailbox, <code>mutt's</code>
+searching works fine, but as your mail volume grows this simple search doesn't really scale. That's
+where the rather modestly named <a href="http://notmuchmail.org/" title="Notmuch website">Notmuch</a> comes into play.</p>
+
+<p>It can be run as a standalone mail client, but you can also use it with <code>mutt</code> to provide
+a ruthlessly efficient and fast search tool for your email. I had looked at it and
+<a href="http://sup.rubyforge.org/" title="A console client for people with lots of mail">Sup</a>
+a couple of years ago, but was spurred to do something about it this week when
+<a href="https://twitter.com/#!/chosig" title="Chosig on Twitter">Gunnar Lundström</a> pinged me on twitter and
+suggested I check it out. So I did.</p>
+
+<p><blockquote><p>"Not much mail" is what Notmuch thinks about your email collection. Even if you receive 12000<br/>messages per month or have on the order of  millions of messages that you've been saving for decades.<br/>Regardless, Notmuch will be able to quickly search all of it. It's just plain not much mail.</p><footer><strong>Notmuch website</strong> <cite><a href='http://notmuchmail.org'>notmuchmail.org/&hellip;</a></cite></footer></blockquote></p>
+
+<p>There was previously a
+<a href="http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/">mutt-notmuch script</a>
+for integrating the two, but the functionality was included upstream at the start of this year
+so it is quite straightforward to set it up. There is a
+<a href="http://aur.archlinux.org/packages.php?ID=36289" title="Arch User Repository package">package in the AUR</a>
+but it is intended as the full mail client, complete with, <em>shudder</em>, emacs support amongst
+other things. I have stripped out the uneeded bindings and included the relevant <code>perl</code> libraries in a
+<a href="https://bitbucket.org/jasonwryan/centurion/src/6ff0f252961f/Build/notmuch/PKGBUILD" title="…in my bitbucket repo">modified PKGBUILD</a>
+if you just want the basic search with <code>mutt</code>.</p>
+
+<p>Otherwise, you'll need to step through it manually.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl perl-mailtools perl-mail-box perl-string-shellquote
+</span><span class='line'>cowerd notmuch perl-term-readline-gnu
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>As you will see from the PKGBUILD, you will need to copy the <code>notmuch-mutt</code> script
+into your <code>$PATH</code>: you'll find it in <span class="file">contrib/notmuch-mutt/</span>.</p>
+
+<p>There is a simple interative setup, which you can complete before running the index the first time:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>notmuch setup
+</span><span class='line'>notmuch new
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The final step is to copy across the <code>mutt</code> macros included with the script:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat src/notmuch-0.13/contrib/notmuch-mutt/notmuch-mutt.rc &gt;&gt; <span class="nv">$HOME</span>/.mutt/muttrc
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Now, from within <code>mutt</code>, <kbd>F8</kbd>, <kbd>F9</kbd> and <kbd>F6</kbd> will respectively
+search, create the relevant threads from search results, and tag mails with <code>notmuch</code>.</p>
+
+<p>As I use <code>offlineimap</code> to retrieve my mail, I simply added <code>notmuch new</code> to the script that
+runs as a <code>cron</code> job to synch my mail and <code>notmuch</code> reindexes all of my mail as soon as it arrives.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a> and
+<a href="http://jasonwryan.com/blog/2012/05/12/mutt/">mutt and HTML email</a></li>
+</ol>
+
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/mjtmail/3008566512/in/photostream/">mjtmail on Flickr</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[mutt and HTML email]]></title>
@@ -397,7 +467,7 @@ by default. Remove the bang and include the details of the key you wish to use:<
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;-- Packager: name/email of the person or organization building packages&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;PACKAGER<span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;a href=&quot;</span>&amp;#109;&amp;#97;&amp;#x69;&amp;#x6c;&amp;#116;&amp;#111;&amp;#58;&amp;#106;&amp;#97;&amp;#x73;&amp;#x6f;&amp;#110;&amp;#119;&amp;#x72;&amp;#121;&amp;#97;&amp;#x6e;&amp;#64;&amp;#x67;&amp;#109;&amp;#x61;&amp;#x69;&amp;#x6c;&amp;#46;&amp;#x63;&amp;#x6f;&amp;#109;<span class="s2">&quot;&gt;&amp;#x6a;&amp;#x61;&amp;#x73;&amp;#x6f;&amp;#x6e;&amp;#119;&amp;#114;&amp;#x79;&amp;#97;&amp;#x6e;&amp;#x40;&amp;#x67;&amp;#x6d;&amp;#x61;&amp;#105;&amp;#108;&amp;#x2e;&amp;#99;&amp;#111;&amp;#x6d;&lt;/a&gt;&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;PACKAGER<span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;a href=&quot;</span>&amp;#x6d;&amp;#x61;&amp;#x69;&amp;#108;&amp;#x74;&amp;#111;&amp;#58;&amp;#x6a;&amp;#97;&amp;#115;&amp;#111;&amp;#110;&amp;#x77;&amp;#114;&amp;#121;&amp;#97;&amp;#110;&amp;#64;&amp;#x67;&amp;#109;&amp;#x61;&amp;#x69;&amp;#x6c;&amp;#x2e;&amp;#x63;&amp;#x6f;&amp;#x6d;<span class="s2">&quot;&gt;&amp;#x6a;&amp;#97;&amp;#x73;&amp;#x6f;&amp;#x6e;&amp;#119;&amp;#114;&amp;#x79;&amp;#x61;&amp;#110;&amp;#64;&amp;#103;&amp;#x6d;&amp;#97;&amp;#x69;&amp;#x6c;&amp;#46;&amp;#x63;&amp;#x6f;&amp;#109;&lt;/a&gt;&quot;</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;-- Specify a key to use <span class="k">for </span>package signing&lt;/h1&gt;
 </span><span class='line'>
@@ -410,7 +480,7 @@ passphrase:</p>
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;You need a passphrase to unlock the secret key <span class="k">for</span>
-</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;a href=&quot;</span>&amp;#x6d;&amp;#97;&amp;#105;&amp;#x6c;&amp;#116;&amp;#111;&amp;#58;&amp;#106;&amp;#x61;&amp;#x73;&amp;#x6f;&amp;#110;&amp;#119;&amp;#114;&amp;#x79;&amp;#97;&amp;#110;&amp;#64;&amp;#x67;&amp;#x6d;&amp;#x61;&amp;#105;&amp;#108;&amp;#46;&amp;#x63;&amp;#111;&amp;#109;<span class="s2">&quot;&gt;&amp;#x6a;&amp;#97;&amp;#x73;&amp;#111;&amp;#110;&amp;#x77;&amp;#x72;&amp;#x79;&amp;#x61;&amp;#x6e;&amp;#64;&amp;#103;&amp;#109;&amp;#x61;&amp;#x69;&amp;#108;&amp;#46;&amp;#x63;&amp;#x6f;&amp;#109;&lt;/a&gt;&quot;</span>
+</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;a href=&quot;</span>&amp;#x6d;&amp;#x61;&amp;#x69;&amp;#x6c;&amp;#x74;&amp;#111;&amp;#58;&amp;#106;&amp;#x61;&amp;#x73;&amp;#x6f;&amp;#110;&amp;#x77;&amp;#114;&amp;#x79;&amp;#x61;&amp;#x6e;&amp;#x40;&amp;#103;&amp;#109;&amp;#97;&amp;#105;&amp;#x6c;&amp;#x2e;&amp;#x63;&amp;#111;&amp;#109;<span class="s2">&quot;&gt;&amp;#x6a;&amp;#x61;&amp;#x73;&amp;#x6f;&amp;#x6e;&amp;#119;&amp;#114;&amp;#121;&amp;#x61;&amp;#110;&amp;#x40;&amp;#x67;&amp;#x6d;&amp;#97;&amp;#x69;&amp;#108;&amp;#46;&amp;#x63;&amp;#x6f;&amp;#x6d;&lt;/a&gt;&quot;</span>
 </span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;Enter passphrase:
@@ -424,70 +494,6 @@ passphrase:</p>
 <p>Creative Commons image by
 <a href="http://www.flickr.com/photos/donovan_beeson/3185668524/" title="Coraline key on Flickr">donovanbeeson</a>
 on Flickr.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Simple aurphan notifier]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/03/09/aurphan/"/>
-    <updated>2012-03-09T16:52:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/03/09/aurphan</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
-
-<p>If you are an Arch Linux user and you are not using
-<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
-you can take a moment to hang your head in shame before you click on to
-whatever the next thing is. The package description sums up perfectly
-what aurphan does:</p>
-
-<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
-today!</p></blockquote>
-
-<p>Running <code>aurphan -a</code>, for example, will identify any
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
-database that are not currently maintained; allowing you to log in to
-the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
-fulfilled.<sup>1</sup></p>
-
-<p>If, like most Archers, you have a compulsive desire to automate
-<em>everything</em> then clearly typing (or even remembering to type) <code>aurphan
--a</code> into a terminal periodically is as ludicrous as it is onerous. The
-obvious answer is some shell script and a cron job.</p>
-
-<p>First, the <code>cron</code> job:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
-</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Then, as part of my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="Script in mercurial repo">dwm-status script</a>,
-a function to check that there are no new additions to the file and, if
-there are, flash a highlight:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;aurphans<span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">}</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The awk filter excludes a null return, which is “No aurphans found.”
-Now, if any of the packages that I use from the AUR are disowned, I’ll
-be the first to know about it.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Actual feeling may differ depending on the package you have adopted
-and the amount of prescription painkillers that you are currently
-ingesting…</li>
-</ol>
-
 ]]></content>
   </entry>
   

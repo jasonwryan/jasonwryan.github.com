@@ -5,13 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Readline Bindings in Vi Mode - jasonwryan.com</title>
+  <title>Using Notmuch with mutt - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I recently threw caution to the wind and
-changed my shell over to vi mode.
-I wanted to take advantage of the superior command editing ability that &hellip;">
+  <meta name="description" content="Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
+mutt posts1 with what I am assuming is the
+final &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +20,7 @@ I wanted to take advantage of the superior command editing ability that &hellip;
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/12/01/readline">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/05/23/notmuch">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -87,7 +87,7 @@ I wanted to take advantage of the superior command editing ability that &hellip;
   
   <header>
     
-      <h1 class="entry-title">Readline Bindings in Vi Mode</h1>
+      <h1 class="entry-title">Using Notmuch with mutt</h1>
     
     
       <p class="meta">
@@ -103,72 +103,79 @@ I wanted to take advantage of the superior command editing ability that &hellip;
   
 
 
-<time datetime="2011-12-01T18:43:00+13:00" pubdate data-updated="true">Dec 1<span>st</span>, 2011</time>
+<time datetime="2012-05-23T19:37:00+12:00" pubdate data-updated="true">May 23<span>rd</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/readline.png" alt="image" /></p>
+<div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/magnifier.png" title="day 307 on Flickr" >
+Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
+<a href="http://www.mutt.org/" title="mutt homepage">mutt</a> posts<sup>1</sup> with what I am assuming is the
+final piece of the puzzle: searching <code>mutt's</code> maildirs. For a small to average size mailbox, <code>mutt's</code>
+searching works fine, but as your mail volume grows this simple search doesn&#8217;t really scale. That&#8217;s
+where the rather modestly named <a href="http://notmuchmail.org/" title="Notmuch website">Notmuch</a> comes into play.</p>
 
-<p>I recently threw caution to the wind and
-<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
-I wanted to take advantage of the superior command editing ability that
-this mode offered, and also to continue to bake vi[m] methods into every
-aspect of my working environment.</p>
+<p>It can be run as a standalone mail client, but you can also use it with <code>mutt</code> to provide
+a ruthlessly efficient and fast search tool for your email. I had looked at it and
+<a href="http://sup.rubyforge.org/" title="A console client for people with lots of mail">Sup</a>
+a couple of years ago, but was spurred to do something about it this week when
+<a href="https://twitter.com/#!/chosig" title="Chosig on Twitter">Gunnar Lundström</a> pinged me on twitter and
+suggested I check it out. So I did.</p>
 
-<p>The change has been relatively straightforward; the only issues I have
-experienced are really just around a couple of keybinds that I had
-become accustomed to in normal/Emacs mode:</p>
-
-<ul>
-<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
-<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
-</ul>
-
-
-<p>The first, the ability to recall the final arguments of previous
-commands was a showstopper for me: I really struggled without this.
-Being able to recall a long file path and append it to a new command is
-invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
-exactly this. Why it is not bound by default in vi mode is beyond me…</p>
-
-<p>The other was purely cosmetic, really. I am an inveterate clearer of the
-screen—unless I am referring to something printed to stdout, I always
-prefer to work at the top of the console.</p>
-
-<p>In any event, with the
-<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
-it was a trivial exercize to restore this functionality to my bash shell
-in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
-
-<figure class='code'><figcaption><span>~/inputrc </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc
-</span><span class='line'>
-</span><span class='line'># for vi mode
-</span><span class='line'>set editing-mode vi
-</span><span class='line'>$if mode=vi
-</span><span class='line'>
-</span><span class='line'>set keymap vi-command
-</span><span class='line'># these are for vi-command mode
-</span><span class='line'>"\e[A": history-search-backward            # arrow up
-</span><span class='line'>"\e[B": history-search-forward             # arrow down
-</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
-</span><span class='line'>Control-l: clear-screen
-</span><span class='line'>
-</span><span class='line'>set keymap vi-insert
-</span><span class='line'># these are for vi-insert mode
-</span><span class='line'>"\e[A": history-search-backward
-</span><span class='line'>"\e[B": history-search-forward
-</span><span class='line'>"\ep": yank-last-arg
-</span><span class='line'>Control-l: clear-screen
-</span><span class='line'>$endif</span></code></pre></div></figure>
+<blockquote><p>&#8220;Not much mail&#8221; is what Notmuch thinks about your email collection. Even if you receive 12000 <br/>messages per month or have on the order of  millions of messages that you&#8217;ve been saving for decades. <br/>Regardless, Notmuch will be able to quickly search all of it. It&#8217;s just plain not much mail.</p><footer><strong>Notmuch website</strong> <cite><a href='http://notmuchmail.org'>notmuchmail.org/&hellip;</a></cite></footer></blockquote>
 
 
-<p>There is an extensive list of
-<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
-with which you can customize your shell environment.</p>
+<p>There was previously a
+<a href="http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/">mutt-notmuch script</a>
+for integrating the two, but the functionality was included upstream at the start of this year
+so it is quite straightforward to set it up. There is a
+<a href="http://aur.archlinux.org/packages.php?ID=36289" title="Arch User Repository package">package in the AUR</a>
+but it is intended as the full mail client, complete with, <em>shudder</em>, emacs support amongst
+other things. I have stripped out the uneeded bindings and included the relevant <code>perl</code> libraries in a
+<a href="https://bitbucket.org/jasonwryan/centurion/src/6ff0f252961f/Build/notmuch/PKGBUILD" title="…in my bitbucket repo">modified PKGBUILD</a>
+if you just want the basic search with <code>mutt</code>.</p>
+
+<p>Otherwise, you&#8217;ll need to step through it manually.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl perl-mailtools perl-mail-box perl-string-shellquote
+</span><span class='line'>cowerd notmuch perl-term-readline-gnu
+</span></code></pre></div></figure>
+
+
+<p>As you will see from the PKGBUILD, you will need to copy the <code>notmuch-mutt</code> script
+into your <code>$PATH</code>: you&#8217;ll find it in <span class="file">contrib/notmuch-mutt/</span>.</p>
+
+<p>There is a simple interative setup, which you can complete before running the index the first time:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>notmuch setup
+</span><span class='line'>notmuch new
+</span></code></pre></div></figure>
+
+
+<p>The final step is to copy across the <code>mutt</code> macros included with the script:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat src/notmuch-0.13/contrib/notmuch-mutt/notmuch-mutt.rc &gt;&gt; <span class="nv">$HOME</span>/.mutt/muttrc
+</span></code></pre></div></figure>
+
+
+<p>Now, from within <code>mutt</code>, <kbd>F8</kbd>, <kbd>F9</kbd> and <kbd>F6</kbd> will respectively
+search, create the relevant threads from search results, and tag mails with <code>notmuch</code>.</p>
+
+<p>As I use <code>offlineimap</code> to retrieve my mail, I simply added <code>notmuch new</code> to the script that
+runs as a <code>cron</code> job to synch my mail and <code>notmuch</code> reindexes all of my mail as soon as it arrives.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a> and
+<a href="http://jasonwryan.com/blog/2012/05/12/mutt/">mutt and HTML email</a></li>
+</ol>
+
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/mjtmail/3008566512/in/photostream/">mjtmail on Flickr</a></p>
 </div>
 
 
@@ -191,12 +198,12 @@ with which you can customize your shell environment.</p>
   
 
 
-<time datetime="2011-12-01T18:43:00+13:00" pubdate data-updated="true">Dec 1<span>st</span>, 2011</time>
+<time datetime="2012-05-23T19:37:00+12:00" pubdate data-updated="true">May 23<span>rd</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/vim/'>vim</a>
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>
   
 </span>
 
@@ -212,10 +219,8 @@ with which you can customize your shell environment.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2011/11/29/rtorrent/" title="Previous Post: Building rtorrent on Debian Squeeze">&laquo; Building rtorrent on Debian Squeeze</a>
+        <a class="basic-alignment left" href="/blog/2012/05/12/mutt/" title="Previous Post: mutt and HTML email">&laquo; mutt and HTML email</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2011/12/18/login/" title="Next Post: Logging Straight Into X">Logging Straight Into X &raquo;</a>
       
     </p>
   </footer>
@@ -363,8 +368,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/12/01/readline/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2011/12/01/readline/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/05/23/notmuch/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2012/05/23/notmuch/';
         var disqus_script = 'embed.js';
       
     (function () {
