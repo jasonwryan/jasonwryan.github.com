@@ -26,7 +26,7 @@ something of a disclaimer. These are my own views and not those of the current,
 or past, forum staff.
 
 One of Arch's significant acheivements is the quality of
-[it's documentation](https://wiki.archlinux.org 'THE best GNU/Linux Wiki').
+[its documentation](https://wiki.archlinux.org 'THE best GNU/Linux Wiki').
 Not just the technical documentation describing how to install and configure
 Arch, but the cultural documentation that sets out
 [Arch's philosophy](https://wiki.archlinux.org/index.php/The_Arch_Way 'The Arch Way')
@@ -43,7 +43,7 @@ Arch Linux targets and accommodates competent GNU/Linux users
 by giving them complete control and responsibility over the system.
 {% endblockquote %}
 
-The expression “targets and accomodates” doesn't exclude other users—for
+The expression “targets and accommodates” doesn't exclude other users—for
 example, those that are not necessarily competent, but are wanting to learn
 more about the specifics of how their machines work—it does, however, signal
 quite explicitly what sort of community Arch is. And what it is not.
