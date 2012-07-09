@@ -1,0 +1,117 @@
+---
+layout: post
+title: "Replacing Grub With Syslinux"
+date: 2012-07-09 13:51
+comments: true
+categories: [archlinux]
+---
+{% img left http://dl.dropbox.com/u/261312/Blog-images/grub.jpg Image of grub on Flickr %}
+With the announcement late last month that 
+[Grub 2.00 has been released](http://lists.gnu.org/archive/html/grub-devel/2012-06/msg00093.html 'Grub ML announcement')
+I thought that it was time to stop procrastinating and do something about moving away from
+[Grub Legacy](http://www.gnu.org/software/grub/grub-legacy.html 'Gnu Page for Grub Legacy'),
+which is no longer actively developed. Not that there is anything wrong with Grub Legacy's 
+functionality; it has always done whatever I asked of it (admittedly, not a lot) and done so
+without complaint.
+
+I have used Grub2 before, when I was running Ubuntu on my home desktop, and it is the bootloader
+on my Debian Squeeze server. I can't, however, say that I have ever really understood—or
+appreciated—its mutliple file, “need to reconfigure after making any changes” type of
+complexity. So, I thought that I would give 
+[Syslinux](http://www.syslinux.org/wiki/index.php/The_Syslinux_Project 'Syslinux Wiki') 
+a shot.
+
+Syslinux isn't a single bootloader, rather it is a collection of lightweight bootloaders,
+with [Extlinux](http://www.syslinux.org/wiki/index.php/EXTLINUX 'Extlinux page on Syslinux Wiki')
+responsible for booting ext2, ext3, ext4 and btrfs filesystems. As the 
+[Arch Wiki Syslinux page](https://wiki.archlinux.org/index.php/Syslinux 'The FINE Wiki')
+notes, since Syslinux 4, Extlinux has been merged with Syslinux.
+
+Installing Syslinux is *ridiculously* easy. It is literally a five step process. First,
+install the package:
+
+{% codeblock %}
+pacman -S syslinux
+{% endcodeblock %}
+
+After installing `syslinux` pacman will helpfully tell you what to do next:
+
+{% blockquote pacman says %}
+==> If you want to use syslinux as your bootloader
+==> edit /boot/syslinux/syslinux.cfg and run
+==>   # /usr/sbin/syslinux-install_update -i -a -m
+==> to install it.
+{% endblockquote %}
+
+Arch user [Matthew Gyurgyik](http://pyther.net/ 'Matthew's website') has written an
+ingenious script, `syslinux-install_update` that automates the process of writing the 
+<acronym title="Master Boot Record">MBR</acronym> and installing the relevant files to 
+<span class="file">/boot/syslinux/</span>. The script also checks if, as is the case
+with my desktop, there is a RAID array present, and if so passes the install command the
+`--raid` flag:
+
+{% blockquote man syslinux %}
+RAID mode.  If boot fails, tell the BIOS to boot the next device in the boot sequence (usually the next  hard
+disk) instead of stopping with an error message.  This is useful for RAID-1 booting.
+{% endblockquote %}
+
+And that, in their entirety, is steps two and three.
+
+If you are moving from Grub Legacy, configuring Syslinux is similarly painless.
+There are two sections to a basic  <span class="file">/boot/syslinux/syslinux.cfg</span>,
+the defaults and the prompt entries.
+
+I set up my defaults to be essentially invisible:
+
+{% codeblock %}
+# General settings                                                              
+DEFAULT Arch
+PROMPT 0
+TIMEOUT 0
+{% endcodeblock %}
+
+And then copy across the relevant lines from my <span class="file">/boot/grub/menu.lst</span>:
+
+{% codeblock lang:sh %}
+grep root= /boot/grub/menu.lst >> /boot/syslinux/syslinux.cfg
+{% endcodeblock %}
+
+Then it is just a matter of adding the relevant entries under LABEL:
+
+{% codeblock %}
+LABEL Arch
+    MENU LABEL Arch Linux
+    LINUX ../vmlinuz-linux
+    APPEND root=/dev/mapper/vgroup-lvroot cryptdevice=/dev/md1:vgroup ro
+    INITRD ../initramfs-linux.img
+{% endcodeblock %}
+
+You then add entries for Fallback, and any other images that you may wish to
+boot from.
+
+You then move to steps four and five:
+
+{% codeblock %}
+pacman -Rsn grub
+shutdown -r now
+{% endcodeblock %}
+
+And you reboot with Syslinux. Done.
+
+The beauty of Syslinux, from my perspective, is that it is simple to install
+and configure, with just the one config file and the options all well documented
+and easy to understand. If you want a menu with a background 
+image, you can have that. If, like me, you just want to get on and boot your default,
+it does that. 
+
+Additionally, if you want or need to boot into Fallback, or want to dual boot,
+you can just hold down <kbd>Shift</kbd> at boot time and enter the desired
+Label at the prompt. Syslinux has Tab completion, so you only need enter a
+couple of letters, hit <kbd>Tab</kbd> and you will see all of the available
+Labels to boot. Brilliant.
+
+#### Notes
+Creative Commons Flickr image by 
+[custer_fluck](http://www.flickr.com/photos/sgodt/5103674184/)
+
+
