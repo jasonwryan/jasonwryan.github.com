@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-06-17T11:07:06+12:00</updated>
+  <updated>2012-07-09T19:27:06+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,113 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Replacing Grub With Syslinux]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/07/09/syslinux/"/>
+    <updated>2012-07-09T13:51:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/07/09/syslinux</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/grub.jpg" title="Image of grub on Flickr" >
+With the announcement late last month that
+<a href="http://lists.gnu.org/archive/html/grub-devel/2012-06/msg00093.html" title="Grub ML announcement">Grub 2.00 has been released</a>
+I thought that it was time to stop procrastinating and do something about moving away from
+<a href="http://www.gnu.org/software/grub/grub-legacy.html" title="Gnu Page for Grub Legacy">Grub Legacy</a>,
+which is no longer actively developed. Not that there is anything wrong with Grub Legacy&#8217;s
+functionality; it has always done whatever I asked of it (admittedly, not a lot) and done so
+without complaint.</p>
+
+<p>I have used Grub2 before, when I was running Ubuntu on my home desktop, and it is the bootloader
+on my Debian Squeeze server. I can&#8217;t, however, say that I have ever really understood—or
+appreciated—its mutliple file, “need to reconfigure after making any changes” type of
+complexity. So, I thought that I would give
+<a href="http://www.syslinux.org/wiki/index.php/The_Syslinux_Project" title="Syslinux Wiki">Syslinux</a>
+a shot.</p>
+
+<p>Syslinux isn&#8217;t a single bootloader, rather it is a collection of lightweight bootloaders,
+with <a href="http://www.syslinux.org/wiki/index.php/EXTLINUX" title="Extlinux page on Syslinux Wiki">Extlinux</a>
+responsible for booting ext2, ext3, ext4 and btrfs filesystems. As the
+<a href="https://wiki.archlinux.org/index.php/Syslinux" title="The FINE Wiki">Arch Wiki Syslinux page</a>
+notes, since Syslinux 4, Extlinux has been merged with Syslinux.</p>
+
+<p>Installing Syslinux is <em>ridiculously</em> easy. It is literally a five step process. First,
+install the package:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -S syslinux</span></code></pre></div></figure>
+
+
+<p>After installing <code>syslinux</code> pacman will helpfully tell you what to do next:</p>
+
+<blockquote><p>==> If you want to use syslinux as your bootloader<br/>==> edit /boot/syslinux/syslinux.cfg and run<br/>==>   # /usr/sbin/syslinux-install_update -i -a -m<br/>==> to install it.</p></blockquote>
+
+
+<p>Arch user <a href="http://pyther.net/" title="Matthew's website">Matthew Gyurgyik</a> has written an
+ingenious script, <code>syslinux-install_update</code> that automates the process of writing the
+<acronym title="Master Boot Record">MBR</acronym> and installing the relevant files to
+<span class="file">/boot/syslinux/</span>. The script also checks if, as is the case
+with my desktop, there is a RAID array present, and if so passes the install command the
+<code>--raid</code> flag:</p>
+
+<blockquote><p>RAID mode.  If boot fails, tell the BIOS to boot the next device in the boot sequence (usually the next  hard<br/>disk) instead of stopping with an error message.  This is useful for RAID-1 booting.</p></blockquote>
+
+
+<p>And that, in their entirety, is steps two and three.</p>
+
+<p>If you are moving from Grub Legacy, configuring Syslinux is similarly painless.
+There are two sections to a basic  <span class="file">/boot/syslinux/syslinux.cfg</span>,
+the defaults and the prompt entries.</p>
+
+<p>I set up my defaults to be essentially invisible:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'># General settings                                                              
+</span><span class='line'>DEFAULT Arch
+</span><span class='line'>PROMPT 0
+</span><span class='line'>TIMEOUT 0</span></code></pre></div></figure>
+
+
+<p>And then copy across the relevant lines from my <span class="file">/boot/grub/menu.lst</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>grep <span class="nv">root</span><span class="o">=</span> /boot/grub/menu.lst &gt;&gt; /boot/syslinux/syslinux.cfg
+</span></code></pre></div></figure>
+
+
+<p>Then it is just a matter of adding the relevant entries under LABEL:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>LABEL Arch
+</span><span class='line'>    MENU LABEL Arch Linux
+</span><span class='line'>    LINUX ../vmlinuz-linux
+</span><span class='line'>    APPEND root=/dev/mapper/vgroup-lvroot cryptdevice=/dev/md1:vgroup ro
+</span><span class='line'>    INITRD ../initramfs-linux.img</span></code></pre></div></figure>
+
+
+<p>You then add entries for Fallback, and any other images that you may wish to
+boot from.</p>
+
+<p>You then move to steps four and five:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -Rsn grub
+</span><span class='line'>shutdown -r now</span></code></pre></div></figure>
+
+
+<p>And you reboot with Syslinux. Done.</p>
+
+<p>The beauty of Syslinux, from my perspective, is that it is simple to install
+and configure, with just the one config file and the options all well documented
+and easy to understand. If you want a menu with a background
+image, you can have that. If, like me, you just want to get on and boot your default,
+it does that.</p>
+
+<p>Additionally, if you want or need to boot into Fallback, or want to dual boot,
+you can just hold down <kbd>Shift</kbd> at boot time and enter the desired
+Label at the prompt. Syslinux has Tab completion, so you only need enter a
+couple of letters, hit <kbd>Tab</kbd> and you will see all of the available
+Labels to boot. Brilliant.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons Flickr image by
+<a href="http://www.flickr.com/photos/sgodt/5103674184/">custer_fluck</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Misunderstanding Arch]]></title>
@@ -1762,84 +1869,6 @@ just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
 </li>
 </ol>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Delicious? Not after the first bite…]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/09/28/delicious/"/>
-    <updated>2011-09-28T09:27:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/09/28/delicious</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/delicious1.png" alt="image" /></p>
-
-<p>I have used
-<a href="http://delicious.com" title="Once great social bookmarking site...">delicious</a>,
-the bookmarking service, for just on five years now and over that time
-added around 1500 bookmarks. This suggests to me that I am a heavy, but
-not compulsive boomarker—I tend to only add pages that I think I will
-have a reasonably good chance of wanting to reference in the future.</p>
-
-<p>I am (or rather, was) an unabashed fan of the service. To the point
-where earlier this year I wrote
-<a href="http://anonscm.debian.org/gitweb/?p=surfraw/surfraw.git;a=blob_plain;f=elvi/deli;hb=8e32f5edaf26b7a65e5535d81b513f6d63e82847" title="Elvis in the Surfraw CVS tree">a Surfraw elvis to search the site</a>.
-As this would suggest, I use the site frequently, not just to bookmark
-or retrieve my own pages, but to search for other pages that people have
-considered “bookmark-worthy” (which is generally a pretty good indicator
-of quality).</p>
-
-<p>Like many comitted users, when the news leaked out late last year that
-<a href="http://www.readwriteweb.com/archives/rip_delicious_you_were_so_beautiful_to_me.php" title="RWW">Yahoo was shuttering delicious</a>,
-I jumped to Pinboard and have been
-<a href="http://pinboard.in/u:jasonwryan/" title="My boomarks on Pinboard">synching my bookmarks</a>
-between the two sites since. In retrospect, that turned out to be an
-excellent decision.</p>
-
-<p>The “new” delicious was launched overnight and I think it is fair to say
-that it has been completely and utterly eviscerated. It has gone from
-being a site that served a very specific (and incredibly useful)
-purpose—saving and tagging web pages for future use—to a bland,
-lowest-common-denominator, generic “social” site, like countless others
-that have arrived and disappeared with quirky names like Plurk, Plonker,
-etc..</p>
-
-<p>The site <em>looks good</em>; all light and airy and spacious (that space will,
-I am sure, be quickly filled with advertising), but they have stripped
-all the utility from the site. You can no longer actually access and
-manage your bookmarks. It is a colossal failure.</p>
-
-<p>I have 757 tags. I know that tag clouds are considered old hat, but on a
-site built on taxonomies, they are still an incredibly effective way of
-presenting information. The new delicious has dispensed with them. They
-have also decided that I don’t need to see all of my tags, so I can now
-only view 50 of them. <strong>Fifty out of seven hundred and fifty</strong>.
-Presumably I am expected to guess all the rest…</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/delicious2.png" alt="image" /></p>
-
-<p><sup>The new tag display on the left and the old, as a cloud, on the right.</sup></p>
-
-<p>These aren’t options, though. All of the settings to display tags, tag
-bundles, etc., and the options to edit tags have been removed. You can’t
-access any of the tools to manage your bookmarks. The designers have
-decreed that you can no longer manage your information in a useful way.
-Morons.</p>
-
-<p>The clueless mediocrities responsible for this will probably think that
-they are reinventing the site and making it relevant for a broader, less
-geeky market. And they are probably right. The fact that the site looks
-remarkably like a phone app suggests that sort of studied rush to the
-bottom.</p>
-
-<p>What they have done is something of an achievement on one level, though.
-They have made Yahoo look good. In all the time that Yahoo owned
-delicious, they were only able to neglect it; these new clowns have
-completely fscked it…</p>
-
-<p>If you bookmark sites because you are semi-intelligent and you recognize
-that being able to easily access and manage information effectively is
-critical to your intellectual and social wellbeing, then head over to
-<a href="http://pinboard.in/" title="A real boomarking site">Pinboard</a> and sign up
-now.</p>
 ]]></content>
   </entry>
   

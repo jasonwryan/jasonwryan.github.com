@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Some time in the last couple of days, the last of the packages in the
-Community repository were signed and, thanks to the tremendous work of
-the &hellip;">
+  <meta name="description" content="Over the last week I have been moving my blog over to Octopress,
+a lightweight blogging framework for Jekyll,
+the static site generator powering &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,138 @@ the &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/30/octopress/">Moving to Octopress</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-30T12:30:00+13:00" pubdate data-updated="true">Mar 30<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
+
+<p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
+a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
+the static site generator powering <a href="http://pages.github.com/">Github Pages</a>. I had previously
+been posting to a <a href="https://www.tumblr.com/">tumblr</a> page and, over the nearly four years that
+I had been doing that I had somehow racked up just over 4000 posts. I was <em>not</em>
+looking forward to migrating across.</p>
+
+<p>However, the fact that the Jekyll project has a number of scripts for
+<a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">migrating from other platforms</a>
+assuaged my concerns about the difficulty of this task. That sense of relief was shortlived.
+Neither of the two tumblr migration scripts were of any assistance: both would die during their
+initial runs, probably due to some funky characters in the post titles, or perhaps the posts themselves.</p>
+
+<p>I certainly had no intention of trying to wade through the entire back catalogue identifying the
+rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the
+“straightforward” nature of the task, I saw this setback as an opportunity to cull all of the
+cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
+some interest.</p>
+
+<p>Being an assiduous record keeper, all of the posts were helpfully bookmarked on
+<a href="https://pinboard.in/u:jasonwryan/t:jwr/">Pinboard under one tag</a>, and therefore it was
+simple enough to create a list of the required <acronym title="Unique Resource Locator">URLs</acronym>.
+Armed with this list, it was just a matter of cobbling together a script to do the bulk of
+the work for me.</p>
+
+<p>The first task was to retrieve the posts from the list:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grab files</span>
+</span><span class='line'><span class="k">while </span><span class="nb">read </span>url; <span class="k">do </span>
+</span><span class='line'><span class="k">    </span>wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
+</span><span class='line'><span class="k">done</span> &lt; /home/jason/Scripts/list
+</span></code></pre></div></figure>
+
+
+<p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
+surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># strip HTML cruft</span>
+</span><span class='line'><span class="k">for </span>file in *.html; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.*}&quot;</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>mkdir html <span class="o">&amp;&amp;</span> mv *.html html/
+</span></code></pre></div></figure>
+
+
+<p>The final task of this part of the migration was to convert the HTML into
+<a href="http://daringfireball.net/projects/markdown/">markdown</a>,
+the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
+the &#8220;universal document converter&#8221; handled that job:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># convert to markdown format</span>
+</span><span class='line'><span class="k">for </span>file in *; <span class="k">do </span>
+</span><span class='line'><span class="k">    </span>pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;$file&quot;</span>.md
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></div></figure>
+
+
+<p>The final result was fifty markdown files holding all of my posts, almost ready to
+be committed to github. I say “almost” because the files still required what turned out to
+be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would
+inexpicably break <a href="http://www.notareallink.com">multi word
+hyperlinks</a> over two lines. Similarly all of the internal
+links to my other posts pointed to the (meaningless) tumblr URLs<sup>2</sup>.</p>
+
+<p>Setting up Octopress was extremely simple and quick by comparison: the
+<a href="http://octopress.org/docs/">documentation is very helpful</a>. There was one slight
+hitch, a <a href="https://github.com/tmm1/pygments.rb/issues/10">known issue on Arch x86_64</a>,
+which was simple enough to deal with.</p>
+
+<p>While the migration was not entirely pain-free, I am pleased that I have done it. Tumblr&#8217;s service
+increasingly <a href="https://twitter.com/#!/jasonwryan/statuses/176543962276954112">left a lot to be desired</a>
+but as it was a free service, I couldn&#8217;t complain too much. Or, more accurately, when I did complain,
+no-one actually listened…</p>
+
+<p>Indeed, moving to a paid service like Github
+(yes, it&#8217;s free at first, but once you have enough data there you need to pay a small amount
+every month) <a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/">makes a lot of sense</a>.
+The paid services I do use, like <a href="http://pinboard.in/">Pinboard</a> and
+<a href="http://www.tarsnap.com/">Tarsnap</a> are both inexpensive and much more
+reliable than their free counterparts<sup>3</sup>; and you get to invest in great
+software that is a pleasure to use.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Initially, I had set up the site as a simple holding page and dumped a whole lot
+of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
+mostly just that sort of internet detritus…</li>
+<li>For creating redirections (Github pages do <em>not</em> support <span class="file">.htaccess</span>)
+I can&#8217;t recommend enough the
+<a href="https://github.com/rawsyntax/jekyll_alias_generator/blob/master/_plugins/alias_generator.rb">Jekyll Alias Generator</a>.
+Just. Brilliant.</li>
+<li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -342,96 +474,6 @@ appearance:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-09T16:52:00+13:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
-
-<p>If you are an Arch Linux user and you are not using
-<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
-you can take a moment to hang your head in shame before you click on to
-whatever the next thing is. The package description sums up perfectly
-what aurphan does:</p>
-
-<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
-today!</p></blockquote>
-
-<p>Running <code>aurphan -a</code>, for example, will identify any
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
-database that are not currently maintained; allowing you to log in to
-the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
-fulfilled.<sup>1</sup></p>
-
-<p>If, like most Archers, you have a compulsive desire to automate
-<em>everything</em> then clearly typing (or even remembering to type) <code>aurphan
--a</code> into a terminal periodically is as ludicrous as it is onerous. The
-obvious answer is some shell script and a cron job.</p>
-
-<p>First, the <code>cron</code> job:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
-</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
-</span></code></pre></div></figure>
-
-
-<p>Then, as part of my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="Script in mercurial repo">dwm-status script</a>,
-a function to check that there are no new additions to the file and, if
-there are, flash a highlight:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>
-</span><span class='line'>    <span class="nv">aurphans</span><span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">        </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
-</span><span class='line'>    <span class="k">fi</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></div></figure>
-
-
-<p>The awk filter excludes a null return, which is “No aurphans found.”
-Now, if any of the packages that I use from the AUR are disowned, I’ll
-be the first to know about it.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Actual feeling may differ depending on the package you have adopted
-and the amount of prescription painkillers that you are currently
-ingesting…</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -449,6 +491,10 @@ ingesting…</li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/16/misunderstanding/">Misunderstanding Arch</a>
       </li>
     
@@ -462,10 +508,6 @@ ingesting…</li>
     
       <li class="post">
         <a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/04/05/catalyst/">The Next Thing</a>
       </li>
     
   </ul>

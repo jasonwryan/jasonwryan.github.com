@@ -9,9 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="In my previous post describing this setup
-I made the point that grub won’t be installed and that it is necessary
-to chroot in to install grub on &hellip;">
+  <meta name="description" content="If you are an Arch Linux user and you are not using
+aurphan,
+you can take a moment to hang your head in shame before you click on to
+whatever the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +85,96 @@ to chroot in to install grub on &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T16:52:00+13:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
+
+<p>If you are an Arch Linux user and you are not using
+<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
+you can take a moment to hang your head in shame before you click on to
+whatever the next thing is. The package description sums up perfectly
+what aurphan does:</p>
+
+<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
+today!</p></blockquote>
+
+<p>Running <code>aurphan -a</code>, for example, will identify any
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
+database that are not currently maintained; allowing you to log in to
+the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
+fulfilled.<sup>1</sup></p>
+
+<p>If, like most Archers, you have a compulsive desire to automate
+<em>everything</em> then clearly typing (or even remembering to type) <code>aurphan
+-a</code> into a terminal periodically is as ludicrous as it is onerous. The
+obvious answer is some shell script and a cron job.</p>
+
+<p>First, the <code>cron</code> job:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
+</span></code></pre></div></figure>
+
+
+<p>Then, as part of my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="Script in mercurial repo">dwm-status script</a>,
+a function to check that there are no new additions to the file and, if
+there are, flash a highlight:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>
+</span><span class='line'>    <span class="nv">aurphans</span><span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">        </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
+</span><span class='line'>    <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>The awk filter excludes a null return, which is “No aurphans found.”
+Now, if any of the packages that I use from the AUR are disowned, I’ll
+be the first to know about it.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Actual feeling may differ depending on the package you have adopted
+and the amount of prescription painkillers that you are currently
+ingesting…</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -487,104 +578,6 @@ the <code>mdadm_udev</code> hook is preferred over the plain <code>mdadm</code> 
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/01/18/monsterwm/">monsterwm</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-01-18T10:03:00+13:00" pubdate data-updated="true">Jan 18<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/monster.jpg" alt="image" /></p>
-
-<p>If you have visited here at all over the last couple of weeks, you would
-have seen some screenshots from
-<a href="http://www.flickr.com/photos/jasonwryan/" title="All of my screenshots on Flickr">my Flickr stream</a>
-of a new window manager,
-<a href="https://github.com/c00kiemon5ter/monsterwm" title="Project on Github">monsterwm</a>.
-Over the break, I have been playing around with it and, despite the fact
-that the project is only really a few weeks old, it is well worth a
-look.</p>
-
-<p>Originally a fork of
-<a href="https://github.com/moetunes/dminiwm" title="dminiwm on Github">dminiwm</a>,
-which was in turn based on
-<a href="https://github.com/pyknite/catwm" title="Project on Github">catwm</a> and
-<a href="http://dwm.suckless.org" title="dwm on suckless">dwm</a><sup>1</sup>, monsterwm for
-me—having used dwm for years—feels very much like a stripped down
-version of dwm, with a few of the patches (like pertag, for example)
-built in.</p>
-
-<p>One of the projects goals, like it’s antecedents, is to keep the SLOC
-low. By way of comparison, dwm’s long-standing goal has been to keep the
-SLOC below 2000<sup>2</sup>. monsterwm’s current count is under 700. One of the
-ways that monsterwm achieves this is <em>not</em> to incorporate a status bar;
-as the README says:</p>
-
-<blockquote><p>Monsterwm does not provide a panel and/or statusbar itself. Instead it
-adheres to the <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="Wikipedia entry">UNIX philosophy</a>
-and outputs information about the existent desktop, the number of
-windows on each, the mode of each desktop, the current desktop and
-urgent hints whenever needed. The user can use whatever tool or panel
-suits him best (dzen2, conky, w/e), to process and display that
-information.</p></blockquote>
-
-<p>So, what is it like to run? Obviously it is fast. It comes with four
-tiling modes: standard tile, backstack, grid and monocle and, as
-mentioned above, the ability to define different layouts per desktop.
-There are still a couple of features to be implemented; floating mode
-being one of the more significant and a couple of minor bugs—as you
-would expect for a project still in its relative infancy.</p>
-
-<p>Overall, it is a very nice, minimalist window manager. If you don’t use
-the <a href="http://lubutu.com/rant/dwm-faq" title="CLS on dwm's tagging feature">dynamic tagging feature of dwm</a>,
-then this would be a window manager to consider switching to. The
-developer, Ivan “c00kiemon5ter” Kanakarakis, has been extremely
-responsive to user’s suggestions and requests (the
-<a href="https://bbs.archlinux.org/viewtopic.php?id=132122" title="Arch Linux forums: monsterwm thread">thread on the Arch boards</a>
-is quite active) and has been admirably clear about his vision for the
-wm.</p>
-
-<p>You can see my monsterwm configs in
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Build/monsterwm-git" title="Mercurial repo: monsterwm">my mercurial repository</a>.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>Updated with the correct genealogy…</p></li>
-<li><p>“dwm is only a single binary, and its source code is intended to
-never exceed 2000 SLOC.” <a href="http:..dwm.suckless.org" title="dwm homepage">dwm.suckless.org</a></p></li>
-</ol>
-
-
-<p>Cookie Monster image from <a href="http://www.flickr.com/photos/nathaninsandiego/3757033518/" title="Creative Commons image on Flickr">San Diego Shooter</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -602,6 +595,10 @@ never exceed 2000 SLOC.” <a href="http:..dwm.suckless.org" title="dwm homepage
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/16/misunderstanding/">Misunderstanding Arch</a>
       </li>
     
@@ -615,10 +612,6 @@ never exceed 2000 SLOC.” <a href="http:..dwm.suckless.org" title="dwm homepage
     
       <li class="post">
         <a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/04/05/catalyst/">The Next Thing</a>
       </li>
     
   </ul>

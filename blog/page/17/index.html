@@ -9,9 +9,8 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I posted a couple of weeks back about
-using dropbox to share dotfiles
-and while I am pleased with how well that works, I had always intended to see &hellip;">
+  <meta name="description" content="The CapsLock key is one of the best examples of persistent usability failure;
+it continues to appear on just about every English-language keyboard, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +83,100 @@ and while I am pleased with how well that works, I had always intended to see &h
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/02/21/capslock/">Mapping CapsLock to Escape in Ubuntu</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-02-21T16:11:00+13:00" pubdate data-updated="true">Feb 21<span>st</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>The <kbd>CapsLock</kbd> key is one of the best examples of persistent usability failure;
+it continues to appear on just about every English-language keyboard, despite
+the fact that —aside from no-one ever uses it— it is an active hindrance to
+both the average typist and the sedulous coder…</p>
+
+<p>As a matter of course, I remove it in my Arch machines with an entry in my
+<span class="file"><a href="https://bitbucket.org/jasonwryan/workstation/src/tip/.xinitrc"
+title="My xinitrc on bitbucket">.xinitrc</a></span>, but in Ubuntu/Gnome, there is no
+such file. Consequently, there is this equally effective way of dispatching the
+<kbd>CapsLock</kbd>, or in my case, mapping it to something
+actually useful, <kbd>Esc</kbd>.</p>
+
+<p>First, create the <code>mapkey</code> file in your home directory:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>xmodmap -pke &gt; ~/.xmodmap.mapkey
+</span></code></pre></div></figure>
+
+
+<p>Then open the file and edit it:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vim ~/.xmodmap.mapkey
+</span></code></pre></div></figure>
+
+
+<p>Look for the <kbd>CapsLock</kbd> key, on my machine it is 66 (you can use
+<a href="http://www.x.org/archive/X11R7.5/doc/man/man1/xev.1.html" title="xev man page">xev</a>
+to locate all of your key codes), and then wreak your revenge. Just deleting
+everything after <code>keycode 66 =</code></p>
+
+<p>will render it useless, which may suit your style. I change the entry to make
+it another <kbd>Escape</kbd> key:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>keycode <span class="nv">66</span> <span class="o">=</span> Escape NoSymbol Escape NoSymbol Escape
+</span></code></pre></div></figure>
+
+
+<p>Log out and when you log back in, you have a useful key.</p>
+
+<h3>Updated for 10.04</h3>
+
+<p>The above hack was for 9.10 and earlier versions of Ubuntu.
+I have no idea why, but it (alone) doesn&#8217;t work in Lucid Lynx.
+You need a couple of extra steps:</p>
+
+<p>Open <code>System &gt; Preferences &gt; Startup Applications</code>  and add
+two new items:</p>
+
+<ul>
+<li>Clear the <kbd>CapsLock</kbd> key with <code>xmodmap -e "clear Lock</code></li>
+<li>Map it to <kbd>Escape</kbd> by pointing to your xmodmap file</li>
+</ul>
+
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>xmodmap ~/.xmodmap.mapkeys
+</span></code></pre></div></figure>
+
+
+<p>Now, whenever you login the script(s) will run and your <kbd>CapsLock</kbd> will map
+to something actually useful, like <kbd>Escape</kbd>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -271,159 +364,6 @@ as a matter of course. I had intended, at some point, to set up a
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/01/07/tmux-terminal-multiplexer/">tmux - terminal multiplexer</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-01-07T15:10:00+13:00" pubdate data-updated="true">Jan 7<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Over the last couple of days I have been familiarising myself with <a href="http://tmux.sourceforge.net/">tmux</a>.
-As it says on the homepage,</p>
-
-<blockquote><p>tmux is a terminal multiplexer: it enables a number of terminals (or windows), each running a separate program, to be created, accessed, and controlled from a single screen. tmux may be detached from a screen and continue running in the background, then later reattached.</p></blockquote>
-
-
-<p>I was attracted to tmux after seeing a number of enthusiastic postings on the
-<a href="http://bbs.archlinux.org/viewtopic.php?id=84157">Arch forums</a>, and by the promise of
-better management of multiple terminals in a single <a href="http://dwm.suckless.org/">dwm tag</a>…</p>
-
-<p>It&#8217;s available in the community repo, so:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S tmux
-</span></code></pre></div></figure>
-
-
-<p>Then it is just a matter of configuring it to suit your style of working,
-keyboard bindings etc. Helpfully, it comes with some example config files to
-start you off. These can be found at <span class="file">/usr/share/tmux/*.conf</span>.
-I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</a> for mine:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># set prefix key to ctrl+t</span>
-</span><span class='line'>unbind C-b
-</span><span class='line'><span class="nb">set</span> -g prefix C-t
-</span><span class='line'>
-</span><span class='line'><span class="c"># more intuitive keybindings for splitting</span>
-</span><span class='line'>unbind %
-</span><span class='line'><span class="nb">bind </span>h split-window -h
-</span><span class='line'>unbind <span class="s1">&#39;&quot;&#39;</span>
-</span><span class='line'><span class="nb">bind </span>v split-window -v
-</span><span class='line'>
-</span><span class='line'><span class="c"># set vi keys</span>
-</span><span class='line'>unbind <span class="o">[</span>
-</span><span class='line'><span class="nb">bind </span>Escape copy-mode
-</span><span class='line'>setw -g mode-keys vi
-</span><span class='line'>
-</span><span class='line'><span class="c"># send the prefix to client inside window (ala nested sessions)</span>
-</span><span class='line'><span class="nb">bind</span>-key a send-prefix
-</span><span class='line'>
-</span><span class='line'><span class="c"># toggle last window like screen</span>
-</span><span class='line'><span class="nb">bind</span>-key C-b last-window
-</span><span class='line'>
-</span><span class='line'><span class="c"># confirm before killing a window or the server</span>
-</span><span class='line'><span class="nb">bind</span>-key k confirm <span class="nb">kill</span>-window
-</span><span class='line'><span class="nb">bind</span>-key K confirm <span class="nb">kill</span>-server
-</span><span class='line'>
-</span><span class='line'><span class="c"># toggle statusbar</span>
-</span><span class='line'><span class="nb">bind</span>-key b <span class="nb">set</span>-option status
-</span><span class='line'>
-</span><span class='line'><span class="c"># ctrl+left/right cycles thru windows</span>
-</span><span class='line'><span class="nb">bind</span>-key -n C-right next
-</span><span class='line'><span class="nb">bind</span>-key -n C-left prev
-</span><span class='line'>
-</span><span class='line'><span class="c"># open a man page in new window</span>
-</span><span class='line'><span class="nb">bind</span> / <span class="nb">command</span>-prompt <span class="s2">&quot;split-window &#39;exec man %%&#39;&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># quick view of processes</span>
-</span><span class='line'><span class="nb">bind</span> <span class="s1">&#39;~&#39;</span> split-window <span class="s2">&quot;exec htop&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># scrollback buffer n lines</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">history</span>-limit 5000
-</span><span class='line'>
-</span><span class='line'><span class="c"># on-screen time for display-panes in ms</span>
-</span><span class='line'><span class="nb">set</span> -g display-panes-time 2000
-</span><span class='line'>
-</span><span class='line'><span class="c"># start window indexing at one instead of zero</span>
-</span><span class='line'><span class="nb">set</span> -g base-index 1
-</span><span class='line'>
-</span><span class='line'><span class="c"># enable wm window titles</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles on
-</span><span class='line'>
-</span><span class='line'><span class="c"># wm window title string (uses statusbar variables)</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles-string <span class="s2">&quot;tmux:#I #W&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># session initialization</span>
-</span><span class='line'>new -s TTYtter ttytter
-</span><span class='line'>neww -t 2
-</span><span class='line'>neww -d -t 3
-</span><span class='line'>neww -d -t 5
-</span><span class='line'>selectw -t 1
-</span><span class='line'>
-</span><span class='line'><span class="c">#### statusbar ####</span>
-</span><span class='line'><span class="nb">set</span> -g status-interval 1
-</span><span class='line'><span class="nb">set</span> -g status-justify centre <span class="c"># center align window list</span>
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="s1">&#39;#[fg=green] #H #[default]&#39;</span>
-</span><span class='line'><span class="nb">set</span> -g status-right <span class="s1">&#39;#[fg=blue,bright]Up#(uptime | cut -f 4-5 -d &quot; &quot; | cut -f 1 -d &quot;,&quot;) </span>
-</span><span class='line'><span class="s1">#[default]:: #[fg=cyan]#(cut -d &quot; &quot; -f 1-4 /proc/loadavg) &#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># default statusbar colors</span>
-</span><span class='line'><span class="nb">set</span> -g status-fg white
-</span><span class='line'><span class="nb">set</span> -g status-bg default
-</span><span class='line'><span class="nb">set</span> -g status-attr bright
-</span><span class='line'>
-</span><span class='line'><span class="c"># default window title colors</span>
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-fg white
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-bg default
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-attr dim
-</span><span class='line'>
-</span><span class='line'><span class="c"># active window title colors</span>
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-fg white
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-bg default
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-attr bright
-</span><span class='line'>
-</span><span class='line'><span class="c"># command/message line colors</span>
-</span><span class='line'><span class="nb">set</span> -g message-fg white
-</span><span class='line'><span class="nb">set</span> -g message-bg black
-</span><span class='line'><span class="nb">set</span> -g message-attr bright
-</span></code></pre></div></figure>
-
-
-<p>Copy this file to <span class="file">~/.tmux.conf</span>. The final result:</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4252840248/" title="Archlinux:  tmux running in dwm by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2703/4252840248_01ca8e7cc1.jpg" width="500" height="293" alt="Archlinux:  tmux running in dwm"/></a></p>
-
-<h3>Updated 16/11/10</h3>
-
-<p>For a current version of my <span class="file">.tmux.conf</span>, check my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.tmux.conf" title="bitbucket site" target="_blank">mercurial repository</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/18/">&larr; Older</a>
@@ -441,6 +381,10 @@ I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/16/misunderstanding/">Misunderstanding Arch</a>
       </li>
     
@@ -454,10 +398,6 @@ I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</
     
       <li class="post">
         <a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/04/05/catalyst/">The Next Thing</a>
       </li>
     
   </ul>
