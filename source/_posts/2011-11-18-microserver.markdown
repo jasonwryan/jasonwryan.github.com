@@ -19,7 +19,7 @@ or 6 years, I opted for
 [Debian stable](http://www.debian.org/releases/stable/ "Debian site") as the
 base system. After installing two 1TB drives, I set them up as an
 [encrypted](http://www.saout.de/misc/dm-crypt/ "Device mapper homepage")
-RAID 1 array, in a i
+RAID 1 array, in a 
 [logical volume](http://en.wikipedia.org/wiki/Logical_volume_management "Wikipedia entry on LVM").
 
 **Pro tip** when you get to the part of the partitioning where you
