@@ -1,0 +1,104 @@
+---
+layout: post
+title: "The Myth of Breakage"
+date: 2012-07-19 19:23
+comments: true
+categories: [archlinux, community]
+---
+{% img left https://dl.dropbox.com/u/261312/Blog-images/broken.jpg Image of breakage on Flickr %}
+Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
+[Arch boards](https://bbs.archlinux.org/ 'Arch Linux BBS') and in the various
+[IRC channels](https://wiki.archlinux.org/index.php/IRC_Channels 'Wiki page listing channels').
+It doesn't take newcomers long to realize that, whether something is actually broken or not,
+there is always 
+[someone they can blame](http://allanmcrae.com/category/arch-linux/ 'Allan's Blog')<sup>1</sup>.
+
+My experience of Arch, over the last three and a bit years, is quite the opposite. I have yet to
+experience anything that would qualify as breakage. Sure, there have been bugs, mostly upstream,
+and the more frequent moments where I haven't been as diligent as I should, but not once have I
+had a machine that was unbootable or otherwise unusable. Arch has, on both my home and work
+machines, been incredibly stable and reliable.
+
+For a number of Arch Linux users, however, that was not their experience over the last week when
+[/lib was moved to /usr/lib](http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/ 'News item on the move').
+The volume of people on the boards and on IRC reporting unbootable or unusable systems was 
+remarkable. Remarkable because, despite the fact that the 
+[news item](http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/ 'Once more, just in case…'), the 
+[wiki page](http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/ 'Arch wiki page on the change'),
+and the [email to arch-announce](http://mailman.archlinux.org/pipermail/arch-announce/2012-July/000317.html 'Mail archive')
+all *explicitly* warned people not to use the `--force` option,<sup>2</sup> so many did. 
+
+{% pullquote %}
+Sadly, these red-boxed warnings were apparently not enough. 
+{" 90% of the breakage was because people either didn't see, or disregarded, that advice. "} 
+The remaining 10% were either in a hurry and didn't pay close attention to how
+to deal with any leftover files in <span class="file">/lib</span> or `rm -rf`'ed
+in the wrong directory. 
+[Accidents happen](http://www.gnu.org/fun/jokes/shit-happens.html 'GNU Humour…').
+{% endpullquote %}
+
+What I am interested in is the people who fell into the much larger category,
+and principally those that didn't see any of the communications about this
+change in advance of updating and reasoned, based on a recent change that did
+[require the use of --force](http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required-1/ 'News item on filesystem upgrade'),
+that this was the most expedient way to resolve `pacman` reporting conflicting
+files.
+
+Some context. The `glibc` update was released to the 
+[\[testing\] repository](https://wiki.archlinux.org/index.php/Testing#.5Btesting.5D 'Wiki entry on Testing')
+in the first week of July: and there were a couple of long threads<sup>3</sup>
+about issues and fixes before it was pushed to \[core\]. By the time the
+package was released for general consumption, it had been tested and the
+developers had obviously planned how to make what is a fundamental system
+change with a minimal amount of user intervention.  I think that, given the
+magnitude of the challenge, they did a superb job.
+
+How then did it go so wrong for so many?<sup>4</sup> To answer that, you have
+to consider the nature of Arch. It's *not* the sort of distribution where you
+install it and then just go on your merry way, installing 
+[the least obsolete packages](http://oswatershed.org/ 'It's SCIENCE, Jim'),
+revelling in the speed of the package manager and generally being
+a 1337 h@x0r…
+
+Successfully running a rolling release like Arch, irrespective of your level of
+competence, means staying in touch with what is happening—in 
+[some form or other](http://kmkeen.com/pacmatic/ 'Pacman wrapper that pulls news updates'). 
+Subscribing to the arch-general <acronym title="Mailing list">ML</acronym>, 
+visiting the forums, idling in IRC; somehow remaining connected to what is
+going on in the community so that you don't blindly update one day and wonder
+why your system is broken.
+
+This strikes me as a real strength; by design Arch encourages its users to
+participate in the community. Even if you are only lurking, over time you will
+inevitably find yourself posting in a thread, responding to an email, editing
+the wiki,
+[adopting an orphaned package](http://jasonwryan.com/blog/2012/03/09/aurphan/ 'Post on aurphan')—increasingly 
+getting involved and contributing.
+
+This level of involvement is not for everyone. Some may find it onerous or
+a waste of their time. That's fine. There are any number of other distros
+that do not ask for this level of commitment. The *quid pro quo* for
+running Arch, though, is that you are prepared, in whatever shape or form
+best works for you, to give something back; at the very least, that is your
+attention.
+
+#### Notes
+1. This is, of course, a reference to said Arch meme: Allan is one
+of the developers who has contributed an enormous amount to Arch and the fact
+that his IRC nick is `allanbrokeit` is purely coincidental.
+
+2. At the end of 2011, the short option `-f` 
+[was removed](http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html 'Post to ML anouncing change') 
+from `pacman` so “it at least makes people read the word 'force' and maybe they
+will have some sense to step back and think about what they are doing first.”
+
+3. [https://bbs.archlinux.org/viewtopic.php?id=144620](https://bbs.archlinux.org/viewtopic.php?id=144620) and 
+[https://bbs.archlinux.org/viewtopic.php?id=144616](https://bbs.archlinux.org/viewtopic.php?id=144616)
+
+4. Relatively speaking. In situations like this, the overwhelming amount of traffic
+is about what went wrong, not people posting to say they had no difficulties whatsoever…
+
+Creative Commons image on Flickr from
+[djeucalyptus](http://www.flickr.com/photos/daviddoctorrose/431786001/ 'Broken keyboard on Flickr')
+
+
