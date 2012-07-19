@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-07-10T12:39:51+12:00</updated>
+  <updated>2012-07-19T19:23:36+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,110 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[The Myth of Breakage]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/07/19/breakage/"/>
+    <updated>2012-07-19T19:23:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/07/19/breakage</id>
+    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/broken.jpg" title="Image of breakage on Flickr" >
+Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
+<a href="https://bbs.archlinux.org/" title="Arch Linux BBS">Arch boards</a> and in the various
+<a href="https://wiki.archlinux.org/index.php/IRC_Channels" title="Wiki page listing channels">IRC channels</a>.
+It doesn&#8217;t take newcomers long to realize that, whether something is actually broken or not,
+there is always
+<a href="http://allanmcrae.com/category/arch-linux/" title="Allan's Blog">someone they can blame</a><sup>1</sup>.</p>
+
+<p>My experience of Arch, over the last three and a bit years, is quite the opposite. I have yet to
+experience anything that would qualify as breakage. Sure, there have been bugs, mostly upstream,
+and the more frequent moments where I haven&#8217;t been as diligent as I should, but not once have I
+had a machine that was unbootable or otherwise unusable. Arch has, on both my home and work
+machines, been incredibly stable and reliable.</p>
+
+<p>For a number of Arch Linux users, however, that was not their experience over the last week when
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="News item on the move">/lib was moved to /usr/lib</a>.
+The volume of people on the boards and on IRC reporting unbootable or unusable systems was
+remarkable. Remarkable because, despite the fact that the
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Once more, just in case…">news item</a>, the
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Arch wiki page on the change">wiki page</a>,
+and the <a href="http://mailman.archlinux.org/pipermail/arch-announce/2012-July/000317.html" title="Mail archive">email to arch-announce</a>
+all <em>explicitly</em> warned people not to use the <code>--force</code> option,<sup>2</sup> so many did.</p>
+
+<p><span class='pullquote-right' data-pullquote='90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice. '>
+Sadly, these red-boxed warnings were apparently not enough.
+90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice.
+The remaining 10% were either in a hurry and didn&#8217;t pay close attention to how
+to deal with any leftover files in <span class="file">/lib</span> or <code>rm -rf</code>&#8216;ed
+in the wrong directory.
+<a href="http://www.gnu.org/fun/jokes/shit-happens.html" title="GNU Humour…">Accidents happen</a>.
+</span></p>
+
+<p>What I am interested in is the people who fell into the much larger category,
+and principally those that didn&#8217;t see any of the communications about this
+change in advance of updating and reasoned, based on a recent change that did
+<a href="http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required-1/" title="News item on filesystem upgrade">require the use of &#8211;force</a>,
+that this was the most expedient way to resolve <code>pacman</code> reporting conflicting
+files.</p>
+
+<p>Some context. The <code>glibc</code> update was released to the
+<a href="https://wiki.archlinux.org/index.php/Testing#.5Btesting.5D" title="Wiki entry on Testing">[testing] repository</a>
+in the first week of July: and there were a couple of long threads<sup>3</sup>
+about issues and fixes before it was pushed to [core]. By the time the
+package was released for general consumption, it had been tested and the
+developers had obviously planned how to make what is a fundamental system
+change with a minimal amount of user intervention.  I think that, given the
+magnitude of the challenge, they did a superb job.</p>
+
+<p>How then did it go so wrong for so many?<sup>4</sup> To answer that, you have
+to consider the nature of Arch. It&#8217;s <em>not</em> the sort of distribution where you
+install it and then just go on your merry way, installing
+<a href="http://oswatershed.org/" title="It's SCIENCE, Jim">the least obsolete packages</a>,
+revelling in the speed of the package manager and generally being
+a 1337 h@x0r…</p>
+
+<p>Successfully running a rolling release like Arch, irrespective of your level of
+competence, means staying in touch with what is happening—in
+<a href="http://kmkeen.com/pacmatic/" title="Pacman wrapper that pulls news updates">some form or other</a>.
+Subscribing to the arch-general <acronym title="Mailing list">ML</acronym>,
+visiting the forums, idling in IRC; somehow remaining connected to what is
+going on in the community so that you don&#8217;t blindly update one day and wonder
+why your system is broken.</p>
+
+<p>This strikes me as a real strength; by design Arch encourages its users to
+participate in the community. Even if you are only lurking, over time you will
+inevitably find yourself posting in a thread, responding to an email, editing
+the wiki,
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="Post on aurphan">adopting an orphaned package</a>—increasingly
+getting involved and contributing.</p>
+
+<p>This level of involvement is not for everyone. Some may find it onerous or
+a waste of their time. That&#8217;s fine. There are any number of other distros
+that do not ask for this level of commitment. The <em>quid pro quo</em> for
+running Arch, though, is that you are prepared, in whatever shape or form
+best works for you, to give something back; at the very least, that is your
+attention.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><p>This is, of course, a reference to said Arch meme: Allan is one
+of the developers who has contributed an enormous amount to Arch and the fact
+that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</p></li>
+<li><p>At the end of 2011, the short option <code>-f</code>
+<a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
+from <code>pacman</code> so “it at least makes people read the word &#8216;force&#8217; and maybe they
+will have some sense to step back and think about what they are doing first.”</p></li>
+<li><p><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
+<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></p></li>
+<li><p>Relatively speaking. In situations like this, the overwhelming amount of traffic
+is about what went wrong, not people posting to say they had no difficulties whatsoever…</p></li>
+</ol>
+
+
+<p>Creative Commons image on Flickr from
+<a href="http://www.flickr.com/photos/daviddoctorrose/431786001/" title="Broken keyboard on Flickr">djeucalyptus</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Replacing Grub With Syslinux]]></title>
@@ -1692,7 +1796,7 @@ or 6 years, I opted for
 <a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
 base system. After installing two 1TB drives, I set them up as an
 <a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
-RAID 1 array, in a i
+RAID 1 array, in a
 <a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
 
 <p><strong>Pro tip</strong> when you get to the part of the partitioning where you
@@ -1813,64 +1917,6 @@ notifications like
 <a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
 (that was closed without any progress)—hence my having to resort to a
 home-cooked solution…</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Pinboard Elvis]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/10/01/pinboard-elvis/"/>
-    <updated>2011-10-01T10:29:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/10/01/pinboard-elvis</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/pinboard-elvis.png" alt="image" /></p>
-
-<p>After recovering from
-<a href="http://jasonwryan.com/blog/2011/09/28/delicious/" title="My post on the delicious fiasco">the shock of the botched delicious relaunch</a>,
-I have switched to
-<a href="http://pinboard.in/u:jasonwryan/" title="My bookmarks on Pinboard">Pinboard</a>
-for my bookmarking. Previously, I was just synching my bookmarks from
-delicious, but now I have abandoned that trainwreck completely.</p>
-
-<p>Two things made the transition painless. The first was the
-<a href="http://www.appbrain.com/app/me.mitnworb.save.to.pinboard/" title="Save to Pinboard page">Pinboard Android app</a>
-so I could access and manage bookmarks from my phone; the second was a
-little trickier.</p>
-
-<p>As I have previously mentioned, I use bookmarking not just to retrieve
-my own saved pages, but as a search repository for material that other
-people have decided is interesting or valuable enough to want to save.
-And there is no better tool for this sort of searching than
-<a href="http://surfraw.alioth.debian.org/" title="Surfraw - Shell Users' Revolutionary Front Rage Against the Web">Surfraw</a><sup>1</sup></p>
-
-<p>I had written an elvis to search delicious bookmarks, so to complete the
-transition to Pinboard, I needed to do the same. It was a little
-trickier than I had anticipated, as some of the URLs (particularly when
-searching across multiple tags) were reasonably complex given my modest
-scripting skills. But
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.config/surfraw/elvi/pin" title="Pinboard elvis in mercurial repo">I got there in the end…</a></p>
-
-<p>Now searching for web pages that I or anyone else has saved to Pinboard
-is as simple as typing:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pin -t<span class="o">=</span>unix+linux+vim
-</span></code></pre></div></figure>
-
-
-<p>Which will return all saved pages that share those three tags. I can
-also refine my search to a particular user with the <code>-u</code>{ser} switch, or
-just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Previous posts on Surfraw:
-
-<ul>
-<li> <a href="http://jasonwryan.com/blog/2011/04/13/archwiki-elvis-for-surfraw/" title="My post on the Arch Wiki elvis">Arch Wiki elvis for Surfraw</a></li>
-<li> <a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Yanking links in w3m">w3m, Surfraw and yanking  URLs</a></li>
-</ul>
-</li>
 </ol>
 
 ]]></content>

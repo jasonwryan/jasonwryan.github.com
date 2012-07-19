@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-07-10T12:39:51+12:00</updated>
+  <updated>2012-07-19T19:23:36+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,110 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[The Myth of Breakage]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/07/19/breakage/"/>
+    <updated>2012-07-19T19:23:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/07/19/breakage</id>
+    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/broken.jpg" title="Image of breakage on Flickr" >
+Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
+<a href="https://bbs.archlinux.org/" title="Arch Linux BBS">Arch boards</a> and in the various
+<a href="https://wiki.archlinux.org/index.php/IRC_Channels" title="Wiki page listing channels">IRC channels</a>.
+It doesn't take newcomers long to realize that, whether something is actually broken or not,
+there is always
+<a href="http://allanmcrae.com/category/arch-linux/" title="Allan's Blog">someone they can blame</a><sup>1</sup>.</p>
+
+<p>My experience of Arch, over the last three and a bit years, is quite the opposite. I have yet to
+experience anything that would qualify as breakage. Sure, there have been bugs, mostly upstream,
+and the more frequent moments where I haven't been as diligent as I should, but not once have I
+had a machine that was unbootable or otherwise unusable. Arch has, on both my home and work
+machines, been incredibly stable and reliable.</p>
+
+<p>For a number of Arch Linux users, however, that was not their experience over the last week when
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="News item on the move">/lib was moved to /usr/lib</a>.
+The volume of people on the boards and on IRC reporting unbootable or unusable systems was
+remarkable. Remarkable because, despite the fact that the
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Once more, just in case…">news item</a>, the
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Arch wiki page on the change">wiki page</a>,
+and the <a href="http://mailman.archlinux.org/pipermail/arch-announce/2012-July/000317.html" title="Mail archive">email to arch-announce</a>
+all <em>explicitly</em> warned people not to use the <code>--force</code> option,<sup>2</sup> so many did.</p>
+
+<p><span class='pullquote-right' data-pullquote='90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice. '>
+Sadly, these red-boxed warnings were apparently not enough.
+90% of the breakage was because people either didn't see, or disregarded, that advice.
+The remaining 10% were either in a hurry and didn't pay close attention to how
+to deal with any leftover files in <span class="file">/lib</span> or <code>rm -rf</code>'ed
+in the wrong directory.
+<a href="http://www.gnu.org/fun/jokes/shit-happens.html" title="GNU Humour…">Accidents happen</a>.
+</span></p>
+
+<p>What I am interested in is the people who fell into the much larger category,
+and principally those that didn't see any of the communications about this
+change in advance of updating and reasoned, based on a recent change that did
+<a href="http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required-1/" title="News item on filesystem upgrade">require the use of --force</a>,
+that this was the most expedient way to resolve <code>pacman</code> reporting conflicting
+files.</p>
+
+<p>Some context. The <code>glibc</code> update was released to the
+<a href="https://wiki.archlinux.org/index.php/Testing#.5Btesting.5D" title="Wiki entry on Testing">[testing] repository</a>
+in the first week of July: and there were a couple of long threads<sup>3</sup>
+about issues and fixes before it was pushed to [core]. By the time the
+package was released for general consumption, it had been tested and the
+developers had obviously planned how to make what is a fundamental system
+change with a minimal amount of user intervention.  I think that, given the
+magnitude of the challenge, they did a superb job.</p>
+
+<p>How then did it go so wrong for so many?<sup>4</sup> To answer that, you have
+to consider the nature of Arch. It's <em>not</em> the sort of distribution where you
+install it and then just go on your merry way, installing
+<a href="http://oswatershed.org/" title="It's SCIENCE, Jim">the least obsolete packages</a>,
+revelling in the speed of the package manager and generally being
+a 1337 h@x0r…</p>
+
+<p>Successfully running a rolling release like Arch, irrespective of your level of
+competence, means staying in touch with what is happening—in
+<a href="http://kmkeen.com/pacmatic/" title="Pacman wrapper that pulls news updates">some form or other</a>.
+Subscribing to the arch-general <acronym title="Mailing list">ML</acronym>,
+visiting the forums, idling in IRC; somehow remaining connected to what is
+going on in the community so that you don't blindly update one day and wonder
+why your system is broken.</p>
+
+<p>This strikes me as a real strength; by design Arch encourages its users to
+participate in the community. Even if you are only lurking, over time you will
+inevitably find yourself posting in a thread, responding to an email, editing
+the wiki,
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="Post on aurphan">adopting an orphaned package</a>—increasingly
+getting involved and contributing.</p>
+
+<p>This level of involvement is not for everyone. Some may find it onerous or
+a waste of their time. That's fine. There are any number of other distros
+that do not ask for this level of commitment. The <em>quid pro quo</em> for
+running Arch, though, is that you are prepared, in whatever shape or form
+best works for you, to give something back; at the very least, that is your
+attention.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><p>This is, of course, a reference to said Arch meme: Allan is one
+of the developers who has contributed an enormous amount to Arch and the fact
+that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</p></li>
+<li><p>At the end of 2011, the short option <code>-f</code>
+<a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
+from <code>pacman</code> so “it at least makes people read the word 'force' and maybe they
+will have some sense to step back and think about what they are doing first.”</p></li>
+<li><p><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
+<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></p></li>
+<li><p>Relatively speaking. In situations like this, the overwhelming amount of traffic
+is about what went wrong, not people posting to say they had no difficulties whatsoever…</p></li>
+</ol>
+
+
+<p>Creative Commons image on Flickr from
+<a href="http://www.flickr.com/photos/daviddoctorrose/431786001/" title="Broken keyboard on Flickr">djeucalyptus</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Replacing Grub With Syslinux]]></title>
@@ -342,133 +446,6 @@ For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">bind </span>attach &lt;<span class="k">return</span>&gt;    view-mailcap
 </span></code></pre></div></figure></notextile></div></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using mutt, LDAP and SSL]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/04/21/lbdb/"/>
-    <updated>2012-04-21T11:23:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/04/21/lbdb</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/addressbook.png" title="'Address Book Icon by bertop on Flickr'" ></p>
-
-<p>One of the great things about starting a new job at
-<a href="http://jasonwryan.com/blog/2012/04/05/catalyst/" title="My post on joining Catalyst IT">an open source company</a>
-is having the freedom to use the tools that suit your workflow, rather than
-having to suffer the indignity of whatever the IT department consider to be the
-lowest comon denominator. Suffice to say, I have had a lot of fun this week
-setting up my working environment—and the ocassional hiccough as I was forced to learn
-something new…</p>
-
-<p>One of those “learning opportunities” consisted of trying to get my mail client,
-<a href="http://www.mutt.org/" title="All mail clients suck. This one just sucks less.">mutt</a>
-to talk to the <acronym title="Lightweight Directory Acces Protocol">LDAP</acronym>
-directory over <acronym title="Secure Sockets Layer">SSL</acronym> so that I could
-query the shared address book. There are a number of helpful blog posts that describe
-using <a href="http://www.spinnaker.de/lbdb/" title="The Little Brother Database homepage">lbdb</a>
-with <code>mutt</code><sup>1</sup>. Unfortunately, after a lot of searching, I was unable to find
-any documentation on achieving this integration over a secure connection.
-I kept seeing this error:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>Error: Search failed. LDAP server returned an error : 13, description: TLS
-</span><span class='line'>confidentiality required at /usr/lib/mutt_ldap_query line 198, &lt;DATA&gt; line 558.
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Several hours later, and with some
-help from <a href="https://twitter.com/#!/ibeardslee" title="Ian on Twitter: follow him…">@ibeardslee</a>,
-I managed to set it up, and it was definitely worth the effort.</p>
-
-<p>You will need to install <code>lbdb</code> from
-<a href="http://aur.archlinux.org/packages.php?ID=10225" title="AUR package">the AUR</a>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cowerd lbdb     <span class="c"># 2</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>…and a couple of packages from the repos to make it all work:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl-ldap perl-io-socket-ssl netkit-bsd-finger
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Then it is a matter of configuring <code>lbdb</code> to both
-query the LDAP directory and be able to be called from <code>mutt</code>.
-First, copy the config files into your <span class="file">$HOME</span>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir .lbdb
-</span><span class='line'>cp /etc/lbdb.rc .lbdb/lbdbrc
-</span><span class='line'>cp /etc/lbdb_ldap.rc .lbdb/ldap.rc
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>And then modify the two configuration files to suit your setup:
-The first, <span class="file">$HOME/.lbdb/lbdbrc</span>, is well commented and
-self-explanatory; add <code>ldap</code> to the methods and the
-nickname of your server:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">METHODS</span><span class="o">=</span><span class="s2">&quot;m_abook m_ldap&quot;</span>
-</span><span class='line'><span class="nv">LDAP_NICKS</span><span class="o">=</span><span class="s2">&quot;catalyst&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The second config file, <span class="file">$HOME/.lbdb/ldap.rc</span>
-is written in Perl and is a bit of a shocker:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='perl'><span class='line'><span class="nv">%ldap_server_db</span> <span class="o">=</span> <span class="p">(</span><span class="sr">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;</span><span class="s">&#39;catalyst&#39;</span> <span class="o">=&amp;</span><span class="ow">gt</span><span class="p">;</span> <span class="p">[</span><span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s">&#39;${mail}&#39;</span><span class="p">,</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">]</span>
-</span><span class='line'><span class="sr">&lt;/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;</span><span class="p">);</span><span class="sr">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;h1&gt;</span><span class="n">hostname</span> <span class="n">of</span> <span class="n">your</span> <span class="n">ldap</span> <span class="n">server</span><span class="sr">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;</span><span class="nv">$ldap_server</span> <span class="o">=</span> <span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$search_base</span> <span class="o">=</span> <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_search_fields</span>    <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_expected_answers</span> <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_result_email</span>     <span class="o">=</span> <span class="s">&#39;${mail}&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_result_realname</span>  <span class="o">=</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ignorant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_bind_dn</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_bind_password</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="mi">1</span><span class="p">;</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The key is to ensure that you use both the <code>ldaps</code>
-prefix <strong>and</strong> explicitely specify the SSL port, 636. Without both of these, you will
-get the TLS confidentiality error.</p>
-
-<p>You can then test that it is working correctly by running a query:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>lbdbq jemima
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>All going well, if there is indeed a Jemima in the shared address book, you will see her
-contact details miraculously appear before you. If there is more than one, you will have a
-list to choose from.</p>
-
-<p>Finally, you just need to set up <code>mutt</code> to query <code>lbdb</code>.
-In your <span class="file">muttrc</span>, add the following:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">query_command</span> <span class="o">=</span> <span class="s2">&quot;lbdbq %s 2&gt;/dev/null&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>I found that suppressing the errors made the whole experience a little smoother. You
-may not require it… Now, hitting <kbd>Shift</kbd><kbd>q</kbd> in <code>mutt</code>
-brings up a prompt to query the LDAP directory (and my <a href="http://abook.sourceforge.net/" title="abook homepage">abook</a> address book that I share via
-<a href="https://www.dropbox.com/" title="Dropbox homepage">dropbox</a>). You can also access the directory
-by starting to type an email address and then hitting <kbd>Ctrl</kbd><kbd>t</kbd> to see
-a list of possible completions.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li><p><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk's post</a> got me started.</p></li>
-<li><p>A <a href="https://bitbucket.org/jasonwryan/eeepc/src/f15bf6e51e62/Scripts/cowerd" title="Script in bitbucket repo">wrapper script for cower</a></p></li>
-</ol>
-
-
-<p>Creative Commons image <a href="http://www.flickr.com/photos/bertop/2530620838/">by bertop on Flickr</a></p>
 ]]></content>
   </entry>
   

@@ -9,10 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="After setting up my server,
-I wanted to use it as a torrent box. The version of
-rtorrent
-in the Debian stable repositories is 0.8.6, which is &hellip;">
+  <meta name="description" content="I recently threw caution to the wind and
+changed my shell over to vi mode.
+I wanted to take advantage of the superior command editing ability that &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +84,100 @@ in the Debian stable repositories is 0.8.6, which is &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/01/readline/">Readline Bindings in Vi Mode</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-01T18:43:00+13:00" pubdate data-updated="true">Dec 1<span>st</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/readline.png" alt="image" /></p>
+
+<p>I recently threw caution to the wind and
+<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
+I wanted to take advantage of the superior command editing ability that
+this mode offered, and also to continue to bake vi[m] methods into every
+aspect of my working environment.</p>
+
+<p>The change has been relatively straightforward; the only issues I have
+experienced are really just around a couple of keybinds that I had
+become accustomed to in normal/Emacs mode:</p>
+
+<ul>
+<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
+<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
+</ul>
+
+
+<p>The first, the ability to recall the final arguments of previous
+commands was a showstopper for me: I really struggled without this.
+Being able to recall a long file path and append it to a new command is
+invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
+exactly this. Why it is not bound by default in vi mode is beyond me…</p>
+
+<p>The other was purely cosmetic, really. I am an inveterate clearer of the
+screen—unless I am referring to something printed to stdout, I always
+prefer to work at the top of the console.</p>
+
+<p>In any event, with the
+<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
+it was a trivial exercize to restore this functionality to my bash shell
+in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
+
+<figure class='code'><figcaption><span>~/inputrc </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc
+</span><span class='line'>
+</span><span class='line'># for vi mode
+</span><span class='line'>set editing-mode vi
+</span><span class='line'>$if mode=vi
+</span><span class='line'>
+</span><span class='line'>set keymap vi-command
+</span><span class='line'># these are for vi-command mode
+</span><span class='line'>"\e[A": history-search-backward            # arrow up
+</span><span class='line'>"\e[B": history-search-forward             # arrow down
+</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>
+</span><span class='line'>set keymap vi-insert
+</span><span class='line'># these are for vi-insert mode
+</span><span class='line'>"\e[A": history-search-backward
+</span><span class='line'>"\e[B": history-search-forward
+</span><span class='line'>"\ep": yank-last-arg
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>$endif</span></code></pre></div></figure>
+
+
+<p>There is an extensive list of
+<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
+with which you can customize your shell environment.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -296,118 +389,6 @@ the server. The rsync command in the script:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/18/microserver/">Microserver</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-18T17:13:00+13:00" pubdate data-updated="true">Nov 18<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/microserver.png" alt="image" /></p>
-
-<p>I recently picked up a
-<a href="http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html" title="HP specs page">HP Microserver</a>;
-a small, silent server to use primarily to back up
-<a href="http://jasonwryan.com/blog/2010/10/04/the-setup" title="Slightly out-of-date setup post">my other boxes</a>.
-I went for the 2GB version without any preinstalled operating system.</p>
-
-<p>As I want this machine to just sit quietly in my garage for the next 5
-or 6 years, I opted for
-<a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
-base system. After installing two 1TB drives, I set them up as an
-<a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
-RAID 1 array, in a i
-<a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
-
-<p><strong>Pro tip</strong> when you get to the part of the partitioning where you
-configure the volume for encryption, make sure you select <em>No</em> for
-<em>erase data</em>. It took close to 90 hours to scrub both the hard drives.
-And, as I am not really expecting
-<a href="http://www.extremetech.com/computing/105931-full-disk-encryption-is-too-good-says-us-intelligence-agency" title="FDE defeats the NSA">a visit from the spooks</a>,
-that seems a little like overkill…</p>
-
-<p>Once the base install was complete, I set up my SSH keys,
-<a href="http://tmux.sourceforge.net/" title="tmux page">tmux</a>, configured the
-firewall and forwarded the necessary ports, set up
-<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia page: network file system">NFS</a>,
-and that was it. The box is deathly quite, can be mounted locally for
-<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync entry">rsync backups</a> and
-accessed remotely (for a tmux session running
-<a href="http://irssi.org/" title="Irssi homepage">irssi</a>), and all for less than
-NZD700.</p>
-
-<p>I knocked together a quick script<sup>1</sup> to manage the backing up; currently
-I run it manually, but once I have the excludes file tweaked properly,
-I’ll set up a
-<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
-automate the task.</p>
-
-<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># Backup to remote server over NFS</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
-</span><span class='line'>     <span class="nb">exit </span>1
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'><span class="k"> </span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then </span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
-</span><span class='line'> <span class="k">else</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
-</span><span class='line'>     mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
-</span><span class='line'> <span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># sync directories</span>
-</span><span class='line'> <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>
-</span><span class='line'>
-</span><span class='line'> rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\</span>
-</span><span class='line'>     --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
-</span><span class='line'>     /home/jason /etc /media/Sentinel/Backups/Centurion
-</span><span class='line'>
-</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
-</span><span class='line'>     umount /media/Sentinel
-</span><span class='line'> <span class="k">else</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
-</span><span class='line'> <span class="k">fi</span>
-</span></code></pre></div></figure>
-
-
-<h5>Notes</h5>
-
-<ol>
-<li>Any faults aside, it should be reasonably portable…</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; Older</a>
@@ -425,6 +406,10 @@ automate the task.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a>
       </li>
     
@@ -438,10 +423,6 @@ automate the task.</p>
     
       <li class="post">
         <a href="/blog/2012/05/12/mutt/">mutt and HTML email</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a>
       </li>
     
   </ul>

@@ -5,15 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Intuxication - jasonwryan.com</title>
+  <title>jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have previously posted about using
-Mercurial to share dotfiles,
-and how I have been using
-bitbucket as a free host
-for that service. Recently, I &hellip;">
+  <meta name="description" content="OpenOffice won’t recognize TrueType fonts with the extension .otf, so you need to convert them to .ttf
+in order to use them in that suite. sudo apt- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -22,7 +19,7 @@ for that service. Recently, I &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/01/13/intuxication">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/20">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -84,12 +81,15 @@ for that service. Recently, I &hellip;">
 </nav>
   <div id="main">
     <div id="content">
-      <div>
-<article class="hentry" role="article">
+      <div class="blog-index">
   
+  
+  
+    <article>
+      
   <header>
     
-      <h1 class="entry-title">Intuxication</h1>
+      <h1 class="entry-title"><a href="/blog/2009/03/17/install-otf-fonts-in-openoffice/">Install .otf Fonts in OpenOffice</a></h1>
     
     
       <p class="meta">
@@ -105,110 +105,73 @@ for that service. Recently, I &hellip;">
   
 
 
-<time datetime="2011-01-13T10:00:00+13:00" pubdate data-updated="true">Jan 13<span>th</span>, 2011</time>
+<time datetime="2009-03-17T19:51:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2009</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/intuxication.png" alt="image" /></p>
+  <div class="entry-content"><p>OpenOffice won’t recognize TrueType fonts with the extension <code>.otf</code>, so you need to convert them to <code>.ttf</code>
+in order to use them in that suite.</p>
 
-<p>I have previously posted about using
-<a href="http://jasonwryan.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/" title="My post on using mercurial">Mercurial to share dotfiles</a>,
-and how I have been using
-<a href="http://bitbucket.org/" title="bitbucket homepage">bitbucket</a> as a free host
-for that service.</p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install fontforge
+</span></code></pre></div></figure>
 
-<p>Recently, I came across
-<a href="http://beta.intuxication.org/" title="Free mercurial hosting">Intuxication</a>,
-who describe themselves thus:</p>
 
-<blockquote><p>Intuxication provides a free, fast and lightweight platform to host
-your Mercurial repositories.</p></blockquote>
+<p>If all the <code>.otf</code> files are in the same folder, then you are good to go.</p>
 
-<p>You will see from their URL that they are only in beta, but the service—while
-undeniably rough around the edges—looks quite promising.</p>
+<p>First, you need the conversion script, which I found in <a href="url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this%20post[/url">this post</a>:</p>
 
-<p>For small projects, the limit is 1GB disk space, Intuxication provides
-all of the basic features you need to maintain a mercurial repository.</p>
+<figure class='code'><figcaption><span>otf2ttf.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/local/bin/fontforge</span>
+</span><span class='line'><span class="c"># Quick and dirty hack: converts a font to truetype (.ttf)</span>
+</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Opening &quot;</span>+<span class="nv">$1</span><span class="o">)</span>;
+</span><span class='line'>Open<span class="o">(</span><span class="nv">$1</span><span class="o">)</span>;
+</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Saving &quot;</span>+<span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
+</span><span class='line'>Generate<span class="o">(</span><span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
+</span><span class='line'>Quit<span class="o">(</span>0<span class="o">)</span>;
+</span></code></pre></div></figure>
 
-<p>One of the advantages it has over bitbucket is that the default
-stylesheet makes it much easier to read the files that you host. And
-while there are obviously plans to introduce more styles (from the
-Configure menu you can select a dropdown of five different styles),
-currently only one works.</p>
 
-<p>If I had any criticism at all, it would be that the unfinished nature of
-the website (like the broken styles and the fact that quite a few of the
-other features like that don’t work) means that it feels a lot more like
-an alpha than a beta.</p>
+<p>Save it as <code>otf2ttf.sh</code> into the folder with the <code>.otf</code> files.</p>
 
-<p>However, I’m sure that with time and some support (there is a donate
-button on every page), Intuxication will continue to develop. I think it
-is a site with potential, and I’m currently pushing my
-<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/" title="EeePC tip">EeePC dotfiles</a>
-there.</p>
+<p>Then run:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">for </span>i in *.otf; <span class="k">do </span>fontforge -script otf2ttf.sh <span class="nv">$i</span>; <span class="k">done</span>
+</span></code></pre></div></figure>
+
+
+<p>Move all the converted fonts to your your shared directory:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo mv *ttf /usr/share/fonts/truetype/myfonts/
+</span></code></pre></div></figure>
+
+
+<p>And then change the permissions and reload the cache:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/
+</span><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/*.ttf
+</span><span class='line'>sudo <span class="nb">fc</span>-cache -f -v
+</span></code></pre></div></figure>
+
+
+<p>And the fonts will now appear in OpenOffice. Easy.</p>
 </div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
-
-      
-
-
-
-
-
-
-
-
   
 
 
-<time datetime="2011-01-13T10:00:00+13:00" pubdate data-updated="true">Jan 13<span>th</span>, 2011</time>
-      
-
-<span class="categories">
+    </article>
   
-    <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/vcs/'>vcs</a>
-  
-</span>
-
-
-    </p>
+  <div class="pagination">
     
-      <div class="sharing">
-  
-  
-  
-</div>
-
+    <a href="/blog/archives">Blog Archives</a>
     
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/2011/01/08/mail-checking-script/" title="Previous Post: Mail Checking Script">&laquo; Mail Checking Script</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2011/01/25/setting-urgent-hints-in-dwm/" title="Next Post: Setting Urgent Hints in dwm">Setting Urgent Hints in dwm &raquo;</a>
-      
-    </p>
-  </footer>
-</article>
-
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a class="next" href="/blog/page/19/">Newer &rarr;</a>
+    
+  </div>
 </div>
-  </section>
-
-</div>
-
 <aside class="sidebar">
   
     <section>
@@ -241,7 +204,7 @@ there.</p>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating...</li>
+    <li class="loading">Status updating&#8230;</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -257,7 +220,7 @@ there.</p>
 
 <section>
   <h1>My Pinboard</h1>
-  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
   <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
 </section>
 <script type="text/javascript">
@@ -280,7 +243,7 @@ there.</p>
   #lastfmList li{ text-align: left; }
 </style>
 <ul id="lastfmList">
-  <li class="loading">Updating tracks...</li>
+  <li class="loading">Updating tracks&#8230;</li>
 </ul>
 <p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
 
@@ -327,7 +290,6 @@ function showLastfmFeed(xml){
   
 </aside>
 
-
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -342,10 +304,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       var disqus_shortname = 'jasonwryan';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/01/13/intuxication/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2011/01/13/intuxication/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

@@ -9,9 +9,11 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have a persistent tmux
-session running on a server connected to IRC and I wanted to get
-notifications whenever someone addressed me, irrespective &hellip;">
+  <meta name="description" content="I recently picked up a
+HP Microserver;
+a small, silent server to use primarily to back up
+my other boxes.
+I went for the 2GB version without any &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +86,118 @@ notifications whenever someone addressed me, irrespective &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/18/microserver/">Microserver</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-18T17:13:00+13:00" pubdate data-updated="true">Nov 18<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/microserver.png" alt="image" /></p>
+
+<p>I recently picked up a
+<a href="http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html" title="HP specs page">HP Microserver</a>;
+a small, silent server to use primarily to back up
+<a href="http://jasonwryan.com/blog/2010/10/04/the-setup" title="Slightly out-of-date setup post">my other boxes</a>.
+I went for the 2GB version without any preinstalled operating system.</p>
+
+<p>As I want this machine to just sit quietly in my garage for the next 5
+or 6 years, I opted for
+<a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
+base system. After installing two 1TB drives, I set them up as an
+<a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
+RAID 1 array, in a
+<a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
+
+<p><strong>Pro tip</strong> when you get to the part of the partitioning where you
+configure the volume for encryption, make sure you select <em>No</em> for
+<em>erase data</em>. It took close to 90 hours to scrub both the hard drives.
+And, as I am not really expecting
+<a href="http://www.extremetech.com/computing/105931-full-disk-encryption-is-too-good-says-us-intelligence-agency" title="FDE defeats the NSA">a visit from the spooks</a>,
+that seems a little like overkill…</p>
+
+<p>Once the base install was complete, I set up my SSH keys,
+<a href="http://tmux.sourceforge.net/" title="tmux page">tmux</a>, configured the
+firewall and forwarded the necessary ports, set up
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia page: network file system">NFS</a>,
+and that was it. The box is deathly quite, can be mounted locally for
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync entry">rsync backups</a> and
+accessed remotely (for a tmux session running
+<a href="http://irssi.org/" title="Irssi homepage">irssi</a>), and all for less than
+NZD700.</p>
+
+<p>I knocked together a quick script<sup>1</sup> to manage the backing up; currently
+I run it manually, but once I have the excludes file tweaked properly,
+I’ll set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
+automate the task.</p>
+
+<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># Backup to remote server over NFS</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
+</span><span class='line'>     <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then </span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
+</span><span class='line'>     mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># sync directories</span>
+</span><span class='line'> <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>
+</span><span class='line'>
+</span><span class='line'> rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\</span>
+</span><span class='line'>     --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
+</span><span class='line'>     /home/jason /etc /media/Sentinel/Backups/Centurion
+</span><span class='line'>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
+</span><span class='line'>     umount /media/Sentinel
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
+</span><span class='line'> <span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<h5>Notes</h5>
+
+<ol>
+<li>Any faults aside, it should be reasonably portable…</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -256,111 +370,6 @@ just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/09/28/delicious/">Delicious? Not after the first bite…</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-09-28T09:27:00+13:00" pubdate data-updated="true">Sep 28<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/delicious1.png" alt="image" /></p>
-
-<p>I have used
-<a href="http://delicious.com" title="Once great social bookmarking site...">delicious</a>,
-the bookmarking service, for just on five years now and over that time
-added around 1500 bookmarks. This suggests to me that I am a heavy, but
-not compulsive boomarker—I tend to only add pages that I think I will
-have a reasonably good chance of wanting to reference in the future.</p>
-
-<p>I am (or rather, was) an unabashed fan of the service. To the point
-where earlier this year I wrote
-<a href="http://anonscm.debian.org/gitweb/?p=surfraw/surfraw.git;a=blob_plain;f=elvi/deli;hb=8e32f5edaf26b7a65e5535d81b513f6d63e82847" title="Elvis in the Surfraw CVS tree">a Surfraw elvis to search the site</a>.
-As this would suggest, I use the site frequently, not just to bookmark
-or retrieve my own pages, but to search for other pages that people have
-considered “bookmark-worthy” (which is generally a pretty good indicator
-of quality).</p>
-
-<p>Like many comitted users, when the news leaked out late last year that
-<a href="http://www.readwriteweb.com/archives/rip_delicious_you_were_so_beautiful_to_me.php" title="RWW">Yahoo was shuttering delicious</a>,
-I jumped to Pinboard and have been
-<a href="http://pinboard.in/u:jasonwryan/" title="My boomarks on Pinboard">synching my bookmarks</a>
-between the two sites since. In retrospect, that turned out to be an
-excellent decision.</p>
-
-<p>The “new” delicious was launched overnight and I think it is fair to say
-that it has been completely and utterly eviscerated. It has gone from
-being a site that served a very specific (and incredibly useful)
-purpose—saving and tagging web pages for future use—to a bland,
-lowest-common-denominator, generic “social” site, like countless others
-that have arrived and disappeared with quirky names like Plurk, Plonker,
-etc..</p>
-
-<p>The site <em>looks good</em>; all light and airy and spacious (that space will,
-I am sure, be quickly filled with advertising), but they have stripped
-all the utility from the site. You can no longer actually access and
-manage your bookmarks. It is a colossal failure.</p>
-
-<p>I have 757 tags. I know that tag clouds are considered old hat, but on a
-site built on taxonomies, they are still an incredibly effective way of
-presenting information. The new delicious has dispensed with them. They
-have also decided that I don’t need to see all of my tags, so I can now
-only view 50 of them. <strong>Fifty out of seven hundred and fifty</strong>.
-Presumably I am expected to guess all the rest…</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/delicious2.png" alt="image" /></p>
-
-<p><sup>The new tag display on the left and the old, as a cloud, on the right.</sup></p>
-
-<p>These aren’t options, though. All of the settings to display tags, tag
-bundles, etc., and the options to edit tags have been removed. You can’t
-access any of the tools to manage your bookmarks. The designers have
-decreed that you can no longer manage your information in a useful way.
-Morons.</p>
-
-<p>The clueless mediocrities responsible for this will probably think that
-they are reinventing the site and making it relevant for a broader, less
-geeky market. And they are probably right. The fact that the site looks
-remarkably like a phone app suggests that sort of studied rush to the
-bottom.</p>
-
-<p>What they have done is something of an achievement on one level, though.
-They have made Yahoo look good. In all the time that Yahoo owned
-delicious, they were only able to neglect it; these new clowns have
-completely fscked it…</p>
-
-<p>If you bookmark sites because you are semi-intelligent and you recognize
-that being able to easily access and manage information effectively is
-critical to your intellectual and social wellbeing, then head over to
-<a href="http://pinboard.in/" title="A real boomarking site">Pinboard</a> and sign up
-now.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -378,6 +387,10 @@ now.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a>
       </li>
     
@@ -391,10 +404,6 @@ now.</p>
     
       <li class="post">
         <a href="/blog/2012/05/12/mutt/">mutt and HTML email</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a>
       </li>
     
   </ul>

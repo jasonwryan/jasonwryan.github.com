@@ -4,7 +4,7 @@
   <title><![CDATA[Category: community | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/community/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-07-10T12:39:51+12:00</updated>
+  <updated>2012-07-19T19:23:36+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,110 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[The Myth of Breakage]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/07/19/breakage/"/>
+    <updated>2012-07-19T19:23:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/07/19/breakage</id>
+    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/broken.jpg" title="Image of breakage on Flickr" >
+Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
+<a href="https://bbs.archlinux.org/" title="Arch Linux BBS">Arch boards</a> and in the various
+<a href="https://wiki.archlinux.org/index.php/IRC_Channels" title="Wiki page listing channels">IRC channels</a>.
+It doesn't take newcomers long to realize that, whether something is actually broken or not,
+there is always
+<a href="http://allanmcrae.com/category/arch-linux/" title="Allan's Blog">someone they can blame</a><sup>1</sup>.</p>
+
+<p>My experience of Arch, over the last three and a bit years, is quite the opposite. I have yet to
+experience anything that would qualify as breakage. Sure, there have been bugs, mostly upstream,
+and the more frequent moments where I haven't been as diligent as I should, but not once have I
+had a machine that was unbootable or otherwise unusable. Arch has, on both my home and work
+machines, been incredibly stable and reliable.</p>
+
+<p>For a number of Arch Linux users, however, that was not their experience over the last week when
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="News item on the move">/lib was moved to /usr/lib</a>.
+The volume of people on the boards and on IRC reporting unbootable or unusable systems was
+remarkable. Remarkable because, despite the fact that the
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Once more, just in case…">news item</a>, the
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Arch wiki page on the change">wiki page</a>,
+and the <a href="http://mailman.archlinux.org/pipermail/arch-announce/2012-July/000317.html" title="Mail archive">email to arch-announce</a>
+all <em>explicitly</em> warned people not to use the <code>--force</code> option,<sup>2</sup> so many did.</p>
+
+<p><span class='pullquote-right' data-pullquote='90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice. '>
+Sadly, these red-boxed warnings were apparently not enough.
+90% of the breakage was because people either didn't see, or disregarded, that advice.
+The remaining 10% were either in a hurry and didn't pay close attention to how
+to deal with any leftover files in <span class="file">/lib</span> or <code>rm -rf</code>'ed
+in the wrong directory.
+<a href="http://www.gnu.org/fun/jokes/shit-happens.html" title="GNU Humour…">Accidents happen</a>.
+</span></p>
+
+<p>What I am interested in is the people who fell into the much larger category,
+and principally those that didn't see any of the communications about this
+change in advance of updating and reasoned, based on a recent change that did
+<a href="http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required-1/" title="News item on filesystem upgrade">require the use of --force</a>,
+that this was the most expedient way to resolve <code>pacman</code> reporting conflicting
+files.</p>
+
+<p>Some context. The <code>glibc</code> update was released to the
+<a href="https://wiki.archlinux.org/index.php/Testing#.5Btesting.5D" title="Wiki entry on Testing">[testing] repository</a>
+in the first week of July: and there were a couple of long threads<sup>3</sup>
+about issues and fixes before it was pushed to [core]. By the time the
+package was released for general consumption, it had been tested and the
+developers had obviously planned how to make what is a fundamental system
+change with a minimal amount of user intervention.  I think that, given the
+magnitude of the challenge, they did a superb job.</p>
+
+<p>How then did it go so wrong for so many?<sup>4</sup> To answer that, you have
+to consider the nature of Arch. It's <em>not</em> the sort of distribution where you
+install it and then just go on your merry way, installing
+<a href="http://oswatershed.org/" title="It's SCIENCE, Jim">the least obsolete packages</a>,
+revelling in the speed of the package manager and generally being
+a 1337 h@x0r…</p>
+
+<p>Successfully running a rolling release like Arch, irrespective of your level of
+competence, means staying in touch with what is happening—in
+<a href="http://kmkeen.com/pacmatic/" title="Pacman wrapper that pulls news updates">some form or other</a>.
+Subscribing to the arch-general <acronym title="Mailing list">ML</acronym>,
+visiting the forums, idling in IRC; somehow remaining connected to what is
+going on in the community so that you don't blindly update one day and wonder
+why your system is broken.</p>
+
+<p>This strikes me as a real strength; by design Arch encourages its users to
+participate in the community. Even if you are only lurking, over time you will
+inevitably find yourself posting in a thread, responding to an email, editing
+the wiki,
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="Post on aurphan">adopting an orphaned package</a>—increasingly
+getting involved and contributing.</p>
+
+<p>This level of involvement is not for everyone. Some may find it onerous or
+a waste of their time. That's fine. There are any number of other distros
+that do not ask for this level of commitment. The <em>quid pro quo</em> for
+running Arch, though, is that you are prepared, in whatever shape or form
+best works for you, to give something back; at the very least, that is your
+attention.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><p>This is, of course, a reference to said Arch meme: Allan is one
+of the developers who has contributed an enormous amount to Arch and the fact
+that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</p></li>
+<li><p>At the end of 2011, the short option <code>-f</code>
+<a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
+from <code>pacman</code> so “it at least makes people read the word 'force' and maybe they
+will have some sense to step back and think about what they are doing first.”</p></li>
+<li><p><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
+<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></p></li>
+<li><p>Relatively speaking. In situations like this, the overwhelming amount of traffic
+is about what went wrong, not people posting to say they had no difficulties whatsoever…</p></li>
+</ol>
+
+
+<p>Creative Commons image on Flickr from
+<a href="http://www.flickr.com/photos/daviddoctorrose/431786001/" title="Broken keyboard on Flickr">djeucalyptus</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Misunderstanding Arch]]></title>
@@ -193,6 +297,110 @@ appearance:</p>
 <li><a href="http://www.flickr.com/photos/phatcontroller/2620032517" title="Leech, by phatcontroler on Flickr">phatcontroller</a></li>
 <li><a href="http://www.flickr.com/photos/sandrafalkevik/4465039571" title="Vampire, by Sandra Falkevik on Flickr">Sandra Falkevik</a></li>
 </ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Quora's Quandary]]></title>
+    <link href="http://jasonwryan.github.com/blog/2011/05/28/quoras-quandary/"/>
+    <updated>2011-05-28T10:05:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2011/05/28/quoras-quandary</id>
+    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora1.png" alt="image" /></p>
+
+<p>I joined <a href="http://www.quora.com/" title="Quora: Q&amp;A site">Quora</a> early in the
+new year and, while
+<a href="http://techcrunch.com/2011/01/23/why-i-don%E2%80%99t-buy-the-quora-hype/" title="TC article on the hype">the hype has in no way abated</a>,
+I have found that increasingly over the months that I have been
+visiting, there is less and less reason for me to return on any regular
+basis. And this puzzles me as I think the concept is, for me, an
+attractive one.</p>
+
+<p>In the five-odd months I have been visiting the site, I have managed to
+<a href="http://www.quora.com/Jason-Ryan" title="My Quora profile">contribute 58 answers</a>
+and over one hundred edits (more on that below); this strikes me as a reasonable
+commitment on my part and one that should return some dividend to me –
+at least in terms of satisfaction with the site. Alas, no.</p>
+
+<p>And why not? For several reasons. And reasons that have only really
+become apparent over the last month as I started to spend time on the
+<a href="http://unix.stackexchange.com/" title="Unix and Linux Stack Exchange">Unix &amp; Linux Stack Exchange site</a>.
+The contrast between the <em>experience</em> of the two sites, that are in
+essence very similar, couldn’t be more striking.</p>
+
+<p>The primary difference between the two is that Unix.SE isn’t a social
+site: you don’t follow anyone. Which, when you think about Q&amp;A sites,
+makes a lot more sense than Quora’s model. I still don’t understand the
+point of following people on Quora. Perhaps I am not following enough
+people, or the wrong ones, but I have yet to see <em>any benefit</em> in
+following on the site.</p>
+
+<p>One other area of seeming similarity between the sites is the ability to
+vote up (or down) questions and answers. On Unix.SE, this is implemented
+as a real strength as these votes determine contributor’s reputation,
+described thus:</p>
+
+<blockquote><p>Reputation is a rough measurement of how much the community trusts
+you. Reputation is never given, it is earned by convincing fellow
+users that you know what you’re talking about.</p></blockquote>
+
+<p>This has a twofold effect: it motivates contributors to provide quality
+answers (and
+<a href="http://unix.stackexchange.com/badges" title="StackExchange badges">rewards</a>
+them when they do), and more importantly, gives you a heuristic for how
+credible an answer may be. Quora doesn’t have this concept and, for me,
+is much the poorer for it.</p>
+
+<p>Reputation has consequences on Unix.SE: the more you accrue, the more
+privileges on the site you are granted. Again, this builds the
+community’s capability while encouraging individual contributors.</p>
+
+<p>Some of the other areas where Quora is really left wanting in comparison
+to Unix.SE are around the design of the site. The text box where you
+enter your answers or edits is a case in point:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora2.png" alt="image" /></p>
+
+<p>On Quora, it is like trying to change a car battery through a letterbox.
+The single, overriding impression is that entering information into the
+site is neither a priority nor pleasurable which, for a site aspiring to
+be a knowledge repository is incredibly perverse.</p>
+
+<p>This is compounded by the fact that the tools for presenting the
+information that you want to add to the site can charitably be described
+as rudimentary (one of the reasons that I have 100-odd edits is that it
+takes at least two to three attempts to present information in a
+semi-acceptable fashion). Searching for
+“<a href="http://www.quora.com/Quora-product/Are-there-any-markup-tags-when-writing-a-question?q=quora+markup+tools" title="Recursion alert">quora markup tools</a>”
+is as disappointing as it is frustrating.</p>
+
+<p>Being able to present information appropriately is critical. The
+StackExchange sites
+<a href="http://unix.stackexchange.com/editing-help" title="Unix.SE editing guidleines">allow all sorts</a>
+of HTML tags and
+<a href="http://daringfireball.net/projects/markdown/syntax" title="markdown syntax">markdown</a>,
+without apparently any additional
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting" title="Wikipedia page on Cross site scripting">XSS risk</a><sup>1</sup>.
+The result is questions and answers that are formatted in a way that
+enhances their legibility, rather than detracting from it.</p>
+
+<p>There are some other areas where Quora is not measuring up for me:
+opaque editorial and moderation policies and practices and an
+unwillingness to more actively curate the questions – and no, those two
+statements are not contradictory.</p>
+
+<p>The overall impression I am left with is that while both sites have
+similar aims (albeit Unix.SE’s is much more specific in terms of the
+subject matter), Quora seems to me to be really failing at building a
+community around it. Unless, of course, you count social media experts…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>God knows if that is actually the reason they refuse to allow
+potential contributors the ability to adequately format their
+information, but it seems plausible enough.</li>
+</ol>
 
 ]]></content>
   </entry>
