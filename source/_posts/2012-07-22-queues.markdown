@@ -1,0 +1,185 @@
+---
+layout: post
+title: "Using Mercurial Queues"
+date: 2012-07-24 19:18
+comments: true
+categories: [archlinux, dwm, hack]
+---
+
+{% img left http://dl.dropbox.com/u/261312/Blog-images/queue.jpg 'Queue image on Flickr' %}
+Over the last week or so, I have finally gotten around to digging into the whole concept of
+using 
+[Mercurial Queues](http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html 'Chapter on queues in the Mercurial book')
+to manage patches against an upstream project; in my case 
+[dwm](http://dwm.suckless.org 'The truly suckless window manager…').<sup>1</sup>
+Essentially, this mercurial extension helps you manage a stack of patches on
+top of a directory tree. This gives you quite a lot of fine-grained control
+over your patchset and assists immeasurably with automating the application of
+patches when the underlying codebase changes. 
+
+After having played around with queues for the last couple of days, I am quite
+impressed: both the concept and the execution are simple and powerful. The concept
+of Mercurial Queues is best described in the Mercurial book: the aptly titled, 
+*Mercurial: The Definitive Guide*:<sup>2</sup>
+
+{% blockquote Mercurial, The Definitive Guide http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html %}
+MQ's marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don't like a patch, you can drop it. If a patch isn't quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.
+{% endblockquote %}
+
+I followed Filippo Negroni's excellent
+[tutorial on the dwm site](http://dwm.suckless.org/customisation/patch_queue 'Step-by-step guide')
+to setup my own 
+[dwm patchset](http://pikacode.com/jasonwryan/dwm-patchset/files/default 'Patchset on Pikacode')
+based on
+[tip](http://hg.suckless.org/dwm 'dwm hg repository'), and the process was
+surprisingly straightforward; the only caveat being it is a good idea to plan
+quite carefully what changes you want in each particular patch. Once I had
+completed the setup, it got me thinking about the fact that the final install
+is done without `pacman`, just using `make install`. And, as a proof-of-concept
+more than anything else, I wondered whether this functionality could be used
+with a `makepkg`.<sup>3</sup>
+
+Turns out, as you might expect with Arch, it was not much of a job to set it
+up at all. 
+
+**Note**: this doesn't mean I think it is a good idea; I was just interested
+to see *if* it could be done and *how* it would work once it was set up. For something
+like dwm, this is definitely a case of introducing a huge amount of complexity for
+no apparent benefit (for those people running Gnome, this may quite appeal to you…).
+
+I have a
+[working PKGBUILD](http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD 'If you must…')
+that you can use if you want to follow along at home. Once you have downloaded
+it into <span class="file">dwm-hg/</span>, run `makepkg` to clone the dwm
+repository and build the binary.  Then you need to make sure that the mercurial
+queue extension is enabled, so your <span class="file">.hgrc</span> needs to
+contain:
+
+{% codeblock lang:sh %}
+[extensions]
+hgext.mq =
+{% endcodeblock %}
+
+Now, you need to setup the queue repository. We do this in `$srcdir`, which
+is <span class="file">dwm-hg/src/dwm</span>:
+
+{% codeblock lang:sh %}
+hg qinit -c
+{% endcodeblock %}
+
+The next step is to start applying the various patches that you want to comprise
+your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
+and three other patches:
+[statuscolours](http://pikacode.com/jasonwryan/dwm-patchset/file/default/statuscolours 'Patch in mercurial queue'),
+[cycle](http://pikacode.com/jasonwryan/dwm-patchset/file/default/cycle 'ditto'), and
+[push](http://pikacode.com/jasonwryan/dwm-patchset/file/default/push 'etc…'). 
+There are other patches in my repository, one of which patches the appropriate 
+settings for an Arch build in the
+[relevant makefiles](http://pikacode.com/jasonwryan/dwm-patchset/file/default/setup.makefile 'Arch settings for Makefiles').
+This is taken care of by the PKGBUILD in this case.
+
+From here, it is very much as Filippo describes it in his tutorial: make
+some changes, add them to the queue and rinse and repeat:
+
+{% codeblock lang:sh %}
+hg qnew base.customizations
+# “hack hack hack…”
+hg qrefresh
+hg qcommit -m 'Added changes to config.def.h to customize'
+{% endcodeblock %}
+
+After committing each of your changes as a discrete patch, you can review the queue
+with `hg qseries`:
+
+{% codeblock lang:sh %}
+┌─[Centurion ~/Build/dwm-hg/src/dwm]
+└─╼ hg qseries
+config.customizations
+statuscolours
+cycle
+push
+{% endcodeblock %}
+
+And `hg qapplied` will tell you which of the patches is currently 
+applied in the working repository; at this stage the list should look
+the same as that in `hg qseries`. The next step is to remove all of the
+patches from the queue so that we have a clean repository:
+
+{% codeblock lang:sh %}
+┌─[Centurion ~/Build/dwm-hg/src/dwm]
+└─╼ hg qpop -a
+popping push
+popping cycle
+popping statuscolours
+popping config.customizations
+patch queue now empty
+{% endcodeblock %}
+
+Should you need to edit a patch, it is simply a matter of popping
+to that spot in the stack (you can do so by name or by index 
+number, beginning at 0):
+
+{% codeblock lang:sh %}
+┌─[Centurion ~/Build/dwm-hg/src/dwm]
+└─╼ hg qpop config.customizations 
+popping push
+popping cycle
+popping statuscolours
+now at: config.customizations
+# “hack hack hack…”
+hg qrefresh
+hg qpush -a
+{% endcodeblock %}
+
+Once you are satisfied with the state of the stack, remove all of the
+patches to return to the original clean working directory and `cd` back 
+to <span class="file">dwm-hg/</span>. You can now use `makepkg -fi` to 
+rebuild the package and you should see the pushed patches as part of
+the output:
+
+{% codeblock lang:sh %}
+==> Starting build()...
+==> Pushing queued patchset
+applying config.customizations
+applying statuscolours
+applying cycle
+applying push
+now at: push
+dwm build options:
+{% endcodeblock %}
+
+…and when you restart dwm, your customizations will be applied.
+When new changes are pushed to 
+[the dwm repo](http://hg.suckless.org/dwm 'dwm mercurial repo')
+you can just `makepkg -fi`, and, if any of the patches fail due
+to changes in the underlying code, pop the stack to the failed
+patch, rebase the code, `hg qrefresh` and continue until done.
+
+As I said at the beginning of this post, this isn't a particularly smart way to
+use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
+better off just cloning dwm to your local repository, initializing a queue
+repository and, once you are done setting up your patchset, issuing `make &&
+sudo make install`.
+
+If you have more than one machine, you can easily setup a repository for
+your patchset on
+[bitbucket](https://bitbucket.org/ 'bitbucket free mercurial hosting')
+or [Pikacode](http://pikacode.com/ 'Free Mercurial and Git hosting')
+and host it there: then just pull the patchset queue
+from your other boxes and `hg qpush -a`. If you require a slightly
+different patchset for each box, you can use MQ to manage this
+process as well. This is where MQ really excels; 
+I'll cover this in more detail in my next post.
+
+#### Notes
+1. See [related dwm posts](http://jasonwryan.com/blog/categories/dwm/ 'dwm category in the archives').
+
+2. I can't recommend this {book,wiki} highly enough; it is an excellent
+example of thorough, accessible documentation.
+
+3. In the case of something like dwm, this is really irrelevant, as there
+is a single tiny binary and a `man` page, so keeping track of these files on
+your system is not an issue at all.
+
+Flickr Creative Commons image by 
+[RachelH](http://www.flickr.com/photos/bagelmouse/3936852444/ 'Queue image on Flickr')
