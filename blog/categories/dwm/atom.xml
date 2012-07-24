@@ -4,7 +4,7 @@
   <title><![CDATA[Category: dwm | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/dwm/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-07-19T19:26:03+12:00</updated>
+  <updated>2012-07-24T19:19:57+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,188 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Mercurial Queues]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/07/24/queues/"/>
+    <updated>2012-07-24T19:18:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/07/24/queues</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
+Over the last week or so, I have finally gotten around to digging into the whole concept of
+using
+<a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
+to manage patches against an upstream project; in my case
+<a href="http://dwm.suckless.org" title="The truly suckless window manager…">dwm</a>.<sup>1</sup>
+Essentially, this mercurial extension helps you manage a stack of patches on
+top of a directory tree. This gives you quite a lot of fine-grained control
+over your patchset and assists immeasurably with automating the application of
+patches when the underlying codebase changes.</p>
+
+<p>After having played around with queues for the last couple of days, I am quite
+impressed: both the concept and the execution are simple and powerful. The concept
+of Mercurial Queues is best described in the Mercurial book: the aptly titled,
+<em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
+
+<p><blockquote><p>MQ's marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don't like a patch, you can drop it. If a patch isn't quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote></p>
+
+<p>I followed Filippo Negroni's excellent
+<a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
+to setup my own
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">dwm patchset</a>
+based on
+<a href="http://hg.suckless.org/dwm" title="dwm hg repository">tip</a>, and the process was
+surprisingly straightforward; the only caveat being it is a good idea to plan
+quite carefully what changes you want in each particular patch. Once I had
+completed the setup, it got me thinking about the fact that the final install
+is done without <code>pacman</code>, just using <code>make install</code>. And, as a proof-of-concept
+more than anything else, I wondered whether this functionality could be used
+with a <code>makepkg</code>.<sup>3</sup></p>
+
+<p>Turns out, as you might expect with Arch, it was not much of a job to set it
+up at all.</p>
+
+<p><strong>Note</strong>: this doesn't mean I think it is a good idea; I was just interested
+to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
+like dwm, this is definitely a case of introducing a huge amount of complexity for
+no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
+
+<p>I have a
+<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD" title="If you must…">working PKGBUILD</a>
+that you can use if you want to follow along at home. Once you have downloaded
+it into <span class="file">dwm-hg/</span>, run <code>makepkg</code> to clone the dwm
+repository and build the binary.  Then you need to make sure that the mercurial
+queue extension is enabled, so your <span class="file">.hgrc</span> needs to
+contain:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
+</span><span class='line'>hgext.mq <span class="o">=</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
+is <span class="file">dwm-hg/src/dwm</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The next step is to start applying the various patches that you want to comprise
+your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
+and three other patches:
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/statuscolours" title="Patch in mercurial queue">statuscolours</a>,
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/cycle" title="ditto">cycle</a>, and
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/push" title="etc…">push</a>.
+There are other patches in my repository, one of which patches the appropriate
+settings for an Arch build in the
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/setup.makefile" title="Arch settings for Makefiles">relevant makefiles</a>.
+This is taken care of by the PKGBUILD in this case.</p>
+
+<p>From here, it is very much as Filippo describes it in his tutorial: make
+some changes, add them to the queue and rinse and repeat:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;“hack hack hack…”&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>After committing each of your changes as a discrete patch, you can review the queue
+with <code>hg qseries</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>And <code>hg qapplied</code> will tell you which of the patches is currently
+applied in the working repository; at this stage the list should look
+the same as that in <code>hg qseries</code>. The next step is to remove all of the
+patches from the queue so that we have a clean repository:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop -a
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>popping config.customizations
+</span><span class='line'>patch queue now empty
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Should you need to edit a patch, it is simply a matter of popping
+to that spot in the stack (you can do so by name or by index
+number, beginning at 0):</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop config.customizations
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>now at: config.customizations&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;“hack hack hack…”&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;hg qrefresh
+</span><span class='line'>hg qpush -a
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Once you are satisfied with the state of the stack, remove all of the
+patches to return to the original clean working directory and <code>cd</code> back
+to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> to
+rebuild the package and you should see the pushed patches as part of
+the output:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
+</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
+</span><span class='line'>applying config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>now at: push
+</span><span class='line'>dwm build options:
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>…and when you restart dwm, your customizations will be applied.
+When new changes are pushed to
+<a href="http://hg.suckless.org/dwm" title="dwm mercurial repo">the dwm repo</a>
+you can just <code>makepkg -fi</code>, and, if any of the patches fail due
+to changes in the underlying code, pop the stack to the failed
+patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
+
+<p>As I said at the beginning of this post, this isn't a particularly smart way to
+use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
+better off just cloning dwm to your local repository, initializing a queue
+repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
+sudo make install</code>.</p>
+
+<p>If you have more than one machine, you can easily setup a repository for
+your patchset on
+<a href="https://bitbucket.org/" title="bitbucket free mercurial hosting">bitbucket</a>
+or <a href="http://pikacode.com/" title="Free Mercurial and Git hosting">Pikacode</a>
+and host it there: then just pull the patchset queue
+from your other boxes and <code>hg qpush -a</code>. If you require a slightly
+different patchset for each box, you can use MQ to manage this
+process as well. This is where MQ really excels;
+I'll cover this in more detail in my next post.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><p>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</p></li>
+<li><p>I can't recommend this {book,wiki} highly enough; it is an excellent
+example of thorough, accessible documentation.</p></li>
+<li><p>In the case of something like dwm, this is really irrelevant, as there
+is a single tiny binary and a <code>man</code> page, so keeping track of these files on
+your system is not an issue at all.</p></li>
+</ol>
+
+
+<p>Flickr Creative Commons image by
+<a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Setting Urgent Hints in dwm]]></title>
@@ -404,49 +586,6 @@ to this amazing window manager.</p>
 <a href="https://bitbucket.org/jasonwryan/workstation/src/tip/dwm-5.7.2-2/" title="diff in mercurial repo">my .diff</a>
 (for bstack, cycle, pertag and push). You are equally welcome to apply
 it if that is the functionality that you are looking for in 5.7.2.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Wikipedia Discriminates Against FOSS]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/02/25/wikipedia-discriminates-against-foss/"/>
-    <updated>2010-02-25T06:59:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/02/25/wikipedia-discriminates-against-foss</id>
-    <content type="html"><![CDATA[<p>There is currently an interesting debate on Wikipedia about <a href="http://en.wikipedia.org/wiki/Wikipedia:Articles_for_deletion/Dwm" title="Wikipedia page">deleting the article on dwm.</a></p>
-
-<p>According to the Wikipedia <a href="http://en.wikipedia.org/wiki/Wikipedia:Notability" title="Wikipedia page">notability guidelines</a>,
-only</p>
-
-<blockquote><p>significant coverage in reliable sources that are independent of the
-subject</p></blockquote>
-
-<p>constitutes notability.</p>
-
-<p>So 300 words by the likes of <a href="http://blogs.zdnet.com/BTL/?p=31024" title="ZDNet article exposing corrupt practice in Tech reporting">Randall Kennedy</a>
-counts for more in terms of “notability” than the hundreds of thousands
-of lines of code contributed to
-<a href="http://dwm.suckless.org/" title="dwm wiki">dwm</a> and its forks
-(<a href="http://awesome.naquadah.org/" title="awesome home page">awesome</a> and
-<a href="http://www.rootshell.be/~polachok/code/" title="echinus page">echinus</a>) and
-clones (<a href="http://www.xmonad.org/" title="xmonad homepage">xmonad</a>,
-<a href="http://aerosuidae.net/musca.html" title="musca homepage">musca</a>,
-<a href="http://www.peereboom.us/scrotwm/html/scrotwm.html">scrotwm</a> <em>et al</em>)?</p>
-
-<p>The notion that, in the free/libre and open source software world, a
-project’s notability is measured in terms of the <em>prose</em> that appears in
-journals, books etc is myopic and—in terms of Wikipedia’s status as a
-FOSS project—quite disappointing. The real measure of notability of
-projects like this is the <strong>code they generate</strong>.</p>
-
-<p>Wikipedia’s criteria actively discriminates against free and open source
-projects where the measure of notability is not the column inches in
-trade magazines sponsored by advertising and advertorial, but by the
-passion and commitment of large communities of contributors who believe
-in the project enough to devote their code, time and money.</p>
-
-<p>Wikipedians need to review their criteria to reflect this reality;
-otherwise the “free encyclopedia” will continue to exclude exactly those
-free/libre projects…</p>
 ]]></content>
   </entry>
   

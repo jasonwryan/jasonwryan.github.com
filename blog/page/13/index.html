@@ -9,10 +9,11 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I use mutt and
-offlineimap
-to manage email on my Arch Linux machines. I like the simplicity and the
-power that this approach offers; that’s power in &hellip;">
+  <meta name="description" content="I have previously posted about using
+Mercurial to share dotfiles,
+and how I have been using
+bitbucket as a free host
+for that service. Recently, I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +86,78 @@ power that this approach offers; that’s power in &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/01/13/intuxication/">Intuxication</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-13T10:00:00+13:00" pubdate data-updated="true">Jan 13<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/intuxication.png" alt="image" /></p>
+
+<p>I have previously posted about using
+<a href="http://jasonwryan.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/" title="My post on using mercurial">Mercurial to share dotfiles</a>,
+and how I have been using
+<a href="http://bitbucket.org/" title="bitbucket homepage">bitbucket</a> as a free host
+for that service.</p>
+
+<p>Recently, I came across
+<a href="http://beta.intuxication.org/" title="Free mercurial hosting">Intuxication</a>,
+who describe themselves thus:</p>
+
+<blockquote><p>Intuxication provides a free, fast and lightweight platform to host
+your Mercurial repositories.</p></blockquote>
+
+<p>You will see from their URL that they are only in beta, but the service—while
+undeniably rough around the edges—looks quite promising.</p>
+
+<p>For small projects, the limit is 1GB disk space, Intuxication provides
+all of the basic features you need to maintain a mercurial repository.</p>
+
+<p>One of the advantages it has over bitbucket is that the default
+stylesheet makes it much easier to read the files that you host. And
+while there are obviously plans to introduce more styles (from the
+Configure menu you can select a dropdown of five different styles),
+currently only one works.</p>
+
+<p>If I had any criticism at all, it would be that the unfinished nature of
+the website (like the broken styles and the fact that quite a few of the
+other features like that don’t work) means that it feels a lot more like
+an alpha than a beta.</p>
+
+<p>However, I’m sure that with time and some support (there is a donate
+button on every page), Intuxication will continue to develop. I think it
+is a site with potential, and I’m currently pushing my
+<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/" title="EeePC tip">EeePC dotfiles</a>
+there.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -299,102 +372,6 @@ dwm, it is still in the minimalist camp in terms of size.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/10/21/console-fonts-in-ubuntu/">Console Fonts in Ubuntu</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-10-21T20:38:00+13:00" pubdate data-updated="true">Oct 21<span>st</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-fonts.png" alt="image" /></p>
-
-<p>Invariably, an <a href="http://www.ubuntu.com/" title="Ubuntu homepage">Ubuntu</a>
-upgrade only ever brings me pain in one area: the framebuffer. Granted,
-most Ubuntu users probably don’t care about the resolution of their
-framebuffer because they probably rarely venture there.</p>
-
-<p>For me, however, having the correct resolution and a decent font is
-important. Not because I spend a huge amount of time there (I don’t),
-but because in the past I have been forced to — and quickly learned that
-if the resolution is off, it makes it <em>very</em> difficult to work with.</p>
-
-<p>So the recent, otherwise completely successful, upgrade to Maverick
-Meerkat once again left me with an almost useless console. Fortunately,
-the hack for forcing a 1680x1050 resolution worked<sup>1</sup>, so it was just a
-matter of getting
-<a href="http://fractal.csie.org/~eric/wiki/Terminus_font" title="Terminus homepage">Terminus</a>
-to stick as the default console font.</p>
-
-<p>This was one instance where Google failed me. There doesn’t seem to be
-any authoritative guide to setting your console font permanently. I
-edited <span class="file">/etc/default/console-setup</span>
-and added Terminus as the font, like so:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">CODESET</span><span class="o">=</span><span class="s2">&quot;Lat15&quot;</span>
-</span><span class='line'><span class="nv">FONTFACE</span><span class="o">=</span><span class="s2">&quot;Terminus&quot;</span>
-</span><span class='line'><span class="nv">FONTSIZE</span><span class="o">=</span><span class="s2">&quot;16&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>Issuing, from the console:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo setupcon -v
-</span></code></pre></div></figure>
-
-
-<p>would change the font to Terminus for that session but a reboot soon
-reverted it to the default fixed (which, given
-<a href="https://wiki.ubuntu.com/Ubuntu%20Font%20Family">Ubuntu have been working on their fonts</a>, is
-spectacularly ugly).</p>
-
-<p>I finally asked in #ubuntu and was pointed in the right direction:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo dpkg-reconfigure console-setup
-</span></code></pre></div></figure>
-
-
-<p>And <em>now</em> I have a workable framebuffer.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Hack to force higher framebuffer resolution in <span class="file">/etc/default/grub</span></li>
-</ol>
-
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">GRUB_GFXPAYLOAD_LINUX</span><span class="o">=</span>1680x1050
-</span></code></pre></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/14/">&larr; Older</a>
@@ -412,6 +389,10 @@ spectacularly ugly).</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a>
       </li>
     
@@ -425,10 +406,6 @@ spectacularly ugly).</p>
     
       <li class="post">
         <a href="/blog/2012/05/23/notmuch/">Using Notmuch with mutt</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/12/mutt/">mutt and HTML email</a>
       </li>
     
   </ul>

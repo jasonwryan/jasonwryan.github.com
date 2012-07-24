@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>jasonwryan.com</title>
+  <title>Using Mercurial Queues - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
@@ -21,7 +21,7 @@ to manage patches against an &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/07/24/queues">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -83,15 +83,12 @@ to manage patches against an &hellip;">
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a></h1>
+      <h1 class="entry-title">Using Mercurial Queues</h1>
     
     
       <p class="meta">
@@ -114,7 +111,7 @@ to manage patches against an &hellip;">
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
+<div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
 Over the last week or so, I have finally gotten around to digging into the whole concept of
 using
 <a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
@@ -293,153 +290,16 @@ your system is not an issue at all.</p></li>
 <p>Flickr Creative Commons image by
 <a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
 
-<time datetime="2012-07-19T19:23:00+12:00" pubdate data-updated="true">Jul 19<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/broken.jpg" title="Image of breakage on Flickr" >
-Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
-<a href="https://bbs.archlinux.org/" title="Arch Linux BBS">Arch boards</a> and in the various
-<a href="https://wiki.archlinux.org/index.php/IRC_Channels" title="Wiki page listing channels">IRC channels</a>.
-It doesn&#8217;t take newcomers long to realize that, whether something is actually broken or not,
-there is always
-<a href="http://allanmcrae.com/category/arch-linux/" title="Allan's Blog">someone they can blame</a>.<sup>1</sup></p>
-
-<p>My experience of Arch, over the last three and a bit years, is quite the opposite. I have yet to
-experience anything that would qualify as breakage. Sure, there have been bugs, mostly upstream,
-and the more frequent moments where I haven&#8217;t been as diligent as I should, but not once have I
-had a machine that was unbootable or otherwise unusable. Arch has, on both my home and work
-machines, been incredibly stable and reliable.</p>
-
-<p>For a number of Arch Linux users, however, that was not their experience over the last week when
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="News item on the move">/lib was moved to /usr/lib</a>.
-The volume of people on the boards and on IRC reporting unbootable or unusable systems was
-remarkable. Remarkable because, despite the fact that the
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Once more, just in case…">news item</a>, the
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Arch wiki page on the change">wiki page</a>,
-and the <a href="http://mailman.archlinux.org/pipermail/arch-announce/2012-July/000317.html" title="Mail archive">email to arch-announce</a>
-all <em>explicitly</em> warned people not to use the <code>--force</code> option,<sup>2</sup> so many did.</p>
-
-<p><span class='pullquote-right' data-pullquote='90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice. '>
-Sadly, these red-boxed warnings were apparently not enough.
-90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice.
-The remaining 10% were either in a hurry and didn&#8217;t pay close attention to how
-to deal with any leftover files in <span class="file">/lib</span> or <code>rm -rf</code>&#8216;ed
-in the wrong directory.
-<a href="http://www.gnu.org/fun/jokes/shit-happens.html" title="GNU Humour…">Accidents happen</a>.
-</span></p>
-
-<p>What I am interested in is the people who fell into the much larger category,
-and principally those that didn&#8217;t see any of the communications about this
-change in advance of updating and reasoned, based on a recent change that did
-<a href="http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required-1/" title="News item on filesystem upgrade">require the use of &#8211;force</a>,
-that this was the most expedient way to resolve <code>pacman</code> reporting conflicting
-files.</p>
-
-<p>Some context. The <code>glibc</code> update was released to the
-<a href="https://wiki.archlinux.org/index.php/Testing#.5Btesting.5D" title="Wiki entry on Testing">[testing] repository</a>
-in the first week of July: and there were a couple of long threads<sup>3</sup>
-about issues and fixes before it was pushed to [core]. By the time the
-package was released for general consumption, it had been tested and the
-developers had obviously planned how to make what is a fundamental system
-change with a minimal amount of user intervention.  I think that, given the
-magnitude of the challenge, they did a superb job.</p>
-
-<p>How then did it go so wrong for so many?<sup>4</sup> To answer that, you have
-to consider the nature of Arch. It&#8217;s <em>not</em> the sort of distribution where you
-install it and then just go on your merry way, installing
-<a href="http://oswatershed.org/" title="It's SCIENCE, Jim">the least obsolete packages</a>,
-revelling in the speed of the package manager and generally being
-a 1337 h@x0r…</p>
-
-<p>Successfully running a rolling release like Arch, irrespective of your level of
-competence, means staying in touch with what is happening—in
-<a href="http://kmkeen.com/pacmatic/" title="Pacman wrapper that pulls news updates">some form or other</a>.
-Subscribing to the arch-general <acronym title="Mailing list">ML</acronym>,
-visiting the forums, idling in IRC; somehow remaining connected to what is
-going on in the community so that you don&#8217;t blindly update one day and wonder
-why your system is broken.</p>
-
-<p>This strikes me as a real strength; by design Arch encourages its users to
-participate in the community. Even if you are only lurking, over time you will
-inevitably find yourself posting in a thread, responding to an email, editing
-the wiki,
-<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="Post on aurphan">adopting an orphaned package</a>—increasingly
-getting involved and contributing.</p>
-
-<p>This level of involvement is not for everyone. Some may find it onerous or
-a waste of their time. That&#8217;s fine. There are any number of other distros
-that do not ask for this level of commitment. The <em>quid pro quo</em> for
-running Arch, though, is that you are prepared, in whatever shape or form
-best works for you, to give something back; at the very least, that is your
-attention.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li><p>This is, of course, a reference to said Arch meme: Allan is one
-of the developers who has contributed an enormous amount to Arch and the fact
-that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</p></li>
-<li><p>At the end of 2011, the short option <code>-f</code>
-<a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
-from <code>pacman</code> so “it at least makes people read the word &#8216;force&#8217; and maybe they
-will have some sense to step back and think about what they are doing first.”</p></li>
-<li><p><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
-<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></p></li>
-<li><p>Relatively speaking. In situations like this, the overwhelming amount of traffic
-is about what went wrong, not people posting to say they had no difficulties whatsoever…</p></li>
-</ol>
-
-
-<p>Creative Commons image on Flickr from
-<a href="http://www.flickr.com/photos/daviddoctorrose/431786001/" title="Broken keyboard on Flickr">djeucalyptus</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -451,131 +311,42 @@ is about what went wrong, not people posting to say they had no difficulties wha
   
 
 
-<time datetime="2012-07-09T13:51:00+12:00" pubdate data-updated="true">Jul 9<span>th</span>, 2012</time>
-        
-      </p>
+<time datetime="2012-07-24T19:18:00+12:00" pubdate data-updated="true">Jul 24<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/dwm/'>dwm</a>, <a class='category' href='/blog/categories/hack/'>hack</a>
+  
+</span>
+
+
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/grub.jpg" title="Image of grub on Flickr" >
-With the announcement late last month that
-<a href="http://lists.gnu.org/archive/html/grub-devel/2012-06/msg00093.html" title="Grub ML announcement">Grub 2.00 has been released</a>
-I thought that it was time to stop procrastinating and do something about moving away from
-<a href="http://www.gnu.org/software/grub/grub-legacy.html" title="Gnu Page for Grub Legacy">Grub Legacy</a>,
-which is no longer actively developed. Not that there is anything wrong with Grub Legacy&#8217;s
-functionality; it has always done whatever I asked of it (admittedly, not a lot) and done so
-without complaint.</p>
-
-<p>I have used Grub2 before, when I was running Ubuntu on my home desktop, and it is the bootloader
-on my Debian Squeeze server. I can&#8217;t, however, say that I have ever really understood—or
-appreciated—its mutliple file, “need to reconfigure after making any changes” type of
-complexity. So, I thought that I would give
-<a href="http://www.syslinux.org/wiki/index.php/The_Syslinux_Project" title="Syslinux Wiki">Syslinux</a>
-a shot.</p>
-
-<p>Syslinux isn&#8217;t a single bootloader, rather it is a collection of lightweight bootloaders,
-with <a href="http://www.syslinux.org/wiki/index.php/EXTLINUX" title="Extlinux page on Syslinux Wiki">Extlinux</a>
-responsible for booting ext2, ext3, ext4 and btrfs filesystems. As the
-<a href="https://wiki.archlinux.org/index.php/Syslinux" title="The FINE Wiki">Arch Wiki Syslinux page</a>
-notes, since Syslinux 4, Extlinux has been merged with Syslinux.</p>
-
-<p>Installing Syslinux is <em>ridiculously</em> easy. It is literally a five step process. First,
-install the package:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -S syslinux</span></code></pre></div></figure>
-
-
-<p>After installing <code>syslinux</code> pacman will helpfully tell you what to do next:</p>
-
-<blockquote><p>==> If you want to use syslinux as your bootloader<br/>==> edit /boot/syslinux/syslinux.cfg and run<br/>==>   # /usr/sbin/syslinux-install_update -i -a -m<br/>==> to install it.</p></blockquote>
-
-
-<p>Arch user <a href="http://pyther.net/" title="Matthew's website">Matthew Gyurgyik</a> has written an
-ingenious script, <code>syslinux-install_update</code> that automates the process of writing the
-<acronym title="Master Boot Record">MBR</acronym> and installing the relevant files to
-<span class="file">/boot/syslinux/</span>. The script also checks if, as is the case
-with my desktop, there is a RAID array present, and if so passes the install command the
-<code>--raid</code> flag:</p>
-
-<blockquote><p>RAID mode.  If boot fails, tell the BIOS to boot the next device in the boot sequence (usually the next  hard<br/>disk) instead of stopping with an error message.  This is useful for RAID-1 booting.</p></blockquote>
-
-
-<p>After running the script, you should receive a message advising you that Syslinux
-has been sucessfully installed on both drives:</p>
-
-<blockquote><p>Detected RAID on /boot - installing Syslinux with &#8211;raid<br/>Syslinux install successful<br/>Boot Flag Set - /dev/sda1<br/>Boot Flag Set - /dev/sdb1<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sda<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sdb</p></blockquote>
-
-
-<p>If you are moving from Grub Legacy, configuring Syslinux is similarly painless.
-There are two sections to a basic  <span class="file">/boot/syslinux/syslinux.cfg</span>,
-the defaults and the prompt entries.</p>
-
-<p>I set up my defaults to be essentially invisible:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'># General settings
-</span><span class='line'>DEFAULT Arch
-</span><span class='line'>PROMPT 0
-</span><span class='line'>TIMEOUT 0</span></code></pre></div></figure>
-
-
-<p>And then copy across the relevant lines from my <span class="file">/boot/grub/menu.lst</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>grep <span class="nv">root</span><span class="o">=</span> /boot/grub/menu.lst &gt;&gt; /boot/syslinux/syslinux.cfg
-</span></code></pre></div></figure>
-
-
-<p>Then it is just a matter of adding the relevant entries under LABEL:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>LABEL Arch
-</span><span class='line'>   MENU LABEL Arch Linux
-</span><span class='line'>   LINUX ../vmlinuz-linux
-</span><span class='line'>   APPEND root=/dev/mapper/vgroup-lvroot cryptdevice=/dev/md1:vgroup ro
-</span><span class='line'>   INITRD ../initramfs-linux.img</span></code></pre></div></figure>
-
-
-<p>You then add entries for Fallback, and any other images that you may wish to
-boot from.</p>
-
-<p>And that, in their entirety, is steps two and three. You then move to steps four and five:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -Rsn grub
-</span><span class='line'>shutdown -r now</span></code></pre></div></figure>
-
-
-<p>And you reboot with Syslinux. Done.</p>
-
-<p>The beauty of Syslinux, from my perspective, is that it is simple to install
-and configure, with just the one config file and the options all well documented
-and easy to understand. If you want a menu with a background
-image, you can have that. If, like me, you just want to get on and boot your default,
-it does that.</p>
-
-<p>Additionally, if you want or need to boot into Fallback, or want to dual boot,
-you can just hold down <kbd>Shift</kbd> at boot time and enter the desired
-Label at the prompt. Syslinux has Tab completion, so you only need enter a
-couple of letters, hit <kbd>Tab</kbd> and you will see all of the available
-Labels to boot. Brilliant.</p>
-
-<h4>Notes</h4>
-
-<p>Creative Commons Flickr image by
-<a href="http://www.flickr.com/photos/sgodt/5103674184/">custer_fluck</a></p>
+      <div class="sharing">
+  
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/07/19/breakage/" title="Previous Post: The Myth of Breakage">&laquo; The Myth of Breakage</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/blog/page/2/">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -608,7 +379,7 @@ Labels to boot. Brilliant.</p>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -624,7 +395,7 @@ Labels to boot. Brilliant.</p>
 
 <section>
   <h1>My Pinboard</h1>
-  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
   <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
 </section>
 <script type="text/javascript">
@@ -647,7 +418,7 @@ Labels to boot. Brilliant.</p>
   #lastfmList li{ text-align: left; }
 </style>
 <ul id="lastfmList">
-  <li class="loading">Updating tracks&#8230;</li>
+  <li class="loading">Updating tracks...</li>
 </ul>
 <p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
 
@@ -694,6 +465,7 @@ function showLastfmFeed(xml){
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -708,7 +480,10 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       var disqus_shortname = 'jasonwryan';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/07/24/queues/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2012/07/24/queues/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

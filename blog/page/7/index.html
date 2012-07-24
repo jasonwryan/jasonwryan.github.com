@@ -9,11 +9,11 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I recently picked up a
-HP Microserver;
-a small, silent server to use primarily to back up
-my other boxes.
-I went for the 2GB version without any &hellip;">
+  <meta name="description" content="I posted recently about setting up a microserver
+and included a
+rsync
+script for backing up my files to the server. At the time, I was running
+it &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +86,118 @@ I went for the 2GB version without any &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/28/rsync/">rsync + SSH Backups</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-28T12:23:00+13:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/rsync-ssh.png" alt="image" /></p>
+
+<p>I <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
+and included a
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
+script for backing up my files to the server. At the time, I was running
+it manually, but since have sorted out the excludes list and have now
+automated it.</p>
+
+<p>My original scheme was to set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
+mount an
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
+before rsync’ing the directories across. In the end, I went with SSH and
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
+as debugging all of the various permissions issues with the NFS share
+did not seem worth the effort.</p>
+
+<p>First, on my local desktop, I created the keypair called, inventively,
+rsync:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
+</span><span class='line'>mv rsync ~/.ssh <span class="o">&amp;&amp;</span> chmod 600 ~/.ssh/rsync
+</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
+</span></code></pre></div></figure>
+
+
+<p>This keypair was created <em>without a passphrase</em> so that the script could
+be successfully called from <code>cron</code>. To slightly increase the security
+around a key without a passphrase, I used the from option in
+authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
+machine(s), like so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
+</span></code></pre></div></figure>
+
+
+<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
+</span></code></pre></div></figure>
+
+
+<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
+the SSH command:</p>
+
+<figure class='code'><figcaption><span>.ssh/config </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>Host backups
+</span><span class='line'>   Hostname 192.168.1.200
+</span><span class='line'>   Port 0000
+</span><span class='line'>   User jason
+</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></div></figure>
+
+
+<p>And I was done. Everynight at 10pm, all of my data will be backed up to
+the server. The rsync command in the script:</p>
+
+<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># Backup to remote server over SSH</span>
+</span><span class='line'>
+</span><span class='line'>rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\</span>
+</span><span class='line'>    --log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
+</span><span class='line'>    -e ssh /home/jason /etc backups:Backups/Centurion
+</span></code></pre></div></figure>
+
+
+<h5>Notes</h5>
+
+<ol>
+<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
+</ol>
+
+
+<p>Creative Commons image from
+<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -285,91 +397,6 @@ home-cooked solution…</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/10/01/pinboard-elvis/">Pinboard Elvis</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-10-01T10:29:00+13:00" pubdate data-updated="true">Oct 1<span>st</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/pinboard-elvis.png" alt="image" /></p>
-
-<p>After recovering from
-<a href="http://jasonwryan.com/blog/2011/09/28/delicious/" title="My post on the delicious fiasco">the shock of the botched delicious relaunch</a>,
-I have switched to
-<a href="http://pinboard.in/u:jasonwryan/" title="My bookmarks on Pinboard">Pinboard</a>
-for my bookmarking. Previously, I was just synching my bookmarks from
-delicious, but now I have abandoned that trainwreck completely.</p>
-
-<p>Two things made the transition painless. The first was the
-<a href="http://www.appbrain.com/app/me.mitnworb.save.to.pinboard/" title="Save to Pinboard page">Pinboard Android app</a>
-so I could access and manage bookmarks from my phone; the second was a
-little trickier.</p>
-
-<p>As I have previously mentioned, I use bookmarking not just to retrieve
-my own saved pages, but as a search repository for material that other
-people have decided is interesting or valuable enough to want to save.
-And there is no better tool for this sort of searching than
-<a href="http://surfraw.alioth.debian.org/" title="Surfraw - Shell Users' Revolutionary Front Rage Against the Web">Surfraw</a><sup>1</sup></p>
-
-<p>I had written an elvis to search delicious bookmarks, so to complete the
-transition to Pinboard, I needed to do the same. It was a little
-trickier than I had anticipated, as some of the URLs (particularly when
-searching across multiple tags) were reasonably complex given my modest
-scripting skills. But
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.config/surfraw/elvi/pin" title="Pinboard elvis in mercurial repo">I got there in the end…</a></p>
-
-<p>Now searching for web pages that I or anyone else has saved to Pinboard
-is as simple as typing:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pin -t<span class="o">=</span>unix+linux+vim
-</span></code></pre></div></figure>
-
-
-<p>Which will return all saved pages that share those three tags. I can
-also refine my search to a particular user with the <code>-u</code>{ser} switch, or
-just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Previous posts on Surfraw:
-
-<ul>
-<li> <a href="http://jasonwryan.com/blog/2011/04/13/archwiki-elvis-for-surfraw/" title="My post on the Arch Wiki elvis">Arch Wiki elvis for Surfraw</a></li>
-<li> <a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Yanking links in w3m">w3m, Surfraw and yanking  URLs</a></li>
-</ul>
-</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -387,6 +414,10 @@ just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a>
       </li>
     
@@ -400,10 +431,6 @@ just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
     
       <li class="post">
         <a href="/blog/2012/05/23/notmuch/">Using Notmuch with mutt</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/12/mutt/">mutt and HTML email</a>
       </li>
     
   </ul>

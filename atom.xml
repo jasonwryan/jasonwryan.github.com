@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-07-19T19:26:03+12:00</updated>
+  <updated>2012-07-24T19:19:57+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,192 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Mercurial Queues]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/07/24/queues/"/>
+    <updated>2012-07-24T19:18:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/07/24/queues</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
+Over the last week or so, I have finally gotten around to digging into the whole concept of
+using
+<a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
+to manage patches against an upstream project; in my case
+<a href="http://dwm.suckless.org" title="The truly suckless window manager…">dwm</a>.<sup>1</sup>
+Essentially, this mercurial extension helps you manage a stack of patches on
+top of a directory tree. This gives you quite a lot of fine-grained control
+over your patchset and assists immeasurably with automating the application of
+patches when the underlying codebase changes.</p>
+
+<p>After having played around with queues for the last couple of days, I am quite
+impressed: both the concept and the execution are simple and powerful. The concept
+of Mercurial Queues is best described in the Mercurial book: the aptly titled,
+<em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
+
+<blockquote><p>MQ&#8217;s marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don&#8217;t like a patch, you can drop it. If a patch isn&#8217;t quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote>
+
+
+<p>I followed Filippo Negroni&#8217;s excellent
+<a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
+to setup my own
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">dwm patchset</a>
+based on
+<a href="http://hg.suckless.org/dwm" title="dwm hg repository">tip</a>, and the process was
+surprisingly straightforward; the only caveat being it is a good idea to plan
+quite carefully what changes you want in each particular patch. Once I had
+completed the setup, it got me thinking about the fact that the final install
+is done without <code>pacman</code>, just using <code>make install</code>. And, as a proof-of-concept
+more than anything else, I wondered whether this functionality could be used
+with a <code>makepkg</code>.<sup>3</sup></p>
+
+<p>Turns out, as you might expect with Arch, it was not much of a job to set it
+up at all.</p>
+
+<p><strong>Note</strong>: this doesn&#8217;t mean I think it is a good idea; I was just interested
+to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
+like dwm, this is definitely a case of introducing a huge amount of complexity for
+no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
+
+<p>I have a
+<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD" title="If you must…">working PKGBUILD</a>
+that you can use if you want to follow along at home. Once you have downloaded
+it into <span class="file">dwm-hg/</span>, run <code>makepkg</code> to clone the dwm
+repository and build the binary.  Then you need to make sure that the mercurial
+queue extension is enabled, so your <span class="file">.hgrc</span> needs to
+contain:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
+</span><span class='line'>hgext.mq <span class="o">=</span>
+</span></code></pre></div></figure>
+
+
+<p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
+is <span class="file">dwm-hg/src/dwm</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
+</span></code></pre></div></figure>
+
+
+<p>The next step is to start applying the various patches that you want to comprise
+your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
+and three other patches:
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/statuscolours" title="Patch in mercurial queue">statuscolours</a>,
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/cycle" title="ditto">cycle</a>, and
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/push" title="etc…">push</a>.
+There are other patches in my repository, one of which patches the appropriate
+settings for an Arch build in the
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/setup.makefile" title="Arch settings for Makefiles">relevant makefiles</a>.
+This is taken care of by the PKGBUILD in this case.</p>
+
+<p>From here, it is very much as Filippo describes it in his tutorial: make
+some changes, add them to the queue and rinse and repeat:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
+</span><span class='line'><span class="c"># “hack hack hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
+</span></code></pre></div></figure>
+
+
+<p>After committing each of your changes as a discrete patch, you can review the queue
+with <code>hg qseries</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span></code></pre></div></figure>
+
+
+<p>And <code>hg qapplied</code> will tell you which of the patches is currently
+applied in the working repository; at this stage the list should look
+the same as that in <code>hg qseries</code>. The next step is to remove all of the
+patches from the queue so that we have a clean repository:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop -a
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>popping config.customizations
+</span><span class='line'>patch queue now empty
+</span></code></pre></div></figure>
+
+
+<p>Should you need to edit a patch, it is simply a matter of popping
+to that spot in the stack (you can do so by name or by index
+number, beginning at 0):</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop config.customizations
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>now at: config.customizations
+</span><span class='line'><span class="c"># “hack hack hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qpush -a
+</span></code></pre></div></figure>
+
+
+<p>Once you are satisfied with the state of the stack, remove all of the
+patches to return to the original clean working directory and <code>cd</code> back
+to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> to
+rebuild the package and you should see the pushed patches as part of
+the output:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
+</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
+</span><span class='line'>applying config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>now at: push
+</span><span class='line'>dwm build options:
+</span></code></pre></div></figure>
+
+
+<p>…and when you restart dwm, your customizations will be applied.
+When new changes are pushed to
+<a href="http://hg.suckless.org/dwm" title="dwm mercurial repo">the dwm repo</a>
+you can just <code>makepkg -fi</code>, and, if any of the patches fail due
+to changes in the underlying code, pop the stack to the failed
+patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
+
+<p>As I said at the beginning of this post, this isn&#8217;t a particularly smart way to
+use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
+better off just cloning dwm to your local repository, initializing a queue
+repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
+sudo make install</code>.</p>
+
+<p>If you have more than one machine, you can easily setup a repository for
+your patchset on
+<a href="https://bitbucket.org/" title="bitbucket free mercurial hosting">bitbucket</a>
+or <a href="http://pikacode.com/" title="Free Mercurial and Git hosting">Pikacode</a>
+and host it there: then just pull the patchset queue
+from your other boxes and <code>hg qpush -a</code>. If you require a slightly
+different patchset for each box, you can use MQ to manage this
+process as well. This is where MQ really excels;
+I&#8217;ll cover this in more detail in my next post.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><p>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</p></li>
+<li><p>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
+example of thorough, accessible documentation.</p></li>
+<li><p>In the case of something like dwm, this is really irrelevant, as there
+is a single tiny binary and a <code>man</code> page, so keeping track of these files on
+your system is not an issue at all.</p></li>
+</ol>
+
+
+<p>Flickr Creative Commons image by
+<a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The Myth of Breakage]]></title>
@@ -1858,65 +2044,6 @@ automate the task.</p>
 
 <ol>
 <li>Any faults aside, it should be reasonably portable…</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[IRC Notifications with dzen2]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/11/07/irc-dzen/"/>
-    <updated>2011-11-07T19:48:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/11/07/irc-dzen</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
-
-<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
-session running on a server connected to IRC and I wanted to get
-notifications whenever someone addressed me, irrespective of whether I
-was connected to the session, or that particular machine at the time.</p>
-
-<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
-and there is a script called
-<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
-that will print any mentions in a channel to a file. I then configured
-the fnotify script to write to a folder in Dropbox. Now, whenever I am
-mentioned in freenode, the file is updated across all my machines.</p>
-
-<p>The next challenge was to translate the updating of the fnotify file
-into a notification on my current machine. As I don’t use
-<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
-on my Arch machines, I wanted to make it work with
-<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
-Enter a simple shell script:</p>
-
-<figure class='code'><figcaption><span>highlights.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">while </span>inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>
-</span><span class='line'><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
-</span><span class='line'><span class="k">done</span>
-</span></code></pre></div></figure>
-
-
-<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
-so that it runs in the background after login. Whenever the metadata
-(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
-written to my
-<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
-with the message.</p>
-
-<p>Simple; but does what I need…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Dropbox’s API won’t work with dzen2—or with other lightweight
-notifications like
-<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
-<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
-(that was closed without any progress)—hence my having to resort to a
-home-cooked solution…</li>
 </ol>
 
 ]]></content>
