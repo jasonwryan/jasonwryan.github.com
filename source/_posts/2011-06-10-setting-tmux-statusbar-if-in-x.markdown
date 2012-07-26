@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Setting tmux statusbar if in X"
-alias: /post/6381226449/tmux-status
 date: 2011-06-10 22:56
 comments: true
 categories: [tmux, linux, hack]

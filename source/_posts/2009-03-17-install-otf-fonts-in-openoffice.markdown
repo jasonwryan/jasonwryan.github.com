@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Install .otf Fonts in OpenOffice"
-alias: /post/87190732/install-otf-fonts-in-openoffice
 date: 2009-03-17 19:51
 comments: true
 categories: [linux,unix,hack]

@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Using Dropbox to Share Dotfiles"
-alias: /post/327549146/dotfiles
 date: 2010-01-11 11:10
 comments: true
 categories: [linux, hack]

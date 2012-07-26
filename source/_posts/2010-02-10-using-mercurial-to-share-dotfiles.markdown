@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Using Mercurial to Share Dotfiles"
-alias: /post/381453418/mercurial
 date: 2010-02-10 20:36
 comments: true
 categories: [vcs, linux]

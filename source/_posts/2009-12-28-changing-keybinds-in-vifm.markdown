@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Changing Keybinds in vifm"
-alias: /post/303470948/changing-keybindings-in-vifm
 date: 2009-12-28 13:50
 comments: true
 categories: [linux, hack]

@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Mail Checking Script"
-alias: /post/2641542598/mailcheck
 date: 2011-01-08 11:04
 comments: true
 categories: [archlinux, dwm, bash]

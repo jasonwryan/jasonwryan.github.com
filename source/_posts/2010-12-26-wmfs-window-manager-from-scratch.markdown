@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "WMFS - Window Manager From Scratch"
-alias: /post/2461350935/wmfs
 date: 2010-12-26 11:08
 comments: true
 categories: [archlinux]

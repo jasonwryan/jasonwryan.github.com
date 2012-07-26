@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Setting Urgent Hints in dwm"
-alias: /post/2921582689/urgency
 date: 2011-01-25 17:45
 comments: true
 categories: [dwm, archlinux, bash]

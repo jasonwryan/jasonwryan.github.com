@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Microserver"
-alias: /post/12956115113/microserver 
 date: 2011-11-18 17:13
 comments: true
 categories: [debian, linux, bash]

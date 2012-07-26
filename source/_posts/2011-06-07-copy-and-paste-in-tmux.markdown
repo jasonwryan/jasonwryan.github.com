@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Copy &amp; Paste in tmux"
-alias: /post/6279048610/tmux-copy
 date: 2011-06-07 19:54
 comments: true
 categories: [tmux, linux]

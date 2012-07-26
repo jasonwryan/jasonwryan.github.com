@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Delicious? Not after the first bite…"
-alias: /post/10736787222/delicious
 date: 2011-09-28 09:27
 comments: true
 categories: [media] 

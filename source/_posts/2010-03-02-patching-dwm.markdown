@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Patching dwm"
-alias: /post/421618180/patching-dwm
 date: 2010-03-02 20:16
 comments: true
 categories: [dwm, archlinux]

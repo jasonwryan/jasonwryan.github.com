@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Vimprobable"
-alias: /post/1260114449/vimprobable
 date: 2010-10-07 16:23
 comments: true
 categories: [browser, archlinux]

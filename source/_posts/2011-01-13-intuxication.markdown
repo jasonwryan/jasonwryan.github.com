@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Intuxication"
-alias: /post/2717707674/intuxication
 date: 2011-01-13 10:00
 comments: true
 categories: [vcs, linux]

@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Tyrs: ncurses Twitter Client"
-alias: /post/5795831283/tyrs
 date: 2011-05-24 20:17
 comments: true
 categories: [linux]

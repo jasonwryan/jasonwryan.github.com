@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "dzen2 and conky-cli in dwm"
-alias: /post/251222945/dzen2-and-conky-cli-in-dwm
 date: 2009-11-21 12:07
 comments: true
 categories: [dwm, archlinux] 
