@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-07-24T20:04:15+12:00</updated>
+  <updated>2012-07-26T18:45:09+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,170 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sharing Mercurial Patchsets]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/07/26/guards/"/>
+    <updated>2012-07-26T18:48:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/07/26/guards</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/guard.jpg" title="'On Guard image on Flickr'" >
+In my last post, on
+<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="You should read it…">Mercurial Queues</a>,
+I outlined how you might use MQ to manage a
+<a href="http://dwm.suckless.org/" title="Dynamic window manager">dwm</a> patchset.
+Mercurial makes this process ridiculously easy, and this functionality is more
+than enough to recommend it. However, where I think it really gets interesting
+is when you share that same patchset across multiple machines and are easily
+able to customize which patches in the queue are applied, based upon the
+particular machine you are building dwm on.</p>
+
+<p>For example, in my case I use dwm on all three of my machines: my desktop at home,
+my laptop at work and my EeePC. Given the nature of each of these three machines,
+though, I want a slightly different stack of patches applied. These differences
+might extend only to particular rules applied in <span class="file">config.def.h</span>
+based upon the number of tags I use, or the different applications that I run
+at home as opposed to at work.</p>
+
+<p>In any event, what I want to be able to do is maintain
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">a single patchset</a>
+in a mercurial repository, clone it to all my machines and then, using MQ,
+filter which specific patches are applied. This is all possible using a killer
+feature of MQ called
+<a href="http://hgbook.red-bean.com/read/advanced-uses-of-mercurial-queues.html%20'Advanced%20uses%20of%20MQ%20in%20the%20Mercurial%20book">guards</a>.
+Guards allow you to conditionally apply patches in a queue. Essentially, in
+a queue, you “tag” a patch with a guard and—depending on whether or not the
+guard is positive (to be applied), or negative (to be skipped)—when you
+<code>hg qpush -a</code> MQ takes care of applying the correct patches in the queue.</p>
+
+<p>So, in the case of my work laptop, I begin by cloning dwm and intializing
+a patch queue:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd </span>Build/
+</span><span class='line'>hg clone http://hg.suckless.org/dwm
+</span><span class='line'>hg qinit -c
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>I setup my <span class="file">.hgrc</span> within the patches directory so that
+it points at the correct mercurial repository:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.hg/patches/.hg/hgrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'> <span class="c"># Mercurial config file</span>
+</span><span class='line'><span class="o">[</span>ui<span class="o">]</span>
+</span><span class='line'><span class="nv">username</span> <span class="o">=</span> jasonwryan &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;&amp;#x6d;&amp;#97;&amp;#105;&amp;#108;&amp;#116;&amp;#x6f;&amp;#x3a;&amp;#x6a;&amp;#x61;&amp;#x73;&amp;#111;&amp;#110;&amp;#119;&amp;#x72;&amp;#x79;&amp;#x61;&amp;#x6e;&amp;#x40;&amp;#103;&amp;#x6d;&amp;#x61;&amp;#x69;&amp;#108;&amp;#x2e;&amp;#x63;&amp;#111;&amp;#x6d;&quot;</span>&gt;&amp;#106;&amp;#x61;&amp;#115;&amp;#111;&amp;#x6e;&amp;#119;&amp;#114;&amp;#x79;&amp;#97;&amp;#110;&amp;#64;&amp;#x67;&amp;#x6d;&amp;#x61;&amp;#105;&amp;#108;&amp;#x2e;&amp;#x63;&amp;#x6f;&amp;#109;&lt;/a&gt;
+</span><span class='line'><span class="nv">ssh</span> <span class="o">=</span> ssh -i ~/.ssh/bb -C
+</span><span class='line'><span class="o">[</span>paths<span class="o">]</span>
+</span><span class='line'><span class="nv">default</span> <span class="o">=</span> ssh://hg@pikacode.com/jasonwryan/dwm-patchset
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then I pull down my dwm patchset from the mercurial repository
+with <code>hg pull</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulling from ssh://hg@pikacode.com/jasonwryan/dwm-patchset
+</span><span class='line'>requesting all changes
+</span><span class='line'>adding changesets
+</span><span class='line'>adding manifests
+</span><span class='line'>adding file changes
+</span><span class='line'>added 6 changesets with 16 changes to 10 files
+</span><span class='line'><span class="o">(</span>run <span class="s1">&#39;hg update&#39;</span> to get a working copy<span class="o">)</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>After I update my local repo,<sup>1</sup> I can see the full patchset with
+<code>hg qseries</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setup.makefile
+</span><span class='line'>base.config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span><span class='line'>bstack
+</span><span class='line'>centurion.config
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then, as I decribed in my previous post, I make the changes to
+<span class="file">config.def.h</span> that are specific to this
+machine:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew veles.config
+</span><span class='line'> <span class="c"># “hack, hack, hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Adaptions for Veles&#39;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>My patchset now has an additional patch in it:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>setup.makefile
+</span><span class='line'>base.config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span><span class='line'>bstack
+</span><span class='line'>centurion.config
+</span><span class='line'>veles.config
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>This is where guards come in to play. If I wasn't interested in sharing
+the patchset, it would just be a matter of deleting the patch for Centurion.
+However, what I want to do is direct MQ to ignore that specific patch
+when applying the queue. I do that by creating a negative guard and then
+activating it:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qguard centurion.config -- -block
+</span><span class='line'>hg qselect block
+</span><span class='line'>number of unguarded, unapplied patches has changed from 8 to 7
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>That's it! Adding a verbose flag to <code>hg qseries</code><sup>2</sup> will print out the
+patchset and the accompanying guard status:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries -v
+</span><span class='line'>0 U setup.makefile
+</span><span class='line'>1 U base.config.customizations
+</span><span class='line'>2 U statuscolours
+</span><span class='line'>3 U cycle
+</span><span class='line'>4 U push
+</span><span class='line'>5 U bstack
+</span><span class='line'>6 G centurion.config
+</span><span class='line'>7 U veles.config
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The real test, of course, is pushing the patchset onto the fresh
+dwm code:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpush -a
+</span><span class='line'>applying setup.makefile
+</span><span class='line'>applying base.config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>applying bstack
+</span><span class='line'>skipping centurion.config - guarded by <span class="s1">&#39;-block&#39;</span>
+</span><span class='line'>applying veles.config
+</span><span class='line'>now at: veles.config
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>How cool is that? One central patchset, applied conditionally depending
+upon the machine you are using at the time.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Any guards applied on other machines will be present in the newly
+pulled <span class="file">series</span> file: these conflicts will need
+to be manually merged…</li>
+<li>The options for all of the <code>hg</code> commands can be read with
+<code>hg -v help $command</code>. For those related to queues, just prepend
+a <code>q</code> to <code>$command</code>.</li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by
+<a href="http://www.flickr.com/photos/alternatewords/4903560373/" title="On Guard on Flickr">Thorsten Becker</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Mercurial Queues]]></title>
@@ -177,12 +341,12 @@ I'll cover this in more detail in my next post.</p>
 <h4>Notes</h4>
 
 <ol>
-<li><p>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</p></li>
-<li><p>I can't recommend this {book,wiki} highly enough; it is an excellent
-example of thorough, accessible documentation.</p></li>
-<li><p>In the case of something like dwm, this is really irrelevant, as there
+<li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
+<li>I can't recommend this {book,wiki} highly enough; it is an excellent
+example of thorough, accessible documentation.</li>
+<li>In the case of something like dwm, this is really irrelevant, as there
 is a single tiny binary and a <code>man</code> page, so keeping track of these files on
-your system is not an issue at all.</p></li>
+your system is not an issue at all.</li>
 </ol>
 
 
@@ -276,17 +440,17 @@ attention.</p>
 <h4>Notes</h4>
 
 <ol>
-<li><p>This is, of course, a reference to said Arch meme: Allan is one
+<li>This is, of course, a reference to said Arch meme: Allan is one
 of the developers who has contributed an enormous amount to Arch and the fact
-that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</p></li>
-<li><p>At the end of 2011, the short option <code>-f</code>
+that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</li>
+<li>At the end of 2011, the short option <code>-f</code>
 <a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
 from <code>pacman</code> so “it at least makes people read the word 'force' and maybe they
-will have some sense to step back and think about what they are doing first.”</p></li>
-<li><p><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
-<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></p></li>
-<li><p>Relatively speaking. In situations like this, the overwhelming amount of traffic
-is about what went wrong, not people posting to say they had no difficulties whatsoever…</p></li>
+will have some sense to step back and think about what they are doing first.”</li>
+<li><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
+<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></li>
+<li>Relatively speaking. In situations like this, the overwhelming amount of traffic
+is about what went wrong, not people posting to say they had no difficulties whatsoever…</li>
 </ol>
 
 
@@ -479,82 +643,6 @@ not a breeding ground for
 
 <p>Flickr Creative Commons image by
 <a href="http://www.flickr.com/photos/angellic/47031159/">si_si_ay</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Notmuch with mutt]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/05/23/notmuch/"/>
-    <updated>2012-05-23T19:37:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/05/23/notmuch</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/magnifier.png" title="day 307 on Flickr" >
-Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
-<a href="http://www.mutt.org/" title="mutt homepage">mutt</a> posts<sup>1</sup> with what I am assuming is the
-final piece of the puzzle: searching <code>mutt's</code> maildirs. For a small to average size mailbox, <code>mutt's</code>
-searching works fine, but as your mail volume grows this simple search doesn't really scale. That's
-where the rather modestly named <a href="http://notmuchmail.org/" title="Notmuch website">Notmuch</a> comes into play.</p>
-
-<p>It can be run as a standalone mail client, but you can also use it with <code>mutt</code> to provide
-a ruthlessly efficient and fast search tool for your email. I had looked at it and
-<a href="http://sup.rubyforge.org/" title="A console client for people with lots of mail">Sup</a>
-a couple of years ago, but was spurred to do something about it this week when
-<a href="https://twitter.com/#!/chosig" title="Chosig on Twitter">Gunnar Lundström</a> pinged me on twitter and
-suggested I check it out. So I did.</p>
-
-<p><blockquote><p>"Not much mail" is what Notmuch thinks about your email collection. Even if you receive 12000<br/>messages per month or have on the order of  millions of messages that you've been saving for decades.<br/>Regardless, Notmuch will be able to quickly search all of it. It's just plain not much mail.</p><footer><strong>Notmuch website</strong> <cite><a href='http://notmuchmail.org'>notmuchmail.org/&hellip;</a></cite></footer></blockquote></p>
-
-<p>There was previously a
-<a href="http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/">mutt-notmuch script</a>
-for integrating the two, but the functionality was included upstream at the start of this year
-so it is quite straightforward to set it up. There is a
-<a href="http://aur.archlinux.org/packages.php?ID=36289" title="Arch User Repository package">package in the AUR</a>
-but it is intended as the full mail client, complete with, <em>shudder</em>, emacs support amongst
-other things. I have stripped out the uneeded bindings and included the relevant <code>perl</code> libraries in a
-<a href="https://bitbucket.org/jasonwryan/centurion/src/6ff0f252961f/Build/notmuch/PKGBUILD" title="…in my bitbucket repo">modified PKGBUILD</a>
-if you just want the basic search with <code>mutt</code>.</p>
-
-<p>Otherwise, you'll need to step through it manually.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl perl-mailtools perl-mail-box perl-string-shellquote
-</span><span class='line'>cowerd notmuch perl-term-readline-gnu
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>As you will see from the PKGBUILD, you will need to copy the <code>notmuch-mutt</code> script
-into your <code>$PATH</code>: you'll find it in <span class="file">contrib/notmuch-mutt/</span>.</p>
-
-<p>There is a simple interative setup, which you can complete before running the index the first time:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>notmuch setup
-</span><span class='line'>notmuch new
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The final step is to copy across the <code>mutt</code> macros included with the script:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat src/notmuch-0.13/contrib/notmuch-mutt/notmuch-mutt.rc &gt;&gt; <span class="nv">$HOME</span>/.mutt/muttrc
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Now, from within <code>mutt</code>, <kbd>F8</kbd>, <kbd>F9</kbd> and <kbd>F6</kbd> will respectively
-search, create the relevant threads from search results, and tag mails with <code>notmuch</code>.</p>
-
-<p>As I use <code>offlineimap</code> to retrieve my mail, I simply added <code>notmuch new</code> to the script that
-runs as a <code>cron</code> job to synch my mail and <code>notmuch</code> reindexes all of my mail as soon as it arrives.</p>
-
-<h3>Updated 27/5/12</h3>
-
-<p>Two of the <code>mutt</code> macros that are shipped in <span class="file">contrib/notmuch-mutt/notmuch-mutt.rc</span>
-do not work. I have written a patch to fix this and
-<a href="http://notmuchmail.org/pipermail/notmuch/2012/011263.html" title="Patch on notmuch list">posted it to the ML</a>.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a> and
-<a href="http://jasonwryan.com/blog/2012/05/12/mutt/">mutt and HTML email</a></li>
-</ol>
-
-
-<p>Creative Commons image by
-<a href="http://www.flickr.com/photos/mjtmail/3008566512/in/photostream/">mjtmail on Flickr</a></p>
 ]]></content>
   </entry>
   

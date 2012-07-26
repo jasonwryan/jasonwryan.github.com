@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-07-24T20:04:15+12:00</updated>
+  <updated>2012-07-26T18:45:09+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,179 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sharing Mercurial Patchsets]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/07/26/guards/"/>
+    <updated>2012-07-26T18:48:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/07/26/guards</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/guard.jpg" title="'On Guard image on Flickr'" >
+In my last post, on
+<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="You should read it…">Mercurial Queues</a>,
+I outlined how you might use MQ to manage a
+<a href="http://dwm.suckless.org/" title="Dynamic window manager">dwm</a> patchset.
+Mercurial makes this process ridiculously easy, and this functionality is more
+than enough to recommend it. However, where I think it really gets interesting
+is when you share that same patchset across multiple machines and are easily
+able to customize which patches in the queue are applied, based upon the
+particular machine you are building dwm on.</p>
+
+<p>For example, in my case I use dwm on all three of my machines: my desktop at home,
+my laptop at work and my EeePC. Given the nature of each of these three machines,
+though, I want a slightly different stack of patches applied. These differences
+might extend only to particular rules applied in <span class="file">config.def.h</span>
+based upon the number of tags I use, or the different applications that I run
+at home as opposed to at work.</p>
+
+<p>In any event, what I want to be able to do is maintain
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">a single patchset</a>
+in a mercurial repository, clone it to all my machines and then, using MQ,
+filter which specific patches are applied. This is all possible using a killer
+feature of MQ called
+<a href="http://hgbook.red-bean.com/read/advanced-uses-of-mercurial-queues.html%20'Advanced%20uses%20of%20MQ%20in%20the%20Mercurial%20book">guards</a>.
+Guards allow you to conditionally apply patches in a queue. Essentially, in
+a queue, you “tag” a patch with a guard and—depending on whether or not the
+guard is positive (to be applied), or negative (to be skipped)—when you
+<code>hg qpush -a</code> MQ takes care of applying the correct patches in the queue.</p>
+
+<p>So, in the case of my work laptop, I begin by cloning dwm and intializing
+a patch queue:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd </span>Build/
+</span><span class='line'>hg clone http://hg.suckless.org/dwm
+</span><span class='line'>hg qinit -c
+</span></code></pre></div></figure>
+
+
+<p>I setup my <span class="file">.hgrc</span> within the patches directory so that
+it points at the correct mercurial repository:</p>
+
+<figure class='code'><figcaption><span>.hg/patches/.hg/hgrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'> <span class="c"># Mercurial config file</span>
+</span><span class='line'><span class="o">[</span>ui<span class="o">]</span>
+</span><span class='line'><span class="nv">username</span> <span class="o">=</span> jasonwryan &lt;jasonwryan@gmail.com&gt;
+</span><span class='line'><span class="nv">ssh</span> <span class="o">=</span> ssh -i ~/.ssh/bb -C
+</span><span class='line'><span class="o">[</span>paths<span class="o">]</span>
+</span><span class='line'><span class="nv">default</span> <span class="o">=</span> ssh://hg@pikacode.com/jasonwryan/dwm-patchset
+</span></code></pre></div></figure>
+
+
+<p>Then I pull down my dwm patchset from the mercurial repository
+with <code>hg pull</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulling from ssh://hg@pikacode.com/jasonwryan/dwm-patchset
+</span><span class='line'>requesting all changes
+</span><span class='line'>adding changesets
+</span><span class='line'>adding manifests
+</span><span class='line'>adding file changes
+</span><span class='line'>added 6 changesets with 16 changes to 10 files
+</span><span class='line'><span class="o">(</span>run <span class="s1">&#39;hg update&#39;</span> to get a working copy<span class="o">)</span>
+</span></code></pre></div></figure>
+
+
+<p>After I update my local repo,<sup>1</sup> I can see the full patchset with
+<code>hg qseries</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setup.makefile
+</span><span class='line'>base.config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span><span class='line'>bstack
+</span><span class='line'>centurion.config
+</span></code></pre></div></figure>
+
+
+<p>Then, as I decribed in my previous post, I make the changes to
+<span class="file">config.def.h</span> that are specific to this
+machine:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew veles.config
+</span><span class='line'> <span class="c"># “hack, hack, hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Adaptions for Veles&#39;</span>
+</span></code></pre></div></figure>
+
+
+<p>My patchset now has an additional patch in it:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>setup.makefile
+</span><span class='line'>base.config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span><span class='line'>bstack
+</span><span class='line'>centurion.config
+</span><span class='line'>veles.config
+</span></code></pre></div></figure>
+
+
+<p>This is where guards come in to play. If I wasn&#8217;t interested in sharing
+the patchset, it would just be a matter of deleting the patch for Centurion.
+However, what I want to do is direct MQ to ignore that specific patch
+when applying the queue. I do that by creating a negative guard and then
+activating it:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qguard centurion.config -- -block
+</span><span class='line'>hg qselect block
+</span><span class='line'>number of unguarded, unapplied patches has changed from 8 to 7
+</span></code></pre></div></figure>
+
+
+<p>That&#8217;s it! Adding a verbose flag to <code>hg qseries</code><sup>2</sup> will print out the
+patchset and the accompanying guard status:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries -v
+</span><span class='line'>0 U setup.makefile
+</span><span class='line'>1 U base.config.customizations
+</span><span class='line'>2 U statuscolours
+</span><span class='line'>3 U cycle
+</span><span class='line'>4 U push
+</span><span class='line'>5 U bstack
+</span><span class='line'>6 G centurion.config
+</span><span class='line'>7 U veles.config
+</span></code></pre></div></figure>
+
+
+<p>The real test, of course, is pushing the patchset onto the fresh
+dwm code:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpush -a
+</span><span class='line'>applying setup.makefile
+</span><span class='line'>applying base.config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>applying bstack
+</span><span class='line'>skipping centurion.config - guarded by <span class="s1">&#39;-block&#39;</span>
+</span><span class='line'>applying veles.config
+</span><span class='line'>now at: veles.config
+</span></code></pre></div></figure>
+
+
+<p>How cool is that? One central patchset, applied conditionally depending
+upon the machine you are using at the time.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Any guards applied on other machines will be present in the newly
+pulled <span class="file">series</span> file: these conflicts will need
+to be manually merged…</li>
+<li>The options for all of the <code>hg</code> commands can be read with
+<code>hg -v help $command</code>. For those related to queues, just prepend
+a <code>q</code> to <code>$command</code>.</li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by
+<a href="http://www.flickr.com/photos/alternatewords/4903560373/" title="On Guard on Flickr">Thorsten Becker</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Mercurial Queues]]></title>
@@ -185,12 +358,12 @@ I&#8217;ll cover this in more detail in my next post.</p>
 <h4>Notes</h4>
 
 <ol>
-<li><p>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</p></li>
-<li><p>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
-example of thorough, accessible documentation.</p></li>
-<li><p>In the case of something like dwm, this is really irrelevant, as there
+<li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
+<li>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
+example of thorough, accessible documentation.</li>
+<li>In the case of something like dwm, this is really irrelevant, as there
 is a single tiny binary and a <code>man</code> page, so keeping track of these files on
-your system is not an issue at all.</p></li>
+your system is not an issue at all.</li>
 </ol>
 
 
@@ -284,17 +457,17 @@ attention.</p>
 <h4>Notes</h4>
 
 <ol>
-<li><p>This is, of course, a reference to said Arch meme: Allan is one
+<li>This is, of course, a reference to said Arch meme: Allan is one
 of the developers who has contributed an enormous amount to Arch and the fact
-that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</p></li>
-<li><p>At the end of 2011, the short option <code>-f</code>
+that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</li>
+<li>At the end of 2011, the short option <code>-f</code>
 <a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
 from <code>pacman</code> so “it at least makes people read the word &#8216;force&#8217; and maybe they
-will have some sense to step back and think about what they are doing first.”</p></li>
-<li><p><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
-<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></p></li>
-<li><p>Relatively speaking. In situations like this, the overwhelming amount of traffic
-is about what went wrong, not people posting to say they had no difficulties whatsoever…</p></li>
+will have some sense to step back and think about what they are doing first.”</li>
+<li><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
+<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></li>
+<li>Relatively speaking. In situations like this, the overwhelming amount of traffic
+is about what went wrong, not people posting to say they had no difficulties whatsoever…</li>
 </ol>
 
 
@@ -781,8 +954,8 @@ a list of possible completions.</p>
 <h4>Notes</h4>
 
 <ol>
-<li><p><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk&#8217;s post</a> got me started.</p></li>
-<li><p>A <a href="https://bitbucket.org/jasonwryan/eeepc/src/f15bf6e51e62/Scripts/cowerd" title="Script in bitbucket repo">wrapper script for cower</a></p></li>
+<li><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk&#8217;s post</a> got me started.</li>
+<li>A <a href="https://bitbucket.org/jasonwryan/eeepc/src/f15bf6e51e62/Scripts/cowerd" title="Script in bitbucket repo">wrapper script for cower</a></li>
 </ol>
 
 
@@ -1961,91 +2134,6 @@ the server. The rsync command in the script:</p>
 
 <p>Creative Commons image from
 <a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Microserver]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/11/18/microserver/"/>
-    <updated>2011-11-18T17:13:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/11/18/microserver</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/microserver.png" alt="image" /></p>
-
-<p>I recently picked up a
-<a href="http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html" title="HP specs page">HP Microserver</a>;
-a small, silent server to use primarily to back up
-<a href="http://jasonwryan.com/blog/2010/10/04/the-setup" title="Slightly out-of-date setup post">my other boxes</a>.
-I went for the 2GB version without any preinstalled operating system.</p>
-
-<p>As I want this machine to just sit quietly in my garage for the next 5
-or 6 years, I opted for
-<a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
-base system. After installing two 1TB drives, I set them up as an
-<a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
-RAID 1 array, in a
-<a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
-
-<p><strong>Pro tip</strong> when you get to the part of the partitioning where you
-configure the volume for encryption, make sure you select <em>No</em> for
-<em>erase data</em>. It took close to 90 hours to scrub both the hard drives.
-And, as I am not really expecting
-<a href="http://www.extremetech.com/computing/105931-full-disk-encryption-is-too-good-says-us-intelligence-agency" title="FDE defeats the NSA">a visit from the spooks</a>,
-that seems a little like overkill…</p>
-
-<p>Once the base install was complete, I set up my SSH keys,
-<a href="http://tmux.sourceforge.net/" title="tmux page">tmux</a>, configured the
-firewall and forwarded the necessary ports, set up
-<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia page: network file system">NFS</a>,
-and that was it. The box is deathly quite, can be mounted locally for
-<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync entry">rsync backups</a> and
-accessed remotely (for a tmux session running
-<a href="http://irssi.org/" title="Irssi homepage">irssi</a>), and all for less than
-NZD700.</p>
-
-<p>I knocked together a quick script<sup>1</sup> to manage the backing up; currently
-I run it manually, but once I have the excludes file tweaked properly,
-I’ll set up a
-<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
-automate the task.</p>
-
-<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># Backup to remote server over NFS</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
-</span><span class='line'>     <span class="nb">exit </span>1
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'><span class="k"> </span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then </span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
-</span><span class='line'> <span class="k">else</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
-</span><span class='line'>     mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
-</span><span class='line'> <span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># sync directories</span>
-</span><span class='line'> <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>
-</span><span class='line'>
-</span><span class='line'> rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\</span>
-</span><span class='line'>     --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
-</span><span class='line'>     /home/jason /etc /media/Sentinel/Backups/Centurion
-</span><span class='line'>
-</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
-</span><span class='line'>     umount /media/Sentinel
-</span><span class='line'> <span class="k">else</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
-</span><span class='line'> <span class="k">fi</span>
-</span></code></pre></div></figure>
-
-
-<h5>Notes</h5>
-
-<ol>
-<li>Any faults aside, it should be reasonably portable…</li>
-</ol>
-
 ]]></content>
   </entry>
   

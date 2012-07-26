@@ -9,10 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have been using
-Surfraw for the
-better part of eighteen months, and I think that it is a perfect Unix
-tool: it does one thing, extremely well… If &hellip;">
+  <meta name="description" content="I posted a couple of weeks ago about
+how much I was enjoying Surfraw,
+to the point of writing a couple of my own elvi. As part of the
+ongoing &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,122 @@ tool: it does one thing, extremely well… If &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/05/05/w3m/">w3m, Surfraw and Yanking URLs</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-05T19:57:00+12:00" pubdate data-updated="true">May 5<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/w3m.png" alt="image" /></p>
+
+<p>I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/blog/2011/04/13/archwiki-elvis-for-surfraw/" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
+to the point of writing a couple of my own <em>elvi</em>. As part of the
+ongoing tweaking of my Surfraw experience, I have been experimenting
+with different
+<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
+to see which one best fits my workflow.</p>
+
+<p>I have previously been using both
+<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
+and it’s homonym,
+<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
+these have been perfectly acceptable, they weren’t quite providing the
+level of functionality —and integration with my vim-oriented workflow—
+that I was looking for. Enter
+<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
+
+<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
+`less’. With w3m you can browse web pages through a terminal emulator
+window (xterm, rxvt or something like that). Moreover, w3m can be used
+as a text formatting tool which typesets HTML into plain text.</p></blockquote>
+
+<p>w3m is a step up from the other two for a variety of reasons. It
+supports tables, frames, SSL connections, color and inline images. It
+also renders pages in a form as true to their original layout as
+possible. The killer features on top of that are, for me, the above
+mentioned rendering of HTML as text (meaning you can save content
+easily), and the customizable keybinds.</p>
+
+<p>There was however, one significant sticking point. After countless hours
+fruitlessly searching, I was unable to find a way to yank URLs to the
+clipboard. As I have been spending a little time of late on
+<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
+I thought I would ask the good folk there…</p>
+
+<p>Less than fourty hours later, I had an answer so simple and elegant,
+that I was literally grinning when I read it. It deserves quoting in
+full. It is that ingenious.</p>
+
+<blockquote><p>Set the “External Browser” option to
+<code>sh -c 'echo "$0" | xsel'</code></p>
+
+<p>You can use xsel -b to use the clipboard instead of the primary
+selection. An alternative to
+<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
+is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
+(xclip for the primary selection, xclip -selection CLIPBOARD for the
+clipboard).</p>
+
+<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
+Then press M to copy (yank) the URL of the current page, or ESCM to
+copy the URL of the link under the cursor.</p>
+
+<p>You can use the second or third external browser for that instead;
+then the key combination is 2M or 3M or 2ESCM or 3ESCM.
+<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
+
+<p>This simple hack means that it is now trivial to yank either the URL of
+the current page, or of the link under the cursor to primary selection.
+It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
+and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
+<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN
+</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
+</span></code></pre></div></figure>
+
+
+<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
+
+<h4>Updated 8/5/11</h4>
+
+<p>Gilles has edited and updated his answer with a slight change:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
+</span></code></pre></div></figure>
+
+
+<p>This prevents a new line being appended.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -331,106 +447,6 @@ of the finished product on Flickr.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/01/25/setting-urgent-hints-in-dwm/">Setting Urgent Hints in dwm</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-01-25T17:45:00+13:00" pubdate data-updated="true">Jan 25<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5379701719/#/photos/jasonwryan/5379701719/lightbox/" title="Arch Linux: dwm with statuscolors patch"><img src="http://dl.dropbox.com/u/261312/Blog-images/dwm-urgent.png" alt="image" /></a></p>
-
-<p>After nearly 12 months of running a pretty stable
-<a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>, with a consistent
-patchset (cycle,
-<a href="http://dwm.suckless.org/patches/push" title="Push on suckless wiki">push</a>,
-and init pertag<sup>1</sup>) I finally added another one:
-statuscolours<sup>2</sup>…</p>
-
-<p>I have been experimenting with
-<a href="http://jasonwryan.com/blog/2010/12/26/wmfs-window-manager-from-scratch/" title="My post on using WMFS">WMFS</a>,
-which is another very nice, minimal tiling window manager and was really
-enjoying the urgency hints in the status bar, so I decided to patch that
-functionality into dwm.</p>
-
-<p>Most terminal applications will send a bell when your attention is
-required; in my case, I was looking for a way to trigger notifications
-for new mail in
-<a href="http://www.mutt.org/" title="If you are using another mail user agent, you are doing it wrong...">mutt</a>
-or highlights in <a href="http://irssi.org/" title="IRC client">irssi</a>. In mutt, it
-was just a case of setting a bell for when mail arrived:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span>beep_new             <span class="c"># bell on new mail</span>
-</span></code></pre></div></figure>
-
-
-<p>And in irssi:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">beep_msg_level</span> <span class="o">=</span> <span class="s2">&quot;NOTICE MSGS HILIGHT&quot;</span>;
-</span></code></pre></div></figure>
-
-
-<p>In <a href="http://tmux.sourceforge.net/" title="terminal mulitplexer">tmux</a>, to cover
-all your terminal bases, add:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set</span> -g bell-action any <span class="c"># listen for activity on all windows</span>
-</span></code></pre></div></figure>
-
-
-<p>The next step is to pass those beeps to your terminal. The entry for
-Urxvt is one I picked up after a quick search turned up
-<a href="http://rsontech.net/articles/2008/11/17/1/handling-urgency-hints" title="Post on reson.tech">this post by rson</a>
-which had the .Xdefaults line I was looking for:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>URxvt*urgentOnBell: <span class="nb">true</span>
-</span></code></pre></div></figure>
-
-
-<p>Now, whenever a bell is triggered in irssi or mutt, that is passed to
-the terminal as an urgent hint. The final step was patching statuscolors
-into dwm.c to change the tag colour when the hint was received.</p>
-
-<p>You can see my
-<a href="https://bitbucket.org/jasonwryan/workstation/src/82e7f34ee0a3/dwm-5.8.2-2/5.8.2-2.diff" title="dwm.c patched">patched dwm.c</a>
-in my mercurial repo.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>These patches are from the extremely helpful Arch Forum thread:
-<a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a></li>
-<li>I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
-from the suckless mailing list. It irons out the padding issues in the one on the wiki.</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/13/">&larr; Older</a>
@@ -448,6 +464,10 @@ from the suckless mailing list. It irons out the padding issues in the one on th
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a>
       </li>
     
@@ -461,10 +481,6 @@ from the suckless mailing list. It irons out the padding issues in the one on th
     
       <li class="post">
         <a href="/blog/2012/06/16/misunderstanding/">Misunderstanding Arch</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/23/notmuch/">Using Notmuch with mutt</a>
       </li>
     
   </ul>
