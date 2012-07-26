@@ -1,0 +1,170 @@
+---
+layout: post
+title: "Sharing Mercurial Patchsets"
+date: 2012-07-26 18:48
+comments: true
+categories: [archlinux, dwm]
+---
+{% img left http://dl.dropbox.com/u/261312/Blog-images/guard.jpg 'On Guard image on Flickr' %}
+In my last post, on
+[Mercurial Queues](http://jasonwryan.com/blog/2012/07/24/queues/ 'You should read it…'),
+I outlined how you might use MQ to manage a 
+[dwm](http://dwm.suckless.org/ 'Dynamic window manager') patchset.
+Mercurial makes this process ridiculously easy, and this functionality is more
+than enough to recommend it. However, where I think it really gets interesting
+is when you share that same patchset across multiple machines and are easily
+able to customize which patches in the queue are applied, based upon the
+particular machine you are building dwm on.
+
+For example, in my case I use dwm on all three of my machines: my desktop at home,
+my laptop at work and my EeePC. Given the nature of each of these three machines,
+though, I want a slightly different stack of patches applied. These differences
+might extend only to particular rules applied in <span class="file">config.def.h</span>
+based upon the number of tags I use, or the different applications that I run 
+at home as opposed to at work.
+
+In any event, what I want to be able to do is maintain 
+[a single patchset](http://pikacode.com/jasonwryan/dwm-patchset/files/default 'Patchset on Pikacode')
+in a mercurial repository, clone it to all my machines and then, using MQ,
+filter which specific patches are applied. This is all possible using a killer
+feature of MQ called
+[guards](http://hgbook.red-bean.com/read/advanced-uses-of-mercurial-queues.html 'Advanced uses of MQ in the Mercurial book).
+Guards allow you to conditionally apply patches in a queue. Essentially, in
+a queue, you “tag” a patch with a guard and—depending on whether or not the
+guard is positive (to be applied), or negative (to be skipped)—when you
+`hg qpush -a` MQ takes care of applying the correct patches in the queue.
+
+So, in the case of my work laptop, I begin by cloning dwm and intializing
+a patch queue:
+
+{% codeblock lang:sh %}
+cd Build/
+hg clone http://hg.suckless.org/dwm
+hg qinit -c
+{% endcodeblock %}
+
+I setup my <span class="file">.hgrc</span> within the patches directory so that
+it points at the correct mercurial repository:
+
+{% codeblock lang:sh .hg/patches/.hg/hgrc %}
+ # Mercurial config file
+[ui]
+username = jasonwryan <jasonwryan@gmail.com>
+ssh = ssh -i ~/.ssh/bb -C 
+[paths]
+default = ssh://hg@pikacode.com/jasonwryan/dwm-patchset
+{% endcodeblock %}
+
+Then I pull down my dwm patchset from the mercurial repository
+with `hg pull`:
+
+{% codeblock lang:sh %}
+pulling from ssh://hg@pikacode.com/jasonwryan/dwm-patchset
+requesting all changes
+adding changesets
+adding manifests
+adding file changes
+added 6 changesets with 16 changes to 10 files
+(run 'hg update' to get a working copy)
+{% endcodeblock %}
+
+After I update my local repo,<sup>1</sup> I can see the full patchset with
+`hg qseries`:
+
+{% codeblock lang:sh %}
+setup.makefile
+base.config.customizations
+statuscolours
+cycle
+push
+bstack
+centurion.config
+{% endcodeblock %}
+
+Then, as I decribed in my previous post, I make the changes to 
+<span class="file">config.def.h</span> that are specific to this
+machine:
+
+{% codeblock lang:sh %}
+hg qnew veles.config
+ # “hack, hack, hack…”
+hg qrefresh
+hg qcommit -m 'Adaptions for Veles'
+{% endcodeblock %}
+
+My patchset now has an additional patch in it:
+
+{% codeblock lang:sh %}
+┌─[Veles ~/Build/dwm]
+└─╼ hg qseries
+setup.makefile
+base.config.customizations
+statuscolours
+cycle
+push
+bstack
+centurion.config
+veles.config
+{% endcodeblock %}
+
+This is where guards come in to play. If I wasn't interested in sharing
+the patchset, it would just be a matter of deleting the patch for Centurion.
+However, what I want to do is direct MQ to ignore that specific patch
+when applying the queue. I do that by creating a negative guard and then
+activating it:
+
+{% codeblock lang:sh %}
+hg qguard centurion.config -- -block
+hg qselect block
+number of unguarded, unapplied patches has changed from 8 to 7
+{% endcodeblock %}
+
+That's it! Adding a verbose flag to `hg qseries`<sup>2</sup> will print out the
+patchset and the accompanying guard status:
+
+{% codeblock lang:sh %}
+┌─[Veles ~/Build/dwm]
+└─╼ hg qseries -v
+0 U setup.makefile
+1 U base.config.customizations
+2 U statuscolours
+3 U cycle
+4 U push
+5 U bstack
+6 G centurion.config
+7 U veles.config
+{% endcodeblock %}
+
+The real test, of course, is pushing the patchset onto the fresh
+dwm code:
+
+{% codeblock lang:sh %}
+┌─[Veles ~/Build/dwm]
+└─╼ hg qpush -a
+applying setup.makefile
+applying base.config.customizations
+applying statuscolours
+applying cycle
+applying push
+applying bstack
+skipping centurion.config - guarded by '-block'
+applying veles.config
+now at: veles.config
+{% endcodeblock %}
+
+How cool is that? One central patchset, applied conditionally depending
+upon the machine you are using at the time.
+
+#### Notes
+1. Any guards applied on other machines will be present in the newly
+pulled <span class="file">series</span> file: these conflicts will need
+to be manually merged…
+2. The options for all of the `hg` commands can be read with
+`hg -v help $command`. For those related to queues, just prepend
+a `q` to `$command`.
+
+Creative Commons image on Flickr by 
+[Thorsten Becker](http://www.flickr.com/photos/alternatewords/4903560373/ 'On Guard on Flickr')
+
+
+
