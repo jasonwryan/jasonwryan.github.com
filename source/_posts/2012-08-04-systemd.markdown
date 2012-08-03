@@ -1,0 +1,114 @@
+---
+layout: post
+title: "The Leap to systemd"
+date: 2012-08-04 09:32
+comments: true
+categories: [archlinux, community]
+---
+{% img left http://dl.dropbox.com/u/261312/Blog-images/leap.jpg Leap image on Flickr %}
+I posted a couple of weeks ago about the impact of some of the current
+[changes to Arch Linux](http://jasonwryan.com/blog/2012/07/19/breakage/ 'Post on the glibc change').
+There seems to be quite a bit of it about, because in conjunction with the move from 
+<span class="file">/lib</span> to <span class="file">/usr/lib</span>—and motivated by the same
+overarching shifts in the other distributions—the other major change making its way through
+the Arch community is the move to 
+[systemd](http://freedesktop.org/wiki/Software/systemd 'Project page'). This change, however, has
+been more controversial because it marks a shift away from Arch's central configuration
+file, [/etc/rc.conf](https://wiki.archlinux.org/index.php/Rc.conf 'Arch wiki entry on rc.conf');
+a move that has disconcerted a number of people.
+
+I'm not going to get into whether or not this move is consistent with
+[The Arch Way](https://wiki.archlinux.org/index.php/The_Arch_Way 'Wiki entry'), because that has
+been thrashed over extensively on the 
+[mailing](http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023283.html 'ML thread on rc.conf')
+[lists](http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023258.html 'And another one…'),
+but also—and more importantly—because Arch is a rolling release, which means change is *inevitable*.
+What is more, after watching all the back and forth on the <acronym title="Mailing lists">ML</acronym>
+and on the [boards](https://bbs.archlinux.org/viewtopic.php?id=96316&p=1 'Arch BBS thread on systemd'), I am convinced that the
+[developer overseeing this shift](http://www.archlinux.org/developers/#tomegun 'Tom Gunderson')
+both knows what he is doing and is acting in the best interests of Arch.
+
+This view has been validated by my experience of shifting to systemd on my machines. 
+
+When the new initscripts package was pushed to [testing] in the middle of last month,
+I stripped out all of the redundant options in <span class="file">/etc/rc.conf</span>
+and took the ten minutes or so to read about and then create the new files. I then spent some
+time reading up on systemd, principally 
+[Lennart Poettering's series of posts](http://0pointer.de/blog/projects/systemd-for-admins-1.html 'One of TWELVE…'),
+the [Arch wiki entry](https://wiki.archlinux.org/index.php/Systemd 'Good, but needing some structure')
+and the many and various
+[manual pages](http://0pointer.de/public/systemd-man/ 'One for everything').
+
+Over the last couple of days, I have migrated all of my machines over to systemd. I found it
+to be a very straightforward process. I went for a pure systemd approach, for reasons I will
+return to. Essentially, this is how I tackled it.
+
+First, for each machine, I established what daemons were running. I did this by using
+[this shell script](http://pikacode.com/jasonwryan/Veles/file/default/Scripts/daemons.sh 'Pretty sure it is one of Xyne's')
+and cross checking entries in my <span class="file">/etc/rc.conf</span>. Then
+it was just a matter of installing systemd:<sup>1</sup>
+
+{% codeblock lang:sh %}
+sudo pacman -S systemd systemd-sysvcompat systemd-arch-units
+{% endcodeblock %}
+
+The only outstanding file to be created was <span class="file">/etc/timezone</span>, the
+others—all documented in `man rc.conf`—I had created earlier in the month. Then, with the
+list of the services I would need running on each box, I enabled them. I think it is
+fair to say that the only thing that is clunky about systemd is the command syntax for
+managing units. Repeatedly typing `systemctl enable foo.service` is as tedious as it is
+error prone, so I hacked up a 
+[wrapper script](http://pikacode.com/jasonwryan/Centurion/file/default/Scripts/sysd 'sysd - *so* much easier'):
+
+{% codeblock lang:sh %}
+sysd enable acpid
+sysd enable lvm
+etc…
+{% endcodeblock %}
+
+I also activated some additional gettys, as I like to log into a tmux session in TTY2 when
+I don't need or want to start `X`:
+
+{% codeblock lang:sh %}
+ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty2.service
+{% endcodeblock %}
+
+And I misguidedly wrote a couple of custom service files that turned out to be
+[completely unnecessary](https://bbs.archlinux.org/viewtopic.php?id=146207 'BBS post on said files');
+and then I was done.
+
+On all three boxes I rebooted and that was it. The only issue I experienced was
+the final shutdown after removing initscripts and before booting up with
+systemd. After issuing `shutdown -r now` the process 
+hung with a message about a missing <span class="file">inittab</span> file. 
+In retrospect, I should have added `init=/bin/systemd` to my kernel parameters
+and not unistalled instiscripts until I had booted with systemd. This has 
+now been added to the
+[systemd wiki page](https://wiki.archlinux.org/index.php/Systemd 'Archwiki systemd page').
+
+Overall, though: no real drama, just a blur of text<sup>2</sup> and then the
+login prompt. While I haven't seen a dramatic decrease in boot time,
+booting does *feel* a bit snappier and two of my three machines shutdown
+markedly more quickly. Consider me sold.
+
+That brings me back to the decision to opt for a pure systemd approach, rather than 
+hanging on to a completely eviscerated <span class="file">/etc/rc.conf</span>. The 
+Arch community has been told that the intention is to 
+[support the rc.conf format forever](https://bbs.archlinux.org/viewtopic.php?pid=1133957#p1133957 'BBS post by tomegun');
+I can't help but think this is a mistake. In the same way that
+[partial upgrades are unsupported](https://wiki.archlinux.org/index.php/Pacman#Partial_upgrades_are_unsupported 'Pacman entry on Arch Wiki'),
+I think that systemd is Arch's inevitable future and the community should be encouraged to accept that, `Syu` and
+move on…
+
+Having said that, I appreciate the consideration shown by the developers in wanting to assure
+people that their choice would continue to be catered for; and perhaps, over time, people still
+using initscripts will be regarded with the same sense of wry amusement as those who still show
+up from time to time with `hal` in their `DAEMONS` line.
+
+#### Notes
+1. Note this approach will *remove* sysvinit and initscripts and `mv /etc/rc.conf{,.pacsave}`.
+2. Make sure you remove `quiet` from your kernel parameters for your first systemd
+boot so you can see that everything starts correctly…
+
+Creative commons image on Flickr by 
+[Tricky](http://www.flickr.com/photos/sovietuk/486119799/ 'leap by rick harrison')
