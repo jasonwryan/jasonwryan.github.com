@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Readline Bindings in Vi Mode - jasonwryan.com</title>
+  <title>jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I recently threw caution to the wind and
-changed my shell over to vi mode.
-I wanted to take advantage of the superior command editing ability that &hellip;">
+  <meta name="description" content="OpenOffice won’t recognize TrueType fonts with the extension .otf, so you need to convert them to .ttf
+in order to use them in that suite. sudo apt- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +19,7 @@ I wanted to take advantage of the superior command editing ability that &hellip;
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/12/01/readline">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/21">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -82,12 +81,15 @@ I wanted to take advantage of the superior command editing ability that &hellip;
 </nav>
   <div id="main">
     <div id="content">
-      <div>
-<article class="hentry" role="article">
+      <div class="blog-index">
   
+  
+  
+    <article>
+      
   <header>
     
-      <h1 class="entry-title">Readline Bindings in Vi Mode</h1>
+      <h1 class="entry-title"><a href="/blog/2009/03/17/install-otf-fonts-in-openoffice/">Install .otf Fonts in OpenOffice</a></h1>
     
     
       <p class="meta">
@@ -103,132 +105,73 @@ I wanted to take advantage of the superior command editing ability that &hellip;
   
 
 
-<time datetime="2011-12-01T18:43:00+13:00" pubdate data-updated="true">Dec 1<span>st</span>, 2011</time>
+<time datetime="2009-03-17T19:51:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2009</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/readline.png" alt="image" /></p>
+  <div class="entry-content"><p>OpenOffice won’t recognize TrueType fonts with the extension <code>.otf</code>, so you need to convert them to <code>.ttf</code>
+in order to use them in that suite.</p>
 
-<p>I recently threw caution to the wind and
-<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
-I wanted to take advantage of the superior command editing ability that
-this mode offered, and also to continue to bake vi[m] methods into every
-aspect of my working environment.</p>
-
-<p>The change has been relatively straightforward; the only issues I have
-experienced are really just around a couple of keybinds that I had
-become accustomed to in normal/Emacs mode:</p>
-
-<ul>
-<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
-<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
-</ul>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install fontforge
+</span></code></pre></div></figure>
 
 
-<p>The first, the ability to recall the final arguments of previous
-commands was a showstopper for me: I really struggled without this.
-Being able to recall a long file path and append it to a new command is
-invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
-exactly this. Why it is not bound by default in vi mode is beyond me…</p>
+<p>If all the <code>.otf</code> files are in the same folder, then you are good to go.</p>
 
-<p>The other was purely cosmetic, really. I am an inveterate clearer of the
-screen—unless I am referring to something printed to stdout, I always
-prefer to work at the top of the console.</p>
+<p>First, you need the conversion script, which I found in <a href="url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this%20post[/url">this post</a>:</p>
 
-<p>In any event, with the
-<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
-it was a trivial exercize to restore this functionality to my bash shell
-in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
-
-<figure class='code'><figcaption><span>~/inputrc </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc
-</span><span class='line'>
-</span><span class='line'># for vi mode
-</span><span class='line'>set editing-mode vi
-</span><span class='line'>$if mode=vi
-</span><span class='line'>
-</span><span class='line'>set keymap vi-command
-</span><span class='line'># these are for vi-command mode
-</span><span class='line'>"\e[A": history-search-backward            # arrow up
-</span><span class='line'>"\e[B": history-search-forward             # arrow down
-</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
-</span><span class='line'>Control-l: clear-screen
-</span><span class='line'>
-</span><span class='line'>set keymap vi-insert
-</span><span class='line'># these are for vi-insert mode
-</span><span class='line'>"\e[A": history-search-backward
-</span><span class='line'>"\e[B": history-search-forward
-</span><span class='line'>"\ep": yank-last-arg
-</span><span class='line'>Control-l: clear-screen
-</span><span class='line'>$endif</span></code></pre></div></figure>
+<figure class='code'><figcaption><span>otf2ttf.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/local/bin/fontforge</span>
+</span><span class='line'><span class="c"># Quick and dirty hack: converts a font to truetype (.ttf)</span>
+</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Opening &quot;</span>+<span class="nv">$1</span><span class="o">)</span>;
+</span><span class='line'>Open<span class="o">(</span><span class="nv">$1</span><span class="o">)</span>;
+</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Saving &quot;</span>+<span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
+</span><span class='line'>Generate<span class="o">(</span><span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
+</span><span class='line'>Quit<span class="o">(</span>0<span class="o">)</span>;
+</span></code></pre></div></figure>
 
 
-<p>There is an extensive list of
-<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
-with which you can customize your shell environment.</p>
+<p>Save it as <code>otf2ttf.sh</code> into the folder with the <code>.otf</code> files.</p>
+
+<p>Then run:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">for </span>i in *.otf; <span class="k">do </span>fontforge -script otf2ttf.sh <span class="nv">$i</span>; <span class="k">done</span>
+</span></code></pre></div></figure>
+
+
+<p>Move all the converted fonts to your your shared directory:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo mv *ttf /usr/share/fonts/truetype/myfonts/
+</span></code></pre></div></figure>
+
+
+<p>And then change the permissions and reload the cache:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/
+</span><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/*.ttf
+</span><span class='line'>sudo <span class="nb">fc</span>-cache -f -v
+</span></code></pre></div></figure>
+
+
+<p>And the fonts will now appear in OpenOffice. Easy.</p>
 </div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
-
-      
-
-
-
-
-
-
-
-
   
 
 
-<time datetime="2011-12-01T18:43:00+13:00" pubdate data-updated="true">Dec 1<span>st</span>, 2011</time>
-      
-
-<span class="categories">
+    </article>
   
-    <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/vim/'>vim</a>
-  
-</span>
-
-
-    </p>
+  <div class="pagination">
     
-      <div class="sharing">
-  
-  
-  
-</div>
-
+    <a href="/blog/archives">Blog Archives</a>
     
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/2011/11/29/rtorrent/" title="Previous Post: Building rtorrent on Debian Squeeze">&laquo; Building rtorrent on Debian Squeeze</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2011/12/18/login/" title="Next Post: Logging Straight Into X">Logging Straight Into X &raquo;</a>
-      
-    </p>
-  </footer>
-</article>
-
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a class="next" href="/blog/page/20/">Newer &rarr;</a>
+    
+  </div>
 </div>
-  </section>
-
-</div>
-
 <aside class="sidebar">
   
     <section>
@@ -261,7 +204,7 @@ with which you can customize your shell environment.</p>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating...</li>
+    <li class="loading">Status updating&#8230;</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -277,7 +220,7 @@ with which you can customize your shell environment.</p>
 
 <section>
   <h1>My Pinboard</h1>
-  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
   <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
 </section>
 <script type="text/javascript">
@@ -300,7 +243,7 @@ with which you can customize your shell environment.</p>
   #lastfmList li{ text-align: left; }
 </style>
 <ul id="lastfmList">
-  <li class="loading">Updating tracks...</li>
+  <li class="loading">Updating tracks&#8230;</li>
 </ul>
 <p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
 
@@ -347,7 +290,6 @@ function showLastfmFeed(xml){
   
 </aside>
 
-
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -362,10 +304,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       var disqus_shortname = 'jasonwryan';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/12/01/readline/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2011/12/01/readline/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

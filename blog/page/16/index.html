@@ -9,7 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Rather than just download Thunderbird, you can always install something a little more interesting that will a) provide hours of fun setting up and &hellip;">
+  <meta name="description" content="A couple of weeks ago, I came across these
+simple bash functions
+written by Jack Mottram of One Thing Well for managing text
+notes. The functions as &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -82,6 +85,108 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/09/28/command-line-notes/">Command Line Notes</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-28T17:56:00+13:00" pubdate data-updated="true">Sep 28<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-1.png" alt="image" /></p>
+
+<p>A couple of weeks ago, I came across these
+<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
+written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
+notes.</p>
+
+<p>The functions as described in the article are so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$*&quot;</span>.txt <span class="o">}</span> nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$*&quot;</span> <span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>Unfortunately, the second function – for retrieving the list of files in
+the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
+and it will only list files in the top level directory. If you are an
+inverterate note taker, this plainly won’t scale.</p>
+
+<p>My first attempt at hacking a solution yielded this little beauty:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\ </span>
+</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>Which removes <code>ls</code> from the function and allows nested directories, but
+is needlessly complex and, with four pipes, hideously <del>inefficient</del>
+inelegant.</p>
+
+<p>After reading up on Awk, particularly
+<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
+I arrived at something marginally longer but relying solely on the
+awesome power of awk to make the various transformations I was seeking…</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
+</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>An added advantage is that it is scalable irrespective of how deep the
+directories go. I’m sure that with some more awk-foo I could write a
+more effective set of conditionals, but this seemed a pretty good start
+for a simple note taking utility.</p>
+
+<h3>Updated 3/11/10</h3>
+
+<p>To remove a little of the visual clutter, I amended the awk script to
+strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
+</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
+in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
+symlink to it from <span class="file">~/.notes</span>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.</p></li>
+<li><p>Obligatory “after” screenshot:</p></li>
+</ol>
+
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-2.png" title="'Screenshot of editing text'" ></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -179,75 +284,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/04/03/vapourware/">Vapourware</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-04-03T13:18:00+13:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This morning I received a heap of brochures inviting me to attend
-professional development courses, training seminars and conferences. One
-in particular stood out for reasons I’d like to share with you.</p>
-
-<p>By way of context; it’s a 2 day programme (workshops on the first,
-plenary sessions on the second) of social media for internal
-communicators. As I have a keen interest in internal communications, I
-studied their offering.</p>
-
-<p>One presentation, from an “international guest speaker,” is so striking
-I’ll reprint it in its entirety, removing the name of the company to
-prevent them any (further) embarassment, (all emphasis mine):</p>
-
-<blockquote><p>[Multi-national company] is rolling out Sharepoint this year. It
-<strong>will</strong> provide the organization with an enhanced way of
-communicating, collaborating and managing content - a dynamic platform
-on which to evolve and further improve [company’s] way or working.
-From an internal communications perspective, the Microsoft Office
-product provides an <strong>updated way</strong> to engage colleagues, in order to
-drive winning culture and business performance. This session captures
-the opportunities, benefits, <strong>and realities</strong> of implementing and
-living with Sharepoint.</p>
-
-<p>[Employee name], Internal Communications Director, [company].</p></blockquote>
-
-<p>Did I read that correctly? The company haven’t actually implemented the
-technology yet, but they are still fronting someone to sell it’s future
-virtues.</p>
-
-<p>Whether or not the technology is able to deliver these benefits (and I
-<a href="http://twitter.com/jasonwryan/status/839079414">doubt it</a> <a href="http://twitter.com/jasonwryan/status/839079197">very
-much</a>), shouldn’t the
-corporate communicator at least be talking about, oh let’s say for a
-whim, something <em>grounded in evidence?</em></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/17/">&larr; Older</a>
@@ -265,6 +301,10 @@ whim, something <em>grounded in evidence?</em></p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/04/systemd/">The Leap to systemd</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a>
       </li>
     
@@ -278,10 +318,6 @@ whim, something <em>grounded in evidence?</em></p>
     
       <li class="post">
         <a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/16/misunderstanding/">Misunderstanding Arch</a>
       </li>
     
   </ul>
