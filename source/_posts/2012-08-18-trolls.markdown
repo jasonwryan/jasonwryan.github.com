@@ -1,0 +1,108 @@
+---
+layout: post
+title: "Trolling Arch Linux"
+date: 2012-08-18 10:47
+comments: true
+categories: [archlinux, community]
+---
+    
+{% img left http://dl.dropbox.com/u/261312/Blog-images/troll.jpg 'Troll on Flickr' %}
+I posted recently about
+[my experiences shifting to systemd](http://jasonwryan.com/blog/2012/08/04/systemd/ 'Some thoughts on moving across…')
+and how I found it, for all three of my Arch machines, to be a relatively simple and
+straightforward process which, in the intervening weeks, has borne out the views of 
+the developers and other members of the community who have been using it for a longer
+period—it works, and works well. At the start of this week, Stéphane Gaudreault
+announced on Arch-dev-public the intention to 
+[replace the original initscripts with systemd](http://mailman.archlinux.org/pipermail/arch-dev-public/2012-August/023389.html 'ML post seeking developer views').
+
+The reaction by some to this announcement was, to me, quite disappointing. My view of
+open source communities is that by participating you are entering into a social contract.
+That contract is that, as you are reliant on the goodwill of the wider community it is
+incumbent on you to ensure that your overall contribution—in whatever form—brings
+more to the community than it takes away. At the very least, you can strive to ensure 
+that it is a value neutral exchange.
+
+Sadly, for some of the trolls on the <acronym title="Mailing lists">MLs</acronym>, that
+is patently not the case. I want to take a closer look at just one of those threads, for two
+reasons. First, it is a textbook case of a particularly pernicious troll. And second, in
+conjunction with some other factors, it had an especially damaging effect on the wider
+community. 
+
+The thread in question is on Arch-general, the largest of the mailing lists. It has
+the suitably alarmist title
+[Think twice before moving to systemd](http://mailman.archlinux.org/pipermail/arch-general/2012-August/029856.html 'A trolling we will go…').
+The troll, who has had only minimal involvement with the Arch community up until this
+unfortunate moment starts by framing his “concern”<sup>1</sup>:
+
+{% blockquote Felipe Contreras %}
+I just became aware that Arch Linux plans to switch to systemd, and this worries me for several reasons.
+{% endblockquote %}
+
+Felipe is worried. Ergo, *we* should be worried. Why should we be worried? Because,
+despite the fact that systemd has been discussed and used by Archers since the
+[middle of 2010](https://bbs.archlinux.org/viewtopic.php?id=96316 '57 page thread on the Arch BBS'),
+it has just come to his attention and now, with the formidable powers of his intellect,
+he has detected a disturbance in the force.
+
+{% blockquote Felipe Contreras %}
+I tried systemd a while ago in a brand new machine with Arch Linux and the boot was *much slower*. After some exchanges with Lennart Poettering and other people in Google+[1], it became clear I was on my own. Eventually I found the culprit: Fedora uses CONFIG_HZ_1000, and Arch Linux uses CONFIG_HZ_300. It became clear to me that systemd was not ready for prime time, it wasn't thoroughly tested in a lot of machines, and if you have problems Lennart Poettering will blame you (PulseAudio sounds familiar?).
+{% endblockquote %}
+
+The salient phrases here are “it became clear I was on my own” and the even more telling, 
+“it became clear to me that systemd was not ready for prime time.” Once I had managed to 
+wipe away the tears of gratitude that were coursing down my cheeks, I realized that Arch
+finally had finally found what it had been missing for all these years: a saviour. We
+were going to be OK after all.
+
+Felipe has “found the culprit.” Despite the best efforts of the Arch developers, upstream,
+the other distros that have been using it for considerably longer, and the experience of the
+[Arch users reported on our boards](https://bbs.archlinux.org/viewtopic.php?pid=1147676 'Thread on systemd - one of many'),
+no-one had the heroic ability to see through to the heart of this conundrum and expose
+systemd for the fraud that it is.
+
+But our gratitude should be tempered with some shame for we, the Arch community, have let
+Felipe down. We haven't lived up to the standards he expects of us. As he gently admonishes us: 
+“I was expecting more from the Arch Linux community.” Yes, Felipe, and you were right to. 
+We let you down; can you forgive us?
+
+The thread goes on to generate more than 50 replies. All of them wasted. 
+His trolling is not interested in facts, in reason or logic; his method of argumentation is
+not rational, and he is not interested in working toward an understanding
+of the truth; he just wants to be right. At whatever cost to the wider community. These posts, 
+and trolls in other fora
+[like this one](https://lkml.org/lkml/2012/4/12/434 'LKML exchange with Linus Torvalds'),<sup>2</sup>
+are really about gratifying Felipe's own voracious appetite for self-aggrandisement. In reality,
+of course, it is a stunning illustration of the
+[Dunning-Kruger effect](https://secure.wikimedia.org/wikipedia/en/wiki/Dunning%E2%80%93Kruger_effect 'Wikipedia entry').
+It would be pathetic if it were a victimless pursuit; but it is not.
+
+Further down in the thread we see the inevitable frustration of the developer who leads
+this work for Arch, 
+[Tom Gunderson](https://www.archlinux.org/developers/#tomegun 'Tom's developer profile'),
+finally [boil over](http://mailman.archlinux.org/pipermail/arch-general/2012-August/029933.html 'Tom's reply quoting Linus').
+This precipitates another thread where Tom announces that he will
+[no longer participate in this list](http://mailman.archlinux.org/pipermail/arch-general/2012-August/029960.html 'Tom's mail to the list').
+This is from the developer that has patiently and constructively engaged with Arch users on the
+list around this issue for the past several months. On his own time.
+
+That is the impact of trolls like Felipe. That is a direct effect of his selfishness on the
+wider community. What has he brought to the community? Dissent, distraction and posturing.
+What has he taken away? The ability for all of us to engage with one of the developers
+of the software we all use. His presence on the list, and that of a few others,
+has been nothing short of corrosive.
+
+And as for the smoking gun, the config setting that no-one was smart enough to 
+discover? Denis A. Altoé Falqueto went to the trouble to build another kernel
+and run a test and, contrary to Felipe who provided no such evidence, 
+[posted the results](http://mailman.archlinux.org/pipermail/arch-general/2012-August/030145.html 'Denni's post').
+You can guess the outcome.
+
+#### Notes
+1. See the [concern troll](http://www.urbandictionary.com/define.php?term=concern+troll).
+2. Read the whole thread to fully understand how obstinance can trump reason… See
+also his [own blog](http://felipec.wordpress.com/2012/05/26/no-mercurial-branches-are-still-not-better-than-git-ones-response-to-jhws-more-on-mercurial-vs-git-with-graphs/)
+where he expresses incredulity that his comments on another blog have been deleted.
+
+Creative Commons image of the troll on Flickr by
+[Comrade Foot](http://www.flickr.com/photos/56380734@N05/6937763971/).
