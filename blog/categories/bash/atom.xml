@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/bash/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-08-18T12:53:41+12:00</updated>
+  <updated>2012-09-01T10:31:13+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,143 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Improved Notes Utility]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/09/01/notes-updated/"/>
+    <updated>2012-09-01T10:09:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/09/01/notes-updated</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/notes.jpg" title="'Notepad image on Flickr'" >
+Nearly two years ago, I posted about my adaption of a simple
+<a href="http://jasonwryan.com/blog/2010/09/28/command-line-notes/" title="My post in 2010">command line note utility</a>.
+I have used this setup on all of my machines on a daily basis since and it has worked
+marvellously. Symlinking to a folder in
+<a href="https://www.dropbox.com/home" title="Dropbox home">Dropbox</a> means that the notes are accessible
+from all my machines, including my phone. There has only really been one aspect of this setup
+that has been sub-optimal.</p>
+
+<p>As an inveterate note-taker (this is one of the “benefits” of ageing; the speed with
+which you forget information outpaces the acquisition of newer material) I have—in
+those intervening years—built up quite a store of notes. Consequently, in order to
+maintain a semblance of order, I have arranged them in a series of directories. There
+is a minor flaw with this approach: retreiving a note depended on two factors, a) excellent
+recall<sup>1</sup> and, b) accurately typing out the full path. Neither of these are things that I
+am inherently good at or inclined to master.</p>
+
+<p>This had been irritating me for some time before I came across this
+<a href="http://unix.stackexchange.com/questions/11906/how-to-change-the-target-directory-for-tab-completion" title="Tab completion for notes function">question on Unix &amp; Linux StackExchange</a>.
+This provided me with a partial solution to the issue but, as I note in my answer, I was not
+able to solve it for nested directories, which was my particular use case. Once I had
+muddled my way through the solution on U&amp;L I pushed it to the back of my mind and
+tried to ignore it.</p>
+
+<p>Recently, though, the accumulation of notes and the frustration of trying to access them
+without <kbd>Tab</kbd> completion drove me to do something about it.</p>
+
+<p>The documentation on
+<a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html" title="Bash Manual">programmable completion</a>
+is typically terse and searching the web returns very little in the way of instructions
+as to how to accomplish this.<sup>2</sup> Undeterred, I decided to hack up a completion
+function that worked for nested directories.</p>
+
+<p>What I arrived at was this:
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">shopt</span> -s globstar
+</span><span class='line'><span class="nb">shopt</span> -s progcomp&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> <span class="nv">$HOME</span>/.notes/<span class="s2">&quot;$*&quot;</span>.txt ;<span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="c"># completion for notes</span>
+</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>cur
+</span><span class='line'>    <span class="nv">cur</span><span class="o">=</span><span class="k">${</span><span class="nv">COMP_WORDS</span><span class="p">[COMP_CWORD]</span><span class="k">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;files<span class="o">=(</span><span class="nv">$HOME</span>/.notes/**<span class="o">)</span>
+</span><span class='line'><span class="nv">file</span><span class="o">=</span><span class="s2">&quot;${files[@]##*/}&quot;</span>
+</span><span class='line'><span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="k">$(</span> <span class="nb">compgen</span> -f <span class="s2">&quot;${file[@]}&quot;</span> -- <span class="k">${</span><span class="nv">cur</span><span class="k">}</span> <span class="k">)</span> <span class="o">)</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The best that can be said about it is that it <em>nearly</em> works…<sup>3</sup></p>
+
+<p>Realising that I was completely out of my depth, I turned to #bash for help, and
+I was indeed fortunate that
+<a href="https://github.com/geirha" title="geirha's Gitgub">geihra</a> offered some much needed
+assistance. geirha's solution is an elegant one:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
+</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/&lt;em&gt;*/<span class="s2">&quot;$2&quot;</span>&lt;/em&gt;<span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;<span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> &amp;amp;&amp;amp; <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>In addition to working exactly as I hoped, it had the benefit of introducing me
+to a couple more bash concepts that I hadn't encountered;
+<a href="http://mywiki.wooledge.org/BashGuide/Arrays" title="Bash Guide on Greg's Wiki">adding elements to an array</a>
+with <code>+=()</code> being one. For posterity, the full script is:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
+</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;nls<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>tree -CR --noreport <span class="nv">$HOME</span>/.notes | awk <span class="s1">&#39;{&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">&lt;pre&gt;&lt;code&gt;if (NF==1) print $1; </span>
+</span><span class='line'><span class="s1">else if (NF==2) print $2; </span>
+</span><span class='line'><span class="s1">else if (NF==3) printf &quot;  %s\n&quot;, $3 </span>
+</span><span class='line'><span class="s1">}&#39;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="c"># TAB completion for notes</span>
+</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/&lt;em&gt;*/<span class="s2">&quot;$2&quot;</span>&lt;/em&gt;<span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;<span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> &amp;amp;&amp;amp; <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure></notextile></div></p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The alternative to remembering the full path name is to list all of the notes before
+each operation with the <code>nls</code> function; this is not ideal either…</li>
+<li>Which means that it is either so straightforward that few have bothered to write up their
+experiences (most likely), or so arcane that not many have bothered (how it
+feels to me). However, there are a couple of pages that I referenced in addition
+to the official documentation:
+
+<ul>
+<li><a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html">Adam Backstrong's post</a></li>
+<li><a href="http://fahdshariff.blogspot.co.nz/2011/04/writing-your-own-bash-completion.html">Fahd Shariff's post</a></li>
+<li><a href="http://devmanual.gentoo.org/tasks-reference/completion/index.html">Gentoo Development Guide</a></li>
+</ul>
+</li>
+<li>It fails, as geirha pointed out, because it breaks the filenames on whitespace.</li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by
+<a href="http://www.flickr.com/photos/nicholasjon/4101203095/" title="Field Notes etc on Flickr">nicholasjon</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Moving to Octopress]]></title>
@@ -372,93 +509,6 @@ in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the re
 <p>There is an extensive list of
 <a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
 with which you can customize your shell environment.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[rsync + SSH Backups]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/11/28/rsync/"/>
-    <updated>2011-11-28T12:23:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/11/28/rsync</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/rsync-ssh.png" alt="image" /></p>
-
-<p>I <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
-and included a
-<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
-script for backing up my files to the server. At the time, I was running
-it manually, but since have sorted out the excludes list and have now
-automated it.</p>
-
-<p>My original scheme was to set up a
-<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
-mount an
-<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
-before rsync’ing the directories across. In the end, I went with SSH and
-<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
-as debugging all of the various permissions issues with the NFS share
-did not seem worth the effort.</p>
-
-<p>First, on my local desktop, I created the keypair called, inventively,
-rsync:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
-</span><span class='line'>mv rsync ~/.ssh &amp;amp;&amp;amp; chmod 600 ~/.ssh/rsync
-</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>This keypair was created <em>without a passphrase</em> so that the script could
-be successfully called from <code>cron</code>. To slightly increase the security
-around a key without a passphrase, I used the from option in
-authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
-machine(s), like so:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
-</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
-the SSH command:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.ssh/config </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>Host backups
-</span><span class='line'>   Hostname 192.168.1.200
-</span><span class='line'>   Port 0000
-</span><span class='line'>   User jason
-</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></div></figure></notextile></div></p>
-
-<p>And I was done. Everynight at 10pm, all of my data will be backed up to
-the server. The rsync command in the script:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Backup to remote server over SSH&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;--log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
-</span><span class='line'>-e ssh /home/jason /etc backups:Backups/Centurion
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></div></figure></notextile></div></p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
-</ol>
-
-
-<p>Creative Commons image from
-<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
 ]]></content>
   </entry>
   

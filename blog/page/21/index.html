@@ -9,8 +9,7 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
-accelerate boot time. This has made for a faster boot, but a side effect &hellip;">
+  <meta name="description" content="I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar. Here is how I sorted it. First, I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +82,99 @@ accelerate boot time. This has made for a faster boot, but a side effect &hellip
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/">dzen2 and conky-cli in dwm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-11-21T12:07:00+13:00" pubdate data-updated="true">Nov 21<span>st</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar.</p>
+
+<p>Here is how I sorted it.</p>
+
+<p>First, I installed <code>conky-cli</code> and <code>dzen2</code>. Conky-cli is in AUR, and dzen2 is in Community:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S dzen2 <span class="o">&amp;&amp;</span> yaourt conky-cli
+</span></code></pre></div></figure>
+
+
+<p>Then it was a matter of setting up the relevant files.</p>
+
+<figure class='code'><figcaption><span>.xinitrc.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># ~/.xinitrc</span>
+</span><span class='line'>setxkbmap -option terminate:ctrl_alt_bksp &amp;amp;
+</span><span class='line'><span class="nb">eval</span> <span class="sb">`</span>cat ~/.fehbg<span class="sb">`</span> &amp;amp;
+</span><span class='line'>numlockx &amp;amp;
+</span><span class='line'>xscreensaver -no-splash &amp;amp;
+</span><span class='line'><span class="c"># Dzen &amp;amp; conky</span>
+</span><span class='line'><span class="o">(</span>sleep 15s &amp;amp;&amp;amp; conky | dzen2 -x <span class="s1">&#39;500&#39;</span> -e <span class="s1">&#39;&#39;</span> -fg <span class="s1">&#39;#dcdcdc&#39;</span> -bg <span class="s1">&#39;#3f3f3f&#39;</span> <span class="se">\</span>
+</span><span class='line'>-w <span class="s1">&#39;650&#39;</span> -ta r -fn <span class="s1">&#39;-*-terminus-*-r-normal-*-*-120-*-*-*-*-iso8859-*&#39;</span> -p <span class="o">)</span> &amp;amp;
+</span><span class='line'><span class="c"># Start dwm</span>
+</span><span class='line'><span class="nb">exec </span>ck-launch-session ~/Scripts/dwm-start
+</span></code></pre></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>.conkyrc .sh </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>background no
+</span><span class='line'>out_to_console yes
+</span><span class='line'>update_interval 2
+</span><span class='line'>total_run_times 0
+</span><span class='line'>use_spacer none
+</span><span class='line'>double_buffer yes
+</span><span class='line'>TEXT
+</span><span class='line'>${if_existing /sys/class/power_supply/BAT0/present}^i(/home/jason/Build/dwm/dzen/bat.xbm)…</span></code></pre></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>dwm-start .sh </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>while true; do 
+</span><span class='line'>    dwm >/dev/null
+</span><span class='line'>done</span></code></pre></div></figure>
+
+
+<p>The key is —and it took me a while to work it out— to delay the loading of conky until <em>after</em> dwm has painted it&#8217;s
+status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
+
+<p>Now, the “before” shot:</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/conky-dzen.png"></p>
+
+<p>…and the finished product:</p>
+
+<p><a href="http://www.flickr.com/photos/jasonwryan/4121324068/" title="Conky-cli to dzen2 in dwm on Arch by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2666/4121324068_6ec29262d7.jpg" width="500" height="293" alt="Conky-cli to dzen2 in dwm on Arch"/></a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -267,6 +359,10 @@ in order to use them in that suite.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/18/trolls/">Trolling Arch Linux</a>
       </li>
     
@@ -280,10 +376,6 @@ in order to use them in that suite.</p>
     
       <li class="post">
         <a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a>
       </li>
     
   </ul>

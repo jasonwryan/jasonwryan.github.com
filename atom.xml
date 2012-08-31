@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-08-18T12:53:41+12:00</updated>
+  <updated>2012-09-01T10:31:13+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,135 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Improved Notes Utility]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/09/01/notes-updated/"/>
+    <updated>2012-09-01T10:09:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/09/01/notes-updated</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/notes.jpg" title="'Notepad image on Flickr'" >
+Nearly two years ago, I posted about my adaption of a simple
+<a href="http://jasonwryan.com/blog/2010/09/28/command-line-notes/" title="My post in 2010">command line note utility</a>.
+I have used this setup on all of my machines on a daily basis since and it has worked
+marvellously. Symlinking to a folder in
+<a href="https://www.dropbox.com/home" title="Dropbox home">Dropbox</a> means that the notes are accessible
+from all my machines, including my phone. There has only really been one aspect of this setup
+that has been sub-optimal.</p>
+
+<p>As an inveterate note-taker (this is one of the “benefits” of ageing; the speed with
+which you forget information outpaces the acquisition of newer material) I have—in
+those intervening years—built up quite a store of notes. Consequently, in order to
+maintain a semblance of order, I have arranged them in a series of directories. There
+is a minor flaw with this approach: retreiving a note depended on two factors, a) excellent
+recall<sup>1</sup> and, b) accurately typing out the full path. Neither of these are things that I
+am inherently good at or inclined to master.</p>
+
+<p>This had been irritating me for some time before I came across this
+<a href="http://unix.stackexchange.com/questions/11906/how-to-change-the-target-directory-for-tab-completion" title="Tab completion for notes function">question on Unix &amp; Linux StackExchange</a>.
+This provided me with a partial solution to the issue but, as I note in my answer, I was not
+able to solve it for nested directories, which was my particular use case. Once I had
+muddled my way through the solution on U&amp;L I pushed it to the back of my mind and
+tried to ignore it.</p>
+
+<p>Recently, though, the accumulation of notes and the frustration of trying to access them
+without <kbd>Tab</kbd> completion drove me to do something about it.</p>
+
+<p>The documentation on
+<a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html" title="Bash Manual">programmable completion</a>
+is typically terse and searching the web returns very little in the way of instructions
+as to how to accomplish this.<sup>2</sup> Undeterred, I decided to hack up a completion
+function that worked for nested directories.</p>
+
+<p>What I arrived at was this:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">shopt</span> -s globstar
+</span><span class='line'><span class="nb">shopt</span> -s progcomp
+</span><span class='line'>
+</span><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> <span class="nv">$HOME</span>/.notes/<span class="s2">&quot;$*&quot;</span>.txt ;<span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'> <span class="c"># completion for notes</span>
+</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>cur
+</span><span class='line'>    <span class="nv">cur</span><span class="o">=</span><span class="k">${</span><span class="nv">COMP_WORDS</span><span class="p">[COMP_CWORD]</span><span class="k">}</span>
+</span><span class='line'>    <span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**<span class="o">)</span>
+</span><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;${files[@]##*/}&quot;</span>
+</span><span class='line'>    <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="k">$(</span> <span class="nb">compgen</span> -f <span class="s2">&quot;${file[@]}&quot;</span> -- <span class="k">${</span><span class="nv">cur</span><span class="k">}</span> <span class="k">)</span> <span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure>
+
+
+<p>The best that can be said about it is that it <em>nearly</em> works…<sup>3</sup></p>
+
+<p>Realising that I was completely out of my depth, I turned to #bash for help, and
+I was indeed fortunate that
+<a href="https://github.com/geirha" title="geirha's Gitgub">geihra</a> offered some much needed
+assistance. geirha&#8217;s solution is an elegant one:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
+</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**/<span class="s2">&quot;$2&quot;</span>*<span class="o">)</span>
+</span><span class='line'>    <span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure>
+
+
+<p>In addition to working exactly as I hoped, it had the benefit of introducing me
+to a couple more bash concepts that I hadn&#8217;t encountered;
+<a href="http://mywiki.wooledge.org/BashGuide/Arrays" title="Bash Guide on Greg's Wiki">adding elements to an array</a>
+with <code>+=()</code> being one. For posterity, the full script is:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
+</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>nls<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>tree -CR --noreport <span class="nv">$HOME</span>/.notes | awk <span class="s1">&#39;{ </span>
+</span><span class='line'><span class="s1">    if (NF==1) print $1; </span>
+</span><span class='line'><span class="s1">    else if (NF==2) print $2; </span>
+</span><span class='line'><span class="s1">    else if (NF==3) printf &quot;  %s\n&quot;, $3 </span>
+</span><span class='line'><span class="s1">    }&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'> <span class="c"># TAB completion for notes</span>
+</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**/<span class="s2">&quot;$2&quot;</span>*<span class="o">)</span>
+</span><span class='line'>    <span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure>
+
+
+<h4>Notes</h4>
+
+<ol>
+<li>The alternative to remembering the full path name is to list all of the notes before
+each operation with the <code>nls</code> function; this is not ideal either…</li>
+<li>Which means that it is either so straightforward that few have bothered to write up their
+experiences (most likely), or so arcane that not many have bothered (how it
+feels to me). However, there are a couple of pages that I referenced in addition
+to the official documentation:
+
+<ul>
+<li><a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html">Adam Backstrong&#8217;s post</a></li>
+<li><a href="http://fahdshariff.blogspot.co.nz/2011/04/writing-your-own-bash-completion.html">Fahd Shariff&#8217;s post</a></li>
+<li><a href="http://devmanual.gentoo.org/tasks-reference/completion/index.html">Gentoo Development Guide</a></li>
+</ul>
+</li>
+<li>It fails, as geirha pointed out, because it breaks the filenames on whitespace.</li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by
+<a href="http://www.flickr.com/photos/nicholasjon/4101203095/" title="Field Notes etc on Flickr">nicholasjon</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Trolling Arch Linux]]></title>
@@ -2150,73 +2279,6 @@ interactive shells if <code>xinit</code> was called with <code>exec</code>.</p>
 <p>I have also ditched <code>consolekit</code> - for all of the processes it was
 spawning, it actually wasn’t performing any critical functions; or
 indeed any functions that I really needed at all…</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Readline Bindings in Vi Mode]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/12/01/readline/"/>
-    <updated>2011-12-01T18:43:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/12/01/readline</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/readline.png" alt="image" /></p>
-
-<p>I recently threw caution to the wind and
-<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
-I wanted to take advantage of the superior command editing ability that
-this mode offered, and also to continue to bake vi[m] methods into every
-aspect of my working environment.</p>
-
-<p>The change has been relatively straightforward; the only issues I have
-experienced are really just around a couple of keybinds that I had
-become accustomed to in normal/Emacs mode:</p>
-
-<ul>
-<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
-<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
-</ul>
-
-
-<p>The first, the ability to recall the final arguments of previous
-commands was a showstopper for me: I really struggled without this.
-Being able to recall a long file path and append it to a new command is
-invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
-exactly this. Why it is not bound by default in vi mode is beyond me…</p>
-
-<p>The other was purely cosmetic, really. I am an inveterate clearer of the
-screen—unless I am referring to something printed to stdout, I always
-prefer to work at the top of the console.</p>
-
-<p>In any event, with the
-<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
-it was a trivial exercize to restore this functionality to my bash shell
-in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
-
-<figure class='code'><figcaption><span>~/inputrc </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc
-</span><span class='line'>
-</span><span class='line'># for vi mode
-</span><span class='line'>set editing-mode vi
-</span><span class='line'>$if mode=vi
-</span><span class='line'>
-</span><span class='line'>set keymap vi-command
-</span><span class='line'># these are for vi-command mode
-</span><span class='line'>"\e[A": history-search-backward            # arrow up
-</span><span class='line'>"\e[B": history-search-forward             # arrow down
-</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
-</span><span class='line'>Control-l: clear-screen
-</span><span class='line'>
-</span><span class='line'>set keymap vi-insert
-</span><span class='line'># these are for vi-insert mode
-</span><span class='line'>"\e[A": history-search-backward
-</span><span class='line'>"\e[B": history-search-forward
-</span><span class='line'>"\ep": yank-last-arg
-</span><span class='line'>Control-l: clear-screen
-</span><span class='line'>$endif</span></code></pre></div></figure>
-
-
-<p>There is an extensive list of
-<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
-with which you can customize your shell environment.</p>
 ]]></content>
   </entry>
   

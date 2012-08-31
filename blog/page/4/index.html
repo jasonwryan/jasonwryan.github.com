@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="One of the great things about starting a new job at
-an open source company
-is having the freedom to use the tools that suit your workflow, rather &hellip;">
+  <meta name="description" content="Following on from my last post about mutt,
+I have been tinkering more with the most suckless of mail clients to
+get it to deal with—of all things— &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,111 @@ is having the freedom to use the tools that suit your workflow, rather &hellip;"
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/12/mutt/">mutt and HTML email</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-12T15:49:00+12:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/mutt-1.png" title="'mutt logo'" ></p>
+
+<p>Following on from my <a href="http://jasonwryan.com/blog/2012/04/21/lbdb/" title="Using mutt, LDAP and SSL">last post about mutt</a>,
+I have been tinkering more with the most suckless of mail clients to
+get it to deal with—of all things—<acronym title="HyperText Markup Language">HTML</acronym>
+emails. I will preface this post with a remark or two that amounts to a warning about
+intemperate language, ranting and a generally cranky disposition: repeated contact with
+email marketers can do that to you…</p>
+
+<p>A further  brief digression is warranted here. HTML email is, without doubt,
+evidence of the imminent end of civilized life as we know it; much like the
+<a href="http://en.wikipedia.org/wiki/Places_in_The_Hitchhiker's_Guide_to_the_Galaxy#Golgafrincham" title="Wikipedia entry on HHGTTG">Golgafrincham diaspora</a>, it is attributable to a depraved cabal of marketing consultants
+and provides the same level of social good as syphilis and fistulas. Suffice to say, it is a blight.</p>
+
+<p>Sadly, it is a blight that I have to deal with. Up until now, I had done that by using the
+excellent <a href="http://w3m.sourceforge.net/" title="w3m homepage on sourceforge">w3m</a> to render
+HTML as text in mutt itself. That is accomplished easily enough with an entry in
+<span class="file">muttrc</span> and another in a <span class="file">mailcap</span> file.</p>
+
+<figure class='code'><figcaption><span>~/.mutt/muttrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>auto_view text/html                                      <span class="c"># view html automatically</span>
+</span><span class='line'>alternative_order text/plain text/enriched text/html     <span class="c"># save html for last</span>
+</span></code></pre></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>~/.mutt/mailcap </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
+</span></code></pre></div></figure>
+
+
+<p>This works for 80 percent of the HTML email I get. It is enough to confirm that the mail is useless
+and can be discarded. The other 20 percent, however, is slightly more problematic. The initial
+view in w3m is enough to tell me that, due to the outstanding incompetence of the idiots that
+generated the email, there <em>is</em> actually some information that is contained in the email that I need
+to access <strong>but it is not viewable in a text browser.</strong></p>
+
+<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/mutt-2.png" title="'An example…'" ></p>
+
+<p>For this special level of retardation, I need to be able to open the email in a ghraphical browser.
+As I use vimprobable, that means sending the file to
+<a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/" title="My post on Using vimprobable">vimprobable running in tabbed</a>. Fortunately, as you would expect with superior software,
+<code>mutt</code> has a way of handling this gracefully. In mutt&#8217;s extensive documentation, there is a
+<a href="http://www.mutt.org/doc/manual/manual-5.html" title="Go and read it…">page on mutt&#8217;s MIME support</a>
+that details how to set up a graduated response to this pernicious issue:</p>
+
+<blockquote><p>In addition, you can use this with Autoview to denote two commands for viewing<br/>an attachment, one to be viewed automatically, the other to be viewed<br/>interactively from the attachment menu.</p><footer><strong>mutt manual</strong> <cite><a href='http://www.mutt.org/doc/manual/manual-5.html'>www.mutt.org/doc/manual/&hellip;</a></cite></footer></blockquote>
+
+
+<p>So, you can have <code>mutt</code> render the HTML abomination in <code>w3m</code> in most cases, and when those
+instances of particularly cretinous behaviour make it to your inbox, you can choose to
+view them in your web browser. In my case, by altering the <span class="file">mailcap</span>
+entry to look like this:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>text/html; vimprobtab.sh %s &amp;; <span class="nb">test</span><span class="o">=</span><span class="nb">test</span> -n <span class="s2">&quot;$DISPLAY&quot;</span>; needsterminal;
+</span><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
+</span></code></pre></div></figure>
+
+
+<p>The first entry tests that X is running, and if it is, it hands the file to <code>vimprobable</code>. The
+default, however, is determined by the <code>copiousoutput</code> tag. So, in <code>mutt</code> it is just a matter
+of hitting <kbd>v</kbd> to view the attached HTML and then <kbd>m</kbd> to send it to <code>mailcap</code>.
+For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">muttrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">bind </span>attach &lt;<span class="k">return</span>&gt;    view-mailcap
+</span></code></pre></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -334,138 +439,6 @@ on Flickr</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/30/octopress/">Moving to Octopress</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-30T12:30:00+13:00" pubdate data-updated="true">Mar 30<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
-
-<p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
-a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
-the static site generator powering <a href="http://pages.github.com/">Github Pages</a>. I had previously
-been posting to a <a href="https://www.tumblr.com/">tumblr</a> page and, over the nearly four years that
-I had been doing that I had somehow racked up just over 4000 posts. I was <em>not</em>
-looking forward to migrating across.</p>
-
-<p>However, the fact that the Jekyll project has a number of scripts for
-<a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">migrating from other platforms</a>
-assuaged my concerns about the difficulty of this task. That sense of relief was shortlived.
-Neither of the two tumblr migration scripts were of any assistance: both would die during their
-initial runs, probably due to some funky characters in the post titles, or perhaps the posts themselves.</p>
-
-<p>I certainly had no intention of trying to wade through the entire back catalogue identifying the
-rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the
-“straightforward” nature of the task, I saw this setback as an opportunity to cull all of the
-cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
-some interest.</p>
-
-<p>Being an assiduous record keeper, all of the posts were helpfully bookmarked on
-<a href="https://pinboard.in/u:jasonwryan/t:jwr/">Pinboard under one tag</a>, and therefore it was
-simple enough to create a list of the required <acronym title="Unique Resource Locator">URLs</acronym>.
-Armed with this list, it was just a matter of cobbling together a script to do the bulk of
-the work for me.</p>
-
-<p>The first task was to retrieve the posts from the list:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grab files</span>
-</span><span class='line'><span class="k">while </span><span class="nb">read </span>url; <span class="k">do </span>
-</span><span class='line'><span class="k">    </span>wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
-</span><span class='line'><span class="k">done</span> &lt; /home/jason/Scripts/list
-</span></code></pre></div></figure>
-
-
-<p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
-surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># strip HTML cruft</span>
-</span><span class='line'><span class="k">for </span>file in *.html; <span class="k">do</span>
-</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.*}&quot;</span>
-</span><span class='line'><span class="k">done</span>
-</span><span class='line'>mkdir html <span class="o">&amp;&amp;</span> mv *.html html/
-</span></code></pre></div></figure>
-
-
-<p>The final task of this part of the migration was to convert the HTML into
-<a href="http://daringfireball.net/projects/markdown/">markdown</a>,
-the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
-the &#8220;universal document converter&#8221; handled that job:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># convert to markdown format</span>
-</span><span class='line'><span class="k">for </span>file in *; <span class="k">do </span>
-</span><span class='line'><span class="k">    </span>pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;$file&quot;</span>.md
-</span><span class='line'><span class="k">done</span>
-</span></code></pre></div></figure>
-
-
-<p>The final result was fifty markdown files holding all of my posts, almost ready to
-be committed to github. I say “almost” because the files still required what turned out to
-be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would
-inexpicably break <a href="http://www.notareallink.com">multi word
-hyperlinks</a> over two lines. Similarly all of the internal
-links to my other posts pointed to the (meaningless) tumblr URLs<sup>2</sup>.</p>
-
-<p>Setting up Octopress was extremely simple and quick by comparison: the
-<a href="http://octopress.org/docs/">documentation is very helpful</a>. There was one slight
-hitch, a <a href="https://github.com/tmm1/pygments.rb/issues/10">known issue on Arch x86_64</a>,
-which was simple enough to deal with.</p>
-
-<p>While the migration was not entirely pain-free, I am pleased that I have done it. Tumblr&#8217;s service
-increasingly <a href="https://twitter.com/#!/jasonwryan/statuses/176543962276954112">left a lot to be desired</a>
-but as it was a free service, I couldn&#8217;t complain too much. Or, more accurately, when I did complain,
-no-one actually listened…</p>
-
-<p>Indeed, moving to a paid service like Github
-(yes, it&#8217;s free at first, but once you have enough data there you need to pay a small amount
-every month) <a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/">makes a lot of sense</a>.
-The paid services I do use, like <a href="http://pinboard.in/">Pinboard</a> and
-<a href="http://www.tarsnap.com/">Tarsnap</a> are both inexpensive and much more
-reliable than their free counterparts<sup>3</sup>; and you get to invest in great
-software that is a pleasure to use.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Initially, I had set up the site as a simple holding page and dumped a whole lot
-of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
-mostly just that sort of internet detritus…</li>
-<li>For creating redirections (Github pages do <em>not</em> support <span class="file">.htaccess</span>)
-I can&#8217;t recommend enough the
-<a href="https://github.com/rawsyntax/jekyll_alias_generator/blob/master/_plugins/alias_generator.rb">Jekyll Alias Generator</a>.
-Just. Brilliant.</li>
-<li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -483,6 +456,10 @@ Just. Brilliant.</li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/18/trolls/">Trolling Arch Linux</a>
       </li>
     
@@ -496,10 +473,6 @@ Just. Brilliant.</li>
     
       <li class="post">
         <a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a>
       </li>
     
   </ul>
