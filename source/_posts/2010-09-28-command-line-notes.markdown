@@ -15,7 +15,9 @@ notes.
 The functions as described in the article are so:
 
 {% codeblock lang:sh %}
-n() { $EDITOR ~/notes/"$*".txt } nls() { ls -c ~/notes/ | grep "$*" }
+n() { $EDITOR ~/notes/"$*".txt } 
+
+nls() { ls -c ~/notes/ | grep "$*" }
 {% endcodeblock %}
 
 Unfortunately, the second function – for retrieving the list of files in
