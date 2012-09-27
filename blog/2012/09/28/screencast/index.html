@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Signing Your Own Key - jasonwryan.com</title>
+  <title>A dwm Screencast - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Some time in the last couple of days, the last of the packages in the
-Community repository were signed and, thanks to the tremendous work of
-the &hellip;">
+  <meta name="description" content="Over the last week as I have been at home convalescing I have, quite unaccountably,
+found myself watching videos of tiling window managers. In all, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +19,7 @@ the &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/03/23/key">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2012/09/28/screencast">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -87,7 +86,7 @@ the &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Signing Your Own Key</h1>
+      <h1 class="entry-title">A dwm Screencast</h1>
     
     
       <p class="meta">
@@ -103,108 +102,48 @@ the &hellip;">
   
 
 
-<time datetime="2012-03-23T11:36:00+13:00" pubdate data-updated="true">Mar 23<span>rd</span>, 2012</time>
+<time datetime="2012-09-28T09:18:00+12:00" pubdate data-updated="true">Sep 28<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/key.jpg" alt="image" /></p>
+<div class="entry-content"><p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/dwm-logo.png" title="'dwm logo'" >
+Over the last week as I have been at home convalescing I have, quite unaccountably,
+found myself watching videos of tiling window managers. In all, I have probably watched
+between twenty and thirty of these videos so I feel, quite confidently, that I have a
+firm grasp of what constitutes the genre. Consequently, I also feel that I can&mdash;based
+on the range of the material I have reviewed, and the scrutiny and attention therein
+applied&mdash;share an unequivocal judgement as to the overall quality of the genre: it
+sucks.</p>
 
-<p>Some time in the last couple of days, the last of the packages in the
-Community repository were signed and, thanks to the tremendous work of
-the Arch developers and Trusted Users, you can fully implement package
-signing in your <span class="file">/etc/pacman.conf</span>.</p>
+<p>Moreover, these videos invariably suck in the same couple of ways; they always lack
+any sort of narration, which means that you are stuck silently watching some sort of
+paroxysm of window rearrangement without <em>any</em> context or explanation, as if the fact
+that you can inflict this sort of injury on an X display is rationale enough. And,
+secondly, just as frequently, they feature a cursor being dragged around the screen
+doing the damage; using the mouse to demonstrate the capabilities of a tiling window
+manager is the sort of vestigial behaviour more commonly associated with pagan
+superstition or mild enfeeblement…</p>
 
-<p>You can check the state of the signed packages with this <code>expac</code>
-one-liner; it will return a list of any <em>unsigned</em> packages:</p>
+<p>Rather that simply bask in the sense of superiority that these observations have
+afforded me, I thought that I would make my own, more lasting, contribution to the
+cannon. I can only describe this process as instructive.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
-</span></code></pre></div></figure>
+<p><a href="http://www.youtube.com/watch?v=GQ5s6T25jCc"><img class="center" src="https://dl.dropbox.com/u/261312/Blog-images/tower.jpg" title="dwm screencast" ></a></p>
 
+<p>The best that can be said of this video is that, while it sucks just as hard as the others
+that I have reviewed over the past week, it has the distinguishing feature of at least
+sucking <em>differently</em>. For example, it has an audio track, so in theory the actions on the
+screen should be accompanied by the narrator&#8217;s soothing tones. Sadly, this is not the case.
+The crappy quality of my headset, my hoarse throat, and most egregiously, my decision to eschew
+post production and shoot it in one take means that the audio is poorly recorded, and at times
+literally inarticulate, rambling.</p>
 
-<p>Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
-take advantage of this. My overall <code>SigLevel</code> setting requires signed
-packages, and—as of yesterday—I was able to move the last repository
-entry over to do the same:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>core<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>extra<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>community<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>multilib<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span></code></pre></div></figure>
-
-
-<p>The next step was to add my key to pacman’s keychain so that I could
-sign the packages that I build using ABS or from the
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>. Allan has an
-<a href="http://allanmcrae.com/2011/08/pacman-package-signing-1-makepkg-and-repo-add/" title="The first in a series of four posts on signing: read them all">excellent post on setting this up</a>.</p>
-
-<p>First, import your key into pacman’s keyring:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
-</span></code></pre></div></figure>
-
-
-<p>Then follow the prompts as you edit the key to sign, set a trust level
-and save your key:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
-</span><span class='line'>gpg&gt; lsign
-</span><span class='line'>...
-</span><span class='line'>gpg&gt; trust
-</span><span class='line'>...
-</span><span class='line'>gpg&gt; save
-</span></code></pre></div></figure>
-
-
-<p>Then it is just a matter of changing the <code>BUILDENV</code> option in your
-<span class="file">/etc/makepkg.conf</span>, which is set to <code>!sign</code>
-by default. Remove the bang and include the details of the key you wish to use:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#-- Packager: name/email of the person or organization building packages</span>
-</span><span class='line'><span class="nv">PACKAGER</span><span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
-</span><span class='line'><span class="c">#-- Specify a key to use for package signing</span>
-</span><span class='line'><span class="nv">GPGKEY</span><span class="o">=</span><span class="s2">&quot;B1BD4E40&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>Now, when you build a package, you will be prompted for your key’s
-passphrase:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...
-</span><span class='line'>
-</span><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
-</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
-</span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21
-</span><span class='line'>
-</span><span class='line'>Enter passphrase:
-</span></code></pre></div></figure>
-
-
-<p>Enter the correct passphrase and your package is built and signed:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
-</span></code></pre></div></figure>
-
-
-<p>Creative Commons image by
-<a href="http://www.flickr.com/photos/donovan_beeson/3185668524/" title="Coraline key on Flickr">donovanbeeson</a>
-on Flickr.</p>
+<p>If nothing else, the exercise has taught me to really appreciate the work of people who
+do this thing well; Drew Neil&#8217;s excellent
+<a href="http://vimcasts.org/" title="The Vimcasts homepage">Vimcasts</a> being a case in point.</p>
 </div>
 
 
@@ -227,12 +166,12 @@ on Flickr.</p>
   
 
 
-<time datetime="2012-03-23T11:36:00+13:00" pubdate data-updated="true">Mar 23<span>rd</span>, 2012</time>
+<time datetime="2012-09-28T09:18:00+12:00" pubdate data-updated="true">Sep 28<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/dwm/'>dwm</a>
   
 </span>
 
@@ -248,10 +187,8 @@ on Flickr.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/03/17/vampires/" title="Previous Post: A Taxonomy of Help Vampires">&laquo; A Taxonomy of Help Vampires</a>
+        <a class="basic-alignment left" href="/blog/2012/09/01/notes-updated/" title="Previous Post: Improved Notes Utility">&laquo; Improved Notes Utility</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/03/30/octopress/" title="Next Post: Moving to Octopress">Moving to Octopress &raquo;</a>
       
     </p>
   </footer>
@@ -399,8 +336,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/03/23/key/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2012/03/23/key/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2012/09/28/screencast/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2012/09/28/screencast/';
         var disqus_script = 'embed.js';
       
     (function () {

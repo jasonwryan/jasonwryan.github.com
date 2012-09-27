@@ -9,11 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="In my last post, on
-Mercurial Queues,
-I outlined how you might use MQ to manage a
-dwm patchset.
-Mercurial makes this process ridiculously easy, and &hellip;">
+  <meta name="description" content="I posted a couple of weeks ago about the impact of some of the current
+changes to Arch Linux.
+There seems to be quite a bit of it about, because in &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +84,162 @@ Mercurial makes this process ridiculously easy, and &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/04/systemd/">The Leap to systemd</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-04T09:32:00+12:00" pubdate data-updated="true">Aug 4<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/leap.jpg" title="Leap image on Flickr" >
+I posted a couple of weeks ago about the impact of some of the current
+<a href="http://jasonwryan.com/blog/2012/07/19/breakage/" title="Post on the glibc change">changes to Arch Linux</a>.
+There seems to be quite a bit of it about, because in conjunction with the move from
+<span class="file">/lib</span> to <span class="file">/usr/lib</span>—and motivated by the same
+overarching shifts in the other distributions—the other major change making its way through
+the Arch community is the move to
+<a href="http://freedesktop.org/wiki/Software/systemd" title="Project page">systemd</a>. This change, however, has
+been more controversial because it marks a shift away from Arch&#8217;s central configuration
+file, <a href="https://wiki.archlinux.org/index.php/Rc.conf" title="Arch wiki entry on rc.conf">/etc/rc.conf</a>;
+a move that has disconcerted a number of people.</p>
+
+<p>I&#8217;m not going to get into whether or not this move is consistent with
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="Wiki entry">The Arch Way</a>, because that has
+been thrashed over extensively on the
+<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023283.html" title="ML thread on rc.conf">mailing</a>
+<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023258.html" title="And another one…">lists</a>,
+but also—and more importantly—because Arch is a rolling release, which means change is <em>inevitable</em>.
+What is more, after watching all the back and forth on the <acronym title="Mailing lists">ML</acronym>
+and on the <a href="https://bbs.archlinux.org/viewtopic.php?id=96316&amp;p=1" title="Arch BBS thread on systemd">boards</a>, I am convinced that the
+<a href="http://www.archlinux.org/developers/#tomegun" title="Tom Gunderson">developer overseeing this shift</a>
+both knows what he is doing and is acting in the best interests of Arch.</p>
+
+<p>This view has been validated by my experience of shifting to systemd on my machines.</p>
+
+<p>When the new initscripts package was pushed to [testing] in the middle of last month,
+I stripped out all of the redundant options in <span class="file">/etc/rc.conf</span>
+and took the ten minutes or so to read about and then create the new files. I then spent some
+time reading up on systemd, principally
+<a href="http://0pointer.de/blog/projects/systemd-for-admins-1.html" title="One of TWELVE…">Lennart Poettering&#8217;s series of posts</a>,
+the <a href="https://wiki.archlinux.org/index.php/Systemd" title="Good, but needing some structure">Arch wiki entry</a>
+and the many and various
+<a href="http://0pointer.de/public/systemd-man/" title="One for everything">manual pages</a>.</p>
+
+<p>Over the last couple of days, I have migrated all of my machines over to systemd. I found it
+to be a very straightforward process. I went for a pure systemd approach, for reasons I will
+return to. Essentially, this is how I tackled it.</p>
+
+<p>First, for each machine, I established what daemons were running. I did this by using
+<a href="http://pikacode.com/jasonwryan/Veles/file/default/Scripts/daemons.sh" title="Pretty sure it is one of Xyne's">this shell script</a>
+and cross checking entries in my <span class="file">/etc/rc.conf</span>. Then
+it was just a matter of installing systemd:<sup>1</sup></p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S systemd systemd-sysvcompat systemd-arch-units
+</span></code></pre></div></figure>
+
+
+<p>The only outstanding file to be created was <span class="file">/etc/timezone</span>, the
+others—all documented in <code>man rc.conf</code>—I had created earlier in the month. Then, with the
+list of the services I would need running on each box, I enabled them. I think it is
+fair to say that the only thing that is clunky about systemd is the command syntax for
+managing units. Repeatedly typing <code>systemctl enable foo.service</code> is as tedious as it is
+error prone, so I hacked up a
+<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Scripts/sysd" title="sysd - *so* much easier">wrapper script</a>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sysd <span class="nb">enable </span>acpid
+</span><span class='line'>sysd <span class="nb">enable </span>lvm
+</span><span class='line'>etc…
+</span></code></pre></div></figure>
+
+
+<p>I also activated some additional gettys, as I like to log into a tmux session in TTY2 when
+I don&#8217;t need or want to start <code>X</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty2.service
+</span></code></pre></div></figure>
+
+
+<p>And I misguidedly wrote a couple of custom service files that turned out to be
+<a href="https://bbs.archlinux.org/viewtopic.php?id=146207" title="BBS post on said files">completely unnecessary</a>;
+and then I was done.</p>
+
+<p>On all three boxes I rebooted and that was it. The only issue I experienced was
+the final shutdown after removing initscripts and before booting up with
+systemd. After issuing <code>shutdown -r now</code> the process
+hung with a message about a missing <span class="file">inittab</span> file.
+In retrospect, I should have added <code>init=/bin/systemd</code> to my kernel parameters
+and not unistalled instiscripts until I had booted with systemd. This has
+now been added to the
+<a href="https://wiki.archlinux.org/index.php/Systemd" title="Archwiki systemd page">systemd wiki page</a>.</p>
+
+<p>Overall, though: no real drama, just a blur of text<sup>2</sup> and then the
+login prompt. While I haven&#8217;t seen a dramatic decrease in boot time,
+booting does <em>feel</em> a bit snappier and two of my three machines shutdown
+markedly more quickly. Consider me sold.</p>
+
+<p>That brings me back to the decision to opt for a pure systemd approach, rather than
+hanging on to a completely eviscerated <span class="file">/etc/rc.conf</span>. The
+Arch community has been told that the intention is to
+<a href="https://bbs.archlinux.org/viewtopic.php?pid=1133957#p1133957" title="BBS post by tomegun">support the rc.conf format forever</a>;
+I can&#8217;t help but think this is a mistake. In the same way that
+<a href="https://wiki.archlinux.org/index.php/Pacman#Partial_upgrades_are_unsupported" title="Pacman entry on Arch Wiki">partial upgrades are unsupported</a>,
+I think that systemd is Arch&#8217;s inevitable future and the community should be encouraged to accept that, <code>Syu</code> and
+move on…</p>
+
+<p>Having said that, I appreciate the consideration shown by the developers in wanting to assure
+people that their choice would continue to be catered for; and perhaps, over time, people still
+using initscripts will be regarded with the same sense of wry amusement as those who still show
+up from time to time with <code>hal</code> in their <code>DAEMONS</code> line.</p>
+
+<h3>Update 4/8/12</h3>
+
+<p>Tom Gunderson, the developer who looks after this part of Arch, has clarified the
+comment about the long term support for initscripts. As comments are hosted on
+a third-party paltform, I thought that it should be included in the body of the
+post.</p>
+
+<blockquote><p>Just a clarification: regarding the (probably very unwise) promise of &#8220;supporting <span="file">rc.conf</span> forever&#8221;, the intended meaning was that initscripts will support the syntax, not that initscripts themselves will always stay around (nor that systemd will gain support for the syntax in case initscripts is dropped).</p><p>At the moment systemd <strong>does</strong> support <span class="file">rc.conf</span> (when installed in conjunction with initscripts), but this is meant as a transitional measure only, and will likely go away eventually (though probably not soon).</p></blockquote>
+
+
+<h4>Notes</h4>
+
+<ol>
+<li>Note this approach will <em>remove</em> sysvinit and initscripts and <code>mv /etc/rc.conf{,.pacsave}</code>.</li>
+<li>Make sure you remove <code>quiet</code> from your kernel parameters for your first systemd
+boot so you can see that everything starts correctly…</li>
+</ol>
+
+
+<p>Creative commons image on Flickr by
+<a href="http://www.flickr.com/photos/sovietuk/486119799/" title="leap by rick harrison">Tricky</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -500,137 +654,6 @@ your system is not an issue at all.</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-19T19:23:00+12:00" pubdate data-updated="true">Jul 19<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/broken.jpg" title="Image of breakage on Flickr" >
-Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
-<a href="https://bbs.archlinux.org/" title="Arch Linux BBS">Arch boards</a> and in the various
-<a href="https://wiki.archlinux.org/index.php/IRC_Channels" title="Wiki page listing channels">IRC channels</a>.
-It doesn&#8217;t take newcomers long to realize that, whether something is actually broken or not,
-there is always
-<a href="http://allanmcrae.com/category/arch-linux/" title="Allan's Blog">someone they can blame</a>.<sup>1</sup></p>
-
-<p>My experience of Arch, over the last three and a bit years, is quite the opposite. I have yet to
-experience anything that would qualify as breakage. Sure, there have been bugs, mostly upstream,
-and the more frequent moments where I haven&#8217;t been as diligent as I should, but not once have I
-had a machine that was unbootable or otherwise unusable. Arch has, on both my home and work
-machines, been incredibly stable and reliable.</p>
-
-<p>For a number of Arch Linux users, however, that was not their experience over the last week when
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="News item on the move">/lib was moved to /usr/lib</a>.
-The volume of people on the boards and on IRC reporting unbootable or unusable systems was
-remarkable. Remarkable because, despite the fact that the
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Once more, just in case…">news item</a>, the
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Arch wiki page on the change">wiki page</a>,
-and the <a href="http://mailman.archlinux.org/pipermail/arch-announce/2012-July/000317.html" title="Mail archive">email to arch-announce</a>
-all <em>explicitly</em> warned people not to use the <code>--force</code> option,<sup>2</sup> so many did.</p>
-
-<p><span class='pullquote-right' data-pullquote='90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice. '>
-Sadly, these red-boxed warnings were apparently not enough.
-90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice.
-The remaining 10% were either in a hurry and didn&#8217;t pay close attention to how
-to deal with any leftover files in <span class="file">/lib</span> or <code>rm -rf</code>&#8216;ed
-in the wrong directory.
-<a href="http://www.gnu.org/fun/jokes/shit-happens.html" title="GNU Humour…">Accidents happen</a>.
-</span></p>
-
-<p>What I am interested in is the people who fell into the much larger category,
-and principally those that didn&#8217;t see any of the communications about this
-change in advance of updating and reasoned, based on a recent change that did
-<a href="http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required-1/" title="News item on filesystem upgrade">require the use of &#8211;force</a>,
-that this was the most expedient way to resolve <code>pacman</code> reporting conflicting
-files.</p>
-
-<p>Some context. The <code>glibc</code> update was released to the
-<a href="https://wiki.archlinux.org/index.php/Testing#.5Btesting.5D" title="Wiki entry on Testing">[testing] repository</a>
-in the first week of July: and there were a couple of long threads<sup>3</sup>
-about issues and fixes before it was pushed to [core]. By the time the
-package was released for general consumption, it had been tested and the
-developers had obviously planned how to make what is a fundamental system
-change with a minimal amount of user intervention.  I think that, given the
-magnitude of the challenge, they did a superb job.</p>
-
-<p>How then did it go so wrong for so many?<sup>4</sup> To answer that, you have
-to consider the nature of Arch. It&#8217;s <em>not</em> the sort of distribution where you
-install it and then just go on your merry way, installing
-<a href="http://oswatershed.org/" title="It's SCIENCE, Jim">the least obsolete packages</a>,
-revelling in the speed of the package manager and generally being
-a 1337 h@x0r…</p>
-
-<p>Successfully running a rolling release like Arch, irrespective of your level of
-competence, means staying in touch with what is happening—in
-<a href="http://kmkeen.com/pacmatic/" title="Pacman wrapper that pulls news updates">some form or other</a>.
-Subscribing to the arch-general <acronym title="Mailing list">ML</acronym>,
-visiting the forums, idling in IRC; somehow remaining connected to what is
-going on in the community so that you don&#8217;t blindly update one day and wonder
-why your system is broken.</p>
-
-<p>This strikes me as a real strength; by design Arch encourages its users to
-participate in the community. Even if you are only lurking, over time you will
-inevitably find yourself posting in a thread, responding to an email, editing
-the wiki,
-<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="Post on aurphan">adopting an orphaned package</a>—increasingly
-getting involved and contributing.</p>
-
-<p>This level of involvement is not for everyone. Some may find it onerous or
-a waste of their time. That&#8217;s fine. There are any number of other distros
-that do not ask for this level of commitment. The <em>quid pro quo</em> for
-running Arch, though, is that you are prepared, in whatever shape or form
-best works for you, to give something back; at the very least, that is your
-attention.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>This is, of course, a reference to said Arch meme: Allan is one
-of the developers who has contributed an enormous amount to Arch and the fact
-that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</li>
-<li>At the end of 2011, the short option <code>-f</code>
-<a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
-from <code>pacman</code> so “it at least makes people read the word &#8216;force&#8217; and maybe they
-will have some sense to step back and think about what they are doing first.”</li>
-<li><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
-<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></li>
-<li>Relatively speaking. In situations like this, the overwhelming amount of traffic
-is about what went wrong, not people posting to say they had no difficulties whatsoever…</li>
-</ol>
-
-
-<p>Creative Commons image on Flickr from
-<a href="http://www.flickr.com/photos/daviddoctorrose/431786001/" title="Broken keyboard on Flickr">djeucalyptus</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -648,6 +671,10 @@ is about what went wrong, not people posting to say they had no difficulties wha
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/09/28/screencast/">A dwm Screencast</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a>
       </li>
     
@@ -661,10 +688,6 @@ is about what went wrong, not people posting to say they had no difficulties wha
     
       <li class="post">
         <a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a>
       </li>
     
   </ul>

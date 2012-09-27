@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>IRC Notifications with dzen2 - jasonwryan.com</title>
+  <title>jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have a persistent tmux
-session running on a server connected to IRC and I wanted to get
-notifications whenever someone addressed me, irrespective &hellip;">
+  <meta name="description" content="OpenOffice won’t recognize TrueType fonts with the extension .otf, so you need to convert them to .ttf
+in order to use them in that suite. sudo apt- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +19,7 @@ notifications whenever someone addressed me, irrespective &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/11/07/irc-dzen">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/22">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -82,12 +81,15 @@ notifications whenever someone addressed me, irrespective &hellip;">
 </nav>
   <div id="main">
     <div id="content">
-      <div>
-<article class="hentry" role="article">
+      <div class="blog-index">
   
+  
+  
+    <article>
+      
   <header>
     
-      <h1 class="entry-title">IRC Notifications with dzen2</h1>
+      <h1 class="entry-title"><a href="/blog/2009/03/17/install-otf-fonts-in-openoffice/">Install .otf Fonts in OpenOffice</a></h1>
     
     
       <p class="meta">
@@ -103,124 +105,73 @@ notifications whenever someone addressed me, irrespective &hellip;">
   
 
 
-<time datetime="2011-11-07T19:48:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2011</time>
+<time datetime="2009-03-17T19:51:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2009</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
+  <div class="entry-content"><p>OpenOffice won’t recognize TrueType fonts with the extension <code>.otf</code>, so you need to convert them to <code>.ttf</code>
+in order to use them in that suite.</p>
 
-<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
-session running on a server connected to IRC and I wanted to get
-notifications whenever someone addressed me, irrespective of whether I
-was connected to the session, or that particular machine at the time.</p>
-
-<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
-and there is a script called
-<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
-that will print any mentions in a channel to a file. I then configured
-the fnotify script to write to a folder in Dropbox. Now, whenever I am
-mentioned in freenode, the file is updated across all my machines.</p>
-
-<p>The next challenge was to translate the updating of the fnotify file
-into a notification on my current machine. As I don’t use
-<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
-on my Arch machines, I wanted to make it work with
-<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
-Enter a simple shell script:</p>
-
-<figure class='code'><figcaption><span>highlights.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">while </span>inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>
-</span><span class='line'><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
-</span><span class='line'><span class="k">done</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install fontforge
 </span></code></pre></div></figure>
 
 
-<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
-so that it runs in the background after login. Whenever the metadata
-(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
-written to my
-<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
-with the message.</p>
+<p>If all the <code>.otf</code> files are in the same folder, then you are good to go.</p>
 
-<p>Simple; but does what I need…</p>
+<p>First, you need the conversion script, which I found in <a href="url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this%20post[/url">this post</a>:</p>
 
-<h5>Notes</h5>
+<figure class='code'><figcaption><span>otf2ttf.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/local/bin/fontforge</span>
+</span><span class='line'><span class="c"># Quick and dirty hack: converts a font to truetype (.ttf)</span>
+</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Opening &quot;</span>+<span class="nv">$1</span><span class="o">)</span>;
+</span><span class='line'>Open<span class="o">(</span><span class="nv">$1</span><span class="o">)</span>;
+</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Saving &quot;</span>+<span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
+</span><span class='line'>Generate<span class="o">(</span><span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
+</span><span class='line'>Quit<span class="o">(</span>0<span class="o">)</span>;
+</span></code></pre></div></figure>
 
-<ol>
-<li>Dropbox’s API won’t work with dzen2—or with other lightweight
-notifications like
-<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
-<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
-(that was closed without any progress)—hence my having to resort to a
-home-cooked solution…</li>
-</ol>
 
+<p>Save it as <code>otf2ttf.sh</code> into the folder with the <code>.otf</code> files.</p>
+
+<p>Then run:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">for </span>i in *.otf; <span class="k">do </span>fontforge -script otf2ttf.sh <span class="nv">$i</span>; <span class="k">done</span>
+</span></code></pre></div></figure>
+
+
+<p>Move all the converted fonts to your your shared directory:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo mv *ttf /usr/share/fonts/truetype/myfonts/
+</span></code></pre></div></figure>
+
+
+<p>And then change the permissions and reload the cache:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/
+</span><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/*.ttf
+</span><span class='line'>sudo <span class="nb">fc</span>-cache -f -v
+</span></code></pre></div></figure>
+
+
+<p>And the fonts will now appear in OpenOffice. Easy.</p>
 </div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
-
-      
-
-
-
-
-
-
-
-
   
 
 
-<time datetime="2011-11-07T19:48:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2011</time>
-      
-
-<span class="categories">
+    </article>
   
-    <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/tmux/'>tmux</a>
-  
-</span>
-
-
-    </p>
+  <div class="pagination">
     
-      <div class="sharing">
-  
-  
-  
-</div>
-
+    <a href="/blog/archives">Blog Archives</a>
     
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/2011/10/01/pinboard-elvis/" title="Previous Post: Pinboard Elvis">&laquo; Pinboard Elvis</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2011/11/18/microserver/" title="Next Post: Microserver">Microserver &raquo;</a>
-      
-    </p>
-  </footer>
-</article>
-
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a class="next" href="/blog/page/21/">Newer &rarr;</a>
+    
+  </div>
 </div>
-  </section>
-
-</div>
-
 <aside class="sidebar">
   
     <section>
@@ -253,7 +204,7 @@ home-cooked solution…</li>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating...</li>
+    <li class="loading">Status updating&#8230;</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -269,7 +220,7 @@ home-cooked solution…</li>
 
 <section>
   <h1>My Pinboard</h1>
-  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
   <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
 </section>
 <script type="text/javascript">
@@ -292,7 +243,7 @@ home-cooked solution…</li>
   #lastfmList li{ text-align: left; }
 </style>
 <ul id="lastfmList">
-  <li class="loading">Updating tracks...</li>
+  <li class="loading">Updating tracks&#8230;</li>
 </ul>
 <p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
 
@@ -339,7 +290,6 @@ function showLastfmFeed(xml){
   
 </aside>
 
-
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -354,10 +304,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       var disqus_shortname = 'jasonwryan';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/11/07/irc-dzen/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2011/11/07/irc-dzen/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

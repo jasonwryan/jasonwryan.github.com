@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I posted last year about Vimprobable
-a webkit browser that uses
-Vim-like keybinds and can be run completely without the rodent. Over the last couple &hellip;">
+  <meta name="description" content="Even with bash completion, endlessly typing and tabbing through the
+directory tree to make a simple change to a config file quickly becomes
+tedious &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,143 @@ Vim-like keybinds and can be run completely without the rodent. Over the last co
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/07/19/script-to-edit-config-files/">Script to Edit Config Files</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-07-19T19:34:00+12:00" pubdate data-updated="true">Jul 19<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/xdg-script.png" alt="image" /></p>
+
+<p>Even with bash completion, endlessly typing and tabbing through the
+directory tree to make a simple change to a config file quickly becomes
+tedious, so I concocted this script to make it somewhat more
+straightforward.</p>
+
+<figure class='code'><figcaption><span>xdg.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>; <span class="k">then </span>
+</span><span class='line'><span class="k">    for </span>f in <span class="nv">$dir</span>/* ; <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nv">$file</span> in
+</span><span class='line'>        conf | config | *.cfg | *rc<span class="o">)</span>  <span class="nv">$EDITOR</span> <span class="s2">&quot;$f&quot;</span> ;;
+</span><span class='line'>        *<span class="o">)</span>  :  ;;
+</span><span class='line'>        <span class="k">esac</span>
+</span><span class='line'><span class="k">    done</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>A relatively simple script, with a nice feature or two, it does a couple
+of things. First, it
+<a href="http://wiki.bash-hackers.org/commands/classictest" title="Bash Hackers: test">tests</a>
+that the directory actually exists:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>    <span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>
+</span></code></pre></div></figure>
+
+
+<p>and then loops through all of the files in the directory using a
+<a href="http://mywiki.wooledge.org/glob" title="Entry on Greg's Wiki">glob</a> and
+checks for a pattern match.</p>
+
+<p>In order for the
+<a href="http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_03.html" title="Cases on Bash Guide">case statement</a>
+to work, however, the directory path has to be stripped from the file
+name.</p>
+
+<p>Rather than run another process with
+<a href="http://www.gnu.org/software/coreutils/manual/html_node/basename-invocation.html" title="GNU basename in coreutils">basename</a>,
+I used
+<a href="http://wiki.bash-hackers.org/syntax/pe#substring_removal" title="Bash Hackers Wiki">parameter expansion</a>
+to remove the substring:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
+</span></code></pre></div></figure>
+
+
+<p>which turns, for example, <span class="file">$XDG_CONGIG_HOME/newsbeuter/conf</span> into a
+simple <span class="file">conf</span>. This can then be evaluated for a match with the file names
+in the <code>case</code> statement and passed to the <code>$EDITOR</code>.</p>
+
+<p>If no match is found, nothing (<code>:</code>) is done.</p>
+
+<p>Now, it is simply a matter of entering <code>xdg vimprobable</code> and
+<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span> is opened in Vim.</p>
+
+<h4>Updated 19/10/11</h4>
+
+<p>After using this script for a while it became clear to me that it has a
+significant drawback: too many applications place their config files in
+directories other than <span class="file">$XDG_CONFIG_HOME</span>. So,
+<a href="https://bbs.archlinux.org/viewtopic.php?id=128585" title="Post on the Arch boards">with some help</a>,
+I updated the script. It now covers all of the directories where you are
+likely to find dotfiles.</p>
+
+<figure class='code'><figcaption><span>xdg.sh v2 </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nb">dirs</span><span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
+</span><span class='line'><span class="nv">IFS</span><span class="o">=</span><span class="s1">$&#39;\n&#39;</span>
+</span><span class='line'><span class="nb">read</span> -r -d <span class="s1">&#39;&#39;</span> -a files &lt; <span class="se">\</span>
+</span><span class='line'>    &lt;<span class="o">(</span>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
+</span><span class='line'>           -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>        -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>        -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
+</span><span class='line'>        -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
+</span><span class='line'>        -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> 2&gt;/dev/null<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">((</span> <span class="k">${#</span><span class="nv">files</span><span class="p">[*]</span><span class="k">}</span> <span class="o">))</span> <span class="o">&amp;&amp;</span> <span class="s2">&quot;$EDITOR&quot;</span> <span class="s2">&quot;${files}&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>If you would prefer a more portable version—which still relies on GNU
+find—then you could simplify it like so:</p>
+
+<figure class='code'><figcaption><span>xdg.sh v3 </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="nb">dirs</span><span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
+</span><span class='line'>       -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
+</span><span class='line'>    -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> <span class="se">\</span>
+</span><span class='line'>    -exec <span class="s2">&quot;$EDITOR&quot;</span> <span class="o">{}</span> +
+</span></code></pre></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -337,100 +474,6 @@ loaded:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/07/copy-and-paste-in-tmux/">Copy &amp; Paste in tmux</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-06-07T19:54:00+12:00" pubdate data-updated="true">Jun 7<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-copy.png" alt="image" /></p>
-
-<p>I’ve posted a couple of times<sup>1</sup> about
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
-terminal mutliplexer. One question I see raised a lot in #tmux is how
-to copy and paste.</p>
-
-<p>The documentation for tmux is excellent: the
-<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
-one of the most clear and thorough I have read. And while it is
-explained there, I thought I would share my approach anyway.</p>
-
-<p>First, I set tmux to use vi keys:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setw -g mode-keys vi
-</span></code></pre></div></figure>
-
-
-<p>Then I change the default keybinds to suit my workflow. As explained in
-the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
-and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
-to more intuitive and Vim-like keys:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
-</span><span class='line'><span class="nb">bind </span>Escape copy-mode
-</span><span class='line'>unbind p
-</span><span class='line'><span class="nb">bind </span>p paste-buffer
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
-</span></code></pre></div></figure>
-
-
-<p>This seems a lot closer to all of the other Vim-like apps that I run -
-where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
-<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
-
-<p>So, to string it all together, the command sequence necessary to copy
-some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
-
-<pre>
-<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
-# move cursor to the start or end of the desired text string
-<kbd>v</kbd>                        # to activate highlighting
-# move cursor to cover the requisite string
-<kbd>y</kbd>                        # to capture the string
-<kbd>q</kbd>                        # exit copy mode
-<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
-</pre>
-
-
-<p>Simple.</p>
-
-<p>This means that you can scroll back through the output of <em>anything</em> in
-your terminal, and copy and paste it anywhere. Once you set it up, it is
-a very powerful tool…</p>
-
-<h5>Notes</h5>
-
-<p>1.<a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/">Sessions in tmux</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/12/">&larr; Older</a>
@@ -448,6 +491,10 @@ a very powerful tool…</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/09/28/screencast/">A dwm Screencast</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a>
       </li>
     
@@ -461,10 +508,6 @@ a very powerful tool…</p>
     
       <li class="post">
         <a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a>
       </li>
     
   </ul>

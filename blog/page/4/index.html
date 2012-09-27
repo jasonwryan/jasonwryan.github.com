@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Following on from my last post about mutt,
-I have been tinkering more with the most suckless of mail clients to
-get it to deal with—of all things— &hellip;">
+  <meta name="description" content="Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
+mutt posts1 with what I am assuming is the
+final &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,113 @@ get it to deal with—of all things— &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/23/notmuch/">Using Notmuch with mutt</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-23T19:37:00+12:00" pubdate data-updated="true">May 23<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/magnifier.png" title="day 307 on Flickr" >
+Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
+<a href="http://www.mutt.org/" title="mutt homepage">mutt</a> posts<sup>1</sup> with what I am assuming is the
+final piece of the puzzle: searching <code>mutt's</code> maildirs. For a small to average size mailbox, <code>mutt's</code>
+searching works fine, but as your mail volume grows this simple search doesn&#8217;t really scale. That&#8217;s
+where the rather modestly named <a href="http://notmuchmail.org/" title="Notmuch website">Notmuch</a> comes into play.</p>
+
+<p>It can be run as a standalone mail client, but you can also use it with <code>mutt</code> to provide
+a ruthlessly efficient and fast search tool for your email. I had looked at it and
+<a href="http://sup.rubyforge.org/" title="A console client for people with lots of mail">Sup</a>
+a couple of years ago, but was spurred to do something about it this week when
+<a href="https://twitter.com/#!/chosig" title="Chosig on Twitter">Gunnar Lundström</a> pinged me on twitter and
+suggested I check it out. So I did.</p>
+
+<blockquote><p>&#8220;Not much mail&#8221; is what Notmuch thinks about your email collection. Even if you receive 12000 <br/>messages per month or have on the order of  millions of messages that you&#8217;ve been saving for decades. <br/>Regardless, Notmuch will be able to quickly search all of it. It&#8217;s just plain not much mail.</p><footer><strong>Notmuch website</strong> <cite><a href='http://notmuchmail.org'>notmuchmail.org/&hellip;</a></cite></footer></blockquote>
+
+
+<p>There was previously a
+<a href="http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/">mutt-notmuch script</a>
+for integrating the two, but the functionality was included upstream at the start of this year
+so it is quite straightforward to set it up. There is a
+<a href="http://aur.archlinux.org/packages.php?ID=36289" title="Arch User Repository package">package in the AUR</a>
+but it is intended as the full mail client, complete with, <em>shudder</em>, emacs support amongst
+other things. I have stripped out the uneeded bindings and included the relevant <code>perl</code> libraries in a
+<a href="https://bitbucket.org/jasonwryan/centurion/src/6ff0f252961f/Build/notmuch/PKGBUILD" title="…in my bitbucket repo">modified PKGBUILD</a>
+if you just want the basic search with <code>mutt</code>.</p>
+
+<p>Otherwise, you&#8217;ll need to step through it manually.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl perl-mailtools perl-mail-box perl-string-shellquote
+</span><span class='line'>cowerd notmuch perl-term-readline-gnu
+</span></code></pre></div></figure>
+
+
+<p>As you will see from the PKGBUILD, you will need to copy the <code>notmuch-mutt</code> script
+into your <code>$PATH</code>: you&#8217;ll find it in <span class="file">contrib/notmuch-mutt/</span>.</p>
+
+<p>There is a simple interative setup, which you can complete before running the index the first time:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>notmuch setup
+</span><span class='line'>notmuch new
+</span></code></pre></div></figure>
+
+
+<p>The final step is to copy across the <code>mutt</code> macros included with the script:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat src/notmuch-0.13/contrib/notmuch-mutt/notmuch-mutt.rc &gt;&gt; <span class="nv">$HOME</span>/.mutt/muttrc
+</span></code></pre></div></figure>
+
+
+<p>Now, from within <code>mutt</code>, <kbd>F8</kbd>, <kbd>F9</kbd> and <kbd>F6</kbd> will respectively
+search, create the relevant threads from search results, and tag mails with <code>notmuch</code>.</p>
+
+<p>As I use <code>offlineimap</code> to retrieve my mail, I simply added <code>notmuch new</code> to the script that
+runs as a <code>cron</code> job to synch my mail and <code>notmuch</code> reindexes all of my mail as soon as it arrives.</p>
+
+<h3>Updated 27/5/12</h3>
+
+<p>Two of the <code>mutt</code> macros that are shipped in <span class="file">contrib/notmuch-mutt/notmuch-mutt.rc</span>
+do not work. I have written a patch to fix this and
+<a href="http://notmuchmail.org/pipermail/notmuch/2012/011263.html" title="Patch on notmuch list">posted it to the ML</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a> and
+<a href="http://jasonwryan.com/blog/2012/05/12/mutt/">mutt and HTML email</a></li>
+</ol>
+
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/mjtmail/3008566512/in/photostream/">mjtmail on Flickr</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -348,97 +455,6 @@ a list of possible completions.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/04/05/catalyst/">The Next Thing</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-05T15:54:00+12:00" pubdate data-updated="true">Apr 5<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/change.jpg" title="'Climate Change by Swamibu on Flickr'" ></p>
-
-<p>After eight years as a bureaucrat<sup>1</sup> working in a
-<a href="http://ssc.govt.nz" title="State Services Commission website">central agency</a>
-in New Zealand&#8217;s public service, I have hung up the grey cardigan.</p>
-
-<p>While I am sure that I will never shed some of the qualities of being an
-official (think discretion and a belief in the importance of sound
-governance—rather than a keen ear for the rattle of the tea trolley),
-I am looking forward to the opportunity to stretch out a little<sup>2</sup>.</p>
-
-<p>When I first joined the Commission, it was to work in the E-government Unit. I
-was strongly attracted to a role that combined communications and technology
-and, at the time, the EGU was the epicentre of a huge amount of really interesting
-initiatives. The
-<a href="http://archive.ict.govt.nz/plone/archive/policy/open-source.1.html" title="Policy Paper in the egovernment archive">Open Source Policy</a>,
-the <a href="http://archive.ict.govt.nz/plone/archive/services/authentication/library/docs/authentication-bpf/index.html" title="BPF in the egovernment archive">Authentication Framework</a>,
-work on <a href="http://archive.ict.govt.nz/plone/archive/policy/tc-and-drm/oldindex.html" title="TC &amp; DRM paper in egovt archive">Digital Rights Management</a>
-and <a href="http://archive.ict.govt.nz/plone/archive/policy/trust-security/niip-report.1.html" title="Security in the egovt archive">security</a>
-to name just a few; it was a geek&#8217;s paradise (certainly from a policy perspective).</p>
-
-<p>I have no doubt that the foundation of much of what I was later able to achieve
-was fostered in this environment; whether it was originally making the code available
-for the <a href="http://e.govt.nz" title="The original Plone site">e-government website</a>,
-<a href="http://psnetwork.org.nz/blog/" title="More than you would ever want to read on this…">blogging about social media in the public sector</a>,
-working with the other public service communications managers on the
-<a href="http://www.psnetwork.org.nz/resources-comms-function-review/" title="A Review of the Communications Function in NZ Govt">Review of the Function</a>,
-or issuing the <acronym title="Request For Proposal">RFP</acronym> for the rebuild
-of the SSC website with the stipulation that the solution had to be
-open source so that we could reuse it across government.</p>
-
-<p>You can probably see a theme emerging here. If you have read this blog at all, you will
-definitely see where this is heading…</p>
-
-<p>Anyway, I am about to start focussing on technology—and open source technology in
-particular—on a full time basis. From the middle of this month, I join the team at
-<a href="http://catalyst.net.nz/" title="Catalyst homepage">Catalyst</a>, New Zealand&#8217;s leading
-open source company, where I will be the newly minted Strategy and Relations Manager.</p>
-
-<p>I&#8217;m thrilled to be able to work for a company that is dedicated to driving the uptake
-of open source by businesses and government. Both the
-<a href="http://arstechnica.com/business/news/2012/03/red-hat-hits-a-billion-dollars-in-revenue-a-milestone-for-open-source.ars" title="Red Hat hits $1billion">private</a>
-and <a href="http://www.zdnet.co.uk/news/business-of-it/2012/03/22/iceland-swaps-windows-for-linux-in-open-source-push-40154870/" title="Iceland dumps windows for Linux in the public sector">public sectors</a>
-around the world are really starting to grasp the strategic and economic benefits of using
-open source; we are going to be doing our best to accelerate that adoption.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>I have used the term proudly for the last eight years, and will continue to do so…</li>
-<li>Yes, my <a href="http://twitter.com/jasonwryan">twitter stream</a> will likely become a little more colourful.</li>
-</ol>
-
-
-<p>Creative Commons image by <a href="http://www.flickr.com/photos/swamibu/4153715570/lightbox/">Swamibu</a>
-on Flickr</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -456,6 +472,10 @@ on Flickr</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/09/28/screencast/">A dwm Screencast</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a>
       </li>
     
@@ -469,10 +489,6 @@ on Flickr</p>
     
       <li class="post">
         <a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a>
       </li>
     
   </ul>
