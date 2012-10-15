@@ -25,7 +25,7 @@ superstition or mild enfeeblement…
 
 Rather that simply bask in the sense of superiority that these observations have 
 afforded me, I thought that I would make my own, more lasting, contribution to the
-cannon. I can only describe this process as instructive.
+canon. I can only describe this process as instructive.
 
 [{% img center https://dl.dropbox.com/u/261312/Blog-images/tower.jpg dwm screencast %}](http://www.youtube.com/watch?v=GQ5s6T25jCc)
 
