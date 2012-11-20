@@ -3,7 +3,7 @@ layout: post
 title: "A dwm Screencast"
 date: 2012-09-28 09:18
 comments: true
-categories: [archlinux, dwm]
+categories: [archlinux, dwm, screencast]
 ---
 {% img left https://dl.dropbox.com/u/261312/Blog-images/dwm-logo.png 'dwm logo' %}
 Over the last week as I have been at home convalescing I have, quite unaccountably,
