@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Over the last several months I have been using dwm
-as my window manager on two Arch Linux
-machines: my <a href="http://www.flickr.com/photos/ &hellip;">
+  <meta name="description" content="Vifm is a ncurses based file manager with vi-like
+keybindings; it gives you complete keyboard control over your files without
+having to learn a new &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,94 @@ machines: my <a href="http://www.flickr.com/photos/ &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/28/changing-keybinds-in-vifm/">Changing Keybinds in vifm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-12-28T13:50:00+13:00" pubdate data-updated="true">Dec 28<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://vifm.sourceforge.net/">Vifm</a> is a ncurses based file manager with vi-like
+keybindings; it gives you complete keyboard control over your files without
+having to learn a new set of commands.</p>
+
+<p><a href="http://www.flickr.com/photos/jasonwryan/4220632362/" title="Vifm by
+jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4039/4220632362_ea980811e1.jpg" width="500"
+height="227" alt="Vifm"/></a></p>
+
+<p>The only drawback, for me, is that as of the current version (0.5-1) you
+can&#8217;t map keys. While the developer has indicated it is on the todo list,
+he also flagged that it is some way off. If, like me, you <code>map : ;</code>
+in <a href="http://www.vim.org/">Vim</a>, then not having this functionality is a minor
+irritant. Fortunately, it is also easily fixed. Ken Steen, the Vifm developer,
+was kind enough to point me in the right direction…</p>
+
+<p>Download <a href="http://aur.archlinux.org/packages.php?ID=6011">the tarball</a> from
+<acronym title="Arch User Repository">AUR</acronym> and untar it etc.,</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span>tar -xzf vifm.tar.gz <span class="nb">cd </span>vifm/
+</span></code></pre></div></figure>
+
+
+<p>Build the package</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span>makepkg -s
+</span></code></pre></div></figure>
+
+
+<p>Then you will need to edit the file, keys.c</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vim src/vifm-0.5/src/keys.c
+</span></code></pre></div></figure>
+
+
+<p>Search for the command key</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>/case <span class="s1">&#39;:&#39;</span>:
+</span></code></pre></div></figure>
+
+
+<p>In this version it is at line 982. Change the entry to your key of choice —
+in my case <kbd>;</kbd> — and save and quit.</p>
+
+<p>Recompile Vifm and you are done&#8230;</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span>makepkg -efi
+</span></code></pre></div></figure>
+
+
+<h3>Update 18/2/10</h3>
+
+<p>Vifm has now been moved to Community, so you can use
+<a href="http://wiki.archlinux.org/index.php/Arch_Build_System%22">ABS</a> to build the package.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -281,94 +369,6 @@ status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/11/07/changing-karmics-login-screen/">Changing Karmic&#8217;s Login Screen</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2009-11-07T18:46:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2009</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
-accelerate boot time. This has made for a faster boot, but a side effect has
-been that there is no longer a straightforward way to theme your login - and
-the default isn’t just ugly, it’s fugly…</p>
-
-<p>Fear not. It can be fixed.</p>
-
-<p>The first thing you want to do is replace the background image. You can find it
-at <code>/usr/share/images/xsplash</code>.</p>
-
-<p>Before doing anything rash, make a copy of the directory:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
-</span></code></pre></div></figure>
-
-
-<p>Then delete all of the images that begin with <code>bg_</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo rm /usr/share/images/xsplash/bg_*
-</span></code></pre></div></figure>
-
-
-<p>Use the gimp to create a background image for your desktop and save it into
-this directory, and name it <code>bg_2560x1600.jpg</code> …irrespective of the resolution
-of your screen. Leave the other images as they are: the logo and the
-marvellously named throbber will sit over your new background as you boot up…</p>
-
-<p>Next you can change the colours of the login box to complement your new
-background. This is all controlled in
-<code>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc</code>.</p>
-
-<p>Again, make a copy:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc <span class="se">\</span>
-</span><span class='line'>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc-backup
-</span></code></pre></div></figure>
-
-
-<p>Then open the file and edit the relevant lines of code at the beginning of the
-file:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
-</span></code></pre></div></figure>
-
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/karmic-text.png" title="'Screenshot of editing text'" ></p>
-
-<p>As you can see, the colour scheme I have chosen uses dark grey to match my
-desktop. Feel free to experiment, you can’t really break anything…</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4081800113/" title="Customized Karmic Login Screen by jasonwryan, on Flickr"><img src="http://farm3.staticflickr.com/2536/4081800113_d4b98a9b3c.jpg" width="500" height="313" alt="Customized Karmic Login Screen"></a></p>
-
-<p>Simple, really.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/22/">&larr; Older</a>
@@ -386,6 +386,10 @@ desktop. Feel free to experiment, you can’t really break anything…</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/09/28/screencast/">A dwm Screencast</a>
       </li>
     
@@ -399,10 +403,6 @@ desktop. Feel free to experiment, you can’t really break anything…</p>
     
       <li class="post">
         <a href="/blog/2012/08/04/systemd/">The Leap to systemd</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a>
       </li>
     
   </ul>
