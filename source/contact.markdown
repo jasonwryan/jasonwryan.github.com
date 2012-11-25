@@ -21,7 +21,7 @@ or find me on IRC in #freenode
 You will find me in a couple of other places around the web:
 
 ### FOSS ###
-* [Arch Linux](http://bbs.archlinux.org/profile.php?id#25579)
+* [Arch Linux](https://bbs.archlinux.org/profile.php?id=25579) (requires login)
 * [My Github projects](http://github.com/jasonwryan)
 * [Bitbucket repositories](http://bitbucket.jasonwryan.com/)
 * [Unix &amp; Linux StackExchange](http://unix.stackexchange.com/users/6761/jasonwryan)
