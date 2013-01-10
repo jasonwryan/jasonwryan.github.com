@@ -4,7 +4,7 @@
   <title><![CDATA[Category: hack | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/hack/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-11-25T18:49:17+13:00</updated>
+  <updated>2013-01-10T16:03:56+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,118 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Replacing TrueCrypt]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/01/10/truecrypt/"/>
+    <updated>2013-01-10T16:02:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/01/10/truecrypt</id>
+    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/lock.jpg" title="'Flickr image of lock'" >
+I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
+I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
+It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
+the fly and—for the especially paranoid—to hide the existence of those volumes from
+inquisitive others.</p>
+
+<p>In the intervening years, with all aspects of my personal life
+increasingly mediated digitally, in order to properly safeguard my privacy,
+and that of my family, I have taken to using LUKS to
+<a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on LVM on LUKS">fully encrypt all of my machines</a>.
+And I have used TrueCrypt, both personally and for work, to encrypt some of my USB drives and as
+a container in <a href="http://dropbox.com/" title="Dropbox homepage">Dropbox</a>
+, for as long as
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on sharing dotfiles with Dropbox">I have used that service</a>.</p>
+
+<p>Early last year, however, I became aware of concerns that TrueCrypt was not truly open source; that almost
+all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
+free (as in Freedom) software:</p>
+
+<p><blockquote><p>The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered "free" by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.</p></blockquote></p>
+
+<p>When I initially accessed the page, in February 2012, there was also a paragraph—now removed—that
+highlighted further, more alarmist, concerns about the shadowy identity of the people behind
+TrueCrypt:</p>
+
+<p><blockquote><p>The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]</p></blockquote></p>
+
+<p>While I don't subscribe to the theory that the CIA have planted a backdoor in the software (if they
+had, <a href="https://en.wikipedia.org/wiki/Truecrypt#Operation_Satyagraha" title="FBI operation foiled by TC">it clearly doesn't work</a>),
+I was relieved to see at the end of last year that someone had written a simple utility that allows
+you to manage TrueCrypt containers from the command line; <a href="https://github.com/bwalex/tc-play" title="tcplay on Guthub">tcplay</a>
+is decribed as:</p>
+
+<p><blockquote><p>a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.</p></blockquote></p>
+
+<p>With a <a href="https://github.com/bwalex/tc-play/blob/master/LICENSE" title="tcplay license">simple, two paragraph license</a>
+and a brief but comprehensive <code>man</code> page, I was sold. I uninstalled TrueCrypt late last year and haven't missed it since. Quite
+the contrary. The only “issue” that I have had with tcplay is remembering the commands to map and mount a drive.
+Initially, I jotted down some notes, but opening them up several times a week to refer to them quickly seemed
+pointless so I eventually wised up and wrote a wrapper script to do the job for me…</p>
+
+<p>The script is quite simple, it finds the first available loop device, maps the encrypted volume to it and
+mounts it for read-writeable fro your user.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;manage truecrypt containers using tcplay&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;user<span class="o">=</span>jason
+</span><span class='line'><span class="nv">cryptdev</span><span class="o">=</span>Safebox
+</span><span class='line'><span class="nv">cryptpath</span><span class="o">=</span>/home/jason/Dropbox/<span class="s2">&quot;$cryptdev&quot;</span>
+</span><span class='line'><span class="nv">loopdev</span><span class="o">=</span><span class="k">$(</span>losetup -f<span class="k">)</span>
+</span><span class='line'><span class="nv">mountpt</span><span class="o">=</span>/media/<span class="s2">&quot;$cryptdev&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;must be run as root&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$EUID</span> !<span class="o">=</span> 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;You must be root to run this.&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;unecrypt and mount container&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span>losetup <span class="s2">&quot;$loopdev&quot;</span> <span class="s2">&quot;$cryptpath&quot;</span>
+</span><span class='line'>  tcplay --map<span class="o">=</span><span class="s2">&quot;$cryptdev&quot;</span> --device<span class="o">=</span><span class="s2">&quot;$loopdev&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># read passphrase</span>
+</span><span class='line'>  <span class="nb">read</span> -r -s passphrase &amp;lt;&amp;lt;EOF
+</span><span class='line'>  <span class="s2">&quot;$passphrase&quot;</span>
+</span><span class='line'>EOF&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># mount container</span>
+</span><span class='line'>  <span class="o">[[</span> -d <span class="s2">&quot;$mountpt&quot;</span> <span class="o">]]</span> <span class="o">||</span> mkdir <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># mount options</span>
+</span><span class='line'>  <span class="nv">userid</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="s2">&quot;[=(]&quot;</span> <span class="s1">&#39;{print $2,$4}&#39;</span> &amp;lt;<span class="o">(</span>id <span class="s2">&quot;$user&quot;</span><span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  mount -o nosuid,uid<span class="o">=</span><span class="s2">&quot;${userid% &lt;em&gt;}&quot;</span>,gid<span class="o">=</span><span class="s2">&quot;${userid#&lt;/em&gt; }&quot;</span> /dev/mapper/<span class="s2">&quot;$cryptdev&quot;</span> <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;close and clean up…&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;close&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">device</span><span class="o">=</span><span class="k">$(</span>awk -v <span class="nv">dev</span><span class="o">=</span><span class="nv">$cryptdev</span> -F<span class="s2">&quot;:&quot;</span> <span class="s1">&#39;/dev/ {print $1}&#39;</span> &amp;lt;<span class="o">(</span>losetup -a<span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  umount <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>  dmsetup remove <span class="s2">&quot;$cryptdev&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;demapping failed&quot;</span>
+</span><span class='line'>  losetup -d <span class="s2">&quot;$device&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;deleting $loopdev failed&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Options are open or close.&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Once you are done, the script will unmount your volume and clean up. Undoubtedly, the
+script could be improved; patches are welcome.</p>
+
+<p>There is a
+<a href="https://aur.archlinux.org/packages/tcplay-git/" title="Arch User Repository">PKGBUILD in the AUR</a>.
+Uninstall TrueCrypt and give tcplay a go, it is an exceptionally handy untility.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Improved Notes Utility]]></title>
@@ -567,70 +679,6 @@ I can't recommend enough the
 <a href="https://github.com/rawsyntax/jekyll_alias_generator/blob/master/_plugins/alias_generator.rb">Jekyll Alias Generator</a>.
 Just. Brilliant.</li>
 <li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Simple aurphan notifier]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/03/09/aurphan/"/>
-    <updated>2012-03-09T16:52:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/03/09/aurphan</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
-
-<p>If you are an Arch Linux user and you are not using
-<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
-you can take a moment to hang your head in shame before you click on to
-whatever the next thing is. The package description sums up perfectly
-what aurphan does:</p>
-
-<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
-today!</p></blockquote>
-
-<p>Running <code>aurphan -a</code>, for example, will identify any
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
-database that are not currently maintained; allowing you to log in to
-the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
-fulfilled.<sup>1</sup></p>
-
-<p>If, like most Archers, you have a compulsive desire to automate
-<em>everything</em> then clearly typing (or even remembering to type) <code>aurphan
--a</code> into a terminal periodically is as ludicrous as it is onerous. The
-obvious answer is some shell script and a cron job.</p>
-
-<p>First, the <code>cron</code> job:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
-</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Then, as part of my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="Script in mercurial repo">dwm-status script</a>,
-a function to check that there are no new additions to the file and, if
-there are, flash a highlight:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;aurphans<span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">}</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The awk filter excludes a null return, which is “No aurphans found.”
-Now, if any of the packages that I use from the AUR are disowned, I’ll
-be the first to know about it.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Actual feeling may differ depending on the package you have adopted
-and the amount of prescription painkillers that you are currently
-ingesting…</li>
 </ol>
 
 ]]></content>

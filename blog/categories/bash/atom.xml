@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/bash/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-11-25T18:49:17+13:00</updated>
+  <updated>2013-01-10T16:03:56+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,118 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Replacing TrueCrypt]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/01/10/truecrypt/"/>
+    <updated>2013-01-10T16:02:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/01/10/truecrypt</id>
+    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/lock.jpg" title="'Flickr image of lock'" >
+I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
+I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
+It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
+the fly and—for the especially paranoid—to hide the existence of those volumes from
+inquisitive others.</p>
+
+<p>In the intervening years, with all aspects of my personal life
+increasingly mediated digitally, in order to properly safeguard my privacy,
+and that of my family, I have taken to using LUKS to
+<a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on LVM on LUKS">fully encrypt all of my machines</a>.
+And I have used TrueCrypt, both personally and for work, to encrypt some of my USB drives and as
+a container in <a href="http://dropbox.com/" title="Dropbox homepage">Dropbox</a>
+, for as long as
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on sharing dotfiles with Dropbox">I have used that service</a>.</p>
+
+<p>Early last year, however, I became aware of concerns that TrueCrypt was not truly open source; that almost
+all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
+free (as in Freedom) software:</p>
+
+<p><blockquote><p>The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered "free" by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.</p></blockquote></p>
+
+<p>When I initially accessed the page, in February 2012, there was also a paragraph—now removed—that
+highlighted further, more alarmist, concerns about the shadowy identity of the people behind
+TrueCrypt:</p>
+
+<p><blockquote><p>The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]</p></blockquote></p>
+
+<p>While I don't subscribe to the theory that the CIA have planted a backdoor in the software (if they
+had, <a href="https://en.wikipedia.org/wiki/Truecrypt#Operation_Satyagraha" title="FBI operation foiled by TC">it clearly doesn't work</a>),
+I was relieved to see at the end of last year that someone had written a simple utility that allows
+you to manage TrueCrypt containers from the command line; <a href="https://github.com/bwalex/tc-play" title="tcplay on Guthub">tcplay</a>
+is decribed as:</p>
+
+<p><blockquote><p>a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.</p></blockquote></p>
+
+<p>With a <a href="https://github.com/bwalex/tc-play/blob/master/LICENSE" title="tcplay license">simple, two paragraph license</a>
+and a brief but comprehensive <code>man</code> page, I was sold. I uninstalled TrueCrypt late last year and haven't missed it since. Quite
+the contrary. The only “issue” that I have had with tcplay is remembering the commands to map and mount a drive.
+Initially, I jotted down some notes, but opening them up several times a week to refer to them quickly seemed
+pointless so I eventually wised up and wrote a wrapper script to do the job for me…</p>
+
+<p>The script is quite simple, it finds the first available loop device, maps the encrypted volume to it and
+mounts it for read-writeable fro your user.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;manage truecrypt containers using tcplay&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;user<span class="o">=</span>jason
+</span><span class='line'><span class="nv">cryptdev</span><span class="o">=</span>Safebox
+</span><span class='line'><span class="nv">cryptpath</span><span class="o">=</span>/home/jason/Dropbox/<span class="s2">&quot;$cryptdev&quot;</span>
+</span><span class='line'><span class="nv">loopdev</span><span class="o">=</span><span class="k">$(</span>losetup -f<span class="k">)</span>
+</span><span class='line'><span class="nv">mountpt</span><span class="o">=</span>/media/<span class="s2">&quot;$cryptdev&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;must be run as root&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$EUID</span> !<span class="o">=</span> 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;You must be root to run this.&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;unecrypt and mount container&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span>losetup <span class="s2">&quot;$loopdev&quot;</span> <span class="s2">&quot;$cryptpath&quot;</span>
+</span><span class='line'>  tcplay --map<span class="o">=</span><span class="s2">&quot;$cryptdev&quot;</span> --device<span class="o">=</span><span class="s2">&quot;$loopdev&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># read passphrase</span>
+</span><span class='line'>  <span class="nb">read</span> -r -s passphrase &amp;lt;&amp;lt;EOF
+</span><span class='line'>  <span class="s2">&quot;$passphrase&quot;</span>
+</span><span class='line'>EOF&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># mount container</span>
+</span><span class='line'>  <span class="o">[[</span> -d <span class="s2">&quot;$mountpt&quot;</span> <span class="o">]]</span> <span class="o">||</span> mkdir <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># mount options</span>
+</span><span class='line'>  <span class="nv">userid</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="s2">&quot;[=(]&quot;</span> <span class="s1">&#39;{print $2,$4}&#39;</span> &amp;lt;<span class="o">(</span>id <span class="s2">&quot;$user&quot;</span><span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  mount -o nosuid,uid<span class="o">=</span><span class="s2">&quot;${userid% &lt;em&gt;}&quot;</span>,gid<span class="o">=</span><span class="s2">&quot;${userid#&lt;/em&gt; }&quot;</span> /dev/mapper/<span class="s2">&quot;$cryptdev&quot;</span> <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;close and clean up…&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;close&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">device</span><span class="o">=</span><span class="k">$(</span>awk -v <span class="nv">dev</span><span class="o">=</span><span class="nv">$cryptdev</span> -F<span class="s2">&quot;:&quot;</span> <span class="s1">&#39;/dev/ {print $1}&#39;</span> &amp;lt;<span class="o">(</span>losetup -a<span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  umount <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>  dmsetup remove <span class="s2">&quot;$cryptdev&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;demapping failed&quot;</span>
+</span><span class='line'>  losetup -d <span class="s2">&quot;$device&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;deleting $loopdev failed&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Options are open or close.&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Once you are done, the script will unmount your volume and clean up. Undoubtedly, the
+script could be improved; patches are welcome.</p>
+
+<p>There is a
+<a href="https://aur.archlinux.org/packages/tcplay-git/" title="Arch User Repository">PKGBUILD in the AUR</a>.
+Uninstall TrueCrypt and give tcplay a go, it is an exceptionally handy untility.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Improved Notes Utility]]></title>
@@ -438,77 +550,6 @@ interactive shells if <code>xinit</code> was called with <code>exec</code>.</p>
 <p>I have also ditched <code>consolekit</code> - for all of the processes it was
 spawning, it actually wasn’t performing any critical functions; or
 indeed any functions that I really needed at all…</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Readline Bindings in Vi Mode]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/12/01/readline/"/>
-    <updated>2011-12-01T18:43:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/12/01/readline</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/readline.png" alt="image" /></p>
-
-<p>I recently threw caution to the wind and
-<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
-I wanted to take advantage of the superior command editing ability that
-this mode offered, and also to continue to bake vi[m] methods into every
-aspect of my working environment.</p>
-
-<p>The change has been relatively straightforward; the only issues I have
-experienced are really just around a couple of keybinds that I had
-become accustomed to in normal/Emacs mode:</p>
-
-<ul>
-<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
-<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
-</ul>
-
-
-<p>The first, the ability to recall the final arguments of previous
-commands was a showstopper for me: I really struggled without this.
-Being able to recall a long file path and append it to a new command is
-invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
-exactly this. Why it is not bound by default in vi mode is beyond me…</p>
-
-<p>The other was purely cosmetic, really. I am an inveterate clearer of the
-screen—unless I am referring to something printed to stdout, I always
-prefer to work at the top of the console.</p>
-
-<p>In any event, with the
-<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
-it was a trivial exercize to restore this functionality to my bash shell
-in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;h1>for vi mode&lt;/h1>
-</span><span class='line'>
-</span><span class='line'>&lt;p>set editing-mode vi
-</span><span class='line'>$if mode=vi&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;p>set keymap vi-command&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;h1>these are for vi-command mode&lt;/h1>
-</span><span class='line'>
-</span><span class='line'>&lt;p>"\e[A": history-search-backward            # arrow up
-</span><span class='line'>"\e[B": history-search-forward             # arrow down
-</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
-</span><span class='line'>Control-l: clear-screen&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;p>set keymap vi-insert&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;h1>these are for vi-insert mode&lt;/h1>
-</span><span class='line'>
-</span><span class='line'>&lt;p>"\e[A": history-search-backward
-</span><span class='line'>"\e[B": history-search-forward
-</span><span class='line'>"\ep": yank-last-arg
-</span><span class='line'>Control-l: clear-screen
-</span><span class='line'>$endif</span></code></pre></div></figure></notextile></div></p>
-
-<p>There is an extensive list of
-<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
-with which you can customize your shell environment.</p>
 ]]></content>
   </entry>
   

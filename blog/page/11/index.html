@@ -9,10 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have been using Tarsnap
-for a couple of months now to backup
-my EeePC.
-Tarsnap’s (superb) tagline is: online backups for the truly paranoid. &hellip;">
+  <meta name="description" content="I have posted before about tmux1, the terminal multiplexer. One of the
+(minor) frustrations that I have to-date done nothing about was setting
+up &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +84,151 @@ Tarsnap’s (superb) tagline is: online backups for the truly paranoid. &hellip;
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/09/10/tmux-and-ssh-keys/">tmux &amp; SSH Keys</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-09-10T16:46:00+12:00" pubdate data-updated="true">Sep 10<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-ssh.jpg" alt="image" /></p>
+
+<p>I have posted before about tmux<sup>1</sup>, the terminal multiplexer. One of the
+(minor) frustrations that I have to-date done nothing about was setting
+up persistent SSH key management across sessions. The ability to enter
+the passphrase for my public keys once, and then to be able to access
+remote hosts—or {git,hg} push—without having to re-enter a passphrase.</p>
+
+<p>My solution is quite hackish, but it works and, given
+<a href="http://duckduckgo.com/?q=tmux+ssh-agent" title="tmux and ssh-agent on DDG">the only other solutions</a>
+I was able to find by searching seem even more convoluted, I thought I
+would share it.</p>
+
+<p>There are a couple of separate steps, none of them of any real
+consequence, but each necessary.</p>
+
+<p>First, in your <span class="file">$HOME/.tmux.conf</span> you need to enable update-environment:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set</span> -g update-environment <span class="s2">&quot;DISPLAY SSH_ASKPASS SSH_AUTH_SOCK</span>
+</span><span class='line'><span class="s2">SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>From the <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="tmux manual">man page</a>:</p>
+
+<blockquote><p>Set a space-separated string containing a list of environment
+variables to be copied into the session environment when a new session
+is created or an existing session is attached. Any variables that do
+not exist in the source environment are set to be removed from the
+session environment (as if -r was given to the set-environment
+command).</p></blockquote>
+
+<p>The next step is to create a script (mine is bound to a key sequence to
+launch from scratch, you can adopt a simpler approach) that starts tmux
+and initializes ssh-agent:<sup>2</sup></p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nv">PID</span><span class="o">=</span><span class="k">$(</span>pgrep tmux<span class="k">)</span>
+</span><span class='line'><span class="nv">new</span><span class="o">=</span><span class="s2">&quot;tmux -f $HOME/.tmux/conf new -s secured&quot;</span>
+</span><span class='line'><span class="nv">old</span><span class="o">=</span><span class="s2">&quot;tmux attach -t secured -d&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$SSH_AUTH_SOCK&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">eval</span> <span class="sb">`</span>ssh-agent<span class="sb">`</span>
+</span><span class='line'>    <span class="nb">trap</span> <span class="s2">&quot;kill $SSH_AGENT_PID&quot;</span> 0
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$PID&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${new}&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">    </span>urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${old}&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'>ssh-add
+</span></code></pre></div></figure>
+
+
+<p>The final step is to install
+<a href="http://www.funtoo.org/wiki/Keychain" title="Keychain homepage">keychain</a>, and
+set it up. I followed the
+<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Using_keychain" title="...because it rocks!">instructions on the Arch Wiki</a>
+and opted for a couple of lines in <span class="file">$HOME/.bash_profile</span><sup>3</sup>, like so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
+</span><span class='line'><span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span> <span class="o">&amp;&amp;</span>
+</span><span class='line'>    <span class="nb">source</span> <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
+</span></code></pre></div></figure>
+
+
+<p>That’s it. Now, hitting a key sequence opens a terminal, I am prompted
+for my passphrase and then, if I open another window, or another tmux
+session <em>as long is the first session is still running, attached or
+not</em>, I am authenticated and can SSH or push without a prompt.</p>
+
+<h4>Updated 7/10/11</h4>
+
+<p>I refined the sequence to provide me a little more flexibility: now the
+keychain is only called if I start a specific named tmux session. To do
+this, I changed my <span class="file">$HOME/.bash_profile</span> to test for that session:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">tsess</span><span class="o">=</span><span class="k">$(</span>tmux ls<span class="k">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;${tsess%%:*}&quot;</span> <span class="o">=</span> <span class="s2">&quot;secured&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span>
+</span><span class='line'>   <span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'>    <span class="c"># start keychain</span>
+</span><span class='line'>    /usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
+</span><span class='line'>    . <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>Previous posts:</p>
+
+<ul>
+<li><a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/" title="First post on tmux">tmux: terminal multiplexer</a></li>
+<li><a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/" title="tmux sessions">Sessions in tmux</a></li>
+<li><a href="http://jasonwryan.com/blog/2011/06/07/copy-and-paste-in-tmux/" title="Copy and paste in tmux">Copy &amp; paste in tmux</a></li>
+<li><a href="http://jasonwryan.com/blog/2011/06/10/setting-tmux-status-bar-if-in-x/" title="tmux status bars">Setting tmux status bar if in X</a></li>
+</ul>
+</li>
+<li><p>Updated to include session test.</p></li>
+<li>Alternatively, placing the script in <span class="file">/etc/profile.d/keychain.sh</span> will
+start the agent when you login, as opposed to starting a specific
+shell. Your call on security versus convenience…</li>
+</ol>
+
+
+<p>Creative Commons image from <a href="http://www.flickr.com/photos/marts-pics/2292588212/in/photostream/" title="Public Key on Flickr">mer de glace</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -317,151 +461,6 @@ find—then you could simplify it like so:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/26/using-vimprobable/">Using Vimprobable</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-06-26T14:08:00+12:00" pubdate data-updated="true">Jun 26<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable2.png" alt="image" /></p>
-
-<p>I <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/" title="Post on using Vimprobable">posted last year about Vimprobable</a>
-a <a href="http://www.webkit.org/" title="Webkit site">webkit browser</a> that uses
-Vim-like keybinds and can be run completely without the rodent.</p>
-
-<p>Over the last couple of months I have become increasingly comfortable
-with it, and with the addition of
-<a href="http://vimprobable.org/pipermail/vimprobable-users/2011-June/000800.html" title="External handlers patch on ML">some great recent functionality</a>,
-it has become my default browser.</p>
-
-<p>The project has good documentation, in the form of two man pages:
-<code>vimprobable</code> and <code>vimprobablerc</code>, but I thought I’d share some of my
-customizations and working methods.</p>
-
-<h3>Copy &amp; Paste</h3>
-
-<p>The only time I have been tempted to take my hand off the keyboard was
-to insert the cursor at the correct character to begin a selection to
-copy and paste. This is unnecessary. With the right options in
-<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span>,
-you can do it all from the keyboard.</p>
-
-<p>Map the keys you would like to use to enter and exit caret mode. I use
-<kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
-return to normal mode:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
-</span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
-</span></code></pre></div></figure>
-
-
-<p>Then, it is just a matter of identifying the text that you wish to copy
-(in the photo above I was copying a script to launch <code>tabbed</code>), and
-highlighting it via search. So the sequence is:</p>
-
-<pre>
-1.  <kbd>/</kbd> - to enter search mode
-2.  <kbd>#</kbd><kbd>!</kbd> <kbd>Enter</kbd> - the shebang and then enter to highlight the correct
-    sequence
-3.  <kbd>Ctrl</kbd><kbd>c</kbd> to enter caret mode
-4.  and then <kbd>Shift</kbd><kbd>Up</kbd> or <kbd>Shift</kbd><kbd>Down</kbd> to highlight the following or
-    preceding lines
-5.  yanking the selected text is <kbd>Shift</kbd><kbd>y</kbd>, and the text is now stored in
-    your clipboard.
-</pre>
-
-
-<h3>Opening new instances in tabbed</h3>
-
-<p>I highlighted the section on tabbed from the
-<a href="http://www.vimprobable.org/" title="Vimprobable website">Vimprobable site</a> for a reason.
-The second tip is how to set up
-<a href="http://tools.suckless.org/tabbed" title="tabbed on suckless.org">tabbed</a> to
-work well with other applications.</p>
-
-<p>By default, any new windows (ie., instances of Vimprobable) opened from
-within Vimprobable are “caught”—and managed— by <code>tabbed</code>. However, if you
-open a link from, say
-<a href="http://newsbeuter.org/" title="ncurses rss reader">newsbeuter</a> or
-<a href="http://tyrs.nicosphere.net/index.html" title="ncurses twitter/identi.ca client">Tyrs</a>,
-this will open an instance outside <code>tabbed</code> which, if you are using a
-tiling window manager like
-<a href="http://dwm.suckless.org/" title="THE titling wm">dwm</a>, means this window gets
-pushed to master in your stack. This is not entirely satisfactory.</p>
-
-<p>Thanks to
-<a href="http://lists.suckless.org/dev/1106/8761.html" title="Tabbed thread on suckless ML">Connor Lane Smith on the suckless ML</a>,
-I have a solution to have all new instances of Vimprobable sent to
-<code>tabbed</code>, whether opened in another application, or if I click on a link
-in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
-
-<p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
-<psan class="file">/tmp</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&lt;/tmp/tabbed.xid)&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>Then it is just a matter of setting up other applications to pass links
-to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
-<span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> %s
-</span></code></pre></div></figure>
-
-
-<p>The workaround for Urxvtc was a little trickier. I finally got there
-with some help from
-<a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
-In my <span class="file">~/.Xdefaults</span> I have:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
-</span><span class='line'>URxvt.perl-ext-common: default,matcher
-</span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
-</span><span class='line'>URxvt.matcher.button: 1
-</span></code></pre></div></figure>
-
-
-<p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="c"># Script to open Vimprobable instances in tabbed</span>
-</span><span class='line'><span class="nb">exec </span>vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>Now whenever I open a link in an application or by clicking a link in
-the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
-it is passed to Vimprobable in <code>tabbed</code>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/12/">&larr; Older</a>
@@ -479,6 +478,10 @@ it is passed to Vimprobable in <code>tabbed</code>.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
       </li>
     
@@ -492,10 +495,6 @@ it is passed to Vimprobable in <code>tabbed</code>.</p>
     
       <li class="post">
         <a href="/blog/2012/08/18/trolls/">Trolling Arch Linux</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/04/systemd/">The Leap to systemd</a>
       </li>
     
   </ul>
@@ -598,7 +597,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2012 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

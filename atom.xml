@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-11-25T18:49:17+13:00</updated>
+  <updated>2013-01-10T16:03:56+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,116 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Replacing TrueCrypt]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/01/10/truecrypt/"/>
+    <updated>2013-01-10T16:02:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/01/10/truecrypt</id>
+    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/lock.jpg" title="'Flickr image of lock'" >
+I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
+I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
+It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
+the fly and—for the especially paranoid—to hide the existence of those volumes from
+inquisitive others.</p>
+
+<p>In the intervening years, with all aspects of my personal life
+increasingly mediated digitally, in order to properly safeguard my privacy,
+and that of my family, I have taken to using LUKS to
+<a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on LVM on LUKS">fully encrypt all of my machines</a>.
+And I have used TrueCrypt, both personally and for work, to encrypt some of my USB drives and as
+a container in <a href="http://dropbox.com/" title="Dropbox homepage">Dropbox</a>
+, for as long as
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on sharing dotfiles with Dropbox">I have used that service</a>.</p>
+
+<p>Early last year, however, I became aware of concerns that TrueCrypt was not truly open source; that almost
+all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
+free (as in Freedom) software:</p>
+
+<blockquote><p>The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered &#8220;free&#8221; by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.</p></blockquote>
+
+
+<p>When I initially accessed the page, in February 2012, there was also a paragraph—now removed—that
+highlighted further, more alarmist, concerns about the shadowy identity of the people behind
+TrueCrypt:</p>
+
+<blockquote><p>The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]</p></blockquote>
+
+
+<p>While I don&#8217;t subscribe to the theory that the CIA have planted a backdoor in the software (if they
+had, <a href="https://en.wikipedia.org/wiki/Truecrypt#Operation_Satyagraha" title="FBI operation foiled by TC">it clearly doesn&#8217;t work</a>),
+I was relieved to see at the end of last year that someone had written a simple utility that allows
+you to manage TrueCrypt containers from the command line; <a href="https://github.com/bwalex/tc-play" title="tcplay on Guthub">tcplay</a>
+is decribed as:</p>
+
+<blockquote><p>a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.</p></blockquote>
+
+
+<p>With a <a href="https://github.com/bwalex/tc-play/blob/master/LICENSE" title="tcplay license">simple, two paragraph license</a>
+and a brief but comprehensive <code>man</code> page, I was sold. I uninstalled TrueCrypt late last year and haven&#8217;t missed it since. Quite
+the contrary. The only “issue” that I have had with tcplay is remembering the commands to map and mount a drive.
+Initially, I jotted down some notes, but opening them up several times a week to refer to them quickly seemed
+pointless so I eventually wised up and wrote a wrapper script to do the job for me…</p>
+
+<p>The script is quite simple, it finds the first available loop device, maps the encrypted volume to it and
+mounts it for read-writeable fro your user.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="c"># manage truecrypt containers using tcplay</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">user</span><span class="o">=</span>jason
+</span><span class='line'><span class="nv">cryptdev</span><span class="o">=</span>Safebox
+</span><span class='line'><span class="nv">cryptpath</span><span class="o">=</span>/home/jason/Dropbox/<span class="s2">&quot;$cryptdev&quot;</span>
+</span><span class='line'><span class="nv">loopdev</span><span class="o">=</span><span class="k">$(</span>losetup -f<span class="k">)</span>
+</span><span class='line'><span class="nv">mountpt</span><span class="o">=</span>/media/<span class="s2">&quot;$cryptdev&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># must be run as root</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$EUID</span> !<span class="o">=</span> 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;You must be root to run this.&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># unecrypt and mount container</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span>losetup <span class="s2">&quot;$loopdev&quot;</span> <span class="s2">&quot;$cryptpath&quot;</span>
+</span><span class='line'>  tcplay --map<span class="o">=</span><span class="s2">&quot;$cryptdev&quot;</span> --device<span class="o">=</span><span class="s2">&quot;$loopdev&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># read passphrase</span>
+</span><span class='line'>  <span class="nb">read</span> -r -s passphrase <span class="s">&lt;&lt;EOF</span>
+</span><span class='line'><span class="s">  &quot;$passphrase&quot;</span>
+</span><span class='line'><span class="s">EOF</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># mount container</span>
+</span><span class='line'>  <span class="o">[[</span> -d <span class="s2">&quot;$mountpt&quot;</span> <span class="o">]]</span> <span class="o">||</span> mkdir <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># mount options</span>
+</span><span class='line'>  <span class="nv">userid</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="s2">&quot;[=(]&quot;</span> <span class="s1">&#39;{print $2,$4}&#39;</span> &lt;<span class="o">(</span>id <span class="s2">&quot;$user&quot;</span><span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  mount -o nosuid,uid<span class="o">=</span><span class="s2">&quot;${userid% *}&quot;</span>,gid<span class="o">=</span><span class="s2">&quot;${userid#* }&quot;</span> /dev/mapper/<span class="s2">&quot;$cryptdev&quot;</span> <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># close and clean up…</span>
+</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;close&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">device</span><span class="o">=</span><span class="k">$(</span>awk -v <span class="nv">dev</span><span class="o">=</span><span class="nv">$cryptdev</span> -F<span class="s2">&quot;:&quot;</span> <span class="s1">&#39;/dev/ {print $1}&#39;</span> &lt;<span class="o">(</span>losetup -a<span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  umount <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>  dmsetup remove <span class="s2">&quot;$cryptdev&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;demapping failed&quot;</span>
+</span><span class='line'>  losetup -d <span class="s2">&quot;$device&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;deleting $loopdev failed&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Options are open or close.&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>Once you are done, the script will unmount your volume and clean up. Undoubtedly, the
+script could be improved; patches are welcome.</p>
+
+<p>There is a
+<a href="https://aur.archlinux.org/packages/tcplay-git/" title="Arch User Repository">PKGBUILD in the AUR</a>.
+Uninstall TrueCrypt and give tcplay a go, it is an exceptionally handy untility.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Vimprobable Walkthrough]]></title>
@@ -1982,232 +2092,6 @@ that one fails.</p>
 
 <p>Creative Commons image by
 <a href="http://www.flickr.com/photos/mpd01605/4152508668/" title="Rescue Engine 6 on Flickr">MPD01605</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[LVM on LUKS on RAID1 on Arch Linux]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/02/11/lvm/"/>
-    <updated>2012-02-11T15:58:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/02/11/lvm</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/lvm-luks-raid.png" alt="image" /></p>
-
-<p>After much procrastination, I finally got around to moving the last of
-my machines to Arch Linux:
-<a href="http://jasonwryan.com/blog/2010/10/04/the-setup/" title="The Setup post">my home desktop</a>,
-which has been running Ubuntu since the end of 2007. I’d like to share a
-few thoughts about why I finally walked away from Ubuntu, but I’ll save
-that for another long post.</p>
-
-<p>Anyway, the setup I decided on was reasonably straightforward: two 1TB
-drives comprising two Raid1 devices, one for a small (150Mb)
-<span class="file">/boot</span> and the other holding three logical volumes
-in a LUKS crypt. This way, I have the flexibility to grow the volumes as
-needed, and only require thesingle passphrase at boot to unlock the
-enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
-and <span class="file">/home</span>.</p>
-
-<p>Almost all of the information here has been gleaned gratefully from
-other sources; principally the Arch Wiki entries on
-<a href="https://wiki.archlinux.org/index.php/LUKS" title="Arch wiki entry">LUKS</a> and
-<a href="https://wiki.archlinux.org/index.php/Lvm" title="Arch LVM article">LVM</a> and
-this <a href="http://www.pindarsign.de/webblog/?p=767" title="Blog post on LUKS and LVM">helpful blog post</a>.
-This post (and the next) are notes to remind me how I got here and, in
-the follow-up, what I need to do to restore this build…</p>
-
-<p>First up, prepare the two hard drives. This took roughly ~90 hours for
-the 1TB drives, so allow some time:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
-</span></code></pre></div></figure>
-
-
-<p>Once the drives are scrubbed (read the Arch Wiki on why that is
-necessary), you can move to the actual installation business. I used a
-256Mb thumb drive with the most recent x86_64 netinstall image burned
-to it. Boot into the live environment and set up the initial partitions
-using <code>cfdisk</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cfdisk /dev/sda
-</span></code></pre></div></figure>
-
-
-<p>I created a 150Mb partition for <span class="file">/boot</span> - marked
-with the boot flag, and then partitoned the rest of the drive. Both partitons
-should be primary and be <code>FSType linux_raid</code> (the FD option). Write the
-partition tabel toa file and then import it to the second drive so both are exactly the
-same:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
-</span><span class='line'>sfdisk /dev/sdb &lt; part-table
-</span></code></pre></div></figure>
-
-
-<p>Now, set up the Raid arrays. Start by loading the required modules and
-then create the two arrays. The metadata flag is important: if you are
-using legacy grub, as I did, you must use the 0.90 type or your MBR will
-get overwritten:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>modprobe raid1 <span class="o">&amp;&amp;</span> modprobe dm-mod
-</span><span class='line'>mdadm --create /dev/md0 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 <span class="se">\</span>
-</span><span class='line'>    --metadata<span class="o">=</span>0.90 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
-</span><span class='line'>mdadm --create /dev/md1 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
-</span></code></pre></div></figure>
-
-
-<p><sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup></p>
-
-<p>At this point, you can switch to another TTY to watch the disks
-sync—again, this could take some time, depending on the size of the
-drives.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
-</span></code></pre></div></figure>
-
-
-<p>Check that it all went to plan…</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
-</span></code></pre></div></figure>
-
-
-<p>Once the drives are synched and pronounced clean, it it time to encrypt
-the second Raid device, <span class="file">dev/md1</span>. You can’t encrypt
-the array that contains <span class="file">/boot</span>,
-but having it duplicated in a Raid array means that, ifone drive goes down,
-you can still boot the other.</p>
-
-<p>Load the module for encryption, and then set it up:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>modprobe dm-crypt
-</span><span class='line'>cryptsetup --cipher<span class="o">=</span>aes-xts-plain --verify-passphrase <span class="se">\</span>
-</span><span class='line'>    --key-size<span class="o">=</span>512 luksFormat /dev/md1
-</span></code></pre></div></figure>
-
-
-<p>Now, open the encrypted device to create the logical volumes:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
-</span></code></pre></div></figure>
-
-
-<p>The three next steps create, in this order, the physical volume (the
-container, if you will), the group and then the individual volumes
-contained in the group. Choose simple, memorable names and do not
-hypenate them. The {pv,vg,lv}display commands print out the details of
-the devices once created.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk
-</span><span class='line'>pvdisplay
-</span><span class='line'>
-</span><span class='line'>vgcreate vgroup /dev/mapper/cryptdisk
-</span><span class='line'>vgdisplay
-</span><span class='line'>
-</span><span class='line'>lvcreate --size 20G --name lvroot vgroup
-</span><span class='line'>lvcreate --contiguous y --size 2G --name lvswap vgroup
-</span><span class='line'>lvcreate --extents +100%FREE --name lvdata vgroup
-</span><span class='line'>lvdisplay
-</span></code></pre></div></figure>
-
-
-<p>It should be pointed out that the
-<a href="https://github.com/Dieterbe/aif" title="AIF on Github">Arch Installer Framework</a> supports
-LUKS and LVM, so you can accomplish these last two steps from within the
-installer. I tried both and I found that I had a little more control
-doing it manually, but YMMV.</p>
-
-<p>At this point, you are ready to enter the installer and complete the
-install. Run /arch/setup and move through the early setup until you
-reach the &#8216;Prepare Hard Drives&#8217; section. Select option 3, &#8216;Configure block
-devices, mountpoints and filesystems&#8217;. Make sure that the only “raw”
-device that you configure is <span class="file">/dev/md0</span>, your
-<span class="file">/boot</span> partition. Otherwise,
-you are configuring the logical volumes, <em>not</em> the devices they are
-built on.</p>
-
-<p>After succesfully setting up the drives, install the base packages and
-then, once that is complete, switch TTYs and update your Raid
-configuration <em>prior to configuring your system</em>. This means that when
-your <code>initrd</code> is regenerated, it will inlcude the correct Raid
-information:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
-</span></code></pre></div></figure>
-
-
-<p>When you are done, move to configure your system and make sure to add
-the relevant details to both your <span class="file">/etc/rc.conf</span> and your
-<span class="file">/etc/mkinitcpio.conf</span>. In the former:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
-</span><span class='line'><span class="nv">USEDMRAID</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>and in /etc/mkinitcpio.conf:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
-</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm_udev encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
-</span></code></pre></div></figure>
-
-
-<p>That is the straightforward part of the install over. The final step is
-a little more tricky: installing a bootloader. My experience, and I
-tried a number of times using different approaches, is that this <em>won’t
-work</em>. The installer doesn’t seem to like the Raid setup, so it
-complains about it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>It’s not all bad, as this is the final hurdle and it is not a
-particularly high one.</p>
-
-<p>The important step is to ensure that your <span class="file">/boot/grub/menu.lst</span> is setup
-correctly. Given the names I chose above for my devices, mine looks like
-this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># (0) Arch</span>
-</span><span class='line'>title  Arch Linux
-</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
-</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
-</span><span class='line'>initrd /kernel26.img
-</span><span class='line'>
-</span><span class='line'><span class="c"># (1) Arch Fallback</span>
-</span><span class='line'>title  Arch Linux Fallback
-</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
-</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
-</span><span class='line'>initrd /kernel26-fallback.img
-</span></code></pre></div></figure>
-
-
-<p>Once it is all setup, simply exit the installer. At this point, you have
-a perfectly secure, redundant, new Arch Linux install that you can’t
-boot into. You have two choices; chroot in and manually install grub
-now, or reboot and do it then. I opted for the latter as it would be
-more like a recovery mission—and I wanted to make sure that I was
-capable enough to manage that before committing all of my backed-up data
-to the machine.</p>
-
-<p>I’ll post the details of the relatively straightforward steps required
-to chroot into the system and install grub on both hard drives in a
-couple of days.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>The name <code>cryptdisk</code> is arbitrary - just make it memorable and use it
-consistently…</p></li>
-<li><p>I am not sure how necessary it is to have the Raid modules included
-here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
-warranted. <strong>UPDATED 12/4/12</strong> as per the <a href="https://wiki.archlinux.org/index.php/Mkinitcpio#HOOKS">mkinitcpio article on the Wiki</a>
-the <code>mdadm_udev</code> hook is preferred over the plain <code>mdadm</code> hook in your
-<span class="file">/etc/mkinitcpio.conf</span>.</p></li>
-</ol>
-
 ]]></content>
   </entry>
   

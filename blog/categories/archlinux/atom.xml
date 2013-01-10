@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2012-11-25T18:49:17+13:00</updated>
+  <updated>2013-01-10T16:03:56+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,118 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Replacing TrueCrypt]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/01/10/truecrypt/"/>
+    <updated>2013-01-10T16:02:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/01/10/truecrypt</id>
+    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/lock.jpg" title="'Flickr image of lock'" >
+I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
+I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
+It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
+the fly and—for the especially paranoid—to hide the existence of those volumes from
+inquisitive others.</p>
+
+<p>In the intervening years, with all aspects of my personal life
+increasingly mediated digitally, in order to properly safeguard my privacy,
+and that of my family, I have taken to using LUKS to
+<a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on LVM on LUKS">fully encrypt all of my machines</a>.
+And I have used TrueCrypt, both personally and for work, to encrypt some of my USB drives and as
+a container in <a href="http://dropbox.com/" title="Dropbox homepage">Dropbox</a>
+, for as long as
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on sharing dotfiles with Dropbox">I have used that service</a>.</p>
+
+<p>Early last year, however, I became aware of concerns that TrueCrypt was not truly open source; that almost
+all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
+free (as in Freedom) software:</p>
+
+<p><blockquote><p>The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered "free" by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.</p></blockquote></p>
+
+<p>When I initially accessed the page, in February 2012, there was also a paragraph—now removed—that
+highlighted further, more alarmist, concerns about the shadowy identity of the people behind
+TrueCrypt:</p>
+
+<p><blockquote><p>The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]</p></blockquote></p>
+
+<p>While I don't subscribe to the theory that the CIA have planted a backdoor in the software (if they
+had, <a href="https://en.wikipedia.org/wiki/Truecrypt#Operation_Satyagraha" title="FBI operation foiled by TC">it clearly doesn't work</a>),
+I was relieved to see at the end of last year that someone had written a simple utility that allows
+you to manage TrueCrypt containers from the command line; <a href="https://github.com/bwalex/tc-play" title="tcplay on Guthub">tcplay</a>
+is decribed as:</p>
+
+<p><blockquote><p>a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.</p></blockquote></p>
+
+<p>With a <a href="https://github.com/bwalex/tc-play/blob/master/LICENSE" title="tcplay license">simple, two paragraph license</a>
+and a brief but comprehensive <code>man</code> page, I was sold. I uninstalled TrueCrypt late last year and haven't missed it since. Quite
+the contrary. The only “issue” that I have had with tcplay is remembering the commands to map and mount a drive.
+Initially, I jotted down some notes, but opening them up several times a week to refer to them quickly seemed
+pointless so I eventually wised up and wrote a wrapper script to do the job for me…</p>
+
+<p>The script is quite simple, it finds the first available loop device, maps the encrypted volume to it and
+mounts it for read-writeable fro your user.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;manage truecrypt containers using tcplay&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;user<span class="o">=</span>jason
+</span><span class='line'><span class="nv">cryptdev</span><span class="o">=</span>Safebox
+</span><span class='line'><span class="nv">cryptpath</span><span class="o">=</span>/home/jason/Dropbox/<span class="s2">&quot;$cryptdev&quot;</span>
+</span><span class='line'><span class="nv">loopdev</span><span class="o">=</span><span class="k">$(</span>losetup -f<span class="k">)</span>
+</span><span class='line'><span class="nv">mountpt</span><span class="o">=</span>/media/<span class="s2">&quot;$cryptdev&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;must be run as root&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$EUID</span> !<span class="o">=</span> 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;You must be root to run this.&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;unecrypt and mount container&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span>losetup <span class="s2">&quot;$loopdev&quot;</span> <span class="s2">&quot;$cryptpath&quot;</span>
+</span><span class='line'>  tcplay --map<span class="o">=</span><span class="s2">&quot;$cryptdev&quot;</span> --device<span class="o">=</span><span class="s2">&quot;$loopdev&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># read passphrase</span>
+</span><span class='line'>  <span class="nb">read</span> -r -s passphrase &amp;lt;&amp;lt;EOF
+</span><span class='line'>  <span class="s2">&quot;$passphrase&quot;</span>
+</span><span class='line'>EOF&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># mount container</span>
+</span><span class='line'>  <span class="o">[[</span> -d <span class="s2">&quot;$mountpt&quot;</span> <span class="o">]]</span> <span class="o">||</span> mkdir <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># mount options</span>
+</span><span class='line'>  <span class="nv">userid</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="s2">&quot;[=(]&quot;</span> <span class="s1">&#39;{print $2,$4}&#39;</span> &amp;lt;<span class="o">(</span>id <span class="s2">&quot;$user&quot;</span><span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  mount -o nosuid,uid<span class="o">=</span><span class="s2">&quot;${userid% &lt;em&gt;}&quot;</span>,gid<span class="o">=</span><span class="s2">&quot;${userid#&lt;/em&gt; }&quot;</span> /dev/mapper/<span class="s2">&quot;$cryptdev&quot;</span> <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;close and clean up…&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;close&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">device</span><span class="o">=</span><span class="k">$(</span>awk -v <span class="nv">dev</span><span class="o">=</span><span class="nv">$cryptdev</span> -F<span class="s2">&quot;:&quot;</span> <span class="s1">&#39;/dev/ {print $1}&#39;</span> &amp;lt;<span class="o">(</span>losetup -a<span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  umount <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>  dmsetup remove <span class="s2">&quot;$cryptdev&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;demapping failed&quot;</span>
+</span><span class='line'>  losetup -d <span class="s2">&quot;$device&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;deleting $loopdev failed&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Options are open or close.&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Once you are done, the script will unmount your volume and clean up. Undoubtedly, the
+script could be improved; patches are welcome.</p>
+
+<p>There is a
+<a href="https://aur.archlinux.org/packages/tcplay-git/" title="Arch User Repository">PKGBUILD in the AUR</a>.
+Uninstall TrueCrypt and give tcplay a go, it is an exceptionally handy untility.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Vimprobable Walkthrough]]></title>
@@ -352,131 +464,6 @@ where he expresses incredulity that his comments on another blog have been delet
 
 <p>Creative Commons image of the troll on Flickr by
 <a href="http://www.flickr.com/photos/56380734@N05/6937763971/">Comrade Foot</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[The Leap to systemd]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/08/04/systemd/"/>
-    <updated>2012-08-04T09:32:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/08/04/systemd</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/leap.jpg" title="Leap image on Flickr" >
-I posted a couple of weeks ago about the impact of some of the current
-<a href="http://jasonwryan.com/blog/2012/07/19/breakage/" title="Post on the glibc change">changes to Arch Linux</a>.
-There seems to be quite a bit of it about, because in conjunction with the move from
-<span class="file">/lib</span> to <span class="file">/usr/lib</span>—and motivated by the same
-overarching shifts in the other distributions—the other major change making its way through
-the Arch community is the move to
-<a href="http://freedesktop.org/wiki/Software/systemd" title="Project page">systemd</a>. This change, however, has
-been more controversial because it marks a shift away from Arch's central configuration
-file, <a href="https://wiki.archlinux.org/index.php/Rc.conf" title="Arch wiki entry on rc.conf">/etc/rc.conf</a>;
-a move that has disconcerted a number of people.</p>
-
-<p>I'm not going to get into whether or not this move is consistent with
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="Wiki entry">The Arch Way</a>, because that has
-been thrashed over extensively on the
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023283.html" title="ML thread on rc.conf">mailing</a>
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023258.html" title="And another one…">lists</a>,
-but also—and more importantly—because Arch is a rolling release, which means change is <em>inevitable</em>.
-What is more, after watching all the back and forth on the <acronym title="Mailing lists">ML</acronym>
-and on the <a href="https://bbs.archlinux.org/viewtopic.php?id=96316&amp;p=1" title="Arch BBS thread on systemd">boards</a>, I am convinced that the
-<a href="http://www.archlinux.org/developers/#tomegun" title="Tom Gunderson">developer overseeing this shift</a>
-both knows what he is doing and is acting in the best interests of Arch.</p>
-
-<p>This view has been validated by my experience of shifting to systemd on my machines.</p>
-
-<p>When the new initscripts package was pushed to [testing] in the middle of last month,
-I stripped out all of the redundant options in <span class="file">/etc/rc.conf</span>
-and took the ten minutes or so to read about and then create the new files. I then spent some
-time reading up on systemd, principally
-<a href="http://0pointer.de/blog/projects/systemd-for-admins-1.html" title="One of TWELVE…">Lennart Poettering's series of posts</a>,
-the <a href="https://wiki.archlinux.org/index.php/Systemd" title="Good, but needing some structure">Arch wiki entry</a>
-and the many and various
-<a href="http://0pointer.de/public/systemd-man/" title="One for everything">manual pages</a>.</p>
-
-<p>Over the last couple of days, I have migrated all of my machines over to systemd. I found it
-to be a very straightforward process. I went for a pure systemd approach, for reasons I will
-return to. Essentially, this is how I tackled it.</p>
-
-<p>First, for each machine, I established what daemons were running. I did this by using
-<a href="http://pikacode.com/jasonwryan/Veles/file/default/Scripts/daemons.sh" title="Pretty sure it is one of Xyne's">this shell script</a>
-and cross checking entries in my <span class="file">/etc/rc.conf</span>. Then
-it was just a matter of installing systemd:<sup>1</sup></p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S systemd systemd-sysvcompat systemd-arch-units
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The only outstanding file to be created was <span class="file">/etc/timezone</span>, the
-others—all documented in <code>man rc.conf</code>—I had created earlier in the month. Then, with the
-list of the services I would need running on each box, I enabled them. I think it is
-fair to say that the only thing that is clunky about systemd is the command syntax for
-managing units. Repeatedly typing <code>systemctl enable foo.service</code> is as tedious as it is
-error prone, so I hacked up a
-<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Scripts/sysd" title="sysd - *so* much easier">wrapper script</a>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sysd <span class="nb">enable </span>acpid
-</span><span class='line'>sysd <span class="nb">enable </span>lvm
-</span><span class='line'>etc…
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>I also activated some additional gettys, as I like to log into a tmux session in TTY2 when
-I don't need or want to start <code>X</code>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty2.service
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>And I misguidedly wrote a couple of custom service files that turned out to be
-<a href="https://bbs.archlinux.org/viewtopic.php?id=146207" title="BBS post on said files">completely unnecessary</a>;
-and then I was done.</p>
-
-<p>On all three boxes I rebooted and that was it. The only issue I experienced was
-the final shutdown after removing initscripts and before booting up with
-systemd. After issuing <code>shutdown -r now</code> the process
-hung with a message about a missing <span class="file">inittab</span> file.
-In retrospect, I should have added <code>init=/bin/systemd</code> to my kernel parameters
-and not unistalled instiscripts until I had booted with systemd. This has
-now been added to the
-<a href="https://wiki.archlinux.org/index.php/Systemd" title="Archwiki systemd page">systemd wiki page</a>.</p>
-
-<p>Overall, though: no real drama, just a blur of text<sup>2</sup> and then the
-login prompt. While I haven't seen a dramatic decrease in boot time,
-booting does <em>feel</em> a bit snappier and two of my three machines shutdown
-markedly more quickly. Consider me sold.</p>
-
-<p>That brings me back to the decision to opt for a pure systemd approach, rather than
-hanging on to a completely eviscerated <span class="file">/etc/rc.conf</span>. The
-Arch community has been told that the intention is to
-<a href="https://bbs.archlinux.org/viewtopic.php?pid=1133957#p1133957" title="BBS post by tomegun">support the rc.conf format forever</a>;
-I can't help but think this is a mistake. In the same way that
-<a href="https://wiki.archlinux.org/index.php/Pacman#Partial_upgrades_are_unsupported" title="Pacman entry on Arch Wiki">partial upgrades are unsupported</a>,
-I think that systemd is Arch's inevitable future and the community should be encouraged to accept that, <code>Syu</code> and
-move on…</p>
-
-<p>Having said that, I appreciate the consideration shown by the developers in wanting to assure
-people that their choice would continue to be catered for; and perhaps, over time, people still
-using initscripts will be regarded with the same sense of wry amusement as those who still show
-up from time to time with <code>hal</code> in their <code>DAEMONS</code> line.</p>
-
-<h3>Update 4/8/12</h3>
-
-<p>Tom Gunderson, the developer who looks after this part of Arch, has clarified the
-comment about the long term support for initscripts. As comments are hosted on
-a third-party paltform, I thought that it should be included in the body of the
-post.</p>
-
-<p><blockquote><p>Just a clarification: regarding the (probably very unwise) promise of "supporting &lt;span="file">rc.conf</span> forever", the intended meaning was that initscripts will support the syntax, not that initscripts themselves will always stay around (nor that systemd will gain support for the syntax in case initscripts is dropped).</p></p><p><p>At the moment systemd <strong>does</strong> support <span class="file">rc.conf</span> (when installed in conjunction with initscripts), but this is meant as a transitional measure only, and will likely go away eventually (though probably not soon).</p></blockquote></p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>Note this approach will <em>remove</em> sysvinit and initscripts and <code>mv /etc/rc.conf{,.pacsave}</code>.</li>
-<li>Make sure you remove <code>quiet</code> from your kernel parameters for your first systemd
-boot so you can see that everything starts correctly…</li>
-</ol>
-
-
-<p>Creative commons image on Flickr by
-<a href="http://www.flickr.com/photos/sovietuk/486119799/" title="leap by rick harrison">Tricky</a></p>
 ]]></content>
   </entry>
   

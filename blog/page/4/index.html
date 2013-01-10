@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I am frequently struck by how many people arrive on the
-Arch boards without any
-understanding of how Arch is different from the other GNU/Linux &hellip;">
+  <meta name="description" content="With the announcement late last month that
+Grub 2.00 has been released
+I thought that it was time to stop procrastinating and do something about &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,144 @@ understanding of how Arch is different from the other GNU/Linux &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-09T13:51:00+12:00" pubdate data-updated="true">Jul 9<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/grub.jpg" title="Image of grub on Flickr" >
+With the announcement late last month that
+<a href="http://lists.gnu.org/archive/html/grub-devel/2012-06/msg00093.html" title="Grub ML announcement">Grub 2.00 has been released</a>
+I thought that it was time to stop procrastinating and do something about moving away from
+<a href="http://www.gnu.org/software/grub/grub-legacy.html" title="Gnu Page for Grub Legacy">Grub Legacy</a>,
+which is no longer actively developed. Not that there is anything wrong with Grub Legacy&#8217;s
+functionality; it has always done whatever I asked of it (admittedly, not a lot) and done so
+without complaint.</p>
+
+<p>I have used Grub2 before, when I was running Ubuntu on my home desktop, and it is the bootloader
+on my Debian Squeeze server. I can&#8217;t, however, say that I have ever really understood—or
+appreciated—its mutliple file, “need to reconfigure after making any changes” type of
+complexity. So, I thought that I would give
+<a href="http://www.syslinux.org/wiki/index.php/The_Syslinux_Project" title="Syslinux Wiki">Syslinux</a>
+a shot.</p>
+
+<p>Syslinux isn&#8217;t a single bootloader, rather it is a collection of lightweight bootloaders,
+with <a href="http://www.syslinux.org/wiki/index.php/EXTLINUX" title="Extlinux page on Syslinux Wiki">Extlinux</a>
+responsible for booting ext2, ext3, ext4 and btrfs filesystems. As the
+<a href="https://wiki.archlinux.org/index.php/Syslinux" title="The FINE Wiki">Arch Wiki Syslinux page</a>
+notes, since Syslinux 4, Extlinux has been merged with Syslinux.</p>
+
+<p>Installing Syslinux is <em>ridiculously</em> easy. It is literally a five step process. First,
+install the package:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -S syslinux</span></code></pre></div></figure>
+
+
+<p>After installing <code>syslinux</code> pacman will helpfully tell you what to do next:</p>
+
+<blockquote><p>==> If you want to use syslinux as your bootloader<br/>==> edit /boot/syslinux/syslinux.cfg and run<br/>==>   # /usr/sbin/syslinux-install_update -i -a -m<br/>==> to install it.</p></blockquote>
+
+
+<p>Arch user <a href="http://pyther.net/" title="Matthew's website">Matthew Gyurgyik</a> has written an
+ingenious script, <code>syslinux-install_update</code> that automates the process of writing the
+<acronym title="Master Boot Record">MBR</acronym> and installing the relevant files to
+<span class="file">/boot/syslinux/</span>. The script also checks if, as is the case
+with my desktop, there is a RAID array present, and if so passes the install command the
+<code>--raid</code> flag:</p>
+
+<blockquote><p>RAID mode.  If boot fails, tell the BIOS to boot the next device in the boot sequence (usually the next  hard<br/>disk) instead of stopping with an error message.  This is useful for RAID-1 booting.</p></blockquote>
+
+
+<p>After running the script, you should receive a message advising you that Syslinux
+has been sucessfully installed on both drives:</p>
+
+<blockquote><p>Detected RAID on /boot - installing Syslinux with &#8211;raid<br/>Syslinux install successful<br/>Boot Flag Set - /dev/sda1<br/>Boot Flag Set - /dev/sdb1<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sda<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sdb</p></blockquote>
+
+
+<p>If you are moving from Grub Legacy, configuring Syslinux is similarly painless.
+There are two sections to a basic  <span class="file">/boot/syslinux/syslinux.cfg</span>,
+the defaults and the prompt entries.</p>
+
+<p>I set up my defaults to be essentially invisible:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'># General settings
+</span><span class='line'>DEFAULT Arch
+</span><span class='line'>PROMPT 0
+</span><span class='line'>TIMEOUT 0</span></code></pre></div></figure>
+
+
+<p>And then copy across the relevant lines from my <span class="file">/boot/grub/menu.lst</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>grep <span class="nv">root</span><span class="o">=</span> /boot/grub/menu.lst &gt;&gt; /boot/syslinux/syslinux.cfg
+</span></code></pre></div></figure>
+
+
+<p>Then it is just a matter of adding the relevant entries under LABEL:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>LABEL Arch
+</span><span class='line'>   MENU LABEL Arch Linux
+</span><span class='line'>   LINUX ../vmlinuz-linux
+</span><span class='line'>   APPEND root=/dev/mapper/vgroup-lvroot cryptdevice=/dev/md1:vgroup ro
+</span><span class='line'>   INITRD ../initramfs-linux.img</span></code></pre></div></figure>
+
+
+<p>You then add entries for Fallback, and any other images that you may wish to
+boot from.</p>
+
+<p>And that, in their entirety, is steps two and three. You then move to steps four and five:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -Rsn grub
+</span><span class='line'>shutdown -r now</span></code></pre></div></figure>
+
+
+<p>And you reboot with Syslinux. Done.</p>
+
+<p>The beauty of Syslinux, from my perspective, is that it is simple to install
+and configure, with just the one config file and the options all well documented
+and easy to understand. If you want a menu with a background
+image, you can have that. If, like me, you just want to get on and boot your default,
+it does that.</p>
+
+<p>Additionally, if you want or need to boot into Fallback, or want to dual boot,
+you can just hold down <kbd>Shift</kbd> at boot time and enter the desired
+Label at the prompt. Syslinux has Tab completion, so you only need enter a
+couple of letters, hit <kbd>Tab</kbd> and you will see all of the available
+Labels to boot. Brilliant.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons Flickr image by
+<a href="http://www.flickr.com/photos/sgodt/5103674184/">custer_fluck</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -306,111 +444,6 @@ do not work. I have written a patch to fix this and
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/12/mutt/">mutt and HTML email</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-12T15:49:00+12:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/mutt-1.png" title="'mutt logo'" ></p>
-
-<p>Following on from my <a href="http://jasonwryan.com/blog/2012/04/21/lbdb/" title="Using mutt, LDAP and SSL">last post about mutt</a>,
-I have been tinkering more with the most suckless of mail clients to
-get it to deal with—of all things—<acronym title="HyperText Markup Language">HTML</acronym>
-emails. I will preface this post with a remark or two that amounts to a warning about
-intemperate language, ranting and a generally cranky disposition: repeated contact with
-email marketers can do that to you…</p>
-
-<p>A further  brief digression is warranted here. HTML email is, without doubt,
-evidence of the imminent end of civilized life as we know it; much like the
-<a href="http://en.wikipedia.org/wiki/Places_in_The_Hitchhiker's_Guide_to_the_Galaxy#Golgafrincham" title="Wikipedia entry on HHGTTG">Golgafrincham diaspora</a>, it is attributable to a depraved cabal of marketing consultants
-and provides the same level of social good as syphilis and fistulas. Suffice to say, it is a blight.</p>
-
-<p>Sadly, it is a blight that I have to deal with. Up until now, I had done that by using the
-excellent <a href="http://w3m.sourceforge.net/" title="w3m homepage on sourceforge">w3m</a> to render
-HTML as text in mutt itself. That is accomplished easily enough with an entry in
-<span class="file">muttrc</span> and another in a <span class="file">mailcap</span> file.</p>
-
-<figure class='code'><figcaption><span>~/.mutt/muttrc </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>auto_view text/html                                      <span class="c"># view html automatically</span>
-</span><span class='line'>alternative_order text/plain text/enriched text/html     <span class="c"># save html for last</span>
-</span></code></pre></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>~/.mutt/mailcap </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
-</span></code></pre></div></figure>
-
-
-<p>This works for 80 percent of the HTML email I get. It is enough to confirm that the mail is useless
-and can be discarded. The other 20 percent, however, is slightly more problematic. The initial
-view in w3m is enough to tell me that, due to the outstanding incompetence of the idiots that
-generated the email, there <em>is</em> actually some information that is contained in the email that I need
-to access <strong>but it is not viewable in a text browser.</strong></p>
-
-<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/mutt-2.png" title="'An example…'" ></p>
-
-<p>For this special level of retardation, I need to be able to open the email in a graphical browser.
-As I use vimprobable, that means sending the file to
-<a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/" title="My post on Using vimprobable">vimprobable running in tabbed</a>. Fortunately, as you would expect with superior software,
-<code>mutt</code> has a way of handling this gracefully. In mutt&#8217;s extensive documentation, there is a
-<a href="http://www.mutt.org/doc/manual/manual-5.html" title="Go and read it…">page on mutt&#8217;s MIME support</a>
-that details how to set up a graduated response to this pernicious issue:</p>
-
-<blockquote><p>In addition, you can use this with Autoview to denote two commands for viewing<br/>an attachment, one to be viewed automatically, the other to be viewed<br/>interactively from the attachment menu.</p><footer><strong>mutt manual</strong> <cite><a href='http://www.mutt.org/doc/manual/manual-5.html'>www.mutt.org/doc/manual/&hellip;</a></cite></footer></blockquote>
-
-
-<p>So, you can have <code>mutt</code> render the HTML abomination in <code>w3m</code> in most cases, and when those
-instances of particularly cretinous behaviour make it to your inbox, you can choose to
-view them in your web browser. In my case, by altering the <span class="file">mailcap</span>
-entry to look like this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>text/html; vimprobtab.sh %s &amp;; <span class="nb">test</span><span class="o">=</span><span class="nb">test</span> -n <span class="s2">&quot;$DISPLAY&quot;</span>; needsterminal;
-</span><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
-</span></code></pre></div></figure>
-
-
-<p>The first entry tests that X is running, and if it is, it hands the file to <code>vimprobable</code>. The
-default, however, is determined by the <code>copiousoutput</code> tag. So, in <code>mutt</code> it is just a matter
-of hitting <kbd>v</kbd> to view the attached HTML and then <kbd>m</kbd> to send it to <code>mailcap</code>.
-For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">muttrc</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">bind </span>attach &lt;<span class="k">return</span>&gt;    view-mailcap
-</span></code></pre></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -428,6 +461,10 @@ For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
       </li>
     
@@ -441,10 +478,6 @@ For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">
     
       <li class="post">
         <a href="/blog/2012/08/18/trolls/">Trolling Arch Linux</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/04/systemd/">The Leap to systemd</a>
       </li>
     
   </ul>
@@ -547,7 +580,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2012 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

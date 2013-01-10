@@ -9,10 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have been posting quite a bit about
-tmux of late1.
-It is a marvellous application and lends itself to all sorts of interesting
-uses. When you &hellip;">
+  <meta name="description" content="I posted last year about Vimprobable
+a webkit browser that uses
+Vim-like keybinds and can be run completely without the rodent. Over the last couple &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +84,151 @@ uses. When you &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/26/using-vimprobable/">Using Vimprobable</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-26T14:08:00+12:00" pubdate data-updated="true">Jun 26<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable2.png" alt="image" /></p>
+
+<p>I <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/" title="Post on using Vimprobable">posted last year about Vimprobable</a>
+a <a href="http://www.webkit.org/" title="Webkit site">webkit browser</a> that uses
+Vim-like keybinds and can be run completely without the rodent.</p>
+
+<p>Over the last couple of months I have become increasingly comfortable
+with it, and with the addition of
+<a href="http://vimprobable.org/pipermail/vimprobable-users/2011-June/000800.html" title="External handlers patch on ML">some great recent functionality</a>,
+it has become my default browser.</p>
+
+<p>The project has good documentation, in the form of two man pages:
+<code>vimprobable</code> and <code>vimprobablerc</code>, but I thought I’d share some of my
+customizations and working methods.</p>
+
+<h3>Copy &amp; Paste</h3>
+
+<p>The only time I have been tempted to take my hand off the keyboard was
+to insert the cursor at the correct character to begin a selection to
+copy and paste. This is unnecessary. With the right options in
+<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span>,
+you can do it all from the keyboard.</p>
+
+<p>Map the keys you would like to use to enter and exit caret mode. I use
+<kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
+return to normal mode:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
+</span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
+</span></code></pre></div></figure>
+
+
+<p>Then, it is just a matter of identifying the text that you wish to copy
+(in the photo above I was copying a script to launch <code>tabbed</code>), and
+highlighting it via search. So the sequence is:</p>
+
+<pre>
+1.  <kbd>/</kbd> - to enter search mode
+2.  <kbd>#</kbd><kbd>!</kbd> <kbd>Enter</kbd> - the shebang and then enter to highlight the correct
+    sequence
+3.  <kbd>Ctrl</kbd><kbd>c</kbd> to enter caret mode
+4.  and then <kbd>Shift</kbd><kbd>Up</kbd> or <kbd>Shift</kbd><kbd>Down</kbd> to highlight the following or
+    preceding lines
+5.  yanking the selected text is <kbd>Shift</kbd><kbd>y</kbd>, and the text is now stored in
+    your clipboard.
+</pre>
+
+
+<h3>Opening new instances in tabbed</h3>
+
+<p>I highlighted the section on tabbed from the
+<a href="http://www.vimprobable.org/" title="Vimprobable website">Vimprobable site</a> for a reason.
+The second tip is how to set up
+<a href="http://tools.suckless.org/tabbed" title="tabbed on suckless.org">tabbed</a> to
+work well with other applications.</p>
+
+<p>By default, any new windows (ie., instances of Vimprobable) opened from
+within Vimprobable are “caught”—and managed— by <code>tabbed</code>. However, if you
+open a link from, say
+<a href="http://newsbeuter.org/" title="ncurses rss reader">newsbeuter</a> or
+<a href="http://tyrs.nicosphere.net/index.html" title="ncurses twitter/identi.ca client">Tyrs</a>,
+this will open an instance outside <code>tabbed</code> which, if you are using a
+tiling window manager like
+<a href="http://dwm.suckless.org/" title="THE titling wm">dwm</a>, means this window gets
+pushed to master in your stack. This is not entirely satisfactory.</p>
+
+<p>Thanks to
+<a href="http://lists.suckless.org/dev/1106/8761.html" title="Tabbed thread on suckless ML">Connor Lane Smith on the suckless ML</a>,
+I have a solution to have all new instances of Vimprobable sent to
+<code>tabbed</code>, whether opened in another application, or if I click on a link
+in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
+
+<p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
+<psan class="file">/tmp</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&lt;/tmp/tabbed.xid)&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Then it is just a matter of setting up other applications to pass links
+to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
+<span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> %s
+</span></code></pre></div></figure>
+
+
+<p>The workaround for Urxvtc was a little trickier. I finally got there
+with some help from
+<a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
+In my <span class="file">~/.Xdefaults</span> I have:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
+</span><span class='line'>URxvt.perl-ext-common: default,matcher
+</span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
+</span><span class='line'>URxvt.matcher.button: 1
+</span></code></pre></div></figure>
+
+
+<p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="c"># Script to open Vimprobable instances in tabbed</span>
+</span><span class='line'><span class="nb">exec </span>vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Now whenever I open a link in an application or by clicking a link in
+the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
+it is passed to Vimprobable in <code>tabbed</code>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -287,100 +431,6 @@ a very powerful tool…</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/06/network-flooding-on-ubuntu/">Network Flooding on Ubuntu</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-06-06T13:40:00+12:00" pubdate data-updated="true">Jun 6<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-logo.png" alt="image" /></p>
-
-<p>I have been experiencing problems with my wifi LAN when playing music
-through
-<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
-or watching movies. My upload speeds would climb to around 120-130Kb/s
-and my wifi would just go down.</p>
-
-<p>Apart from being frustrating, this was inconvenient as it meant that if
-I was doing either of those things, my stereo in the living room
-couldn’t stream music from my
-<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
-other members of the family (or guests) couldn’t connect to the access
-point to get online.</p>
-
-<p>After asking on
-<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
-(which, like many of the Ubuntu-related fora is populated with people
-who are more well-intentioned than they are knowledgeable - which seems
-to me one of the fundamental problems the distro has; but I’ll save that
-rant for another day), one helpful user suggested I use
-<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
-the network traffic.</p>
-
-<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
-immediately instructive. Wireshark quickly identified that, as soon as I
-started mpd, one of my ports was being flooded: 46560</p>
-
-<p><code>lsof</code> showed that pulse audio was the culprit:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
-</span></code></pre></div></figure>
-
-
-<p>Quelle surprise… When software engineers want a case study of opacity
-and abstraction from the user, this should be their first port of call.</p>
-
-<p>Worse, it is a known bug.
-<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
-And apparently insufficiently serious to warrant any attention. Fair
-enough, I suppose, given the fix is easy enough <em>if you know what you
-are trying to fix…</em></p>
-
-<p>Install the Pulse audio preferences tool:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install papref
-</span></code></pre></div></figure>
-
-
-<p>…and disable Multicast/RTP.</p>
-
-<p>Another example for me of Ubuntu’s fast waning utility as a distribution
-for people that want to be able to exercize some control over their
-system. It is only still installed on this machine because there isn’t
-an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
-here and, with my international traffic capped to 30Kb/s until last
-month, I wasn’t prepared to try and run a distro on that sort of
-bandwidth. Now that has changed, I suspect that Ubuntu’s days are
-numbered on this box.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/13/">&larr; Older</a>
@@ -398,6 +448,10 @@ numbered on this box.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
       </li>
     
@@ -411,10 +465,6 @@ numbered on this box.</p>
     
       <li class="post">
         <a href="/blog/2012/08/18/trolls/">Trolling Arch Linux</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/04/systemd/">The Leap to systemd</a>
       </li>
     
   </ul>
@@ -517,7 +567,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2012 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

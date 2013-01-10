@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Invariably, an Ubuntu
-upgrade only ever brings me pain in one area: the framebuffer. Granted,
-most Ubuntu users probably don’t care about the &hellip;">
+  <meta name="description" content="I have been experimenting with a couple of new window managers over the
+last week or so. Not that I am in any way dissatisfied with
+dwm — far from &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,122 @@ most Ubuntu users probably don’t care about the &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/12/26/wmfs-window-manager-from-scratch/">WMFS - Window Manager From Scratch</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-12-26T11:08:00+13:00" pubdate data-updated="true">Dec 26<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5289976238/lightbox/" title="Screenshot on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/wmfs.png" alt="image" /></a></p>
+
+<p>I have been experimenting with a couple of new window managers over the
+last week or so. Not that I am in any way dissatisfied with
+<a href="http://dwm.suckless.org/" title="suckless page for dwm">dwm</a> — far from it; I
+do from time to time, however, like to see what else is on offer.</p>
+
+<p><a href="http://wmfs.info/projects/wmfs" title="WMFS homepage">WMFS</a> is a fairly new
+entrant in the window manager marketplace. The developers describe it
+as:</p>
+
+<blockquote><p>a lightweight and highly configurable tiling window manager for X… It
+supports Xft (Freetype) fonts and is compliant with the Extended
+Window Manager Hints (EWMH) specifications, Xinerama and Xrandr.</p></blockquote>
+
+<p>The <a href="http://aur.archlinux.org/packages.php?ID=26924" title="AUR page">git version is available</a> in
+AUR, and is straightforward to build and install. The fun, as always,
+comes with customization…</p>
+
+<p>As is says on the box, WMFS is highly configurable. The configuration is
+all done (initially) in one file, which you will need to copy to your
+<span class="file">~/.config/wmfs/directory</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cp /etc/xdg/wmfs/wmfsrc ~/.config/wmfs/
+</span></code></pre></div></figure>
+
+
+<p>Even the default config is relatively fully featured. There are nine
+default layouts (about five more than I usually need, but it is always
+better to over cater). The <span class="file">wmfsrc</span> is quite well
+commented, so most of the options are self explanatory.</p>
+
+<p>One thing I did note about editing this file, which is probably more a
+reflection of my haste rather than the wm itself, is that it seemed
+<em>very</em> unforgiving of any errors. More than once I had to copy the
+default wmfsrc back across and start again. My advice is to make any
+changes cumulatively, and test by reloading before continuing.</p>
+
+<p>You can see my config file in my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/.config/wmfs/wmfsrc" title="Mercurial repository for EeePC">bitbucket repo</a>.
+Most of the changes have been made in setting up my preferred tags and
+keybindings – so they are consistent with my dwm and
+<a href="http://plhk.ru/" title="Echinus window manager home">echinus</a> setups.</p>
+
+<p>One of the great features of WMFS is the status bar. You can pipe all
+sorts of information into it with a bash script, and you can use colours
+and icons (if that is your thing). Simply sourcing the bash script from
+within wmfsrc will see it up and running:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">background_command</span> <span class="o">=</span> <span class="s2">&quot;$HOME/.config/wmfs/autostart.sh&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Or, if you prefer to use conky:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>conky | <span class="k">while </span><span class="nb">read</span> -r; <span class="k">do </span>wmfs -s -name <span class="s2">&quot;$REPLY&quot;</span>; <span class="k">done</span>
+</span></code></pre></div></figure>
+
+
+<p>I use the status bar to display some basic system information. You can
+see from
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/Scripts/wmfs-status" title="Script in bitbucket repo">my status script</a>
+that most of it is simply piping commands through the awesomeness that
+is <a href="http://awk.info/" title="Awk Community Portal">awk</a>.</p>
+
+<p>I hadn’t thought that I would find a replacement for dwm, but WMFS is a
+serious contender. It has all of the functionality out-of-the-box,
+including:</p>
+
+<ul>
+<li>pre-set layout per tag</li>
+<li>rules to send applications to specific tags</li>
+<li>completely customizable keybinds, and – as a bonus,</li>
+<li><a href="http://en.wikipedia.org/wiki/Vi" title="Wikipedia page">Vi</a>-driven
+command interface</li>
+</ul>
+
+
+<p>Unlike dwm, it requires no patching for any of this. It has been
+completely stable while I have been using it and, while not as light as
+dwm, it is still in the minimalist camp in terms of size.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -292,245 +408,6 @@ which will give you an idea…</p></li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/10/04/the-setup/">The Setup</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-10-04T17:23:00+13:00" pubdate data-updated="true">Oct 4<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/4522790892/" title="Arch Linux and dwm"><img src="http://dl.dropbox.com/u/261312/Blog-images/setup.png" alt="image" /></a></p>
-
-<p>Inspired by <a href="http://usesthis.com/">The Setup</a><sup>1</sup>, I decided to document
-the free (as in <a href="http://www.gnu.org/philosophy/free-sw.html">freedom</a>)
-and open source software tools I use daily.</p>
-
-<p>I made the move to using open-source about four years ago. At the time
-it was mostly a practical decision — the Pentium 4 laptop that I was
-using with XP on it had slowed to a crawl and I wasn’t keen to replace
-it, so I installed Ubuntu (Hardy Heron) on it and haven’t looked back.</p>
-
-<p>That same machine, incidentally, is still happily churning away, but it
-now runs a lightweight <a href="http://www.debian.org/releases/stable/">Debian Stable</a>.</p>
-
-<h3>Desktop</h3>
-
-<p>My primary home machine is a one I had built from spec two to three
-years ago. It was always intended to be a long-term investment, with
-sufficient power and storage to last for the better part of a decade.</p>
-
-<p>Centurion is an
-<a href="http://www.asus.com/Product.aspx?P_ID=cXoprTXLaShErTzI&amp;content=specifications">Asus P5E-V motherboard</a>
-with an
-<a href="http://www.intel.com/products/processor/core2quad/index.htm">Intel Core 2 Quad 6600 2.4GHz CPU</a> and
-4GB of DDR2 RAM. The sound card is an
-<a href="http://www.m-audio.com/products/en_us/Audiophile2496.html">M-Audio Audiophile 2496</a> and the
-graphics card is a
-<a href="http://www.nvidia.com/object/product_geforce_9600gt_us.html">1GB nVidia GeForce 9600GT</a>
-driving an LG 22” flat panel 1680x1050 display.</p>
-
-<h4>Software</h4>
-
-<p>I dual boot this machine, switching between the current
-<a href="http://www.ubuntu.com">Ubuntu</a> (10.04) and <a href="http://archlinux.org">Arch Linux</a>.</p>
-
-<p>There are two 1TB Seagate drives in a <a href="http://en.wikipedia.org/wiki/RAID">RAID1 array</a>,
-and a 500GB Seagate which has Arch on it as well as a couple of virtual machines.
-I back up the RAID array frequently, using <a href="http://www.samba.org/rsync/">rsync</a>, as it
-holds my <span class="file">/home</span> but don’t worry about the 500GB drive
-as I figure it is simple to reinstall Arch or a virtual machine…</p>
-
-<p>I try to use the same software across all of my machines to simplify my
-working habits, however I am experiencing some tension between Ubuntu
-and Arch insofar as Arch is a rolling release and you very quickly get
-used to the most recent builds…</p>
-
-<p>Applications specific to the Ubuntu box include:</p>
-
-<ul>
-<li><p><a href="http://www.getfirefox.net/">Firefox</a>: I also have
-<a href="http://www.google.com/chrome">Chrome</a> installed on this machine, but
-stick with the ‘fox for <a href="http://getfirebug.com/">Firebug</a> and other
-extensions</p></li>
-<li><p><a href="http://www.mozillamessaging.com/en-US/thunderbird/">Thunderbird</a>: with
-the <a href="http://enigmail.mozdev.org/home/index.php.html">Enigmail</a>
-extension. One of those areas of tension - it’s just a matter of time
-before I move to <code>mutt</code> (see EeePC)</p></li>
-<li><p><a href="http://wiki.slimdevices.com/index.php/SlimServer">Squeezeserver</a>: I
-have a Logitech Squeezebox to serve my music and it runs off this great
-open source software</p></li>
-<li><p><a href="http://www.virtualbox.org/">Virtualbox</a> (OS): for running virtual
-machines - currently <a href="http://www.slackware.com/">Slackware</a> and
-<a href="http://www.freebsd.org/">FreeBSD</a>.</p></li>
-</ul>
-
-
-<h3>EeePC 901</h3>
-
-<p>Archer is a 901 I bought two years ago – the
-<a href="http://eeepc.asus.com/au/product901-spec.html">Linux model with the 4/16GB SSD</a>, and I
-absolutely love it. I put a second GB of RAM into it and another 16GB SD
-Card (for /music) and it does everything that I need. The
-<a href="http://www.intel.com/products/processor/atom/index.htm">Atom 1.6GHz processor</a>
-handles compiling relatively smartly and the screen and keyboard, while
-small (9” at 1024x600) are not uncomfortable to use for protracted
-sessions. It is also <em>deathly quiet</em>. The only other addition is a
-second 6 cell battery so I can safely count on 8-10 hours out of it.</p>
-
-<p>One of the reasons that it works so efficiently is that it is an
-<em>extremely</em> minimal Arch Linux setup.</p>
-
-<h4>Software</h4>
-
-<p>Applications specific to this machine are:</p>
-
-<ul>
-<li><a href="http://dwm.suckless.org" title="dwm page on suckless">dwm</a>: <em>the</em>
-suckless window manager. With added functionality of some patches:
-init-pertag, cycle and push: see <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/dwm/5.8.2-2.diff">the patchset for
-details</a></li>
-<li><a href="http://tools.suckless.org/dmenu/">dmenu</a>: application launcher,
-again from suckless.org</li>
-<li><p><a href="http://www.mutt.org/">mutt</a>: the best email client I have used -
-requires some setup, but –if you want your mail client to run
-exactly as you would like– then this one repays the investment in
-spades. Mutt is just a MUA, the rest of the email cycle is handled
-by:</p>
-
-<ul>
-<li><a href="http://github.com/jgoerzen/offlineimap/wiki">offlineimap</a>: to
-fetch mail</li>
-<li><a href="http://msmtp.sourceforge.net/">msmtp</a>: to send mail</li>
-<li><a href="http://www.gnupg.org/">GnuPG</a>: for signing and encryption</li>
-<li><a href="http://abook.sourceforge.net/">abook</a>: address book</li>
-<li><a href="http://linuxcommand.org/man_pages/urlview1.html">urlview</a> and
-<a href="http://lynx.browser.org/">lynx</a>: open urls from mutt</li>
-</ul>
-</li>
-<li><p><del><a href="http://www.uzbl.org/">uzbl</a>: a lightweight webkit browser that is
-infintely extensible and
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.config/uzbl/config">configurable</a></del><sup>2^</sup></p></li>
-<li><a href="http://www.vimprobable.org/">Vimprobable</a> in
-<a href="http://tools.suckless.org/tabbed">tabbed</a>: another lightweight
-webkit browser that can be
-<a href="http://www.flickr.com/photos/jasonwryan/5063510130/" title="Screenshot on Flickr">customized</a>
-to your heart’s desire…</li>
-<li>A host of small programs that make life easy:
-
-<ul>
-<li><a href="https://derf.homelinux.org/projects/feh/">feh</a>: image viewer</li>
-<li><a href="http://www.nongnu.org/autocutsel/">autocutsel</a>: synchronize
-clipboards</li>
-<li><a href="http://sites.google.com/site/gotmor/dzen">dzen</a> and
-<a href="http://conky.sourceforge.net/">conky</a>: to print system stats to
-dwm’s status bar</li>
-<li><a href="http://surfraw.alioth.debian.org/">surfraw</a>: command line
-search client</li>
-<li><a href="http://www.ibiblio.org/pub/X11/contrib/utilities/unclutter-8.README">unclutter</a>:
-hides the mouse cursor (don’t really need a mouse with this
-setup)</li>
-<li><a href="http://www.xfree86.org/4.2.0/xmodmap.1.html">xmodmap</a>: map Caps
-Lock to Escape</li>
-</ul>
-</li>
-</ul>
-
-
-<h4>Common tools</h4>
-
-<p>Applications and utilities that I use across all of my machines include:</p>
-
-<ul>
-<li><p><a href="http://software.schmorp.de/pkg/rxvt-unicode.html">Urxvt</a>: I would’nt
-dream of using another terminal… Run as a daemon, with these
-applications:</p>
-
-<ul>
-<li>  <a href="http://tmux.sourceforge.net/">tmux</a>: for local and remote terminal
-  sessions</li>
-<li>  <a href="http://www.vim.org/">Vim</a>: with a <a href="http://jasonwryan.com/blog/2010/09/28/command-line-notes/">simple notes function</a>
-  in my .bashrc</li>
-<li>  <a href="http://vifm.sourceforge.net/">Vifm</a>: Vi-like file manager – for
-  when I am not using
-  <a href="http://www.gnu.org/software/coreutils/">coreutils</a></li>
-<li>  <a href="http://www.floodgap.com/software/ttytter/">TTYtter</a>: fantastic
-  Twitter client: if it could integrate Identi.ca into a single feed,
-  it would be perfect…</li>
-<li>  <a href="http://irssi.org/">irssi</a>: for IRC</li>
-<li>  <a href="http://www.mplayerhq.hu/design7/news.html">Mplayer</a>: for movies</li>
-<li>  <a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki">MPD</a> and
-  <a href="http://unkart.ovh.org/ncmpcpp/">ncmpcpp</a>: music player daemon and
-  ncurses player</li>
-<li>  <a href="http://code.google.com/p/mpdscribble/">mpdscribble</a>: for scrobbling
-  to Libre.fm and Last.fm</li>
-<li>  <a href="http://libtorrent.rakshasa.no/">rtorrent</a>: run inside tmux for
-remote sessions. Genius.</li>
-</ul>
-</li>
-<li><p><a href="http://www.dropbox.com/">Dropbox</a>: the daemon is closed source, but
-this is the best tool I have found for synching across machines. If the
-Ubuntu One devs ever focus on other Linux distros, I’d move across.</p></li>
-<li><a href="http://www.truecrypt.org/">Truecrypt</a>: a TC volume in Dropbox and you
-are set</li>
-<li><a href="http://www.skype.com/intl/en/home">Skype</a>.</li>
-</ul>
-
-
-<h4>Other Utilities</h4>
-
-<p>I use <a href="http://mercurial.selenic.com/">mercurial</a> and
-<a href="https://bitbucket.org/jasonwryan/">bitbucket</a> to share my dotfiles
-between Arch machines (one of my work boxes is also running Arch). I
-have two <a href="http://www.linksysbycisco.com/EU/en/products/WRT54GL">Linksys WRT54GL routers</a>, both
-running <a href="http://www.polarcloud.com/tomato">Tomato</a>, to handle my routing
-and wireless networking (thanks to
-<a href="http://twitter.com/jethrocarr" title="Jethro on Twitter">@jethrocarr</a> for
-solving that puzzle). For LAN file sharing I use
-<a href="http://nfs.sourceforge.net/">NFS</a> and I use
-<a href="http://www.openssh.com/">OpenSSH</a> to access my machines remotely. I
-have a third generation <a href="http://guides.macrumors.com/iPod_(3G">iPod</a>)
-and I run <a href="http://www.rockbox.org/">Rockbox</a> on it.</p>
-
-<p>You can see screenshot of these machines on
-<a href="http://www.flickr.com/photos/jasonwryan">flickr</a>.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>…and the fact that, apart from RMS, it is pretty much MacBookPros
-all the way down.</p></li>
-<li><p>Updated 9/10/10 - <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/" title="My post on changing to Vimprobable">moved to Vimprobable</a>
-after some issues with uzbl.</p></li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/17/">&larr; Older</a>
@@ -548,6 +425,10 @@ after some issues with uzbl.</p></li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
       </li>
     
@@ -561,10 +442,6 @@ after some issues with uzbl.</p></li>
     
       <li class="post">
         <a href="/blog/2012/08/18/trolls/">Trolling Arch Linux</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/04/systemd/">The Leap to systemd</a>
       </li>
     
   </ul>
@@ -667,7 +544,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2012 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

@@ -9,8 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="<img src="http://dl.dropbox.com/u/261312/Blog-images/uzbl.jpg" alt="Arch &amp;
-uzbl" /> A couple of weeks ago, I switched my default browser from &hellip;">
+  <meta name="description" content="I had posted a while back
+about my (failed) attempt to patch dwm
+with both pertag and some of the other layout patches. I had been able to get it to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +84,73 @@ uzbl" /> A couple of weeks ago, I switched my default browser from &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/03/02/patching-dwm/">Patching dwm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-03-02T20:16:00+13:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/patching-dwm.png" alt="image" /></p>
+
+<p>I had posted <a href="http://jasonwryan.com/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/" title="Patching dwm with pertag &amp; bstack">a while back</a>
+about my (failed) attempt to patch <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>
+with both pertag and some of the other layout patches. I had been able to get it to work with
+<a href="http://dwm.suckless.org/patches/bottom_stack" title="dwm wiki: bstack">bottomstack</a>,
+but adding another patch caused some of the chunks to fail. It seems
+pertag moves the code around to the point that – using
+<a href="http://dwm.suckless.org/patches/" title="patches: dwm wiki">the standard patching method</a> –
+any further patches won’t take.</p>
+
+<p>Further investigation, and some trial and a tolerable amount of error,
+have however demonstrated to me that it is quite possible to patch dwm
+to your heart’s content; or at least to my meagre needs. Which in the
+case of <a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="EeePC configs">my EeePC</a>
+is pertag, cycle and push, with the addition of bstack on
+<a href="https://bitbucket.org/jasonwryan/workstation/src/" title="Workstation configs">my workstation</a>.</p>
+
+<p>The solution, as I have found in almost every instance of my tinkering
+with dwm, is stunningly simple. Start with a new version of dwm and
+apply the
+<a href="http://dwm.suckless.org/patches/pertag" title="dwm wiki: pertag">pertag diff</a>. Then
+manually add all of the chunks of the subsequent patches.</p>
+
+<p>All of the changes are now in dwm.c and your config.h should only have
+the necessary keybindings to activate the functionality you have added
+to this amazing window manager.</p>
+
+<p>If you want to see what changes this makes, you can take a peek at
+<a href="https://bitbucket.org/jasonwryan/workstation/src/tip/dwm-5.7.2-2/" title="diff in mercurial repo">my .diff</a>
+(for bstack, cycle, pertag and push). You are equally welcome to apply
+it if that is the functionality that you are looking for in 5.7.2.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -249,100 +317,6 @@ free/libre projects…</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/02/21/capslock/">Mapping CapsLock to Escape in Ubuntu</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-02-21T16:11:00+13:00" pubdate data-updated="true">Feb 21<span>st</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>The <kbd>CapsLock</kbd> key is one of the best examples of persistent usability failure;
-it continues to appear on just about every English-language keyboard, despite
-the fact that —aside from no-one ever uses it— it is an active hindrance to
-both the average typist and the sedulous coder…</p>
-
-<p>As a matter of course, I remove it in my Arch machines with an entry in my
-<span class="file"><a href="https://bitbucket.org/jasonwryan/workstation/src/tip/.xinitrc"
-title="My xinitrc on bitbucket">.xinitrc</a></span>, but in Ubuntu/Gnome, there is no
-such file. Consequently, there is this equally effective way of dispatching the
-<kbd>CapsLock</kbd>, or in my case, mapping it to something
-actually useful, <kbd>Esc</kbd>.</p>
-
-<p>First, create the <code>mapkey</code> file in your home directory:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>xmodmap -pke &gt; ~/.xmodmap.mapkey
-</span></code></pre></div></figure>
-
-
-<p>Then open the file and edit it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vim ~/.xmodmap.mapkey
-</span></code></pre></div></figure>
-
-
-<p>Look for the <kbd>CapsLock</kbd> key, on my machine it is 66 (you can use
-<a href="http://www.x.org/archive/X11R7.5/doc/man/man1/xev.1.html" title="xev man page">xev</a>
-to locate all of your key codes), and then wreak your revenge. Just deleting
-everything after <code>keycode 66 =</code></p>
-
-<p>will render it useless, which may suit your style. I change the entry to make
-it another <kbd>Escape</kbd> key:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>keycode <span class="nv">66</span> <span class="o">=</span> Escape NoSymbol Escape NoSymbol Escape
-</span></code></pre></div></figure>
-
-
-<p>Log out and when you log back in, you have a useful key.</p>
-
-<h3>Updated for 10.04</h3>
-
-<p>The above hack was for 9.10 and earlier versions of Ubuntu.
-I have no idea why, but it (alone) doesn&#8217;t work in Lucid Lynx.
-You need a couple of extra steps:</p>
-
-<p>Open <code>System &gt; Preferences &gt; Startup Applications</code>  and add
-two new items:</p>
-
-<ul>
-<li>Clear the <kbd>CapsLock</kbd> key with <code>xmodmap -e "clear Lock</code></li>
-<li>Map it to <kbd>Escape</kbd> by pointing to your xmodmap file</li>
-</ul>
-
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>xmodmap ~/.xmodmap.mapkeys
-</span></code></pre></div></figure>
-
-
-<p>Now, whenever you login the script(s) will run and your <kbd>CapsLock</kbd> will map
-to something actually useful, like <kbd>Escape</kbd>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/20/">&larr; Older</a>
@@ -360,6 +334,10 @@ to something actually useful, like <kbd>Escape</kbd>.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
       </li>
     
@@ -373,10 +351,6 @@ to something actually useful, like <kbd>Escape</kbd>.</p>
     
       <li class="post">
         <a href="/blog/2012/08/18/trolls/">Trolling Arch Linux</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/04/systemd/">The Leap to systemd</a>
       </li>
     
   </ul>
@@ -479,7 +453,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2012 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
