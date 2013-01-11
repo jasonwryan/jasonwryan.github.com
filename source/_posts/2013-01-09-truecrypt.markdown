@@ -25,7 +25,7 @@ Early last year, however, I became aware of concerns that TrueCrypt was not trul
 all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
 free (as in Freedom) software:
 
-{% blockquote Wikipedia entry on TrueCrypt %}
+{% blockquote Wikipedia entry on TrueCrypt https://en.wikipedia.org/wiki/Truecrypt %}
 The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered "free" by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.
 {% endblockquote %}
 
@@ -33,7 +33,7 @@ When I initially accessed the page, in February 2012, there was also a paragraph
 highlighted further, more alarmist, concerns about the shadowy identity of the people behind
 TrueCrypt:
 
-{% blockquote Wikipedia entry retrieved in February 2012 %}
+{% blockquote Wikipedia entry retrieved in February 2012 https://en.wikipedia.org/w/index.php?title=TrueCrypt&diff=478623780&oldid=478608477 %}
 The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]
 {% endblockquote %}
 
