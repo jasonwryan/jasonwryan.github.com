@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-01-11T13:40:15+13:00</updated>
+  <updated>2013-01-25T19:43:18+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,92 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Hi-UEFI Way]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/01/25/uefi/"/>
+    <updated>2013-01-25T19:35:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/01/25/uefi</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/uefi.jpg" title="'Samsung Series 9 Laptop'" >
+Just before Christmas my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src" title="Bitbucket repo for Archer">EeePC 901</a> started
+to behave erratically. Rather than prolong the final throes, I decided to replace it and,
+after looking around and having played with a colleague's
+<a href="http://www.cnet.com.au/samsung-series-9-13-inch-2012-339341806.htm" title="CNet Review">Samsung Series 9</a>,
+I decided that I would swallow my pride, pay the Windows tax and opt for one of these sleek, fast
+little notebooks. Given my experience with it over the last six to eight weeks, I am confident that
+it was a decision that I am unlikely to regret.</p>
+
+<p>The machine came with
+<a href="https://en.wikipedia.org/wiki/Windows_8#Secure_boot" title="Wikipedia entry on Windows 8">Secure Boot</a>
+enabled and running Windows 8.<sup>1</sup> After sedulously ignoring the mounting number
+of posts on the Arch boards that had <acronym title="Unified Extensible Firmware Interface">UEFI</acronym>
+in the title, initially convinced that it had something to do with Apple hardware and therefore
+would be unlikely to impact on me at any point in the future, I now found myself in the position of
+having to understand all of the disparate elements involved in UEFI booting.</p>
+
+<p>This proved to be a non-trivial task. It is not that there is insufficient information
+available; quite the opposite. The Arch Wiki has a typically thorough
+<a href="https://wiki.archlinux.org/index.php/UEFI" title="Arch Wiki page">entry on UEFI</a>; the real
+challenge is revealed when you scroll to the bottom of that page to the
+<a href="https://wiki.archlinux.org/index.php/UEFI#See_also" title="See also section">reference links</a>
+where you begin to reach an appreciation that this isn't a drop-in replacement for
+Grub in the way <a href="http://jasonwryan.com/blog/2012/07/09/syslinux/" title="My post on moving to Syslinux">Syslinux was</a>,
+for example. This is a whole new booting ecosystem.</p>
+
+<p>I wanted a LVM on LUKS setup and, after reading <em>a lot</em> more documentation on
+<a href="https://wiki.archlinux.org/index.php/UEFI_Bootloaders" title="Arch Wiki entry">UEFI bootloaders</a>,
+<a href="https://wiki.archlinux.org/index.php/GPT" title="Arch Wiki GPT page">GUID Partition Tables</a> and
+<a href="http://www.rodsbooks.com/efi-bootloaders/efistub.html" title="Rod Smith's excellent site">EFISTUB</a><sup>2</sup>
+than I had bargained on, I felt reasonably well equipped to proceed. And while this was an
+admittedly time consuming (and sometimes confusing) process, I believe it was worth it.</p>
+
+<p>Once I had a reasonable grasp of the conceptual model—and I am convinced this is the single
+biggest hurdle in this process—I chose the EFISTUB boot approach with
+<a href="http://freedesktop.org/wiki/Software/gummiboot" title="gummiboot homepage">gummiboot</a>,
+as the boot manager; mostly because it seemed the simplest approach (the name may also
+have been a factor).</p>
+
+<p>Armed with all this new knowledge, I embarked on the install process. It didn't take long at
+all. Mostly because I couldn't boot in UEFI mode from the USB drive.</p>
+
+<p>Turns out a couple of things were thwarting me; one I had disabled Secure Boot
+in the UEFI menu, but had neglected to disable the fast boot option. Secondly,
+and more worryingly, I kept encountering kernel panics once I had got the
+machine to boot. Seems that booting in UEFI mode triggers a nasty
+<a href="https://bugzilla.kernel.org/show_bug.cgi?id=47121" title="On the Kernel bugtracker">bug with the samsung_laptop module</a>.</p>
+
+<p>Once I could boot from the USB drive, I was able to successfully complete the install.
+Rather than include a blow-by-blow account of that process here, I
+have uploaded
+<a href="https://gist.github.com/4618490" title="Gist with installation details">a gist with the details</a>,
+for the morbidly curious or preternaturally bored.</p>
+
+<p>The whole process, for me, epitomised what Arch is really about. No matter how comfortable
+a point you reach with your understanding of the tools you use, the rolling release model
+constantly challenges you to adopt and adapt to new technologies. Sure, I could have just
+opted to boot in regular BIOS mode, but what would be the point of that? I wouldn't have
+<em>learned</em> anything.</p>
+
+<p>The other thing that quickly became apparent is that, contrary to some commentary
+on the boards about the
+<a href="https://www.archlinux.org/news/install-media-20120715-released/" title="News item on new install method">removal of the AIF</a>,
+the new install scripts are quite superb; simple, direct and quite unambiguous, the whole
+install procedure now feels a lot more Arch-like. The developers have done a great
+job with these tools.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><p>Surely the worst operating system, at least in terms of the user interface, I have
+had the misfortune to encounter (and I include Vista and Ubuntu's Unity in that
+cavalcade of fail)…</p></li>
+<li><p>I'll post more on the voluminous documentation around this, and other aspects of
+GNU/Linux, in the coming weeks.</p></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Replacing TrueCrypt]]></title>
@@ -357,114 +443,6 @@ to the official documentation:
 
 <p>Creative Commons image on Flickr by
 <a href="http://www.flickr.com/photos/nicholasjon/4101203095/" title="Field Notes etc on Flickr">nicholasjon</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Trolling Arch Linux]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/08/18/trolls/"/>
-    <updated>2012-08-18T10:47:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/08/18/trolls</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/troll.jpg" title="'Troll on Flickr'" >
-I posted recently about
-<a href="http://jasonwryan.com/blog/2012/08/04/systemd/" title="Some thoughts on moving across…">my experiences shifting to systemd</a>
-and how I found it, for all three of my Arch machines, to be a relatively simple and
-straightforward process which, in the intervening weeks, has borne out the views of
-the developers and other members of the community who have been using it for a longer
-period—it works, and works well. At the start of this week, Stéphane Gaudreault
-announced on Arch-dev-public the intention to
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-August/023389.html" title="ML post seeking developer views">replace the original initscripts with systemd</a>.</p>
-
-<p>The reaction by some to this announcement was, to me, quite disappointing. My view of
-open source communities is that by participating you are entering into a social contract.
-That contract is that, as you are reliant on the goodwill of the wider community it is
-incumbent on you to ensure that your overall contribution—in whatever form—brings
-more to the community than it takes away. At the very least, you can strive to ensure
-that it is a value neutral exchange.</p>
-
-<p>Sadly, for some of the trolls on the <acronym title="Mailing lists">MLs</acronym>, that
-is patently not the case. I want to take a closer look at just one of those threads, for two
-reasons. First, it is a textbook case of a particularly pernicious troll. And second, in
-conjunction with some other factors, it had an especially damaging effect on the wider
-community.</p>
-
-<p>The thread in question is on Arch-general, the largest of the mailing lists. It has
-the suitably alarmist title
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029856.html" title="A trolling we will go…">Think twice before moving to systemd</a>.
-The troll, who has had only minimal involvement with the Arch community up until this
-unfortunate moment starts by framing his “concern”<sup>1</sup>:</p>
-
-<p><blockquote><p>I just became aware that Arch Linux plans to switch to systemd, and this worries me for several reasons.</p></blockquote></p>
-
-<p>Felipe is worried. Ergo, <em>we</em> should be worried. Why should we be worried? Because,
-despite the fact that systemd has been discussed and used by Archers since the
-<a href="https://bbs.archlinux.org/viewtopic.php?id=96316" title="57 page thread on the Arch BBS">middle of 2010</a>,
-it has just come to his attention and now, with the formidable powers of his intellect,
-he has detected a disturbance in the force.</p>
-
-<p><blockquote><p>I tried systemd a while ago in a brand new machine with Arch Linux and the boot was <em>much slower</em>. After some exchanges with Lennart Poettering and other people in Google+[1], it became clear I was on my own. Eventually I found the culprit: Fedora uses CONFIG_HZ_1000, and Arch Linux uses CONFIG_HZ_300. It became clear to me that systemd was not ready for prime time, it wasn't thoroughly tested in a lot of machines, and if you have problems Lennart Poettering will blame you (PulseAudio sounds familiar?).</p></blockquote></p>
-
-<p>The salient phrases here are “it became clear I was on my own” and the even more telling,
-“it became clear to me that systemd was not ready for prime time.” Once I had managed to
-wipe away the tears of gratitude that were coursing down my cheeks, I realized that Arch
-finally had finally found what it had been missing for all these years: a saviour. We
-were going to be OK after all.</p>
-
-<p>Felipe has “found the culprit.” Despite the best efforts of the Arch developers, upstream,
-the other distros that have been using it for considerably longer, and the experience of the
-<a href="https://bbs.archlinux.org/viewtopic.php?pid=1147676" title="Thread on systemd - one of many">Arch users reported on our boards</a>,
-no-one had the heroic ability to see through to the heart of this conundrum and expose
-systemd for the fraud that it is.</p>
-
-<p>But our gratitude should be tempered with some shame for we, the Arch community, have let
-Felipe down. We haven't lived up to the standards he expects of us. As he gently admonishes us:
-“I was expecting more from the Arch Linux community.” Yes, Felipe, and you were right to.
-We let you down; can you forgive us?</p>
-
-<p>The thread goes on to generate more than 50 replies. All of them wasted.
-His trolling is not interested in facts, in reason or logic; his method of argumentation is
-not rational, and he is not interested in working toward an understanding
-of the truth; he just wants to be right. At whatever cost to the wider community. These posts,
-and trolls in other fora
-<a href="https://lkml.org/lkml/2012/4/12/434" title="LKML exchange with Linus Torvalds">like this one</a>,<sup>2</sup>
-are really about gratifying Felipe's own voracious appetite for self-aggrandisement. In reality,
-of course, it is a stunning illustration of the
-<a href="https://secure.wikimedia.org/wikipedia/en/wiki/Dunning%E2%80%93Kruger_effect" title="Wikipedia entry">Dunning-Kruger effect</a>.
-It would be pathetic if it were a victimless pursuit; but it is not.</p>
-
-<p>Further down in the thread we see the inevitable frustration of the developer who leads
-this work for Arch,
-<a href="https://www.archlinux.org/developers/#tomegun" title="Tom's developer profile">Tom Gunderson</a>,
-finally <a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029933.html" title="Tom's reply quoting Linus">boil over</a>.
-This precipitates another thread where Tom announces that he will
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029960.html" title="Tom's mail to the list">no longer participate in this list</a>.
-This is from the developer that has patiently and constructively engaged with Arch users on the
-list around this issue for the past several months. On his own time.</p>
-
-<p>That is the impact of trolls like Felipe. That is a direct effect of his selfishness on the
-wider community. What has he brought to the community? Dissent, distraction and posturing.
-What has he taken away? The ability for all of us to engage with one of the developers
-of the software we all use. His presence on the list, and that of a few others,
-has been nothing short of corrosive.</p>
-
-<p>And as for the smoking gun, the config setting that no-one was smart enough to
-discover? Denis A. Altoé Falqueto went to the trouble to build another kernel
-and run a test and, contrary to Felipe who provided no such evidence,
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/030145.html" title="Denis' post">posted the results</a>.
-You can guess the outcome.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>See the <a href="http://www.urbandictionary.com/define.php?term=concern+troll">concern troll</a>.</li>
-<li>Read the whole thread to fully understand how obstinance can trump reason… See
-also his <a href="http://felipec.wordpress.com/2012/05/26/no-mercurial-branches-are-still-not-better-than-git-ones-response-to-jhws-more-on-mercurial-vs-git-with-graphs/">own blog</a>
-where he expresses incredulity that his comments on another blog have been deleted.</li>
-</ol>
-
-
-<p>Creative Commons image of the troll on Flickr by
-<a href="http://www.flickr.com/photos/56380734@N05/6937763971/">Comrade Foot</a>.</p>
 ]]></content>
   </entry>
   

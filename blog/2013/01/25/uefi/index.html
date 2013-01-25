@@ -5,14 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Building rtorrent on Debian Squeeze - jasonwryan.com</title>
+  <title>Hi-UEFI Way - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="After setting up my server,
-I wanted to use it as a torrent box. The version of
-rtorrent
-in the Debian stable repositories is 0.8.6, which is &hellip;">
+  <meta name="description" content="Just before Christmas my
+EeePC 901 started
+to behave erratically. Rather than prolong the final throes, I decided to replace it and,
+after looking &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +21,7 @@ in the Debian stable repositories is 0.8.6, which is &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/11/29/rtorrent">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2013/01/25/uefi">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -88,7 +88,7 @@ in the Debian stable repositories is 0.8.6, which is &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Building rtorrent on Debian Squeeze</h1>
+      <h1 class="entry-title">Hi-UEFI Way</h1>
     
     
       <p class="meta">
@@ -104,76 +104,91 @@ in the Debian stable repositories is 0.8.6, which is &hellip;">
   
 
 
-<time datetime="2011-11-29T21:21:00+13:00" pubdate data-updated="true">Nov 29<span>th</span>, 2011</time>
+<time datetime="2013-01-25T19:35:00+13:00" pubdate data-updated="true">Jan 25<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/rtorrent.png" alt="image" /></p>
+<div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/uefi.jpg" title="'Samsung Series 9 Laptop'" >
+Just before Christmas my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src" title="Bitbucket repo for Archer">EeePC 901</a> started
+to behave erratically. Rather than prolong the final throes, I decided to replace it and,
+after looking around and having played with a colleague&#8217;s
+<a href="http://www.cnet.com.au/samsung-series-9-13-inch-2012-339341806.htm" title="CNet Review">Samsung Series 9</a>,
+I decided that I would swallow my pride, pay the Windows tax and opt for one of these sleek, fast
+little notebooks. Given my experience with it over the last six to eight weeks, I am confident that
+it was a decision that I am unlikely to regret.</p>
 
-<p>After <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Post on the HP microserver">setting up my server</a>,
-I wanted to use it as a torrent box. The version of
-<a href="http://libtorrent.rakshasa.no/" title="rtorrent &amp; libtorrent homepage">rtorrent</a>
-in the Debian stable repositories is 0.8.6, which is unfortunate as
-support for <a href="http://en.wikipedia.org/wiki/Magnet_URI_scheme" title="Wikipedia page on magnet URIs">magnet links</a>
-was introduced in 0.8.7.</p>
+<p>The machine came with
+<a href="https://en.wikipedia.org/wiki/Windows_8#Secure_boot" title="Wikipedia entry on Windows 8">Secure Boot</a>
+enabled and running Windows 8.<sup>1</sup> After sedulously ignoring the mounting number
+of posts on the Arch boards that had <acronym title="Unified Extensible Firmware Interface">UEFI</acronym>
+in the title, initially convinced that it had something to do with Apple hardware and therefore
+would be unlikely to impact on me at any point in the future, I now found myself in the position of
+having to understand all of the disparate elements involved in UEFI booting.</p>
 
-<p>To remedy this, I decided to build the current stable version of
-rtorrent, 0.8.9. At the same time—seeing as I was getting my hands dirty
-anyway—I thought I’d patch in colour support.</p>
+<p>This proved to be a non-trivial task. It is not that there is insufficient information
+available; quite the opposite. The Arch Wiki has a typically thorough
+<a href="https://wiki.archlinux.org/index.php/UEFI" title="Arch Wiki page">entry on UEFI</a>; the real
+challenge is revealed when you scroll to the bottom of that page to the
+<a href="https://wiki.archlinux.org/index.php/UEFI#See_also" title="See also section">reference links</a>
+where you begin to reach an appreciation that this isn&#8217;t a drop-in replacement for
+Grub in the way <a href="http://jasonwryan.com/blog/2012/07/09/syslinux/" title="My post on moving to Syslinux">Syslinux was</a>,
+for example. This is a whole new booting ecosystem.</p>
 
-<p>This is a straightforward two-step process. First, build the current
-version of libtorrent, 0.12.9:</p>
+<p>I wanted a LVM on LUKS setup and, after reading <em>a lot</em> more documentation on
+<a href="https://wiki.archlinux.org/index.php/UEFI_Bootloaders" title="Arch Wiki entry">UEFI bootloaders</a>,
+<a href="https://wiki.archlinux.org/index.php/GPT" title="Arch Wiki GPT page">GUID Partition Tables</a> and
+<a href="http://www.rodsbooks.com/efi-bootloaders/efistub.html" title="Rod Smith's excellent site">EFISTUB</a><sup>2</sup>
+than I had bargained on, I felt reasonably well equipped to proceed. And while this was an
+admittedly time consuming (and sometimes confusing) process, I believe it was worth it.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
-</span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
-</span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
-</span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
-</span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure>
+<p>Once I had a reasonable grasp of the conceptual model—and I am convinced this is the single
+biggest hurdle in this process—I chose the EFISTUB boot approach with
+<a href="http://freedesktop.org/wiki/Software/gummiboot" title="gummiboot homepage">gummiboot</a>,
+as the boot manager; mostly because it seemed the simplest approach (the name may also
+have been a factor).</p>
 
+<p>Armed with all this new knowledge, I embarked on the install process. It didn&#8217;t take long at
+all. Mostly because I couldn&#8217;t boot in UEFI mode from the USB drive.</p>
 
-<p>Once libtorrent is successfully built and installed, you can begin the
-rtorrent build:</p>
+<p>Turns out a couple of things were thwarting me; one I had disabled Secure Boot
+in the UEFI menu, but had neglected to disable the fast boot option. Secondly,
+and more worryingly, I kept encountering kernel panics once I had got the
+machine to boot. Seems that booting in UEFI mode triggers a nasty
+<a href="https://bugzilla.kernel.org/show_bug.cgi?id=47121" title="On the Kernel bugtracker">bug with the samsung_laptop module</a>.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
-</span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
-</span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
-</span></code></pre></div></figure>
+<p>Once I could boot from the USB drive, I was able to successfully complete the install.
+Rather than include a blow-by-blow account of that process here, I
+have uploaded
+<a href="https://gist.github.com/4618490" title="Gist with installation details">a gist with the details</a>,
+for the morbidly curious or preternaturally bored.</p>
 
+<p>The whole process, for me, epitomised what Arch is really about. No matter how comfortable
+a point you reach with your understanding of the tools you use, the rolling release model
+constantly challenges you to adopt and adapt to new technologies. Sure, I could have just
+opted to boot in regular BIOS mode, but what would be the point of that? I wouldn&#8217;t have
+<em>learned</em> anything.</p>
 
-<p>Then, if you want colour support, you need the patch. I used the version
-in the
-<a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
-but you can also grab a copy from a paste site:</p>
+<p>The other thing that quickly became apparent is that, contrary to some commentary
+on the boards about the
+<a href="https://www.archlinux.org/news/install-media-20120715-released/" title="News item on new install method">removal of the AIF</a>,
+the new install scripts are quite superb; simple, direct and quite unambiguous, the whole
+install procedure now feels a lot more Arch-like. The developers have done a great
+job with these tools.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
-</span><span class='line'>mv canvas_colour.patch src/
-</span><span class='line'>patch -uNp1 -i canvas_colour.patch
-</span></code></pre></div></figure>
+<h4>Notes</h4>
 
+<ol>
+<li><p>Surely the worst operating system, at least in terms of the user interface, I have
+had the misfortune to encounter (and I include Vista and Ubuntu&#8217;s Unity in that
+cavalcade of fail)…</p></li>
+<li><p>I&#8217;ll post more on the voluminous documentation around this, and other aspects of
+GNU/Linux, in the coming weeks.</p></li>
+</ol>
 
-<p>The patch should apply cleanly. Then specify where libtorrent is
-installed to ensure that it is linked during the rtorrent build:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
-</span><span class='line'>make
-</span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure>
-
-
-<p>Once again, this should compile cleanly and you will now have rtorrent
-with colour and magnet link support installed in
-<span class="file">/usr/local/bin/rtorrent</span>.</p>
-
-<h5>Notes</h5>
-
-<p>I prefer to use
-<a href="http://asic-linux.com.mx/~izto/checkinstall/" title="checkinstall homepage">checkinstall</a>
-so that self-installed applications are tracked by
-<a href="http://wiki.debian.org/Apt" title="Debian wiki entry">Apt</a>.</p>
 </div>
 
 
@@ -196,12 +211,12 @@ so that self-installed applications are tracked by
   
 
 
-<time datetime="2011-11-29T21:21:00+13:00" pubdate data-updated="true">Nov 29<span>th</span>, 2011</time>
+<time datetime="2013-01-25T19:35:00+13:00" pubdate data-updated="true">Jan 25<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/debian/'>debian</a>, <a class='category' href='/blog/categories/linux/'>linux</a>
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>
   
 </span>
 
@@ -217,10 +232,8 @@ so that self-installed applications are tracked by
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2011/11/28/rsync/" title="Previous Post: rsync + SSH Backups">&laquo; rsync + SSH Backups</a>
+        <a class="basic-alignment left" href="/blog/2013/01/10/truecrypt/" title="Previous Post: Replacing TrueCrypt">&laquo; Replacing TrueCrypt</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2011/12/01/readline/" title="Next Post: Readline Bindings in Vi Mode">Readline Bindings in Vi Mode &raquo;</a>
       
     </p>
   </footer>
@@ -373,8 +386,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/11/29/rtorrent/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2011/11/29/rtorrent/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2013/01/25/uefi/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2013/01/25/uefi/';
         var disqus_script = 'embed.js';
       
     (function () {
