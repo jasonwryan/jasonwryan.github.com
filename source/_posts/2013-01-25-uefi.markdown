@@ -1,0 +1,82 @@
+---
+layout: post
+title: "Hi-UEFI Way"
+date: 2013-01-25 19:35
+comments: true
+categories: [archlinux]
+---
+{% img left http://dl.dropbox.com/u/261312/Blog-images/uefi.jpg 'Samsung Series 9 Laptop' %}
+Just before Christmas my 
+[EeePC 901](https://bitbucket.org/jasonwryan/eeepc/src 'Bitbucket repo for Archer') started
+to behave erratically. Rather than prolong the final throes, I decided to replace it and,
+after looking around and having played with a colleague's
+[Samsung Series 9](http://www.cnet.com.au/samsung-series-9-13-inch-2012-339341806.htm 'CNet Review'),
+I decided that I would swallow my pride, pay the Windows tax and opt for one of these sleek, fast
+little notebooks. Given my experience with it over the last six to eight weeks, I am confident that
+it was a decision that I am unlikely to regret.
+
+The machine came with 
+[Secure Boot](https://en.wikipedia.org/wiki/Windows_8#Secure_boot 'Wikipedia entry on Windows 8')
+enabled and running Windows 8.<sup>1</sup> After sedulously ignoring the mounting number
+of posts on the Arch boards that had <acronym title="Unified Extensible Firmware Interface">UEFI</acronym>
+in the title, initially convinced that it had something to do with Apple hardware and therefore
+would be unlikely to impact on me at any point in the future, I now found myself in the position of
+having to understand all of the disparate elements involved in UEFI booting.
+
+This proved to be a non-trivial task. It is not that there is insufficient information
+available; quite the opposite. The Arch Wiki has a typically thorough
+[entry on UEFI](https://wiki.archlinux.org/index.php/UEFI 'Arch Wiki page'); the real 
+challenge is revealed when you scroll to the bottom of that page to the 
+[reference links](https://wiki.archlinux.org/index.php/UEFI#See_also 'See also section')
+where you begin to reach an appreciation that this isn't a drop-in replacement for
+Grub in the way [Syslinux was](http://jasonwryan.com/blog/2012/07/09/syslinux/ 'My post on moving to Syslinux'),
+for example. This is a whole new booting ecosystem.
+
+I wanted a LVM on LUKS setup and, after reading *a lot* more documentation on
+[UEFI bootloaders](https://wiki.archlinux.org/index.php/UEFI_Bootloaders 'Arch Wiki entry'),
+[GUID Partition Tables](https://wiki.archlinux.org/index.php/GPT 'Arch Wiki GPT page') and
+[EFISTUB](http://www.rodsbooks.com/efi-bootloaders/efistub.html 'Rod Smith's excellent site')<sup>2</sup>
+than I had bargained on, I felt reasonably well equipped to proceed. And while this was an
+admittedly time consuming (and sometimes confusing) process, I believe it was worth it.
+
+Once I had a reasonable grasp of the conceptual model—and I am convinced this is the single
+biggest hurdle in this process—I chose the EFISTUB boot approach with
+[gummiboot](http://freedesktop.org/wiki/Software/gummiboot 'gummiboot homepage'),
+as the boot manager; mostly because it seemed the simplest approach (the name may also
+have been a factor).
+
+Armed with all this new knowledge, I embarked on the install process. It didn't take long at
+all. Mostly because I couldn't boot in UEFI mode from the USB drive. 
+
+Turns out a couple of things were thwarting me; one I had disabled Secure Boot
+in the UEFI menu, but had neglected to disable the fast boot option. Secondly,
+and more worryingly, I kept encountering kernel panics once I had got the
+machine to boot. Seems that booting in UEFI mode triggers a nasty 
+[bug with the samsung_laptop module](https://bugzilla.kernel.org/show_bug.cgi?id=47121 'On the Kernel bugtracker').
+
+Once I could boot from the USB drive, I was able to successfully complete the install. 
+Rather than include a blow-by-blow account of that process here, I
+have uploaded 
+[a gist with the details](https://gist.github.com/4618490 'Gist with installation details'),
+for the morbidly curious or preternaturally bored.
+
+The whole process, for me, epitomised what Arch is really about. No matter how comfortable
+a point you reach with your understanding of the tools you use, the rolling release model
+constantly challenges you to adopt and adapt to new technologies. Sure, I could have just
+opted to boot in regular BIOS mode, but what would be the point of that? I wouldn't have
+*learned* anything.
+
+The other thing that quickly became apparent is that, contrary to some commentary
+on the boards about the
+[removal of the AIF](https://www.archlinux.org/news/install-media-20120715-released/ 'News item on new install method'),
+the new install scripts are quite superb; simple, direct and quite unambiguous, the whole
+install procedure now feels a lot more Arch-like. The developers have done a great
+job with these tools.
+
+#### Notes
+1. Surely the worst operating system, at least in terms of the user interface, I have
+had the misfortune to encounter (and I include Vista and Ubuntu's Unity in that
+cavalcade of fail)…
+
+2. I'll post more on the voluminous documentation around this, and other aspects of
+GNU/Linux, in the coming weeks.
