@@ -3,7 +3,7 @@ layout: post
 title: "Mail Checking Script"
 date: 2011-01-08 11:04
 comments: true
-categories: [archlinux, dwm, bash]
+categories: [archlinux, dwm, bash, hack]
 ---
 ![image](http://dl.dropbox.com/u/261312/Blog-images/mailcheck.png)
 
