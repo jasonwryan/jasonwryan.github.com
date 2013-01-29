@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: mutt | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.github.com/blog/categories/mutt/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.github.com/"/>
+  <updated>2013-01-29T15:36:11+13:00</updated>
+  <id>http://jasonwryan.github.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using Notmuch with mutt]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/05/23/notmuch/"/>
+    <updated>2012-05-23T19:37:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/05/23/notmuch</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/magnifier.png" title="day 307 on Flickr" >
+Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
+<a href="http://www.mutt.org/" title="mutt homepage">mutt</a> posts<sup>1</sup> with what I am assuming is the
+final piece of the puzzle: searching <code>mutt's</code> maildirs. For a small to average size mailbox, <code>mutt's</code>
+searching works fine, but as your mail volume grows this simple search doesn't really scale. That's
+where the rather modestly named <a href="http://notmuchmail.org/" title="Notmuch website">Notmuch</a> comes into play.</p>
+
+<p>It can be run as a standalone mail client, but you can also use it with <code>mutt</code> to provide
+a ruthlessly efficient and fast search tool for your email. I had looked at it and
+<a href="http://sup.rubyforge.org/" title="A console client for people with lots of mail">Sup</a>
+a couple of years ago, but was spurred to do something about it this week when
+<a href="https://twitter.com/#!/chosig" title="Chosig on Twitter">Gunnar Lundström</a> pinged me on twitter and
+suggested I check it out. So I did.</p>
+
+<p><blockquote><p>"Not much mail" is what Notmuch thinks about your email collection. Even if you receive 12000<br/>messages per month or have on the order of  millions of messages that you've been saving for decades.<br/>Regardless, Notmuch will be able to quickly search all of it. It's just plain not much mail.</p><footer><strong>Notmuch website</strong> <cite><a href='http://notmuchmail.org'>notmuchmail.org/&hellip;</a></cite></footer></blockquote></p>
+
+<p>There was previously a
+<a href="http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/">mutt-notmuch script</a>
+for integrating the two, but the functionality was included upstream at the start of this year
+so it is quite straightforward to set it up. There is a
+<a href="http://aur.archlinux.org/packages.php?ID=36289" title="Arch User Repository package">package in the AUR</a>
+but it is intended as the full mail client, complete with, <em>shudder</em>, emacs support amongst
+other things. I have stripped out the uneeded bindings and included the relevant <code>perl</code> libraries in a
+<a href="https://bitbucket.org/jasonwryan/centurion/src/6ff0f252961f/Build/notmuch/PKGBUILD" title="…in my bitbucket repo">modified PKGBUILD</a>
+if you just want the basic search with <code>mutt</code>.</p>
+
+<p>Otherwise, you'll need to step through it manually.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl perl-mailtools perl-mail-box perl-string-shellquote
+</span><span class='line'>cowerd notmuch perl-term-readline-gnu
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>As you will see from the PKGBUILD, you will need to copy the <code>notmuch-mutt</code> script
+into your <code>$PATH</code>: you'll find it in <span class="file">contrib/notmuch-mutt/</span>.</p>
+
+<p>There is a simple interative setup, which you can complete before running the index the first time:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>notmuch setup
+</span><span class='line'>notmuch new
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The final step is to copy across the <code>mutt</code> macros included with the script:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat src/notmuch-0.13/contrib/notmuch-mutt/notmuch-mutt.rc &gt;&gt; <span class="nv">$HOME</span>/.mutt/muttrc
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Now, from within <code>mutt</code>, <kbd>F8</kbd>, <kbd>F9</kbd> and <kbd>F6</kbd> will respectively
+search, create the relevant threads from search results, and tag mails with <code>notmuch</code>.</p>
+
+<p>As I use <code>offlineimap</code> to retrieve my mail, I simply added <code>notmuch new</code> to the script that
+runs as a <code>cron</code> job to synch my mail and <code>notmuch</code> reindexes all of my mail as soon as it arrives.</p>
+
+<h3>Updated 27/5/12</h3>
+
+<p>Two of the <code>mutt</code> macros that are shipped in <span class="file">contrib/notmuch-mutt/notmuch-mutt.rc</span>
+do not work. I have written a patch to fix this and
+<a href="http://notmuchmail.org/pipermail/notmuch/2012/011263.html" title="Patch on notmuch list">posted it to the ML</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a> and
+<a href="http://jasonwryan.com/blog/2012/05/12/mutt/">mutt and HTML email</a></li>
+</ol>
+
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/mjtmail/3008566512/in/photostream/">mjtmail on Flickr</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mutt and HTML email]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/05/12/mutt/"/>
+    <updated>2012-05-12T15:49:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/05/12/mutt</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/mutt-1.png" title="'mutt logo'" ></p>
+
+<p>Following on from my <a href="http://jasonwryan.com/blog/2012/04/21/lbdb/" title="Using mutt, LDAP and SSL">last post about mutt</a>,
+I have been tinkering more with the most suckless of mail clients to
+get it to deal with—of all things—<acronym title="HyperText Markup Language">HTML</acronym>
+emails. I will preface this post with a remark or two that amounts to a warning about
+intemperate language, ranting and a generally cranky disposition: repeated contact with
+email marketers can do that to you…</p>
+
+<p>A further  brief digression is warranted here. HTML email is, without doubt,
+evidence of the imminent end of civilized life as we know it; much like the
+<a href="http://en.wikipedia.org/wiki/Places_in_The_Hitchhiker's_Guide_to_the_Galaxy#Golgafrincham" title="Wikipedia entry on HHGTTG">Golgafrincham diaspora</a>, it is attributable to a depraved cabal of marketing consultants
+and provides the same level of social good as syphilis and fistulas. Suffice to say, it is a blight.</p>
+
+<p>Sadly, it is a blight that I have to deal with. Up until now, I had done that by using the
+excellent <a href="http://w3m.sourceforge.net/" title="w3m homepage on sourceforge">w3m</a> to render
+HTML as text in mutt itself. That is accomplished easily enough with an entry in
+<span class="file">muttrc</span> and another in a <span class="file">mailcap</span> file.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/.mutt/muttrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>auto_view text/html                                      <span class="c"># view html automatically</span>
+</span><span class='line'>alternative_order text/plain text/enriched text/html     <span class="c"># save html for last</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/.mutt/mailcap </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>This works for 80 percent of the HTML email I get. It is enough to confirm that the mail is useless
+and can be discarded. The other 20 percent, however, is slightly more problematic. The initial
+view in w3m is enough to tell me that, due to the outstanding incompetence of the idiots that
+generated the email, there <em>is</em> actually some information that is contained in the email that I need
+to access <strong>but it is not viewable in a text browser.</strong></p>
+
+<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/mutt-2.png" title="'An example…'" ></p>
+
+<p>For this special level of retardation, I need to be able to open the email in a graphical browser.
+As I use vimprobable, that means sending the file to
+<a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/" title="My post on Using vimprobable">vimprobable running in tabbed</a>. Fortunately, as you would expect with superior software,
+<code>mutt</code> has a way of handling this gracefully. In mutt's extensive documentation, there is a
+<a href="http://www.mutt.org/doc/manual/manual-5.html" title="Go and read it…">page on mutt's MIME support</a>
+that details how to set up a graduated response to this pernicious issue:</p>
+
+<p><blockquote><p>In addition, you can use this with Autoview to denote two commands for viewing<br/>an attachment, one to be viewed automatically, the other to be viewed<br/>interactively from the attachment menu.</p><footer><strong>mutt manual</strong> <cite><a href='http://www.mutt.org/doc/manual/manual-5.html'>www.mutt.org/doc/manual/&hellip;</a></cite></footer></blockquote></p>
+
+<p>So, you can have <code>mutt</code> render the HTML abomination in <code>w3m</code> in most cases, and when those
+instances of particularly cretinous behaviour make it to your inbox, you can choose to
+view them in your web browser. In my case, by altering the <span class="file">mailcap</span>
+entry to look like this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>text/html; vimprobtab.sh %s &amp;; <span class="nb">test</span><span class="o">=</span><span class="nb">test</span> -n <span class="s2">&quot;$DISPLAY&quot;</span>; needsterminal;
+</span><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The first entry tests that X is running, and if it is, it hands the file to <code>vimprobable</code>. The
+default, however, is determined by the <code>copiousoutput</code> tag. So, in <code>mutt</code> it is just a matter
+of hitting <kbd>v</kbd> to view the attached HTML and then <kbd>m</kbd> to send it to <code>mailcap</code>.
+For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">muttrc</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">bind </span>attach &lt;<span class="k">return</span>&gt;    view-mailcap
+</span></code></pre></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using mutt, LDAP and SSL]]></title>
+    <link href="http://jasonwryan.github.com/blog/2012/04/21/lbdb/"/>
+    <updated>2012-04-21T11:23:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2012/04/21/lbdb</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/addressbook.png" title="'Address Book Icon by bertop on Flickr'" ></p>
+
+<p>One of the great things about starting a new job at
+<a href="http://jasonwryan.com/blog/2012/04/05/catalyst/" title="My post on joining Catalyst IT">an open source company</a>
+is having the freedom to use the tools that suit your workflow, rather than
+having to suffer the indignity of whatever the IT department consider to be the
+lowest comon denominator. Suffice to say, I have had a lot of fun this week
+setting up my working environment—and the ocassional hiccough as I was forced to learn
+something new…</p>
+
+<p>One of those “learning opportunities” consisted of trying to get my mail client,
+<a href="http://www.mutt.org/" title="All mail clients suck. This one just sucks less.">mutt</a>
+to talk to the <acronym title="Lightweight Directory Acces Protocol">LDAP</acronym>
+directory over <acronym title="Secure Sockets Layer">SSL</acronym> so that I could
+query the shared address book. There are a number of helpful blog posts that describe
+using <a href="http://www.spinnaker.de/lbdb/" title="The Little Brother Database homepage">lbdb</a>
+with <code>mutt</code><sup>1</sup>. Unfortunately, after a lot of searching, I was unable to find
+any documentation on achieving this integration over a secure connection.
+I kept seeing this error:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>Error: Search failed. LDAP server returned an error : 13, description: TLS
+</span><span class='line'>confidentiality required at /usr/lib/mutt_ldap_query line 198, &lt;DATA&gt; line 558.
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Several hours later, and with some
+help from <a href="https://twitter.com/#!/ibeardslee" title="Ian on Twitter: follow him…">@ibeardslee</a>,
+I managed to set it up, and it was definitely worth the effort.</p>
+
+<p>You will need to install <code>lbdb</code> from
+<a href="http://aur.archlinux.org/packages.php?ID=10225" title="AUR package">the AUR</a>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cowerd lbdb     <span class="c"># 2</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>…and a couple of packages from the repos to make it all work:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl-ldap perl-io-socket-ssl netkit-bsd-finger
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then it is a matter of configuring <code>lbdb</code> to both
+query the LDAP directory and be able to be called from <code>mutt</code>.
+First, copy the config files into your <span class="file">$HOME</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir .lbdb
+</span><span class='line'>cp /etc/lbdb.rc .lbdb/lbdbrc
+</span><span class='line'>cp /etc/lbdb_ldap.rc .lbdb/ldap.rc
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>And then modify the two configuration files to suit your setup:
+The first, <span class="file">$HOME/.lbdb/lbdbrc</span>, is well commented and
+self-explanatory; add <code>ldap</code> to the methods and the
+nickname of your server:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">METHODS</span><span class="o">=</span><span class="s2">&quot;m_abook m_ldap&quot;</span>
+</span><span class='line'><span class="nv">LDAP_NICKS</span><span class="o">=</span><span class="s2">&quot;catalyst&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The second config file, <span class="file">$HOME/.lbdb/ldap.rc</span>
+is written in Perl and is a bit of a shocker:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='perl'><span class='line'><span class="nv">%ldap_server_db</span> <span class="o">=</span> <span class="p">(</span><span class="sr">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;</span><span class="s">&#39;catalyst&#39;</span> <span class="o">=&amp;</span><span class="ow">gt</span><span class="p">;</span> <span class="p">[</span><span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">,</span>
+</span><span class='line'>                <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">,</span>
+</span><span class='line'>                <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span>
+</span><span class='line'>                <span class="s">&#39;${mail}&#39;</span><span class="p">,</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="sr">&lt;/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;</span><span class="p">);</span><span class="sr">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;h1&gt;</span><span class="n">hostname</span> <span class="n">of</span> <span class="n">your</span> <span class="n">ldap</span> <span class="n">server</span><span class="sr">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;</span><span class="nv">$ldap_server</span> <span class="o">=</span> <span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$search_base</span> <span class="o">=</span> <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_search_fields</span>    <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_expected_answers</span> <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_result_email</span>     <span class="o">=</span> <span class="s">&#39;${mail}&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_result_realname</span>  <span class="o">=</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ignorant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_bind_dn</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_bind_password</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="mi">1</span><span class="p">;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The key is to ensure that you use both the <code>ldaps</code>
+prefix <strong>and</strong> explicitely specify the SSL port, 636. Without both of these, you will
+get the TLS confidentiality error.</p>
+
+<p>You can then test that it is working correctly by running a query:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>lbdbq jemima
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>All going well, if there is indeed a Jemima in the shared address book, you will see her
+contact details miraculously appear before you. If there is more than one, you will have a
+list to choose from.</p>
+
+<p>Finally, you just need to set up <code>mutt</code> to query <code>lbdb</code>.
+In your <span class="file">muttrc</span>, add the following:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">query_command</span> <span class="o">=</span> <span class="s2">&quot;lbdbq %s 2&gt;/dev/null&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>I found that suppressing the errors made the whole experience a little smoother. You
+may not require it… Now, hitting <kbd>Shift</kbd><kbd>q</kbd> in <code>mutt</code>
+brings up a prompt to query the LDAP directory (and my <a href="http://abook.sourceforge.net/" title="abook homepage">abook</a> address book that I share via
+<a href="https://www.dropbox.com/" title="Dropbox homepage">dropbox</a>). You can also access the directory
+by starting to type an email address and then hitting <kbd>Ctrl</kbd><kbd>t</kbd> to see
+a list of possible completions.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk's post</a> got me started.</li>
+<li>A <a href="https://bitbucket.org/jasonwryan/eeepc/src/f15bf6e51e62/Scripts/cowerd" title="Script in bitbucket repo">wrapper script for cower</a></li>
+</ol>
+
+
+<p>Creative Commons image <a href="http://www.flickr.com/photos/bertop/2530620838/">by bertop on Flickr</a></p>
+]]></content>
+  </entry>
+  
+</feed>
