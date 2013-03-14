@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I posted a couple of weeks ago about the impact of some of the current
-changes to Arch Linux.
-There seems to be quite a bit of it about, because in &hellip;">
+  <meta name="description" content="Nearly two years ago, I posted about my adaption of a simple
+command line note utility.
+I have used this setup on all of my machines on a daily &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,299 @@ There seems to be quite a bit of it about, because in &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-01T10:09:00+12:00" pubdate data-updated="true">Sep 1<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/notes.jpg" title="'Notepad image on Flickr'" >
+Nearly two years ago, I posted about my adaption of a simple
+<a href="http://jasonwryan.com/blog/2010/09/28/command-line-notes/" title="My post in 2010">command line note utility</a>.
+I have used this setup on all of my machines on a daily basis since and it has worked
+marvellously. Symlinking to a folder in
+<a href="https://www.dropbox.com/home" title="Dropbox home">Dropbox</a> means that the notes are accessible
+from all my machines, including my phone. There has only really been one aspect of this setup
+that has been sub-optimal.</p>
+
+<p>As an inveterate note-taker (this is one of the “benefits” of ageing; the speed with
+which you forget information outpaces the acquisition of newer material) I have—in
+those intervening years—built up quite a store of notes. Consequently, in order to
+maintain a semblance of order, I have arranged them in a series of directories. There
+is a minor flaw with this approach: retreiving a note depended on two factors, a) excellent
+recall<sup>1</sup> and, b) accurately typing out the full path. Neither of these are things that I
+am inherently good at or inclined to master.</p>
+
+<p>This had been irritating me for some time before I came across this
+<a href="http://unix.stackexchange.com/questions/11906/how-to-change-the-target-directory-for-tab-completion" title="Tab completion for notes function">question on Unix &amp; Linux StackExchange</a>.
+This provided me with a partial solution to the issue but, as I note in my answer, I was not
+able to solve it for nested directories, which was my particular use case. Once I had
+muddled my way through the solution on U&amp;L I pushed it to the back of my mind and
+tried to ignore it.</p>
+
+<p>Recently, though, the accumulation of notes and the frustration of trying to access them
+without <kbd>Tab</kbd> completion drove me to do something about it.</p>
+
+<p>The documentation on
+<a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html" title="Bash Manual">programmable completion</a>
+is typically terse and searching the web returns very little in the way of instructions
+as to how to accomplish this.<sup>2</sup> Undeterred, I decided to hack up a completion
+function that worked for nested directories.</p>
+
+<p>What I arrived at was this:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">shopt</span> -s globstar
+</span><span class='line'><span class="nb">shopt</span> -s progcomp
+</span><span class='line'>
+</span><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> <span class="nv">$HOME</span>/.notes/<span class="s2">&quot;$*&quot;</span>.txt ;<span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'> <span class="c"># completion for notes</span>
+</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>cur
+</span><span class='line'>    <span class="nv">cur</span><span class="o">=</span><span class="k">${</span><span class="nv">COMP_WORDS</span><span class="p">[COMP_CWORD]</span><span class="k">}</span>
+</span><span class='line'>    <span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**<span class="o">)</span>
+</span><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;${files[@]##*/}&quot;</span>
+</span><span class='line'>    <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="k">$(</span> <span class="nb">compgen</span> -f <span class="s2">&quot;${file[@]}&quot;</span> -- <span class="k">${</span><span class="nv">cur</span><span class="k">}</span> <span class="k">)</span> <span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure>
+
+
+<p>The best that can be said about it is that it <em>nearly</em> works…<sup>3</sup></p>
+
+<p>Realising that I was completely out of my depth, I turned to #bash for help, and
+I was indeed fortunate that
+<a href="https://github.com/geirha" title="geirha's Gitgub">geihra</a> offered some much needed
+assistance. geirha&#8217;s solution is an elegant one:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
+</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**/<span class="s2">&quot;$2&quot;</span>*<span class="o">)</span>
+</span><span class='line'>    <span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure>
+
+
+<p>In addition to working exactly as I hoped, it had the benefit of introducing me
+to a couple more bash concepts that I hadn&#8217;t encountered;
+<a href="http://mywiki.wooledge.org/BashGuide/Arrays" title="Bash Guide on Greg's Wiki">adding elements to an array</a>
+with <code>+=()</code> being one. For posterity, the full script is:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
+</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>nls<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>tree -CR --noreport <span class="nv">$HOME</span>/.notes | awk <span class="s1">&#39;{ </span>
+</span><span class='line'><span class="s1">    if (NF==1) print $1; </span>
+</span><span class='line'><span class="s1">    else if (NF==2) print $2; </span>
+</span><span class='line'><span class="s1">    else if (NF==3) printf &quot;  %s\n&quot;, $3 </span>
+</span><span class='line'><span class="s1">    }&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'> <span class="c"># TAB completion for notes</span>
+</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**/<span class="s2">&quot;$2&quot;</span>*<span class="o">)</span>
+</span><span class='line'>    <span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure>
+
+
+<h4>Notes</h4>
+
+<ol>
+<li>The alternative to remembering the full path name is to list all of the notes before
+each operation with the <code>nls</code> function; this is not ideal either…</li>
+<li>Which means that it is either so straightforward that few have bothered to write up their
+experiences (most likely), or so arcane that not many have bothered (how it
+feels to me). However, there are a couple of pages that I referenced in addition
+to the official documentation:
+
+<ul>
+<li><a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html">Adam Backstrong&#8217;s post</a></li>
+<li><a href="http://fahdshariff.blogspot.co.nz/2011/04/writing-your-own-bash-completion.html">Fahd Shariff&#8217;s post</a></li>
+<li><a href="http://devmanual.gentoo.org/tasks-reference/completion/index.html">Gentoo Development Guide</a></li>
+</ul>
+</li>
+<li>It fails, as geirha pointed out, because it breaks the filenames on whitespace.</li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by
+<a href="http://www.flickr.com/photos/nicholasjon/4101203095/" title="Field Notes etc on Flickr">nicholasjon</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/18/trolls/">Trolling Arch Linux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-18T10:47:00+12:00" pubdate data-updated="true">Aug 18<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/troll.jpg" title="'Troll on Flickr'" >
+I posted recently about
+<a href="http://jasonwryan.com/blog/2012/08/04/systemd/" title="Some thoughts on moving across…">my experiences shifting to systemd</a>
+and how I found it, for all three of my Arch machines, to be a relatively simple and
+straightforward process which, in the intervening weeks, has borne out the views of
+the developers and other members of the community who have been using it for a longer
+period—it works, and works well. At the start of this week, Stéphane Gaudreault
+announced on Arch-dev-public the intention to
+<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-August/023389.html" title="ML post seeking developer views">replace the original initscripts with systemd</a>.</p>
+
+<p>The reaction by some to this announcement was, to me, quite disappointing. My view of
+open source communities is that by participating you are entering into a social contract.
+That contract is that, as you are reliant on the goodwill of the wider community it is
+incumbent on you to ensure that your overall contribution—in whatever form—brings
+more to the community than it takes away. At the very least, you can strive to ensure
+that it is a value neutral exchange.</p>
+
+<p>Sadly, for some of the trolls on the <acronym title="Mailing lists">MLs</acronym>, that
+is patently not the case. I want to take a closer look at just one of those threads, for two
+reasons. First, it is a textbook case of a particularly pernicious troll. And second, in
+conjunction with some other factors, it had an especially damaging effect on the wider
+community.</p>
+
+<p>The thread in question is on Arch-general, the largest of the mailing lists. It has
+the suitably alarmist title
+<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029856.html" title="A trolling we will go…">Think twice before moving to systemd</a>.
+The troll, who has had only minimal involvement with the Arch community up until this
+unfortunate moment starts by framing his “concern”<sup>1</sup>:</p>
+
+<blockquote><p>I just became aware that Arch Linux plans to switch to systemd, and this worries me for several reasons.</p></blockquote>
+
+
+<p>Felipe is worried. Ergo, <em>we</em> should be worried. Why should we be worried? Because,
+despite the fact that systemd has been discussed and used by Archers since the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=96316" title="57 page thread on the Arch BBS">middle of 2010</a>,
+it has just come to his attention and now, with the formidable powers of his intellect,
+he has detected a disturbance in the force.</p>
+
+<blockquote><p>I tried systemd a while ago in a brand new machine with Arch Linux and the boot was *much slower*. After some exchanges with Lennart Poettering and other people in Google+[1], it became clear I was on my own. Eventually I found the culprit: Fedora uses CONFIG_HZ_1000, and Arch Linux uses CONFIG_HZ_300. It became clear to me that systemd was not ready for prime time, it wasn&#8217;t thoroughly tested in a lot of machines, and if you have problems Lennart Poettering will blame you (PulseAudio sounds familiar?).</p></blockquote>
+
+
+<p>The salient phrases here are “it became clear I was on my own” and the even more telling,
+“it became clear to me that systemd was not ready for prime time.” Once I had managed to
+wipe away the tears of gratitude that were coursing down my cheeks, I realized that Arch
+finally had finally found what it had been missing for all these years: a saviour. We
+were going to be OK after all.</p>
+
+<p>Felipe has “found the culprit.” Despite the best efforts of the Arch developers, upstream,
+the other distros that have been using it for considerably longer, and the experience of the
+<a href="https://bbs.archlinux.org/viewtopic.php?pid=1147676" title="Thread on systemd - one of many">Arch users reported on our boards</a>,
+no-one had the heroic ability to see through to the heart of this conundrum and expose
+systemd for the fraud that it is.</p>
+
+<p>But our gratitude should be tempered with some shame for we, the Arch community, have let
+Felipe down. We haven&#8217;t lived up to the standards he expects of us. As he gently admonishes us:
+“I was expecting more from the Arch Linux community.” Yes, Felipe, and you were right to.
+We let you down; can you forgive us?</p>
+
+<p>The thread goes on to generate more than 50 replies. All of them wasted.
+His trolling is not interested in facts, in reason or logic; his method of argumentation is
+not rational, and he is not interested in working toward an understanding
+of the truth; he just wants to be right. At whatever cost to the wider community. These posts,
+and trolls in other fora
+<a href="https://lkml.org/lkml/2012/4/12/434" title="LKML exchange with Linus Torvalds">like this one</a>,<sup>2</sup>
+are really about gratifying Felipe&#8217;s own voracious appetite for self-aggrandisement. In reality,
+of course, it is a stunning illustration of the
+<a href="https://secure.wikimedia.org/wikipedia/en/wiki/Dunning%E2%80%93Kruger_effect" title="Wikipedia entry">Dunning-Kruger effect</a>.
+It would be pathetic if it were a victimless pursuit; but it is not.</p>
+
+<p>Further down in the thread we see the inevitable frustration of the developer who leads
+this work for Arch,
+<a href="https://www.archlinux.org/developers/#tomegun" title="Tom's developer profile">Tom Gunderson</a>,
+finally <a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029933.html" title="Tom's reply quoting Linus">boil over</a>.
+This precipitates another thread where Tom announces that he will
+<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029960.html" title="Tom's mail to the list">no longer participate in this list</a>.
+This is from the developer that has patiently and constructively engaged with Arch users on the
+list around this issue for the past several months. On his own time.</p>
+
+<p>That is the impact of trolls like Felipe. That is a direct effect of his selfishness on the
+wider community. What has he brought to the community? Dissent, distraction and posturing.
+What has he taken away? The ability for all of us to engage with one of the developers
+of the software we all use. His presence on the list, and that of a few others,
+has been nothing short of corrosive.</p>
+
+<p>And as for the smoking gun, the config setting that no-one was smart enough to
+discover? Denis A. Altoé Falqueto went to the trouble to build another kernel
+and run a test and, contrary to Felipe who provided no such evidence,
+<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/030145.html" title="Denis' post">posted the results</a>.
+You can guess the outcome.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See the <a href="http://www.urbandictionary.com/define.php?term=concern+troll">concern troll</a>.</li>
+<li>Read the whole thread to fully understand how obstinance can trump reason… See
+also his <a href="http://felipec.wordpress.com/2012/05/26/no-mercurial-branches-are-still-not-better-than-git-ones-response-to-jhws-more-on-mercurial-vs-git-with-graphs/">own blog</a>
+where he expresses incredulity that his comments on another blog have been deleted.</li>
+</ol>
+
+
+<p>Creative Commons image of the troll on Flickr by
+<a href="http://www.flickr.com/photos/56380734@N05/6937763971/">Comrade Foot</a>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -241,419 +534,6 @@ boot so you can see that everything starts correctly…</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-26T18:48:00+12:00" pubdate data-updated="true">Jul 26<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/guard.jpg" title="'On Guard image on Flickr'" >
-In my last post, on
-<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="You should read it…">Mercurial Queues</a>,
-I outlined how you might use MQ to manage a
-<a href="http://dwm.suckless.org/" title="Dynamic window manager">dwm</a> patchset.
-Mercurial makes this process ridiculously easy, and this functionality is more
-than enough to recommend it. However, where I think it really gets interesting
-is when you share that same patchset across multiple machines and are easily
-able to customize which patches in the queue are applied, based upon the
-particular machine you are building dwm on.</p>
-
-<p>For example, in my case I use dwm on all three of my machines: my desktop at home,
-my laptop at work and my EeePC. Given the nature of each of these three machines,
-though, I want a slightly different stack of patches applied. These differences
-might extend only to particular rules applied in <span class="file">config.def.h</span>
-based upon the number of tags I use, or the different applications that I run
-at home as opposed to at work.</p>
-
-<p>In any event, what I want to be able to do is maintain
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">a single patchset</a>
-in a mercurial repository, clone it to all my machines and then, using MQ,
-filter which specific patches are applied. This is all possible using a killer
-feature of MQ called
-<a href="http://hgbook.red-bean.com/read/advanced-uses-of-mercurial-queues.html%20'Advanced%20uses%20of%20MQ%20in%20the%20Mercurial%20book">guards</a>.
-Guards allow you to conditionally apply patches in a queue. Essentially, in
-a queue, you “tag” a patch with a guard and—depending on whether or not the
-guard is positive (to be applied), or negative (to be skipped)—when you
-<code>hg qpush -a</code> MQ takes care of applying the correct patches in the queue.</p>
-
-<p>So, in the case of my work laptop, I begin by cloning dwm and intializing
-a patch queue:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd </span>Build/
-</span><span class='line'>hg clone http://hg.suckless.org/dwm
-</span><span class='line'>hg qinit -c
-</span></code></pre></div></figure>
-
-
-<p>I setup my <span class="file">.hgrc</span> within the patches directory so that
-it points at the correct mercurial repository:</p>
-
-<figure class='code'><figcaption><span>.hg/patches/.hg/hgrc </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'> <span class="c"># Mercurial config file</span>
-</span><span class='line'><span class="o">[</span>ui<span class="o">]</span>
-</span><span class='line'><span class="nv">username</span> <span class="o">=</span> jasonwryan &lt;jasonwryan@gmail.com&gt;
-</span><span class='line'><span class="nv">ssh</span> <span class="o">=</span> ssh -i ~/.ssh/bb -C
-</span><span class='line'><span class="o">[</span>paths<span class="o">]</span>
-</span><span class='line'><span class="nv">default</span> <span class="o">=</span> ssh://hg@pikacode.com/jasonwryan/dwm-patchset
-</span></code></pre></div></figure>
-
-
-<p>Then I pull down my dwm patchset from the mercurial repository
-with <code>hg pull</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulling from ssh://hg@pikacode.com/jasonwryan/dwm-patchset
-</span><span class='line'>requesting all changes
-</span><span class='line'>adding changesets
-</span><span class='line'>adding manifests
-</span><span class='line'>adding file changes
-</span><span class='line'>added 6 changesets with 16 changes to 10 files
-</span><span class='line'><span class="o">(</span>run <span class="s1">&#39;hg update&#39;</span> to get a working copy<span class="o">)</span>
-</span></code></pre></div></figure>
-
-
-<p>After I update my local repo,<sup>1</sup> I can see the full patchset with
-<code>hg qseries</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setup.makefile
-</span><span class='line'>base.config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span><span class='line'>bstack
-</span><span class='line'>centurion.config
-</span></code></pre></div></figure>
-
-
-<p>Then, as I decribed in my previous post, I make the changes to
-<span class="file">config.def.h</span> that are specific to this
-machine:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew veles.config
-</span><span class='line'> <span class="c"># “hack, hack, hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qcommit -m <span class="s1">&#39;Adaptions for Veles&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>My patchset now has an additional patch in it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries
-</span><span class='line'>setup.makefile
-</span><span class='line'>base.config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span><span class='line'>bstack
-</span><span class='line'>centurion.config
-</span><span class='line'>veles.config
-</span></code></pre></div></figure>
-
-
-<p>This is where guards come in to play. If I wasn&#8217;t interested in sharing
-the patchset, it would just be a matter of deleting the patch for Centurion.
-However, what I want to do is direct MQ to ignore that specific patch
-when applying the queue. I do that by creating a negative guard and then
-activating it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qguard centurion.config -- -block
-</span><span class='line'>hg qselect block
-</span><span class='line'>number of unguarded, unapplied patches has changed from 8 to 7
-</span></code></pre></div></figure>
-
-
-<p>That&#8217;s it! Adding a verbose flag to <code>hg qseries</code><sup>2</sup> will print out the
-patchset and the accompanying guard status:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries -v
-</span><span class='line'>0 U setup.makefile
-</span><span class='line'>1 U base.config.customizations
-</span><span class='line'>2 U statuscolours
-</span><span class='line'>3 U cycle
-</span><span class='line'>4 U push
-</span><span class='line'>5 U bstack
-</span><span class='line'>6 G centurion.config
-</span><span class='line'>7 U veles.config
-</span></code></pre></div></figure>
-
-
-<p>The real test, of course, is pushing the patchset onto the fresh
-dwm code:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpush -a
-</span><span class='line'>applying setup.makefile
-</span><span class='line'>applying base.config.customizations
-</span><span class='line'>applying statuscolours
-</span><span class='line'>applying cycle
-</span><span class='line'>applying push
-</span><span class='line'>applying bstack
-</span><span class='line'>skipping centurion.config - guarded by <span class="s1">&#39;-block&#39;</span>
-</span><span class='line'>applying veles.config
-</span><span class='line'>now at: veles.config
-</span></code></pre></div></figure>
-
-
-<p>How cool is that? One central patchset, applied conditionally depending
-upon the machine you are using at the time.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>Any guards applied on other machines will be present in the newly
-pulled <span class="file">series</span> file: these conflicts will need
-to be manually merged…</li>
-<li>The options for all of the <code>hg</code> commands can be read with
-<code>hg -v help $command</code>. For those related to queues, just prepend
-a <code>q</code> to <code>$command</code>.</li>
-</ol>
-
-
-<p>Creative Commons image on Flickr by
-<a href="http://www.flickr.com/photos/alternatewords/4903560373/" title="On Guard on Flickr">Thorsten Becker</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-24T19:18:00+12:00" pubdate data-updated="true">Jul 24<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
-Over the last week or so, I have finally gotten around to digging into the whole concept of
-using
-<a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
-to manage patches against an upstream project; in my case
-<a href="http://dwm.suckless.org" title="The truly suckless window manager…">dwm</a>.<sup>1</sup>
-Essentially, this mercurial extension helps you manage a stack of patches on
-top of a directory tree. This gives you quite a lot of fine-grained control
-over your patchset and assists immeasurably with automating the application of
-patches when the underlying codebase changes.</p>
-
-<p>After having played around with queues for the last couple of days, I am quite
-impressed: both the concept and the execution are simple and powerful. The concept
-of Mercurial Queues is best described in the Mercurial book: the aptly titled,
-<em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
-
-<blockquote><p>MQ&#8217;s marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don&#8217;t like a patch, you can drop it. If a patch isn&#8217;t quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote>
-
-
-<p>I followed Filippo Negroni&#8217;s excellent
-<a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
-to setup my own
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">dwm patchset</a>
-based on
-<a href="http://hg.suckless.org/dwm" title="dwm hg repository">tip</a>, and the process was
-surprisingly straightforward; the only caveat being it is a good idea to plan
-quite carefully what changes you want in each particular patch. Once I had
-completed the setup, it got me thinking about the fact that the final install
-is done without <code>pacman</code>, just using <code>make install</code>. And, as a proof-of-concept
-more than anything else, I wondered whether this functionality could be used
-with <code>makepkg</code>.<sup>3</sup></p>
-
-<p>Turns out, as you might expect with Arch, it was not much of a job to set it
-up at all.</p>
-
-<p><strong>Note</strong>: this doesn&#8217;t mean I think it is a good idea; I was just interested
-to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
-like dwm, this is definitely a case of introducing a huge amount of complexity for
-no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
-
-<p>I have a
-<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD" title="If you must…">working PKGBUILD</a>
-that you can use if you want to follow along at home. Once you have downloaded
-it into <span class="file">dwm-hg/</span>, run <code>makepkg</code> to clone the dwm
-repository and build the binary.  Then you need to make sure that the mercurial
-queue extension is enabled, so your <span class="file">.hgrc</span> needs to
-contain:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
-</span><span class='line'>hgext.mq <span class="o">=</span>
-</span></code></pre></div></figure>
-
-
-<p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
-is <span class="file">dwm-hg/src/dwm</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
-</span></code></pre></div></figure>
-
-
-<p>The next step is to start applying the various patches that you want to comprise
-your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
-and three other patches:
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/statuscolours" title="Patch in mercurial queue">statuscolours</a>,
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/cycle" title="ditto">cycle</a>, and
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/push" title="etc…">push</a>.
-There are other patches in my repository, one of which patches the appropriate
-settings for an Arch build in the
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/setup.makefile" title="Arch settings for Makefiles">relevant makefiles</a>.
-This is taken care of by the PKGBUILD in this case.</p>
-
-<p>From here, it is very much as Filippo describes it in his tutorial: make
-some changes, add them to the queue and rinse and repeat:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
-</span><span class='line'> <span class="c"># “hack hack hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>After committing each of your changes as a discrete patch, you can review the queue
-with <code>hg qseries</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries
-</span><span class='line'>config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span></code></pre></div></figure>
-
-
-<p>And <code>hg qapplied</code> will tell you which of the patches is currently
-applied in the working repository; at this stage the list should look
-the same as that in <code>hg qseries</code>. The next step is to remove all of the
-patches from the queue so that we have a clean repository:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpop -a
-</span><span class='line'>popping push
-</span><span class='line'>popping cycle
-</span><span class='line'>popping statuscolours
-</span><span class='line'>popping config.customizations
-</span><span class='line'>patch queue now empty
-</span></code></pre></div></figure>
-
-
-<p>Should you need to edit a patch, it is simply a matter of popping
-to that spot in the stack (you can do so by name or by index
-number, beginning at 0):</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpop config.customizations
-</span><span class='line'>popping push
-</span><span class='line'>popping cycle
-</span><span class='line'>popping statuscolours
-</span><span class='line'>now at: config.customizations
-</span><span class='line'> <span class="c"># “hack hack hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qpush -a
-</span></code></pre></div></figure>
-
-
-<p>Once you are satisfied with the state of the stack, remove all of the
-patches to return to the original clean working directory and <code>cd</code> back
-to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> to
-rebuild the package and you should see the pushed patches as part of
-the output:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
-</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
-</span><span class='line'>applying config.customizations
-</span><span class='line'>applying statuscolours
-</span><span class='line'>applying cycle
-</span><span class='line'>applying push
-</span><span class='line'>now at: push
-</span><span class='line'>dwm build options:
-</span></code></pre></div></figure>
-
-
-<p>…and when you restart dwm, your customizations will be applied.
-When new changes are pushed to
-<a href="http://hg.suckless.org/dwm" title="dwm mercurial repo">the dwm repo</a>
-you can just <code>makepkg -fi</code>, and, if any of the patches fail due
-to changes in the underlying code, pop the stack to the failed
-patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
-
-<p>As I said at the beginning of this post, this isn&#8217;t a particularly smart way to
-use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
-better off just cloning dwm to your local repository, initializing a queue
-repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
-sudo make install</code>.</p>
-
-<p>If you have more than one machine, you can easily setup a repository for
-your patchset on
-<a href="https://bitbucket.org/" title="bitbucket free mercurial hosting">bitbucket</a>
-or <a href="http://pikacode.com/" title="Free Mercurial and Git hosting">Pikacode</a>
-and host it there: then just pull the patchset queue
-from your other boxes and <code>hg qpush -a</code>. If you require a slightly
-different patchset for each box, you can use MQ to manage this
-process as well. This is where MQ really excels;
-I&#8217;ll cover this in more detail in my next post.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
-<li>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
-example of thorough, accessible documentation.</li>
-<li>In the case of something like dwm, this is really irrelevant, as there
-is a single tiny binary and a <code>man</code> page, so keeping track of these files on
-your system is not an issue at all.</li>
-</ol>
-
-
-<p>Flickr Creative Commons image by
-<a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -671,6 +551,14 @@ your system is not an issue at all.</li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/03/02/forking/">Forking Arch</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/08/documentation/">Read The Fine Manual</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/01/25/uefi/">Hi-UEFI Way</a>
       </li>
     
@@ -680,14 +568,6 @@ your system is not an issue at all.</li>
     
       <li class="post">
         <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/09/28/screencast/">A dwm Screencast</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a>
       </li>
     
   </ul>

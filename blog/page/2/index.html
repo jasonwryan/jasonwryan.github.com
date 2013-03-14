@@ -9,8 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Over the last week as I have been at home convalescing I have, quite unaccountably,
-found myself watching videos of tiling window managers. In all, &hellip;">
+  <meta name="description" content="I have used TrueCrypt since just before
+I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
+It is an &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -89,6 +90,225 @@ found myself watching videos of tiling window managers. In all, &hellip;">
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-10T16:02:00+13:00" pubdate data-updated="true">Jan 10<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/lock.jpg" title="'Flickr image of lock'" >
+I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
+I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
+It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
+the fly and—for the especially paranoid—to hide the existence of those volumes from
+inquisitive others.</p>
+
+<p>In the intervening years, with all aspects of my personal life
+increasingly mediated digitally, in order to properly safeguard my privacy,
+and that of my family, I have taken to using LUKS to
+<a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on LVM on LUKS">fully encrypt all of my machines</a>.
+And I have used TrueCrypt, both personally and for work, to encrypt some of my USB drives and as
+a container in <a href="http://dropbox.com/" title="Dropbox homepage">Dropbox</a>
+, for as long as
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on sharing dotfiles with Dropbox">I have used that service</a>.</p>
+
+<p>Early last year, however, I became aware of concerns that TrueCrypt was not truly open source; that almost
+all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
+free (as in Freedom) software:</p>
+
+<blockquote><p>The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered &#8220;free&#8221; by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.</p><footer><strong>Wikipedia entry on TrueCrypt</strong> <cite><a href='https://en.wikipedia.org/wiki/Truecrypt'>en.wikipedia.org/wiki/Truecrypt/&hellip;</a></cite></footer></blockquote>
+
+
+<p>When I initially accessed the page, in February 2012, there was also a paragraph—now removed—that
+highlighted further, more alarmist, concerns about the shadowy identity of the people behind
+TrueCrypt:</p>
+
+<blockquote><p>The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]</p><footer><strong>Wikipedia entry retrieved in February 2012</strong> <cite><a href='https://en.wikipedia.org/w/index.php?title=TrueCrypt&diff=478623780&oldid=478608477'>en.wikipedia.org/w/&hellip;</a></cite></footer></blockquote>
+
+
+<p>While I don&#8217;t subscribe to the theory that the CIA have planted a backdoor in the software (if they
+had, <a href="https://en.wikipedia.org/wiki/Truecrypt#Operation_Satyagraha" title="FBI operation foiled by TC">it clearly doesn&#8217;t work</a>),
+I was relieved to see at the end of last year that someone had written a simple utility that allows
+you to manage TrueCrypt containers from the command line; <a href="https://github.com/bwalex/tc-play" title="tcplay on Guthub">tcplay</a>
+is decribed as:</p>
+
+<blockquote><p>a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.</p></blockquote>
+
+
+<p>With a <a href="https://github.com/bwalex/tc-play/blob/master/LICENSE" title="tcplay license">simple, two paragraph license</a>
+and a brief but comprehensive <code>man</code> page, I was sold. I uninstalled TrueCrypt late last year and haven&#8217;t missed it since. Quite
+the contrary. The only “issue” that I have had with tcplay is remembering the commands to map and mount a drive.
+Initially, I jotted down some notes, but opening them up several times a week to refer to them quickly seemed
+pointless so I eventually wised up and wrote a wrapper script to do the job for me…</p>
+
+<p>The script is quite simple, it finds the first available loop device, maps the encrypted volume to it and
+mounts it read-writeable for your user.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="c"># manage truecrypt containers using tcplay</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">user</span><span class="o">=</span>jason
+</span><span class='line'><span class="nv">cryptdev</span><span class="o">=</span>Safebox
+</span><span class='line'><span class="nv">cryptpath</span><span class="o">=</span>/home/jason/Dropbox/<span class="s2">&quot;$cryptdev&quot;</span>
+</span><span class='line'><span class="nv">loopdev</span><span class="o">=</span><span class="k">$(</span>losetup -f<span class="k">)</span>
+</span><span class='line'><span class="nv">mountpt</span><span class="o">=</span>/media/<span class="s2">&quot;$cryptdev&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># must be run as root</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$EUID</span> !<span class="o">=</span> 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;You must be root to run this.&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># unecrypt and mount container</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span>losetup <span class="s2">&quot;$loopdev&quot;</span> <span class="s2">&quot;$cryptpath&quot;</span>
+</span><span class='line'>  tcplay --map<span class="o">=</span><span class="s2">&quot;$cryptdev&quot;</span> --device<span class="o">=</span><span class="s2">&quot;$loopdev&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># read passphrase</span>
+</span><span class='line'>  <span class="nb">read</span> -r -s passphrase <span class="s">&lt;&lt;EOF</span>
+</span><span class='line'><span class="s">  &quot;$passphrase&quot;</span>
+</span><span class='line'><span class="s">EOF</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># mount container</span>
+</span><span class='line'>  <span class="o">[[</span> -d <span class="s2">&quot;$mountpt&quot;</span> <span class="o">]]</span> <span class="o">||</span> mkdir <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># mount options</span>
+</span><span class='line'>  <span class="nv">userid</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="s2">&quot;[=(]&quot;</span> <span class="s1">&#39;{print $2,$4}&#39;</span> &lt;<span class="o">(</span>id <span class="s2">&quot;$user&quot;</span><span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  mount -o nosuid,uid<span class="o">=</span><span class="s2">&quot;${userid% *}&quot;</span>,gid<span class="o">=</span><span class="s2">&quot;${userid#* }&quot;</span> /dev/mapper/<span class="s2">&quot;$cryptdev&quot;</span> <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># close and clean up…</span>
+</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;close&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">device</span><span class="o">=</span><span class="k">$(</span>awk -v <span class="nv">dev</span><span class="o">=</span><span class="nv">$cryptdev</span> -F<span class="s2">&quot;:&quot;</span> <span class="s1">&#39;/dev/ {print $1}&#39;</span> &lt;<span class="o">(</span>losetup -a<span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  umount <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>  dmsetup remove <span class="s2">&quot;$cryptdev&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;demapping failed&quot;</span>
+</span><span class='line'>  losetup -d <span class="s2">&quot;$device&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;deleting $loopdev failed&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Options are open or close.&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>Once you are done, the script will unmount your volume and clean up. Undoubtedly, the
+script could be improved; patches are welcome.</p>
+
+<p>There is a
+<a href="https://aur.archlinux.org/packages/tcplay-git/" title="Arch User Repository">PKGBUILD in the AUR</a>.
+Uninstall TrueCrypt and give tcplay a go, it is a simple, powerful application; and it <em>is</em>
+free software…</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-20T18:58:00+13:00" pubdate data-updated="true">Nov 20<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/vimprobable-logo.png" title="'Vimprobable logo'" >
+I have written about <a href="http://vimprobable.org" title="Vimprobable homepage">Vimprobable</a>
+a couple of times over the last two years<sup>1</sup>,
+it is one of those projects that, for a variety of reasons, I have picked up
+and stuck with.  Like <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>,
+<a href="http://vim.org" title="Vim homepage">Vim</a> and
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>,
+it is an essential part of my working environment and is installed on all of my
+machines, where it is my default browser. It&#8217;s simplicity, power and
+configurability are why, despite looking at a few other similar projects, I
+have stuck with Vimprobable since first installing it.</p>
+
+<p>After my last post, a <a href="http://jasonwryan.com/blog/2012/09/28/screencast/" title="An intro to dwm">dwm screencast</a>,
+I wanted to have another crack at making a decent screencast. Sadly,
+this is not it.  I can say that making a <em>good</em> screencast is not a simple
+accomplishment; there are so many elements that require significant attention. I
+spent a good many hours this time around playing with custom Xorg modelines,
+<code>ffmpeg</code>&#8217;s arcane encoding options and, to be frank, the final product is just not worth
+all that effort.</p>
+
+<p>I&#8217;m going to stick with plain text from now on. It requires little more from me
+than a passing acquaintance with the subject matter, some loosely held and
+<a href="http://jasonwryan.com/blog/2012/08/18/trolls/" title="Trolling Arch Linux">firmly expressed opinions</a>
+and my unbridled confidence in the fact that anyone who
+has read this far down the page is so bereft of other, more pressing things to
+think about that they may inadvertently find a scintilla of amusement in here…</p>
+
+<p>With that explanation out of the way, I give you my final screencast:</p>
+
+<iframe src="http://player.vimeo.com/video/53829053?byline=0&amp;portrait=0&amp;badge=0&amp;color=ffffff" 
+width="350" height="197" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+
+
+<p></p>
+
+<p><a href="http://vimeo.com/53829053">An Introduction to Vimprobable</a> on 
+<a href="http://vimeo.com">Vimeo</a>.</p>
+
+
+<h4>Notes</h4>
+
+<ol>
+<li>First back in <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/">October, 2010</a> and then,
+more recently, in <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/">June, 2011</a>.</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2012/09/28/screencast/">A dwm Screencast</a></h1>
     
     
@@ -154,299 +374,6 @@ do this thing well; Drew Neil&#8217;s excellent
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-01T10:09:00+12:00" pubdate data-updated="true">Sep 1<span>st</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/notes.jpg" title="'Notepad image on Flickr'" >
-Nearly two years ago, I posted about my adaption of a simple
-<a href="http://jasonwryan.com/blog/2010/09/28/command-line-notes/" title="My post in 2010">command line note utility</a>.
-I have used this setup on all of my machines on a daily basis since and it has worked
-marvellously. Symlinking to a folder in
-<a href="https://www.dropbox.com/home" title="Dropbox home">Dropbox</a> means that the notes are accessible
-from all my machines, including my phone. There has only really been one aspect of this setup
-that has been sub-optimal.</p>
-
-<p>As an inveterate note-taker (this is one of the “benefits” of ageing; the speed with
-which you forget information outpaces the acquisition of newer material) I have—in
-those intervening years—built up quite a store of notes. Consequently, in order to
-maintain a semblance of order, I have arranged them in a series of directories. There
-is a minor flaw with this approach: retreiving a note depended on two factors, a) excellent
-recall<sup>1</sup> and, b) accurately typing out the full path. Neither of these are things that I
-am inherently good at or inclined to master.</p>
-
-<p>This had been irritating me for some time before I came across this
-<a href="http://unix.stackexchange.com/questions/11906/how-to-change-the-target-directory-for-tab-completion" title="Tab completion for notes function">question on Unix &amp; Linux StackExchange</a>.
-This provided me with a partial solution to the issue but, as I note in my answer, I was not
-able to solve it for nested directories, which was my particular use case. Once I had
-muddled my way through the solution on U&amp;L I pushed it to the back of my mind and
-tried to ignore it.</p>
-
-<p>Recently, though, the accumulation of notes and the frustration of trying to access them
-without <kbd>Tab</kbd> completion drove me to do something about it.</p>
-
-<p>The documentation on
-<a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html" title="Bash Manual">programmable completion</a>
-is typically terse and searching the web returns very little in the way of instructions
-as to how to accomplish this.<sup>2</sup> Undeterred, I decided to hack up a completion
-function that worked for nested directories.</p>
-
-<p>What I arrived at was this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">shopt</span> -s globstar
-</span><span class='line'><span class="nb">shopt</span> -s progcomp
-</span><span class='line'>
-</span><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> <span class="nv">$HOME</span>/.notes/<span class="s2">&quot;$*&quot;</span>.txt ;<span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'> <span class="c"># completion for notes</span>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>cur
-</span><span class='line'>    <span class="nv">cur</span><span class="o">=</span><span class="k">${</span><span class="nv">COMP_WORDS</span><span class="p">[COMP_CWORD]</span><span class="k">}</span>
-</span><span class='line'>    <span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**<span class="o">)</span>
-</span><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;${files[@]##*/}&quot;</span>
-</span><span class='line'>    <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="k">$(</span> <span class="nb">compgen</span> -f <span class="s2">&quot;${file[@]}&quot;</span> -- <span class="k">${</span><span class="nv">cur</span><span class="k">}</span> <span class="k">)</span> <span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
-</span></code></pre></div></figure>
-
-
-<p>The best that can be said about it is that it <em>nearly</em> works…<sup>3</sup></p>
-
-<p>Realising that I was completely out of my depth, I turned to #bash for help, and
-I was indeed fortunate that
-<a href="https://github.com/geirha" title="geirha's Gitgub">geihra</a> offered some much needed
-assistance. geirha&#8217;s solution is an elegant one:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
-</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**/<span class="s2">&quot;$2&quot;</span>*<span class="o">)</span>
-</span><span class='line'>    <span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
-</span></code></pre></div></figure>
-
-
-<p>In addition to working exactly as I hoped, it had the benefit of introducing me
-to a couple more bash concepts that I hadn&#8217;t encountered;
-<a href="http://mywiki.wooledge.org/BashGuide/Arrays" title="Bash Guide on Greg's Wiki">adding elements to an array</a>
-with <code>+=()</code> being one. For posterity, the full script is:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
-</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>nls<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>tree -CR --noreport <span class="nv">$HOME</span>/.notes | awk <span class="s1">&#39;{ </span>
-</span><span class='line'><span class="s1">    if (NF==1) print $1; </span>
-</span><span class='line'><span class="s1">    else if (NF==2) print $2; </span>
-</span><span class='line'><span class="s1">    else if (NF==3) printf &quot;  %s\n&quot;, $3 </span>
-</span><span class='line'><span class="s1">    }&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'> <span class="c"># TAB completion for notes</span>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**/<span class="s2">&quot;$2&quot;</span>*<span class="o">)</span>
-</span><span class='line'>    <span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
-</span></code></pre></div></figure>
-
-
-<h4>Notes</h4>
-
-<ol>
-<li>The alternative to remembering the full path name is to list all of the notes before
-each operation with the <code>nls</code> function; this is not ideal either…</li>
-<li>Which means that it is either so straightforward that few have bothered to write up their
-experiences (most likely), or so arcane that not many have bothered (how it
-feels to me). However, there are a couple of pages that I referenced in addition
-to the official documentation:
-
-<ul>
-<li><a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html">Adam Backstrong&#8217;s post</a></li>
-<li><a href="http://fahdshariff.blogspot.co.nz/2011/04/writing-your-own-bash-completion.html">Fahd Shariff&#8217;s post</a></li>
-<li><a href="http://devmanual.gentoo.org/tasks-reference/completion/index.html">Gentoo Development Guide</a></li>
-</ul>
-</li>
-<li>It fails, as geirha pointed out, because it breaks the filenames on whitespace.</li>
-</ol>
-
-
-<p>Creative Commons image on Flickr by
-<a href="http://www.flickr.com/photos/nicholasjon/4101203095/" title="Field Notes etc on Flickr">nicholasjon</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/18/trolls/">Trolling Arch Linux</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-18T10:47:00+12:00" pubdate data-updated="true">Aug 18<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/troll.jpg" title="'Troll on Flickr'" >
-I posted recently about
-<a href="http://jasonwryan.com/blog/2012/08/04/systemd/" title="Some thoughts on moving across…">my experiences shifting to systemd</a>
-and how I found it, for all three of my Arch machines, to be a relatively simple and
-straightforward process which, in the intervening weeks, has borne out the views of
-the developers and other members of the community who have been using it for a longer
-period—it works, and works well. At the start of this week, Stéphane Gaudreault
-announced on Arch-dev-public the intention to
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-August/023389.html" title="ML post seeking developer views">replace the original initscripts with systemd</a>.</p>
-
-<p>The reaction by some to this announcement was, to me, quite disappointing. My view of
-open source communities is that by participating you are entering into a social contract.
-That contract is that, as you are reliant on the goodwill of the wider community it is
-incumbent on you to ensure that your overall contribution—in whatever form—brings
-more to the community than it takes away. At the very least, you can strive to ensure
-that it is a value neutral exchange.</p>
-
-<p>Sadly, for some of the trolls on the <acronym title="Mailing lists">MLs</acronym>, that
-is patently not the case. I want to take a closer look at just one of those threads, for two
-reasons. First, it is a textbook case of a particularly pernicious troll. And second, in
-conjunction with some other factors, it had an especially damaging effect on the wider
-community.</p>
-
-<p>The thread in question is on Arch-general, the largest of the mailing lists. It has
-the suitably alarmist title
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029856.html" title="A trolling we will go…">Think twice before moving to systemd</a>.
-The troll, who has had only minimal involvement with the Arch community up until this
-unfortunate moment starts by framing his “concern”<sup>1</sup>:</p>
-
-<blockquote><p>I just became aware that Arch Linux plans to switch to systemd, and this worries me for several reasons.</p></blockquote>
-
-
-<p>Felipe is worried. Ergo, <em>we</em> should be worried. Why should we be worried? Because,
-despite the fact that systemd has been discussed and used by Archers since the
-<a href="https://bbs.archlinux.org/viewtopic.php?id=96316" title="57 page thread on the Arch BBS">middle of 2010</a>,
-it has just come to his attention and now, with the formidable powers of his intellect,
-he has detected a disturbance in the force.</p>
-
-<blockquote><p>I tried systemd a while ago in a brand new machine with Arch Linux and the boot was *much slower*. After some exchanges with Lennart Poettering and other people in Google+[1], it became clear I was on my own. Eventually I found the culprit: Fedora uses CONFIG_HZ_1000, and Arch Linux uses CONFIG_HZ_300. It became clear to me that systemd was not ready for prime time, it wasn&#8217;t thoroughly tested in a lot of machines, and if you have problems Lennart Poettering will blame you (PulseAudio sounds familiar?).</p></blockquote>
-
-
-<p>The salient phrases here are “it became clear I was on my own” and the even more telling,
-“it became clear to me that systemd was not ready for prime time.” Once I had managed to
-wipe away the tears of gratitude that were coursing down my cheeks, I realized that Arch
-finally had finally found what it had been missing for all these years: a saviour. We
-were going to be OK after all.</p>
-
-<p>Felipe has “found the culprit.” Despite the best efforts of the Arch developers, upstream,
-the other distros that have been using it for considerably longer, and the experience of the
-<a href="https://bbs.archlinux.org/viewtopic.php?pid=1147676" title="Thread on systemd - one of many">Arch users reported on our boards</a>,
-no-one had the heroic ability to see through to the heart of this conundrum and expose
-systemd for the fraud that it is.</p>
-
-<p>But our gratitude should be tempered with some shame for we, the Arch community, have let
-Felipe down. We haven&#8217;t lived up to the standards he expects of us. As he gently admonishes us:
-“I was expecting more from the Arch Linux community.” Yes, Felipe, and you were right to.
-We let you down; can you forgive us?</p>
-
-<p>The thread goes on to generate more than 50 replies. All of them wasted.
-His trolling is not interested in facts, in reason or logic; his method of argumentation is
-not rational, and he is not interested in working toward an understanding
-of the truth; he just wants to be right. At whatever cost to the wider community. These posts,
-and trolls in other fora
-<a href="https://lkml.org/lkml/2012/4/12/434" title="LKML exchange with Linus Torvalds">like this one</a>,<sup>2</sup>
-are really about gratifying Felipe&#8217;s own voracious appetite for self-aggrandisement. In reality,
-of course, it is a stunning illustration of the
-<a href="https://secure.wikimedia.org/wikipedia/en/wiki/Dunning%E2%80%93Kruger_effect" title="Wikipedia entry">Dunning-Kruger effect</a>.
-It would be pathetic if it were a victimless pursuit; but it is not.</p>
-
-<p>Further down in the thread we see the inevitable frustration of the developer who leads
-this work for Arch,
-<a href="https://www.archlinux.org/developers/#tomegun" title="Tom's developer profile">Tom Gunderson</a>,
-finally <a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029933.html" title="Tom's reply quoting Linus">boil over</a>.
-This precipitates another thread where Tom announces that he will
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029960.html" title="Tom's mail to the list">no longer participate in this list</a>.
-This is from the developer that has patiently and constructively engaged with Arch users on the
-list around this issue for the past several months. On his own time.</p>
-
-<p>That is the impact of trolls like Felipe. That is a direct effect of his selfishness on the
-wider community. What has he brought to the community? Dissent, distraction and posturing.
-What has he taken away? The ability for all of us to engage with one of the developers
-of the software we all use. His presence on the list, and that of a few others,
-has been nothing short of corrosive.</p>
-
-<p>And as for the smoking gun, the config setting that no-one was smart enough to
-discover? Denis A. Altoé Falqueto went to the trouble to build another kernel
-and run a test and, contrary to Felipe who provided no such evidence,
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/030145.html" title="Denis' post">posted the results</a>.
-You can guess the outcome.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>See the <a href="http://www.urbandictionary.com/define.php?term=concern+troll">concern troll</a>.</li>
-<li>Read the whole thread to fully understand how obstinance can trump reason… See
-also his <a href="http://felipec.wordpress.com/2012/05/26/no-mercurial-branches-are-still-not-better-than-git-ones-response-to-jhws-more-on-mercurial-vs-git-with-graphs/">own blog</a>
-where he expresses incredulity that his comments on another blog have been deleted.</li>
-</ol>
-
-
-<p>Creative Commons image of the troll on Flickr by
-<a href="http://www.flickr.com/photos/56380734@N05/6937763971/">Comrade Foot</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -464,6 +391,14 @@ where he expresses incredulity that his comments on another blog have been delet
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/03/02/forking/">Forking Arch</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/08/documentation/">Read The Fine Manual</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/01/25/uefi/">Hi-UEFI Way</a>
       </li>
     
@@ -473,14 +408,6 @@ where he expresses incredulity that his comments on another blog have been delet
     
       <li class="post">
         <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/09/28/screencast/">A dwm Screencast</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a>
       </li>
     
   </ul>

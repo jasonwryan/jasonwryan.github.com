@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="If you have spent any time at all amongst online (or, for that matter,
-off-line) communities, you will be familiar with the help vampire. If,
-by &hellip;">
+  <meta name="description" content="Over the last week I have been moving my blog over to Octopress,
+a lightweight blogging framework for Jekyll,
+the static site generator powering &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,268 @@ by &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/30/octopress/">Moving to Octopress</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-30T12:30:00+13:00" pubdate data-updated="true">Mar 30<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
+
+<p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
+a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
+the static site generator powering <a href="http://pages.github.com/">Github Pages</a>. I had previously
+been posting to a <a href="https://www.tumblr.com/">tumblr</a> page and, over the nearly four years that
+I had been doing that I had somehow racked up just over 4000 posts. I was <em>not</em>
+looking forward to migrating across.</p>
+
+<p>However, the fact that the Jekyll project has a number of scripts for
+<a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">migrating from other platforms</a>
+assuaged my concerns about the difficulty of this task. That sense of relief was shortlived.
+Neither of the two tumblr migration scripts were of any assistance: both would die during their
+initial runs, probably due to some funky characters in the post titles, or perhaps the posts themselves.</p>
+
+<p>I certainly had no intention of trying to wade through the entire back catalogue identifying the
+rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the
+“straightforward” nature of the task, I saw this setback as an opportunity to cull all of the
+cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
+some interest.</p>
+
+<p>Being an assiduous record keeper, all of the posts were helpfully bookmarked on
+<a href="https://pinboard.in/u:jasonwryan/t:jwr/">Pinboard under one tag</a>, and therefore it was
+simple enough to create a list of the required <acronym title="Unique Resource Locator">URLs</acronym>.
+Armed with this list, it was just a matter of cobbling together a script to do the bulk of
+the work for me.</p>
+
+<p>The first task was to retrieve the posts from the list:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grab files</span>
+</span><span class='line'><span class="k">while </span><span class="nb">read </span>url; <span class="k">do </span>
+</span><span class='line'><span class="k">    </span>wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
+</span><span class='line'><span class="k">done</span> &lt; /home/jason/Scripts/list
+</span></code></pre></div></figure>
+
+
+<p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
+surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># strip HTML cruft</span>
+</span><span class='line'><span class="k">for </span>file in *.html; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.*}&quot;</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>mkdir html <span class="o">&amp;&amp;</span> mv *.html html/
+</span></code></pre></div></figure>
+
+
+<p>The final task of this part of the migration was to convert the HTML into
+<a href="http://daringfireball.net/projects/markdown/">markdown</a>,
+the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
+the &#8220;universal document converter&#8221; handled that job:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># convert to markdown format</span>
+</span><span class='line'><span class="k">for </span>file in *; <span class="k">do </span>
+</span><span class='line'><span class="k">    </span>pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;$file&quot;</span>.md
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></div></figure>
+
+
+<p>The final result was fifty markdown files holding all of my posts, almost ready to
+be committed to github. I say “almost” because the files still required what turned out to
+be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would
+inexpicably break <a href="http://www.notareallink.com">multi word
+hyperlinks</a> over two lines. Similarly all of the internal
+links to my other posts pointed to the (meaningless) tumblr URLs<sup>2</sup>.</p>
+
+<p>Setting up Octopress was extremely simple and quick by comparison: the
+<a href="http://octopress.org/docs/">documentation is very helpful</a>. There was one slight
+hitch, a <a href="https://github.com/tmm1/pygments.rb/issues/10">known issue on Arch x86_64</a>,
+which was simple enough to deal with.</p>
+
+<p>While the migration was not entirely pain-free, I am pleased that I have done it. Tumblr&#8217;s service
+increasingly <a href="https://twitter.com/#!/jasonwryan/statuses/176543962276954112">left a lot to be desired</a>
+but as it was a free service, I couldn&#8217;t complain too much. Or, more accurately, when I did complain,
+no-one actually listened…</p>
+
+<p>Indeed, moving to a paid service like Github
+(yes, it&#8217;s free at first, but once you have enough data there you need to pay a small amount
+every month) <a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/">makes a lot of sense</a>.
+The paid services I do use, like <a href="http://pinboard.in/">Pinboard</a> and
+<a href="http://www.tarsnap.com/">Tarsnap</a> are both inexpensive and much more
+reliable than their free counterparts<sup>3</sup>; and you get to invest in great
+software that is a pleasure to use.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Initially, I had set up the site as a simple holding page and dumped a whole lot
+of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
+mostly just that sort of internet detritus…</li>
+<li>For creating redirections (Github pages do <em>not</em> support <span class="file">.htaccess</span>)
+I can&#8217;t recommend enough the
+<a href="https://github.com/rawsyntax/jekyll_alias_generator/blob/master/_plugins/alias_generator.rb">Jekyll Alias Generator</a>.
+Just. Brilliant.</li>
+<li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/23/key/">Signing Your Own Key</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-23T11:36:00+13:00" pubdate data-updated="true">Mar 23<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/key.jpg" alt="image" /></p>
+
+<p>Some time in the last couple of days, the last of the packages in the
+Community repository were signed and, thanks to the tremendous work of
+the Arch developers and Trusted Users, you can fully implement package
+signing in your <span class="file">/etc/pacman.conf</span>.</p>
+
+<p>You can check the state of the signed packages with this <code>expac</code>
+one-liner; it will return a list of any <em>unsigned</em> packages:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
+</span></code></pre></div></figure>
+
+
+<p>Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
+take advantage of this. My overall <code>SigLevel</code> setting requires signed
+packages, and—as of yesterday—I was able to move the last repository
+entry over to do the same:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>core<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>extra<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>community<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>multilib<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span></code></pre></div></figure>
+
+
+<p>The next step was to add my key to pacman’s keychain so that I could
+sign the packages that I build using ABS or from the
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>. Allan has an
+<a href="http://allanmcrae.com/2011/08/pacman-package-signing-1-makepkg-and-repo-add/" title="The first in a series of four posts on signing: read them all">excellent post on setting this up</a>.</p>
+
+<p>First, import your key into pacman’s keyring:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
+</span></code></pre></div></figure>
+
+
+<p>Then follow the prompts as you edit the key to sign, set a trust level
+and save your key:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
+</span><span class='line'>gpg&gt; lsign
+</span><span class='line'>...
+</span><span class='line'>gpg&gt; trust
+</span><span class='line'>...
+</span><span class='line'>gpg&gt; save
+</span></code></pre></div></figure>
+
+
+<p>Then it is just a matter of changing the <code>BUILDENV</code> option in your
+<span class="file">/etc/makepkg.conf</span>, which is set to <code>!sign</code>
+by default. Remove the bang and include the details of the key you wish to use:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#-- Packager: name/email of the person or organization building packages</span>
+</span><span class='line'><span class="nv">PACKAGER</span><span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
+</span><span class='line'><span class="c">#-- Specify a key to use for package signing</span>
+</span><span class='line'><span class="nv">GPGKEY</span><span class="o">=</span><span class="s2">&quot;B1BD4E40&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Now, when you build a package, you will be prompted for your key’s
+passphrase:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...
+</span><span class='line'>
+</span><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
+</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
+</span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21
+</span><span class='line'>
+</span><span class='line'>Enter passphrase:
+</span></code></pre></div></figure>
+
+
+<p>Enter the correct passphrase and your package is built and signed:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
+</span></code></pre></div></figure>
+
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/donovan_beeson/3185668524/" title="Coraline key on Flickr">donovanbeeson</a>
+on Flickr.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -212,245 +474,6 @@ appearance:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-09T16:52:00+13:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
-
-<p>If you are an Arch Linux user and you are not using
-<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
-you can take a moment to hang your head in shame before you click on to
-whatever the next thing is. The package description sums up perfectly
-what aurphan does:</p>
-
-<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
-today!</p></blockquote>
-
-<p>Running <code>aurphan -a</code>, for example, will identify any
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
-database that are not currently maintained; allowing you to log in to
-the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
-fulfilled.<sup>1</sup></p>
-
-<p>If, like most Archers, you have a compulsive desire to automate
-<em>everything</em> then clearly typing (or even remembering to type) <code>aurphan
--a</code> into a terminal periodically is as ludicrous as it is onerous. The
-obvious answer is some shell script and a cron job.</p>
-
-<p>First, the <code>cron</code> job:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
-</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
-</span></code></pre></div></figure>
-
-
-<p>Then, as part of my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="Script in mercurial repo">dwm-status script</a>,
-a function to check that there are no new additions to the file and, if
-there are, flash a highlight:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>
-</span><span class='line'>    <span class="nv">aurphans</span><span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">        </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
-</span><span class='line'>    <span class="k">fi</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></div></figure>
-
-
-<p>The awk filter excludes a null return, which is “No aurphans found.”
-Now, if any of the packages that I use from the AUR are disowned, I’ll
-be the first to know about it.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Actual feeling may differ depending on the package you have adopted
-and the amount of prescription painkillers that you are currently
-ingesting…</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/02/13/chroot/">Chroot in LVM on LUKS on Raid: Arch Linux</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-02-13T10:25:00+13:00" pubdate data-updated="true">Feb 13<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/chroot-lvm.jpg" alt="image" /></p>
-
-<p>In <a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on setting this system up">my previous post describing this setup</a>
-I made the point that grub won’t be installed and that it is necessary
-to <code>chroot</code> in to install grub on both drives. This is the procedure I use
-to do that—and to perform any other maintenance that requires working
-from a live environment.</p>
-
-<p>Again, most of this information is on the
-<a href="https://wiki.archlinux.org/index.php/Chroot" title="Arch wiki page">Arch Wiki chroot page</a>, I
-am just going to fill in the detail around this setup: LVM on LUKS on
-Raid1.</p>
-
-<p>Once you have booted into your live environment, load the modules that
-are required; in this case: <code>raid1</code>, <code>dm-mod</code> and <code>dm-crypt</code>.</p>
-
-<p>Check that udev hasn’t helpfully read the superblock of your Raid drives
-and assembled phantom arrays:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/mdstat
-</span></code></pre></div></figure>
-
-
-<p>I find that there are a couple there generally assigned the names
-<span class="file">/dev/md126</span> and <span class="file">/dev/md127</span>.
-These need to be stopped before assembling the correct arrays:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
-</span><span class='line'>mdadm --assemble /dev/md0 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
-</span><span class='line'>mdadm --assemble /dev/md1 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
-</span></code></pre></div></figure>
-
-
-<p>You should now have both your arrays up and running. The next step is to
-unlock your encrypted device:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
-</span></code></pre></div></figure>
-
-
-<p>After entering your passphrase, your device will be unlocked. Next, make
-the logical volumes available, and then check they are correct:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vgchange --available y vgroup
-</span><span class='line'>lvscan
-</span></code></pre></div></figure>
-
-
-<p>At this point, you are ready to mount the devices and <code>chroot</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir /mnt/arch
-</span><span class='line'>mount /dev/mapper/vgroup-lvroot /mnt/arch
-</span></code></pre></div></figure>
-
-
-<p>The next steps are straight from the wiki:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
-</span><span class='line'>mount -t proc proc proc/
-</span><span class='line'>mount -t sysfs sys sys/
-</span><span class='line'>mount -o <span class="nb">bind</span> /dev dev/
-</span></code></pre></div></figure>
-
-
-<p>Mount the other parts of the system that you need to use in your
-recovery – in this case, I need my <span class="file">/boot</span> partition:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
-</span></code></pre></div></figure>
-
-
-<p>Now <code>chroot</code> to the device and define your shell:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>chroot . /bin/bash
-</span></code></pre></div></figure>
-
-
-<p>The wiki has some good advice about customizing your prompt to reinforce
-the fact that you are in a chroot:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>With everything mounted, it is just a matter of performing your
-maintenance. To reinstall <code>grub</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grub</span>
-</span><span class='line'>grub&gt; find /grub/stage1
-</span><span class='line'>grub&gt; device <span class="o">(</span>hd0<span class="o">)</span> /dev/sda
-</span><span class='line'>grub&gt; root <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>grub&gt; setup <span class="o">(</span>hd0<span class="o">)</span>
-</span><span class='line'>grub&gt; quit
-</span></code></pre></div></figure>
-
-
-<p>Repeat for <span class="file">/dev/sdb</span> and both your drives will be bootable in the event
-that one fails.</p>
-
-<p>With the maintenance accomplished, all that remains is to exit the
-<code>chroot</code> and unmount the devices cleanly:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">exit</span>
-</span><span class='line'>umount <span class="o">{</span>proc,sys,dev,boot...<span class="o">}</span>
-</span><span class='line'><span class="nb">cd</span> ..
-</span><span class='line'>umount arch/
-</span><span class='line'>reboot
-</span></code></pre></div></figure>
-
-
-<p>Simple.</p>
-
-<p>Creative Commons image by
-<a href="http://www.flickr.com/photos/mpd01605/4152508668/" title="Rescue Engine 6 on Flickr">MPD01605</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -468,6 +491,14 @@ that one fails.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/03/02/forking/">Forking Arch</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/08/documentation/">Read The Fine Manual</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/01/25/uefi/">Hi-UEFI Way</a>
       </li>
     
@@ -477,14 +508,6 @@ that one fails.</p>
     
       <li class="post">
         <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/09/28/screencast/">A dwm Screencast</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a>
       </li>
     
   </ul>
