@@ -34,5 +34,6 @@ You will find me in a couple of other places around the web:
 
 ### Old Blog ###
 You can also find all of my old posts on public sector communications
-on the [Network of Public Sector Communicators site](http://psnetwork.org.nz/blog/)
-
+on the Wayback Machine's archive of the 
+[Network of Public Sector Communicators site](http://web.archive.org/web/20080912133553/http://www.psnetwork.org.nz/blog/)
+(because the Network people haven't figured out the whole Internet thing yet, apparently…)
