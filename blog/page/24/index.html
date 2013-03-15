@@ -5,14 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Command Line Notes - jasonwryan.com</title>
+  <title>jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="A couple of weeks ago, I came across these
-simple bash functions
-written by Jack Mottram of One Thing Well for managing text
-notes. The functions as &hellip;">
+  <meta name="description" content="OpenOffice won’t recognize TrueType fonts with the extension .otf, so you need to convert them to .ttf
+in order to use them in that suite. sudo apt- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +19,7 @@ notes. The functions as &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2010/09/28/command-line-notes">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/24">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -83,12 +81,15 @@ notes. The functions as &hellip;">
 </nav>
   <div id="main">
     <div id="content">
-      <div>
-<article class="hentry" role="article">
+      <div class="blog-index">
   
+  
+  
+    <article>
+      
   <header>
     
-      <h1 class="entry-title">Command Line Notes</h1>
+      <h1 class="entry-title"><a href="/blog/2009/03/17/install-otf-fonts-in-openoffice/">Install .otf Fonts in OpenOffice</a></h1>
     
     
       <p class="meta">
@@ -104,142 +105,73 @@ notes. The functions as &hellip;">
   
 
 
-<time datetime="2010-09-28T17:56:00+13:00" pubdate data-updated="true">Sep 28<span>th</span>, 2010</time>
+<time datetime="2009-03-17T19:51:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2009</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-1.png" alt="image" /></p>
+  <div class="entry-content"><p>OpenOffice won’t recognize TrueType fonts with the extension <code>.otf</code>, so you need to convert them to <code>.ttf</code>
+in order to use them in that suite.</p>
 
-<p>A couple of weeks ago, I came across these
-<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
-written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
-notes.</p>
-
-<p>The functions as described in the article are so:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$*&quot;</span>.txt <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$*&quot;</span> <span class="o">}</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install fontforge
 </span></code></pre></div></figure>
 
 
-<p>Unfortunately, the second function – for retrieving the list of files in
-the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
-and it will only list files in the top level directory. If you are an
-inverterate note taker, this plainly won’t scale.</p>
+<p>If all the <code>.otf</code> files are in the same folder, then you are good to go.</p>
 
-<p>My first attempt at hacking a solution yielded this little beauty:</p>
+<p>First, you need the conversion script, which I found in <a href="url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this%20post[/url">this post</a>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\ </span>
-</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
+<figure class='code'><figcaption><span>otf2ttf.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/local/bin/fontforge</span>
+</span><span class='line'><span class="c"># Quick and dirty hack: converts a font to truetype (.ttf)</span>
+</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Opening &quot;</span>+<span class="nv">$1</span><span class="o">)</span>;
+</span><span class='line'>Open<span class="o">(</span><span class="nv">$1</span><span class="o">)</span>;
+</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Saving &quot;</span>+<span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
+</span><span class='line'>Generate<span class="o">(</span><span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
+</span><span class='line'>Quit<span class="o">(</span>0<span class="o">)</span>;
 </span></code></pre></div></figure>
 
 
-<p>Which removes <code>ls</code> from the function and allows nested directories, but
-is needlessly complex and, with four pipes, hideously <del>inefficient</del>
-inelegant.</p>
+<p>Save it as <code>otf2ttf.sh</code> into the folder with the <code>.otf</code> files.</p>
 
-<p>After reading up on Awk, particularly
-<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
-I arrived at something marginally longer but relying solely on the
-awesome power of awk to make the various transformations I was seeking…</p>
+<p>Then run:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
-</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">for </span>i in *.otf; <span class="k">do </span>fontforge -script otf2ttf.sh <span class="nv">$i</span>; <span class="k">done</span>
 </span></code></pre></div></figure>
 
 
-<p>An added advantage is that it is scalable irrespective of how deep the
-directories go. I’m sure that with some more awk-foo I could write a
-more effective set of conditionals, but this seemed a pretty good start
-for a simple note taking utility.</p>
+<p>Move all the converted fonts to your your shared directory:</p>
 
-<h3>Updated 3/11/10</h3>
-
-<p>To remove a little of the visual clutter, I amended the awk script to
-strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
-</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo mv *ttf /usr/share/fonts/truetype/myfonts/
 </span></code></pre></div></figure>
 
 
-<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
-in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
-symlink to it from <span class="file">~/.notes</span>.</p>
+<p>And then change the permissions and reload the cache:</p>
 
-<h5>Notes</h5>
-
-<ol>
-<li><p>See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.</p></li>
-<li><p>Obligatory “after” screenshot:</p></li>
-</ol>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/
+</span><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/*.ttf
+</span><span class='line'>sudo <span class="nb">fc</span>-cache -f -v
+</span></code></pre></div></figure>
 
 
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/cli-notes-2.png" title="'Screenshot of editing text'" ></p>
+<p>And the fonts will now appear in OpenOffice. Easy.</p>
 </div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
-
-      
-
-
-
-
-
-
-
-
   
 
 
-<time datetime="2010-09-28T17:56:00+13:00" pubdate data-updated="true">Sep 28<span>th</span>, 2010</time>
-      
-
-<span class="categories">
+    </article>
   
-    <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/linux/'>linux</a>
-  
-</span>
-
-
-    </p>
+  <div class="pagination">
     
-      <div class="sharing">
-  
-  
-  
-</div>
-
+    <a href="/blog/archives">Blog Archives</a>
     
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/2010/08/06/mailers/" title="Previous Post: 5 Alternate Mail Clients">&laquo; 5 Alternate Mail Clients</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2010/10/03/sessions-in-tmux/" title="Next Post: Sessions in tmux">Sessions in tmux &raquo;</a>
-      
-    </p>
-  </footer>
-</article>
-
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a class="next" href="/blog/page/23/">Newer &rarr;</a>
+    
+  </div>
 </div>
-  </section>
-
-</div>
-
 <aside class="sidebar">
   
     <section>
@@ -272,7 +204,7 @@ symlink to it from <span class="file">~/.notes</span>.</p>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating...</li>
+    <li class="loading">Status updating&#8230;</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -288,7 +220,7 @@ symlink to it from <span class="file">~/.notes</span>.</p>
 
 <section>
   <h1>My Pinboard</h1>
-  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
   <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
 </section>
 <script type="text/javascript">
@@ -311,7 +243,7 @@ symlink to it from <span class="file">~/.notes</span>.</p>
   #lastfmList li{ text-align: left; }
 </style>
 <ul id="lastfmList">
-  <li class="loading">Updating tracks...</li>
+  <li class="loading">Updating tracks&#8230;</li>
 </ul>
 <p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
 
@@ -363,7 +295,6 @@ function showLastfmFeed(xml){
   
 </aside>
 
-
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -378,10 +309,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       var disqus_shortname = 'jasonwryan';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2010/09/28/command-line-notes/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2010/09/28/command-line-notes/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

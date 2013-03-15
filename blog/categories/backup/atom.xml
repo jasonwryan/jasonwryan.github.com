@@ -4,7 +4,7 @@
   <title><![CDATA[Category: backup | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/backup/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-03-15T06:26:39+13:00</updated>
+  <updated>2013-03-16T11:49:52+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,120 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[BitTorrent Sync Alpha]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/03/16/sync/"/>
+    <updated>2013-03-16T10:17:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/03/16/sync</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/syncapp.png" title="'BitTorrent Sync logo'" >
+I have posted about using <a href="http://dropbox.com" title="dropbox homepage">dropbox</a> quite
+<a href="https://duckduckgo.com/?sites=jasonwryan.com&amp;q=dropbox" title="DDG search results">a few times</a>
+over the last couple of years; it is one of those utilities that quickly insinuates itself
+into an indispensable niche in your workflow and, consequently, can be <em>very</em> difficult to
+dislodge. Perhaps because it has started to glue together so much of the way I work, I have
+been wondering when I would find a replacement that would deliver all, or much, of the
+functionality, without the standard
+<a href="http://arstechnica.com/security/2012/07/dropbox-confirms-it-got-hacked-will-offer-two-factor-authentication/" title="Ars post on the dropbox hack">cloud security issues</a>,
+that seem to bedevil these services.<sup>1</sup></p>
+
+<p>When I saw that BitTorrent had release a distributed synching app called—appropriately—
+<a href="http://blog.bittorrent.com/2013/01/24/test-bittorrent-sync-pre-alpha/" title="Blog post on sync release">Sync</a>,
+I <a href="http://labs.bittorrent.com/experiments/sync.html" title="Invitation form">signed up for the Alpha</a> and
+have been running it in lieu of dropbox for the past three weeks. My initial reaction is,
+that for a first release, it is very impressive.</p>
+
+<p>Essentially, Sync uses the
+<a href="https://en.wikipedia.org/wiki/Bittorent" title="Wikipedia entry">bittorrent peer-to-peer protocol</a>
+and encryption
+(<a href="https://en.wikipedia.org/wiki/Aes_256" title="Wikipedia entry on the standard">AES 256</a>
+using a private key based on the secret generated for each shared folder)
+to sync files between your machines—or anyone with whom you share the secret
+for a particular directory. This has several advantages over dropbox, from my perspective.
+First and foremost, you are not relying on some third party for security<sup>2</sup>, storage
+and uptime. Secondly, all of the traffic between your devices is encrypted. And finally,
+it is free (sadly, only as in beer).</p>
+
+<h3>Positives</h3>
+
+<p>So what does it do well? It is ridiculously easy to setup. You download the binary, start
+the app and then (on Linux) use the web interface to setup your first synching folder by
+generating a secret and then nominating a folder to share. On your next machine, enter the
+secret and select or create the shared folder and your files will be synched. Done.</p>
+
+<p>On a headless machine, there is a config file that you can create:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --dump-sample-config &gt; syncapp.conf
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Edit it to suit your requirements, and then start <code>syncapp</code> with that configuration:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --config /path/to/syncapp.conf
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>and you are away, happily synching.</p>
+
+<p>Like other applications that use the bittorrent protocol, it can take a minute or
+two for the synching to begin, but once it does I found it—over the Internet as well
+as my <acronym title="Local Area Network">LAN</acronym> to be much faster than
+dropbox. Another plus.</p>
+
+<h3>Areas for improvement</h3>
+
+<p>It is Alpha software so there are some areas where you can expect to see improvements
+with subsequent release. For me, that includes:</p>
+
+<ul>
+<li>Better command line tools; the current limited set are servicable, but could do
+with more flexibility and options</li>
+<li>The ability to create your own secret, rather than rely on generated ones</li>
+<li>A less fragile config file; it is written in JSON and the simplest errors will
+break it</li>
+<li>More Linux love; the other platforms have a much more sophisticated <acronym title="User Interface">UI</acronym></li>
+</ul>
+
+
+<p>A comparison with dropbox is not entirely fair; there are some things that dropbox
+does—like versioning—that Sync can/will not do. Dropbox also allows you to host
+public files and folders, meaning that you can
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on using dropbox to host dotfiles">setup a basic webpage</a>
+or <a href="https://www.dropbox.com/sh/t6ko1rbl9edy8p4/OkwVLtY5fO" title="My Top 10 Albums">share a photo album</a>.
+Sync clearly isn't designed for this.</p>
+
+<p>However, in some other respects, like architectures
+for example, Sync is already a better choice. The ARMv6 port means that I am able
+to run it on my Raspberry Pi, and that I have been able to update my
+<a href="http://jasonwryan.com/blog/2011/11/07/irc-dzen/" title="Post on IRC highlights">IRC notification system</a>
+to use Sync rather than dropbox and it is working perfectly well.</p>
+
+<p>There is one area, though, where I wish the BitTorrent team would be a lot more
+forthcoming. There has been an unanswered question on the Sync forums for
+over three weeks now asking
+<a href="http://forum.bittorrent.com/topic/8816-will-syncapp-be-open-source/" title="Syncapp Forums">will Syncapp be open sourced?</a>
+Aside from the issue of whether or not the source will be made available (and I am guessing
+that given their reticence to answer the question on their boards the prognosis
+is not promising) people using the application now should know under what terms
+they are using it.</p>
+
+<p>In the absence of any definitive licensing, I can only assume that the application
+is covered by BitTorrent's
+<a href="http://www.bittorrent.com/legal/eula" title="Licensing agreement on BitTorrent site">default EULA</a>.
+That ambiguity means that I am happy to participate in the
+trial and provide feedback, but I won't be using the app for any remotely
+sensitive data and I am unlikely to do so until that issue is clarified.</p>
+
+<p>I'll install <a href="http://sparkleshare.org/" title="Sparkleshare site">Sparkleshare</a>
+and give that a shot instead…</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Naturally, there are more issues at play here than just their (in)security policies.</li>
+<li>Assuming, of course, you trust what BitTorrent pack into the binary…</li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[rsync + SSH Backups]]></title>

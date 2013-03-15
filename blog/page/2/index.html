@@ -9,9 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have used TrueCrypt since just before
-I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
-It is an &hellip;">
+  <meta name="description" content="Just before Christmas my
+EeePC 901 started
+to behave erratically. Rather than prolong the final throes, I decided to replace it and,
+after looking &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +85,119 @@ It is an &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/01/25/uefi/">Hi-UEFI Way</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-25T19:35:00+13:00" pubdate data-updated="true">Jan 25<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/uefi.jpg" title="'Samsung Series 9 Laptop'" >
+Just before Christmas my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src" title="Bitbucket repo for Archer">EeePC 901</a> started
+to behave erratically. Rather than prolong the final throes, I decided to replace it and,
+after looking around and having played with a colleague&#8217;s
+<a href="http://www.cnet.com.au/samsung-series-9-13-inch-2012-339341806.htm" title="CNet Review">Samsung Series 9</a>,
+I decided that I would swallow my pride, pay the Windows tax and opt for one of these sleek, fast
+little notebooks. Given my experience with it over the last six to eight weeks, I am confident that
+it was a decision that I am unlikely to regret.</p>
+
+<p>The machine came with
+<a href="https://en.wikipedia.org/wiki/Windows_8#Secure_boot" title="Wikipedia entry on Windows 8">Secure Boot</a>
+enabled and running Windows 8.<sup>1</sup> After sedulously ignoring the mounting number
+of posts on the Arch boards that had <acronym title="Unified Extensible Firmware Interface">UEFI</acronym>
+in the title, initially convinced that it had something to do with Apple hardware and therefore
+would be unlikely to impact on me at any point in the future, I now found myself in the position of
+having to understand all of the disparate elements involved in UEFI booting.</p>
+
+<p>This proved to be a non-trivial task. It is not that there is insufficient information
+available; quite the opposite. The Arch Wiki has a typically thorough
+<a href="https://wiki.archlinux.org/index.php/UEFI" title="Arch Wiki page">entry on UEFI</a>; the real
+challenge is revealed when you scroll to the bottom of that page to the
+<a href="https://wiki.archlinux.org/index.php/UEFI#See_also" title="See also section">reference links</a>
+where you begin to reach an appreciation that this isn&#8217;t a drop-in replacement for
+Grub in the way <a href="http://jasonwryan.com/blog/2012/07/09/syslinux/" title="My post on moving to Syslinux">Syslinux was</a>,
+for example. This is a whole new booting ecosystem.</p>
+
+<p>I wanted a LVM on LUKS setup and, after reading <em>a lot</em> more documentation on
+<a href="https://wiki.archlinux.org/index.php/UEFI_Bootloaders" title="Arch Wiki entry">UEFI bootloaders</a>,
+<a href="https://wiki.archlinux.org/index.php/GPT" title="Arch Wiki GPT page">GUID Partition Tables</a> and
+<a href="http://www.rodsbooks.com/efi-bootloaders/efistub.html" title="Rod Smith's excellent site">EFISTUB</a><sup>2</sup>
+than I had bargained on, I felt reasonably well equipped to proceed. And while this was an
+admittedly time consuming (and sometimes confusing) process, I believe it was worth it.</p>
+
+<p>Once I had a reasonable grasp of the conceptual model—and I am convinced this is the single
+biggest hurdle in this process—I chose the EFISTUB boot approach with
+<a href="http://freedesktop.org/wiki/Software/gummiboot" title="gummiboot homepage">gummiboot</a>,
+as the boot manager; mostly because it seemed the simplest approach (the name may also
+have been a factor).</p>
+
+<p>Armed with all this new knowledge, I embarked on the install process. It didn&#8217;t take long at
+all. Mostly because I couldn&#8217;t boot in UEFI mode from the USB drive.</p>
+
+<p>Turns out a couple of things were thwarting me; one I had disabled Secure Boot
+in the UEFI menu, but had neglected to disable the fast boot option. Secondly,
+and more worryingly, I kept encountering kernel panics once I had got the
+machine to boot. Seems that booting in UEFI mode triggers a nasty
+<a href="https://bugzilla.kernel.org/show_bug.cgi?id=47121" title="On the Kernel bugtracker">bug with the samsung_laptop module</a>.</p>
+
+<p>Once I could boot from the USB drive, I was able to successfully complete the install.
+Rather than include a blow-by-blow account of that process here, I
+have uploaded
+<a href="https://gist.github.com/4618490" title="Gist with installation details">a gist with the details</a>,
+for the morbidly curious or preternaturally bored.</p>
+
+<p>The whole process, for me, epitomised what Arch is really about. No matter how comfortable
+a point you reach with your understanding of the tools you use, the rolling release model
+constantly challenges you to adopt and adapt to new technologies. Sure, I could have just
+opted to boot in regular BIOS mode, but what would be the point of that? I wouldn&#8217;t have
+<em>learned</em> anything.</p>
+
+<p>The other thing that quickly became apparent is that, contrary to some commentary
+on the boards about the
+<a href="https://www.archlinux.org/news/install-media-20120715-released/" title="News item on new install method">removal of the AIF</a>,
+the new install scripts are quite superb; simple, direct and quite unambiguous, the whole
+install procedure now feels a lot more Arch-like. The developers have done a great
+job with these tools.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><p>Surely the worst operating system, at least in terms of the user interface, I have
+had the misfortune to encounter (and I include Vista and Ubuntu&#8217;s Unity in that
+cavalcade of fail)…</p></li>
+<li><p>I&#8217;ll post more on the voluminous documentation around this, and other aspects of
+GNU/Linux, in the coming weeks.</p></li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -304,76 +418,6 @@ more recently, in <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobab
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/09/28/screencast/">A dwm Screencast</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-28T09:18:00+12:00" pubdate data-updated="true">Sep 28<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/dwm-logo.png" title="'dwm logo'" >
-Over the last week as I have been at home convalescing I have, quite unaccountably,
-found myself watching videos of tiling window managers. In all, I have probably watched
-between twenty and thirty of these videos so I feel, quite confidently, that I have a
-firm grasp of what constitutes the genre. Consequently, I also feel that I can&mdash;based
-on the range of the material I have reviewed, and the scrutiny and attention therein
-applied&mdash;share an unequivocal judgement as to the overall quality of the genre: it
-sucks.</p>
-
-<p>Moreover, these videos invariably suck in the same couple of ways; they always lack
-any sort of narration, which means that you are stuck silently watching some sort of
-paroxysm of window rearrangement without <em>any</em> context or explanation, as if the fact
-that you can inflict this sort of injury on an X display is rationale enough. And,
-secondly, just as frequently, they feature a cursor being dragged around the screen
-doing the damage; using the mouse to demonstrate the capabilities of a tiling window
-manager is the sort of vestigial behaviour more commonly associated with pagan
-superstition or mild enfeeblement…</p>
-
-<p>Rather that simply bask in the sense of superiority that these observations have
-afforded me, I thought that I would make my own, more lasting, contribution to the
-canon. I can only describe this process as instructive.</p>
-
-<p><a href="http://www.youtube.com/watch?v=GQ5s6T25jCc"><img class="center" src="https://dl.dropbox.com/u/261312/Blog-images/tower.jpg" title="dwm screencast" ></a></p>
-
-<p>The best that can be said of this video is that, while it sucks just as hard as the others
-that I have reviewed over the past week, it has the distinguishing feature of at least
-sucking <em>differently</em>. For example, it has an audio track, so in theory the actions on the
-screen should be accompanied by the narrator&#8217;s soothing tones. Sadly, this is not the case.
-The crappy quality of my headset, my hoarse throat, and most egregiously, my decision to eschew
-post production and shoot it in one take means that the audio is poorly recorded, and at times
-literally inarticulate, rambling.</p>
-
-<p>If nothing else, the exercise has taught me to really appreciate the work of people who
-do this thing well; Drew Neil&#8217;s excellent
-<a href="http://vimcasts.org/" title="The Vimcasts homepage">Vimcasts</a> being a case in point.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -391,6 +435,10 @@ do this thing well; Drew Neil&#8217;s excellent
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/03/16/sync/">BitTorrent Sync Alpha</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/03/02/forking/">Forking Arch</a>
       </li>
     
@@ -404,10 +452,6 @@ do this thing well; Drew Neil&#8217;s excellent
     
       <li class="post">
         <a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
       </li>
     
   </ul>

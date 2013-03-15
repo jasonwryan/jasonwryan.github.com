@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-03-15T06:26:39+13:00</updated>
+  <updated>2013-03-16T11:49:52+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,122 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[BitTorrent Sync Alpha]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/03/16/sync/"/>
+    <updated>2013-03-16T10:17:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/03/16/sync</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/syncapp.png" title="'BitTorrent Sync logo'" >
+I have posted about using <a href="http://dropbox.com" title="dropbox homepage">dropbox</a> quite
+<a href="https://duckduckgo.com/?sites=jasonwryan.com&amp;q=dropbox" title="DDG search results">a few times</a>
+over the last couple of years; it is one of those utilities that quickly insinuates itself
+into an indispensable niche in your workflow and, consequently, can be <em>very</em> difficult to
+dislodge. Perhaps because it has started to glue together so much of the way I work, I have
+been wondering when I would find a replacement that would deliver all, or much, of the
+functionality, without the standard
+<a href="http://arstechnica.com/security/2012/07/dropbox-confirms-it-got-hacked-will-offer-two-factor-authentication/" title="Ars post on the dropbox hack">cloud security issues</a>,
+that seem to bedevil these services.<sup>1</sup></p>
+
+<p>When I saw that BitTorrent had release a distributed synching app called—appropriately—
+<a href="http://blog.bittorrent.com/2013/01/24/test-bittorrent-sync-pre-alpha/" title="Blog post on sync release">Sync</a>,
+I <a href="http://labs.bittorrent.com/experiments/sync.html" title="Invitation form">signed up for the Alpha</a> and
+have been running it in lieu of dropbox for the past three weeks. My initial reaction is,
+that for a first release, it is very impressive.</p>
+
+<p>Essentially, Sync uses the
+<a href="https://en.wikipedia.org/wiki/Bittorent" title="Wikipedia entry">bittorrent peer-to-peer protocol</a>
+and encryption
+(<a href="https://en.wikipedia.org/wiki/Aes_256" title="Wikipedia entry on the standard">AES 256</a>
+using a private key based on the secret generated for each shared folder)
+to sync files between your machines—or anyone with whom you share the secret
+for a particular directory. This has several advantages over dropbox, from my perspective.
+First and foremost, you are not relying on some third party for security<sup>2</sup>, storage
+and uptime. Secondly, all of the traffic between your devices is encrypted. And finally,
+it is free (sadly, only as in beer).</p>
+
+<h3>Positives</h3>
+
+<p>So what does it do well? It is ridiculously easy to setup. You download the binary, start
+the app and then (on Linux) use the web interface to setup your first synching folder by
+generating a secret and then nominating a folder to share. On your next machine, enter the
+secret and select or create the shared folder and your files will be synched. Done.</p>
+
+<p>On a headless machine, there is a config file that you can create:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --dump-sample-config &gt; syncapp.conf
+</span></code></pre></div></figure>
+
+
+<p>Edit it to suit your requirements, and then start <code>syncapp</code> with that configuration:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --config /path/to/syncapp.conf
+</span></code></pre></div></figure>
+
+
+<p>and you are away, happily synching.</p>
+
+<p>Like other applications that use the bittorrent protocol, it can take a minute or
+two for the synching to begin, but once it does I found it—over the Internet as well
+as my <acronym title="Local Area Network">LAN</acronym> to be much faster than
+dropbox. Another plus.</p>
+
+<h3>Areas for improvement</h3>
+
+<p>It is Alpha software so there are some areas where you can expect to see improvements
+with subsequent release. For me, that includes:</p>
+
+<ul>
+<li>Better command line tools; the current limited set are servicable, but could do
+with more flexibility and options</li>
+<li>The ability to create your own secret, rather than rely on generated ones</li>
+<li>A less fragile config file; it is written in JSON and the simplest errors will
+break it</li>
+<li>More Linux love; the other platforms have a much more sophisticated <acronym title="User Interface">UI</acronym></li>
+</ul>
+
+
+<p>A comparison with dropbox is not entirely fair; there are some things that dropbox
+does—like versioning—that Sync can/will not do. Dropbox also allows you to host
+public files and folders, meaning that you can
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on using dropbox to host dotfiles">setup a basic webpage</a>
+or <a href="https://www.dropbox.com/sh/t6ko1rbl9edy8p4/OkwVLtY5fO" title="My Top 10 Albums">share a photo album</a>.
+Sync clearly isn&#8217;t designed for this.</p>
+
+<p>However, in some other respects, like architectures
+for example, Sync is already a better choice. The ARMv6 port means that I am able
+to run it on my Raspberry Pi, and that I have been able to update my
+<a href="http://jasonwryan.com/blog/2011/11/07/irc-dzen/" title="Post on IRC highlights">IRC notification system</a>
+to use Sync rather than dropbox and it is working perfectly well.</p>
+
+<p>There is one area, though, where I wish the BitTorrent team would be a lot more
+forthcoming. There has been an unanswered question on the Sync forums for
+over three weeks now asking
+<a href="http://forum.bittorrent.com/topic/8816-will-syncapp-be-open-source/" title="Syncapp Forums">will Syncapp be open sourced?</a>
+Aside from the issue of whether or not the source will be made available (and I am guessing
+that given their reticence to answer the question on their boards the prognosis
+is not promising) people using the application now should know under what terms
+they are using it.</p>
+
+<p>In the absence of any definitive licensing, I can only assume that the application
+is covered by BitTorrent&#8217;s
+<a href="http://www.bittorrent.com/legal/eula" title="Licensing agreement on BitTorrent site">default EULA</a>.
+That ambiguity means that I am happy to participate in the
+trial and provide feedback, but I won&#8217;t be using the app for any remotely
+sensitive data and I am unlikely to do so until that issue is clarified.</p>
+
+<p>I&#8217;ll install <a href="http://sparkleshare.org/" title="Sparkleshare site">Sparkleshare</a>
+and give that a shot instead…</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Naturally, there are more issues at play here than just their (in)security policies.</li>
+<li>Assuming, of course, you trust what BitTorrent pack into the binary…</li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Forking Arch]]></title>
@@ -2000,109 +2116,6 @@ Just. Brilliant.</li>
 <li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
 </ol>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Signing Your Own Key]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/03/23/key/"/>
-    <updated>2012-03-23T11:36:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/03/23/key</id>
-    <content type="html"><![CDATA[<p><img src="http://dl.dropbox.com/u/261312/Blog-images/key.jpg" alt="image" /></p>
-
-<p>Some time in the last couple of days, the last of the packages in the
-Community repository were signed and, thanks to the tremendous work of
-the Arch developers and Trusted Users, you can fully implement package
-signing in your <span class="file">/etc/pacman.conf</span>.</p>
-
-<p>You can check the state of the signed packages with this <code>expac</code>
-one-liner; it will return a list of any <em>unsigned</em> packages:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
-take advantage of this. My overall <code>SigLevel</code> setting requires signed
-packages, and—as of yesterday—I was able to move the last repository
-entry over to do the same:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>core<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>extra<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>community<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>multilib<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span></code></pre></div></figure>
-
-
-<p>The next step was to add my key to pacman’s keychain so that I could
-sign the packages that I build using ABS or from the
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>. Allan has an
-<a href="http://allanmcrae.com/2011/08/pacman-package-signing-1-makepkg-and-repo-add/" title="The first in a series of four posts on signing: read them all">excellent post on setting this up</a>.</p>
-
-<p>First, import your key into pacman’s keyring:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
-</span></code></pre></div></figure>
-
-
-<p>Then follow the prompts as you edit the key to sign, set a trust level
-and save your key:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
-</span><span class='line'>gpg&gt; lsign
-</span><span class='line'>...
-</span><span class='line'>gpg&gt; trust
-</span><span class='line'>...
-</span><span class='line'>gpg&gt; save
-</span></code></pre></div></figure>
-
-
-<p>Then it is just a matter of changing the <code>BUILDENV</code> option in your
-<span class="file">/etc/makepkg.conf</span>, which is set to <code>!sign</code>
-by default. Remove the bang and include the details of the key you wish to use:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#-- Packager: name/email of the person or organization building packages</span>
-</span><span class='line'><span class="nv">PACKAGER</span><span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
-</span><span class='line'><span class="c">#-- Specify a key to use for package signing</span>
-</span><span class='line'><span class="nv">GPGKEY</span><span class="o">=</span><span class="s2">&quot;B1BD4E40&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>Now, when you build a package, you will be prompted for your key’s
-passphrase:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...
-</span><span class='line'>
-</span><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
-</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
-</span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21
-</span><span class='line'>
-</span><span class='line'>Enter passphrase:
-</span></code></pre></div></figure>
-
-
-<p>Enter the correct passphrase and your package is built and signed:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
-</span></code></pre></div></figure>
-
-
-<p>Creative Commons image by
-<a href="http://www.flickr.com/photos/donovan_beeson/3185668524/" title="Coraline key on Flickr">donovanbeeson</a>
-on Flickr.</p>
 ]]></content>
   </entry>
   

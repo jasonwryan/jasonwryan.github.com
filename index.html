@@ -9,10 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Over the last couple of months there have been a number of discussions on the Arch boards
-about the
-forum policy
-of only providing support for Arch &hellip;">
+  <meta name="description" content="I have posted about using dropbox quite
+a few times
+over the last couple of years; it is one of those utilities that quickly insinuates itself
+into &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,149 @@ of only providing support for Arch &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/16/sync/">BitTorrent Sync Alpha</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-16T10:17:00+13:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/syncapp.png" title="'BitTorrent Sync logo'" >
+I have posted about using <a href="http://dropbox.com" title="dropbox homepage">dropbox</a> quite
+<a href="https://duckduckgo.com/?sites=jasonwryan.com&amp;q=dropbox" title="DDG search results">a few times</a>
+over the last couple of years; it is one of those utilities that quickly insinuates itself
+into an indispensable niche in your workflow and, consequently, can be <em>very</em> difficult to
+dislodge. Perhaps because it has started to glue together so much of the way I work, I have
+been wondering when I would find a replacement that would deliver all, or much, of the
+functionality, without the standard
+<a href="http://arstechnica.com/security/2012/07/dropbox-confirms-it-got-hacked-will-offer-two-factor-authentication/" title="Ars post on the dropbox hack">cloud security issues</a>,
+that seem to bedevil these services.<sup>1</sup></p>
+
+<p>When I saw that BitTorrent had release a distributed synching app called—appropriately—
+<a href="http://blog.bittorrent.com/2013/01/24/test-bittorrent-sync-pre-alpha/" title="Blog post on sync release">Sync</a>,
+I <a href="http://labs.bittorrent.com/experiments/sync.html" title="Invitation form">signed up for the Alpha</a> and
+have been running it in lieu of dropbox for the past three weeks. My initial reaction is,
+that for a first release, it is very impressive.</p>
+
+<p>Essentially, Sync uses the
+<a href="https://en.wikipedia.org/wiki/Bittorent" title="Wikipedia entry">bittorrent peer-to-peer protocol</a>
+and encryption
+(<a href="https://en.wikipedia.org/wiki/Aes_256" title="Wikipedia entry on the standard">AES 256</a>
+using a private key based on the secret generated for each shared folder)
+to sync files between your machines—or anyone with whom you share the secret
+for a particular directory. This has several advantages over dropbox, from my perspective.
+First and foremost, you are not relying on some third party for security<sup>2</sup>, storage
+and uptime. Secondly, all of the traffic between your devices is encrypted. And finally,
+it is free (sadly, only as in beer).</p>
+
+<h3>Positives</h3>
+
+<p>So what does it do well? It is ridiculously easy to setup. You download the binary, start
+the app and then (on Linux) use the web interface to setup your first synching folder by
+generating a secret and then nominating a folder to share. On your next machine, enter the
+secret and select or create the shared folder and your files will be synched. Done.</p>
+
+<p>On a headless machine, there is a config file that you can create:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --dump-sample-config &gt; syncapp.conf
+</span></code></pre></div></figure>
+
+
+<p>Edit it to suit your requirements, and then start <code>syncapp</code> with that configuration:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --config /path/to/syncapp.conf
+</span></code></pre></div></figure>
+
+
+<p>and you are away, happily synching.</p>
+
+<p>Like other applications that use the bittorrent protocol, it can take a minute or
+two for the synching to begin, but once it does I found it—over the Internet as well
+as my <acronym title="Local Area Network">LAN</acronym> to be much faster than
+dropbox. Another plus.</p>
+
+<h3>Areas for improvement</h3>
+
+<p>It is Alpha software so there are some areas where you can expect to see improvements
+with subsequent release. For me, that includes:</p>
+
+<ul>
+<li>Better command line tools; the current limited set are servicable, but could do
+with more flexibility and options</li>
+<li>The ability to create your own secret, rather than rely on generated ones</li>
+<li>A less fragile config file; it is written in JSON and the simplest errors will
+break it</li>
+<li>More Linux love; the other platforms have a much more sophisticated <acronym title="User Interface">UI</acronym></li>
+</ul>
+
+
+<p>A comparison with dropbox is not entirely fair; there are some things that dropbox
+does—like versioning—that Sync can/will not do. Dropbox also allows you to host
+public files and folders, meaning that you can
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on using dropbox to host dotfiles">setup a basic webpage</a>
+or <a href="https://www.dropbox.com/sh/t6ko1rbl9edy8p4/OkwVLtY5fO" title="My Top 10 Albums">share a photo album</a>.
+Sync clearly isn&#8217;t designed for this.</p>
+
+<p>However, in some other respects, like architectures
+for example, Sync is already a better choice. The ARMv6 port means that I am able
+to run it on my Raspberry Pi, and that I have been able to update my
+<a href="http://jasonwryan.com/blog/2011/11/07/irc-dzen/" title="Post on IRC highlights">IRC notification system</a>
+to use Sync rather than dropbox and it is working perfectly well.</p>
+
+<p>There is one area, though, where I wish the BitTorrent team would be a lot more
+forthcoming. There has been an unanswered question on the Sync forums for
+over three weeks now asking
+<a href="http://forum.bittorrent.com/topic/8816-will-syncapp-be-open-source/" title="Syncapp Forums">will Syncapp be open sourced?</a>
+Aside from the issue of whether or not the source will be made available (and I am guessing
+that given their reticence to answer the question on their boards the prognosis
+is not promising) people using the application now should know under what terms
+they are using it.</p>
+
+<p>In the absence of any definitive licensing, I can only assume that the application
+is covered by BitTorrent&#8217;s
+<a href="http://www.bittorrent.com/legal/eula" title="Licensing agreement on BitTorrent site">default EULA</a>.
+That ambiguity means that I am happy to participate in the
+trial and provide feedback, but I won&#8217;t be using the app for any remotely
+sensitive data and I am unlikely to do so until that issue is clarified.</p>
+
+<p>I&#8217;ll install <a href="http://sparkleshare.org/" title="Sparkleshare site">Sparkleshare</a>
+and give that a shot instead…</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Naturally, there are more issues at play here than just their (in)security policies.</li>
+<li>Assuming, of course, you trust what BitTorrent pack into the binary…</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -349,119 +492,6 @@ I am indebted to).</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/01/25/uefi/">Hi-UEFI Way</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-01-25T19:35:00+13:00" pubdate data-updated="true">Jan 25<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/uefi.jpg" title="'Samsung Series 9 Laptop'" >
-Just before Christmas my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src" title="Bitbucket repo for Archer">EeePC 901</a> started
-to behave erratically. Rather than prolong the final throes, I decided to replace it and,
-after looking around and having played with a colleague&#8217;s
-<a href="http://www.cnet.com.au/samsung-series-9-13-inch-2012-339341806.htm" title="CNet Review">Samsung Series 9</a>,
-I decided that I would swallow my pride, pay the Windows tax and opt for one of these sleek, fast
-little notebooks. Given my experience with it over the last six to eight weeks, I am confident that
-it was a decision that I am unlikely to regret.</p>
-
-<p>The machine came with
-<a href="https://en.wikipedia.org/wiki/Windows_8#Secure_boot" title="Wikipedia entry on Windows 8">Secure Boot</a>
-enabled and running Windows 8.<sup>1</sup> After sedulously ignoring the mounting number
-of posts on the Arch boards that had <acronym title="Unified Extensible Firmware Interface">UEFI</acronym>
-in the title, initially convinced that it had something to do with Apple hardware and therefore
-would be unlikely to impact on me at any point in the future, I now found myself in the position of
-having to understand all of the disparate elements involved in UEFI booting.</p>
-
-<p>This proved to be a non-trivial task. It is not that there is insufficient information
-available; quite the opposite. The Arch Wiki has a typically thorough
-<a href="https://wiki.archlinux.org/index.php/UEFI" title="Arch Wiki page">entry on UEFI</a>; the real
-challenge is revealed when you scroll to the bottom of that page to the
-<a href="https://wiki.archlinux.org/index.php/UEFI#See_also" title="See also section">reference links</a>
-where you begin to reach an appreciation that this isn&#8217;t a drop-in replacement for
-Grub in the way <a href="http://jasonwryan.com/blog/2012/07/09/syslinux/" title="My post on moving to Syslinux">Syslinux was</a>,
-for example. This is a whole new booting ecosystem.</p>
-
-<p>I wanted a LVM on LUKS setup and, after reading <em>a lot</em> more documentation on
-<a href="https://wiki.archlinux.org/index.php/UEFI_Bootloaders" title="Arch Wiki entry">UEFI bootloaders</a>,
-<a href="https://wiki.archlinux.org/index.php/GPT" title="Arch Wiki GPT page">GUID Partition Tables</a> and
-<a href="http://www.rodsbooks.com/efi-bootloaders/efistub.html" title="Rod Smith's excellent site">EFISTUB</a><sup>2</sup>
-than I had bargained on, I felt reasonably well equipped to proceed. And while this was an
-admittedly time consuming (and sometimes confusing) process, I believe it was worth it.</p>
-
-<p>Once I had a reasonable grasp of the conceptual model—and I am convinced this is the single
-biggest hurdle in this process—I chose the EFISTUB boot approach with
-<a href="http://freedesktop.org/wiki/Software/gummiboot" title="gummiboot homepage">gummiboot</a>,
-as the boot manager; mostly because it seemed the simplest approach (the name may also
-have been a factor).</p>
-
-<p>Armed with all this new knowledge, I embarked on the install process. It didn&#8217;t take long at
-all. Mostly because I couldn&#8217;t boot in UEFI mode from the USB drive.</p>
-
-<p>Turns out a couple of things were thwarting me; one I had disabled Secure Boot
-in the UEFI menu, but had neglected to disable the fast boot option. Secondly,
-and more worryingly, I kept encountering kernel panics once I had got the
-machine to boot. Seems that booting in UEFI mode triggers a nasty
-<a href="https://bugzilla.kernel.org/show_bug.cgi?id=47121" title="On the Kernel bugtracker">bug with the samsung_laptop module</a>.</p>
-
-<p>Once I could boot from the USB drive, I was able to successfully complete the install.
-Rather than include a blow-by-blow account of that process here, I
-have uploaded
-<a href="https://gist.github.com/4618490" title="Gist with installation details">a gist with the details</a>,
-for the morbidly curious or preternaturally bored.</p>
-
-<p>The whole process, for me, epitomised what Arch is really about. No matter how comfortable
-a point you reach with your understanding of the tools you use, the rolling release model
-constantly challenges you to adopt and adapt to new technologies. Sure, I could have just
-opted to boot in regular BIOS mode, but what would be the point of that? I wouldn&#8217;t have
-<em>learned</em> anything.</p>
-
-<p>The other thing that quickly became apparent is that, contrary to some commentary
-on the boards about the
-<a href="https://www.archlinux.org/news/install-media-20120715-released/" title="News item on new install method">removal of the AIF</a>,
-the new install scripts are quite superb; simple, direct and quite unambiguous, the whole
-install procedure now feels a lot more Arch-like. The developers have done a great
-job with these tools.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li><p>Surely the worst operating system, at least in terms of the user interface, I have
-had the misfortune to encounter (and I include Vista and Ubuntu&#8217;s Unity in that
-cavalcade of fail)…</p></li>
-<li><p>I&#8217;ll post more on the voluminous documentation around this, and other aspects of
-GNU/Linux, in the coming weeks.</p></li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -477,6 +507,10 @@ GNU/Linux, in the coming weeks.</p></li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/03/16/sync/">BitTorrent Sync Alpha</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/03/02/forking/">Forking Arch</a>
       </li>
     
@@ -490,10 +524,6 @@ GNU/Linux, in the coming weeks.</p></li>
     
       <li class="post">
         <a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a>
       </li>
     
   </ul>
