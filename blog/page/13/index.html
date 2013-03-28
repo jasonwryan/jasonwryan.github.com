@@ -9,9 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Even with bash completion, endlessly typing and tabbing through the
-directory tree to make a simple change to a config file quickly becomes
-tedious &hellip;">
+  <meta name="description" content="I have been using Tarsnap
+for a couple of months now to backup
+my EeePC.
+Tarsnap’s (superb) tagline is: online backups for the truly paranoid. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +85,100 @@ tedious &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/09/08/tarsnap/">Tarsnap</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-09-08T17:55:00+12:00" pubdate data-updated="true">Sep 8<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap.jpg" alt="image" /></p>
+
+<p>I have been using <a href="http://www.tarsnap.com/" title="Tarsnap homepage">Tarsnap</a>
+for a couple of months now to backup
+<a href="http://jasonwryan.com/blog/2010/10/04/the-setup/" title="My setup">my EeePC</a>.
+Tarsnap’s (superb) tagline is: <code>online backups for the truly paranoid.</code></p>
+
+<p>Essentially, Tarsnap stores your encrypted backups on
+<a href="http://aws.amazon.com/s3//192-5766046-6455343/" title="Amazon page">Amazon’s S3 servers</a>,
+recognizes duplicate data and avoids storing it again, and only deletes
+data once no remaining archives require it. I can recommend it as a
+terrific service for a number of reasons.</p>
+
+<p>It is <em><a href="http://www.tarsnap.com/security.html" title="Security page">secure</a></em>.
+Developed by the FreeBSD Security Officer, there is a
+<a href="http://www.tarsnap.com/bugbounty.html" title="Bug bounty details">bug bounty</a> for
+anyone who does discover bugs or security holes. It is very reasonably
+priced. It is reliable. And most importantly,
+<a href="http://www.tarsnap.com/about.html" title="Tarsnap about page">Dr Colin Percival</a>,
+erstwhile child prodigy and developer, is extremely helpful either on
+the mailing list or IRC if you have any questions or need help.</p>
+
+<p>If, however, you have a quick look at the
+<a href="http://www.tarsnap.com/man-tarsnap.1.html" title="tarsnap(1)">man page</a>, you will
+see that it is not exactly a simple application. After a couple of
+months of trying to remember all of the relevant flags, I searched for a
+script that would simplify the process for me. There are
+<a href="http://duckduckgo.com/?q=tarsnap+%2B+bash+script" title="DDG results">a few online</a>,
+but they are all intended to fully automate the process (which makes
+sense for something like backups)…</p>
+
+<p>What I was looking for, however, was something more interactive: more
+along the lines of a prompt. So, realizing I would have to scratch my
+own itch, I wrote a wrapper script to assist my failing memory.</p>
+
+<p>The script prints out a menu of the available options and, once you have
+selected the activity that you would like (creating a new snapshot,
+deleting an old one etc.,), then the script checks if any further input
+is required, for example, the name of the snapshot to delete, and then
+executes it. It is nothing flash, but it works…</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tarsnap2.png" alt="image" /></p>
+
+<p>You can <a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/snap" title="Snap script in mercurial repo">grab the script</a>
+from my mercurial repo. It’s written in bash, but if you require
+<a href="http://tldp.org/LDP/abs/html/portabilityissues.html" title="Advanced Bash Scripting Guide">portability</a>,
+it shouldn’t be too hard to tweak.</p>
+
+<h4>Updated 3/10/11</h4>
+
+<p>I have rewritten the script to be
+<a href="http://pubs.opengroup.org/onlinepubs/9699919799/" title="POSIX Standard at the Open Group">POSIX compliant</a>
+and also to better conform to basic UNIX behaviours, in terms of the
+options etc. It should now be good to run in most shells.</p>
+
+<h5>Notes</h5>
+
+<p>Creative Commons licensed image by
+<a href="http://www.flickr.com/photos/declanjewell/2447653142/" title="Flickr image credit">Declan TM</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -367,113 +462,6 @@ it is passed to Vimprobable in <code>tabbed</code>.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/10/setting-tmux-statusbar-if-in-x/">Setting tmux statusbar if in X</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-06-10T22:56:00+12:00" pubdate data-updated="true">Jun 10<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5636783883/" title="Arch Linux: dwm, tmux &amp; scratchpad by jasonwryan, on Flickr"><img src="http://farm6.static.flickr.com/5303/5636783883_5b7272453b.jpg" alt="Arch Linux: dwm, tmux &amp; scratchpad" /></a></p>
-
-<p>I have been posting quite a bit about
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a> of late<sup>1</sup>.
-It is a marvellous application and lends itself to all sorts of interesting
-uses. When you first install it, you will find a number of user config
-files in <span class="file">/usr/share/tmux/</span>. I started with tmux by copying
-<a href="http://cinderwick.ca/" title="Thayer Williams' site">Thayer’s</a> config across
-and then working up from there. There is a section
-<a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
-that has always puzzled me, and so I decided to get to the bottom of it.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># show some useful stats but only when tmux is started</span>
-</span><span class='line'><span class="c"># outside of Xorg, otherwise dwm statusbar shows these already </span>
-</span></code></pre></div></figure>
-
-
-<p>It is a great idea. If you are running tmux in X, then you have
-<a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
-what the time is,
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="dwm status bar in my mercurial repo">how much battery you have left</a>
-etc,. You don’t need to replicate that functionality in tmux. If,
-however, you are in the console, you don’t have that information, unless
-you print it in tmux’s statusbar.</p>
-
-<p>I had tried to get this to work once or twice over the last couple of
-years, but never persevered with it. However, as I have been doing a bit
-of work making the console as functional as possible<sup>2</sup>, I thought I
-would revisit it.</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status1.png" alt="image" /></p>
-
-<p>The insight that I had that got it working for me was to use the
-source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
-depending if X was running or not. I just adapted Thayer’s code, like
-so:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Statusbar starting in X or not</span>
-</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
-</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>And then created those files with the desired statusbar options. So, for
-example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
-loaded:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Statusbar if tmux run in console</span>
-</span><span class='line'><span class="c"># information normally in dwm bar</span>
-</span><span class='line'><span class="nb">set</span> -g status-right-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
-</span></code></pre></div></figure>
-
-
-<p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png" alt="image" /></p>
-
-<p>All the relevant files are in
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.tmux" title="My mercurial repository">my mercurial repo</a>.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p><a href="http://jasonwryan.com/blog/2011/06/07/copy-and-paste-in-tmux/" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
-<a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/" title="Sessions in tmux">Sessions in tmux</a>
-&amp; <a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/" title="Intro to tmux">Introduction to tmux</a></p></li>
-<li><p><a href="http://jasonwryan.com/blog/2011/04/06/vim-colours-in-the-console/" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
-<li><p>Image squashed to fit the requirements of this blog…</p></li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/14/">&larr; Older</a>
@@ -491,6 +479,10 @@ loaded:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/03/16/sync/">BitTorrent Sync Alpha</a>
       </li>
     
@@ -504,10 +496,6 @@ loaded:</p>
     
       <li class="post">
         <a href="/blog/2013/01/25/uefi/">Hi-UEFI Way</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a>
       </li>
     
   </ul>

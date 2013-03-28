@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="After eight years as a bureaucrat1 working in a
-central agency
-in New Zealand&#8217;s public service, I have hung up the grey cardigan. While I am &hellip;">
+  <meta name="description" content="One of the great things about starting a new job at
+an open source company
+is having the freedom to use the tools that suit your workflow, rather &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,164 @@ in New Zealand&#8217;s public service, I have hung up the grey cardigan. While I
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-21T11:23:00+12:00" pubdate data-updated="true">Apr 21<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/addressbook.png" title="'Address Book Icon by bertop on Flickr'" ></p>
+
+<p>One of the great things about starting a new job at
+<a href="http://jasonwryan.com/blog/2012/04/05/catalyst/" title="My post on joining Catalyst IT">an open source company</a>
+is having the freedom to use the tools that suit your workflow, rather than
+having to suffer the indignity of whatever the IT department consider to be the
+lowest comon denominator. Suffice to say, I have had a lot of fun this week
+setting up my working environment—and the ocassional hiccough as I was forced to learn
+something new…</p>
+
+<p>One of those “learning opportunities” consisted of trying to get my mail client,
+<a href="http://www.mutt.org/" title="All mail clients suck. This one just sucks less.">mutt</a>
+to talk to the <acronym title="Lightweight Directory Acces Protocol">LDAP</acronym>
+directory over <acronym title="Secure Sockets Layer">SSL</acronym> so that I could
+query the shared address book. There are a number of helpful blog posts that describe
+using <a href="http://www.spinnaker.de/lbdb/" title="The Little Brother Database homepage">lbdb</a>
+with <code>mutt</code><sup>1</sup>. Unfortunately, after a lot of searching, I was unable to find
+any documentation on achieving this integration over a secure connection.
+I kept seeing this error:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>Error: Search failed. LDAP server returned an error : 13, description: TLS
+</span><span class='line'>confidentiality required at /usr/lib/mutt_ldap_query line 198, &lt;DATA&gt; line 558.
+</span></code></pre></div></figure>
+
+
+<p>Several hours later, and with some
+help from <a href="https://twitter.com/#!/ibeardslee" title="Ian on Twitter: follow him…">@ibeardslee</a>,
+I managed to set it up, and it was definitely worth the effort.</p>
+
+<p>You will need to install <code>lbdb</code> from
+<a href="http://aur.archlinux.org/packages.php?ID=10225" title="AUR package">the AUR</a>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cowerd lbdb     <span class="c"># 2</span>
+</span></code></pre></div></figure>
+
+
+<p>…and a couple of packages from the repos to make it all work:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl-ldap perl-io-socket-ssl netkit-bsd-finger
+</span></code></pre></div></figure>
+
+
+<p>Then it is a matter of configuring <code>lbdb</code> to both
+query the LDAP directory and be able to be called from <code>mutt</code>.
+First, copy the config files into your <span class="file">$HOME</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir .lbdb
+</span><span class='line'>cp /etc/lbdb.rc .lbdb/lbdbrc
+</span><span class='line'>cp /etc/lbdb_ldap.rc .lbdb/ldap.rc
+</span></code></pre></div></figure>
+
+
+<p>And then modify the two configuration files to suit your setup:
+The first, <span class="file">$HOME/.lbdb/lbdbrc</span>, is well commented and
+self-explanatory; add <code>ldap</code> to the methods and the
+nickname of your server:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">METHODS</span><span class="o">=</span><span class="s2">&quot;m_abook m_ldap&quot;</span>
+</span><span class='line'><span class="nv">LDAP_NICKS</span><span class="o">=</span><span class="s2">&quot;catalyst&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>The second config file, <span class="file">$HOME/.lbdb/ldap.rc</span>
+is written in Perl and is a bit of a shocker:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='perl'><span class='line'><span class="nv">%ldap_server_db</span> <span class="o">=</span> <span class="p">(</span>
+</span><span class='line'>    <span class="s">&#39;catalyst&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;${mail}&#39;</span><span class="p">,</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># hostname of your ldap server</span>
+</span><span class='line'><span class="nv">$ldap_server</span> <span class="o">=</span> <span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$search_base</span> <span class="o">=</span> <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_search_fields</span>    <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_expected_answers</span> <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_result_email</span>     <span class="o">=</span> <span class="s">&#39;${mail}&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_result_realname</span>  <span class="o">=</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ignorant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_bind_dn</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$ldap_bind_password</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="mi">1</span><span class="p">;</span>
+</span></code></pre></div></figure>
+
+
+<p>The key is to ensure that you use both the <code>ldaps</code>
+prefix <strong>and</strong> explicitely specify the SSL port, 636. Without both of these, you will
+get the TLS confidentiality error.</p>
+
+<p>You can then test that it is working correctly by running a query:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>lbdbq jemima
+</span></code></pre></div></figure>
+
+
+<p>All going well, if there is indeed a Jemima in the shared address book, you will see her
+contact details miraculously appear before you. If there is more than one, you will have a
+list to choose from.</p>
+
+<p>Finally, you just need to set up <code>mutt</code> to query <code>lbdb</code>.
+In your <span class="file">muttrc</span>, add the following:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">query_command</span> <span class="o">=</span> <span class="s2">&quot;lbdbq %s 2&gt;/dev/null&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>I found that suppressing the errors made the whole experience a little smoother. You
+may not require it… Now, hitting <kbd>Shift</kbd><kbd>q</kbd> in <code>mutt</code>
+brings up a prompt to query the LDAP directory (and my <a href="http://abook.sourceforge.net/" title="abook homepage">abook</a> address book that I share via
+<a href="https://www.dropbox.com/" title="Dropbox homepage">dropbox</a>). You can also access the directory
+by starting to type an email address and then hitting <kbd>Ctrl</kbd><kbd>t</kbd> to see
+a list of possible completions.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk&#8217;s post</a> got me started.</li>
+<li>A <a href="https://bitbucket.org/jasonwryan/eeepc/src/f15bf6e51e62/Scripts/cowerd" title="Script in bitbucket repo">wrapper script for cower</a></li>
+</ol>
+
+
+<p>Creative Commons image <a href="http://www.flickr.com/photos/bertop/2530620838/">by bertop on Flickr</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -308,136 +466,6 @@ Just. Brilliant.</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/23/key/">Signing Your Own Key</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-23T11:36:00+13:00" pubdate data-updated="true">Mar 23<span>rd</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/key.jpg" alt="image" /></p>
-
-<p>Some time in the last couple of days, the last of the packages in the
-Community repository were signed and, thanks to the tremendous work of
-the Arch developers and Trusted Users, you can fully implement package
-signing in your <span class="file">/etc/pacman.conf</span>.</p>
-
-<p>You can check the state of the signed packages with this <code>expac</code>
-one-liner; it will return a list of any <em>unsigned</em> packages:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
-take advantage of this. My overall <code>SigLevel</code> setting requires signed
-packages, and—as of yesterday—I was able to move the last repository
-entry over to do the same:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>core<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>extra<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>community<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>multilib<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span></code></pre></div></figure>
-
-
-<p>The next step was to add my key to pacman’s keychain so that I could
-sign the packages that I build using ABS or from the
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>. Allan has an
-<a href="http://allanmcrae.com/2011/08/pacman-package-signing-1-makepkg-and-repo-add/" title="The first in a series of four posts on signing: read them all">excellent post on setting this up</a>.</p>
-
-<p>First, import your key into pacman’s keyring:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
-</span></code></pre></div></figure>
-
-
-<p>Then follow the prompts as you edit the key to sign, set a trust level
-and save your key:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
-</span><span class='line'>gpg&gt; lsign
-</span><span class='line'>...
-</span><span class='line'>gpg&gt; trust
-</span><span class='line'>...
-</span><span class='line'>gpg&gt; save
-</span></code></pre></div></figure>
-
-
-<p>Then it is just a matter of changing the <code>BUILDENV</code> option in your
-<span class="file">/etc/makepkg.conf</span>, which is set to <code>!sign</code>
-by default. Remove the bang and include the details of the key you wish to use:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#-- Packager: name/email of the person or organization building packages</span>
-</span><span class='line'><span class="nv">PACKAGER</span><span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
-</span><span class='line'><span class="c">#-- Specify a key to use for package signing</span>
-</span><span class='line'><span class="nv">GPGKEY</span><span class="o">=</span><span class="s2">&quot;B1BD4E40&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>Now, when you build a package, you will be prompted for your key’s
-passphrase:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...
-</span><span class='line'>
-</span><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
-</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
-</span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21
-</span><span class='line'>
-</span><span class='line'>Enter passphrase:
-</span></code></pre></div></figure>
-
-
-<p>Enter the correct passphrase and your package is built and signed:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
-</span></code></pre></div></figure>
-
-
-<p>Creative Commons image by
-<a href="http://www.flickr.com/photos/donovan_beeson/3185668524/" title="Coraline key on Flickr">donovanbeeson</a>
-on Flickr.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -455,6 +483,10 @@ on Flickr.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/03/16/sync/">BitTorrent Sync Alpha</a>
       </li>
     
@@ -468,10 +500,6 @@ on Flickr.</p>
     
       <li class="post">
         <a href="/blog/2013/01/25/uefi/">Hi-UEFI Way</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a>
       </li>
     
   </ul>

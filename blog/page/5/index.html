@@ -9,10 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
-Arch boards and in the various
-IRC channels.
-It doesn&# &hellip;">
+  <meta name="description" content="Over the last week or so, I have finally gotten around to digging into the whole concept of
+using
+Mercurial Queues
+to manage patches against an &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,219 @@ It doesn&# &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-24T19:18:00+12:00" pubdate data-updated="true">Jul 24<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
+Over the last week or so, I have finally gotten around to digging into the whole concept of
+using
+<a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
+to manage patches against an upstream project; in my case
+<a href="http://dwm.suckless.org" title="The truly suckless window manager…">dwm</a>.<sup>1</sup>
+Essentially, this mercurial extension helps you manage a stack of patches on
+top of a directory tree. This gives you quite a lot of fine-grained control
+over your patchset and assists immeasurably with automating the application of
+patches when the underlying codebase changes.</p>
+
+<p>After having played around with queues for the last couple of days, I am quite
+impressed: both the concept and the execution are simple and powerful. The concept
+of Mercurial Queues is best described in the Mercurial book: the aptly titled,
+<em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
+
+<blockquote><p>MQ&#8217;s marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don&#8217;t like a patch, you can drop it. If a patch isn&#8217;t quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote>
+
+
+<p>I followed Filippo Negroni&#8217;s excellent
+<a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
+to setup my own
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">dwm patchset</a>
+based on
+<a href="http://hg.suckless.org/dwm" title="dwm hg repository">tip</a>, and the process was
+surprisingly straightforward; the only caveat being it is a good idea to plan
+quite carefully what changes you want in each particular patch. Once I had
+completed the setup, it got me thinking about the fact that the final install
+is done without <code>pacman</code>, just using <code>make install</code>. And, as a proof-of-concept
+more than anything else, I wondered whether this functionality could be used
+with <code>makepkg</code>.<sup>3</sup></p>
+
+<p>Turns out, as you might expect with Arch, it was not much of a job to set it
+up at all.</p>
+
+<p><strong>Note</strong>: this doesn&#8217;t mean I think it is a good idea; I was just interested
+to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
+like dwm, this is definitely a case of introducing a huge amount of complexity for
+no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
+
+<p>I have a
+<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD" title="If you must…">working PKGBUILD</a>
+that you can use if you want to follow along at home. Once you have downloaded
+it into <span class="file">dwm-hg/</span>, run <code>makepkg</code> to clone the dwm
+repository and build the binary.  Then you need to make sure that the mercurial
+queue extension is enabled, so your <span class="file">.hgrc</span> needs to
+contain:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
+</span><span class='line'>hgext.mq <span class="o">=</span>
+</span></code></pre></div></figure>
+
+
+<p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
+is <span class="file">dwm-hg/src/dwm</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
+</span></code></pre></div></figure>
+
+
+<p>The next step is to start applying the various patches that you want to comprise
+your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
+and three other patches:
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/statuscolours" title="Patch in mercurial queue">statuscolours</a>,
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/cycle" title="ditto">cycle</a>, and
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/push" title="etc…">push</a>.
+There are other patches in my repository, one of which patches the appropriate
+settings for an Arch build in the
+<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/setup.makefile" title="Arch settings for Makefiles">relevant makefiles</a>.
+This is taken care of by the PKGBUILD in this case.</p>
+
+<p>From here, it is very much as Filippo describes it in his tutorial: make
+some changes, add them to the queue and rinse and repeat:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
+</span><span class='line'> <span class="c"># “hack hack hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
+</span></code></pre></div></figure>
+
+
+<p>After committing each of your changes as a discrete patch, you can review the queue
+with <code>hg qseries</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span></code></pre></div></figure>
+
+
+<p>And <code>hg qapplied</code> will tell you which of the patches is currently
+applied in the working repository; at this stage the list should look
+the same as that in <code>hg qseries</code>. The next step is to remove all of the
+patches from the queue so that we have a clean repository:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop -a
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>popping config.customizations
+</span><span class='line'>patch queue now empty
+</span></code></pre></div></figure>
+
+
+<p>Should you need to edit a patch, it is simply a matter of popping
+to that spot in the stack (you can do so by name or by index
+number, beginning at 0):</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop config.customizations
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>now at: config.customizations
+</span><span class='line'> <span class="c"># “hack hack hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qpush -a
+</span></code></pre></div></figure>
+
+
+<p>Once you are satisfied with the state of the stack, remove all of the
+patches to return to the original clean working directory and <code>cd</code> back
+to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> to
+rebuild the package and you should see the pushed patches as part of
+the output:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
+</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
+</span><span class='line'>applying config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>now at: push
+</span><span class='line'>dwm build options:
+</span></code></pre></div></figure>
+
+
+<p>…and when you restart dwm, your customizations will be applied.
+When new changes are pushed to
+<a href="http://hg.suckless.org/dwm" title="dwm mercurial repo">the dwm repo</a>
+you can just <code>makepkg -fi</code>, and, if any of the patches fail due
+to changes in the underlying code, pop the stack to the failed
+patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
+
+<p>As I said at the beginning of this post, this isn&#8217;t a particularly smart way to
+use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
+better off just cloning dwm to your local repository, initializing a queue
+repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
+sudo make install</code>.</p>
+
+<p>If you have more than one machine, you can easily setup a repository for
+your patchset on
+<a href="https://bitbucket.org/" title="bitbucket free mercurial hosting">bitbucket</a>
+or <a href="http://pikacode.com/" title="Free Mercurial and Git hosting">Pikacode</a>
+and host it there: then just pull the patchset queue
+from your other boxes and <code>hg qpush -a</code>. If you require a slightly
+different patchset for each box, you can use MQ to manage this
+process as well. This is where MQ really excels;
+I&#8217;ll cover this in more detail in my next post.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
+<li>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
+example of thorough, accessible documentation.</li>
+<li>In the case of something like dwm, this is really irrelevant, as there
+is a single tiny binary and a <code>man</code> page, so keeping track of these files on
+your system is not an issue at all.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image by
+<a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -355,120 +568,6 @@ Labels to boot. Brilliant.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/16/misunderstanding/">Misunderstanding Arch</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-16T10:52:00+12:00" pubdate data-updated="true">Jun 16<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/hands.jpg" title="'mutt logo'" ></p>
-
-<p>I am frequently struck by how many people arrive on the
-<a href="https://bbs.archlinux.org/" title="Arch Linux Forums">Arch boards</a> without <em>any</em>
-understanding of how Arch is different from the other GNU/Linux communities
-they may have spent time with (if, indeed, they have spent any time in
-another community before trying Arch). For me, this is akin to arriving in a
-foreign country and not bothering to familiarize yourself at all with the local
-mores and customs; it lies on a spectrum somewhere between ignorance and
-outright arrogance.</p>
-
-<p>The result, inevitably, is that these people are shocked
-when their expectations of how they <em>should</em> be treated are at odds with the
-reception their behaviour invites…</p>
-
-<p>Before venturing any further, I should preface my remarks about this with
-something of a disclaimer. These are my own views and not those of the current,
-or past, forum staff.</p>
-
-<p>One of Arch&#8217;s significant acheivements is the quality of
-<a href="https://wiki.archlinux.org" title="THE best GNU/Linux Wiki">its documentation</a>.
-Not just the technical documentation describing how to install and configure
-Arch, but the cultural documentation that sets out
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="The Arch Way">Arch&#8217;s philosophy</a>
-and <a href="https://wiki.archlinux.org/index.php/Forum_Etiquette" title="Forum Etiquette">standards of behaviour</a>. Both these pages provide clear statements on what to expect when
-using Arch Linux and a clear indication of how to respectfully interact with the
-community when you are seeking help.</p>
-
-<p>The defining statement about Arch&#8217;s intended user base is quite direct and
-unambiguous:</p>
-
-<blockquote><p>Arch Linux targets and accommodates competent GNU/Linux users <br/>by giving them complete control and responsibility over the system.</p><footer><strong>The Arch Way</strong> <cite><a href='https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric'>wiki.archlinux.org/index.php/&hellip;</a></cite></footer></blockquote>
-
-
-<p>The expression “targets and accommodates” doesn&#8217;t exclude other users—for
-example, those that are not necessarily competent, but are wanting to learn
-more about the specifics of how their machines work—it does, however, signal
-quite explicitly what sort of community Arch is. And what it is not.</p>
-
-<p><a href="http://ubuntu.com" title="Ubuntu Linux">Ubuntu</a> is an excellent distribution. Like Arch,
-it has very specific aims and a clear concept of what the Ubuntu community is.
-Popularity is central to Ubuntu&#8217;s culture. People coming from Ubuntu, who
-haven&#8217;t bothered to familiarize themselves with Arch&#8217;s values, often struggle
-to appreciate the difference; leading to comments like this one:</p>
-
-<blockquote><p>Maybe if Arch is friendly and Arch forum is friendly, it might go some<br/>place, who knows…</p><footer><strong>Linux Journal commenter</strong> <cite><a href='http://www.linuxjournal.com/content/arch-way#comment-361974'>www.linuxjournal.com/content/&hellip;</a></cite></footer></blockquote>
-
-
-<p>This was posted in reply to a post on Arch in which the author noted how to
-seek help with Arch Linux:</p>
-
-<blockquote><p>You&#8217;ll find far less hand-holding on the Arch Forums than some of the other<br/>distro&#8217;s forums, and for good reason.  Arch has one of the most informative,<br/>user-friendly wiki&#8217;s out there. Do not, I repeat, DO NOT ask a question in the<br/>forums or on IRC without searching the wiki and the forums first.</p></blockquote>
-
-
-<p>Similarly, looking through the threads in
-<a href="https://bbs.archlinux.org/viewforum.php?id=23" title="Newbie board">Newbie Corner</a>
-will periodically turn up new posters who are indignant at being told to
-<acronym title="Read The Fscking Manual">RTFM</acronym> and see it as some
-sort of <em>personal</em> attack, when in fact it is just someone pointing out the
-obvious to them. The community hasn&#8217;t compiled all that documentation just
-so they can sit around and regurgitate answers for people who are either
-unwilling or incapable of making the minimum amount of  effort required to
-solve their own problems…</p>
-
-<p>If you want handholding, there are plenty of online communities that will
-cater for you. If you install Arch and think that you are automatically entitled
-to immediate support for issues that you encounter, then you are mistaken.
-If you think that Arch will suffer if you don&#8217;t get what you want, then
-your problems extend significantly beyond your choice of distro.</p>
-
-<p>The community has worked hard over the years to keep the signal-to-noise ratio
-on the boards high, that way, the forums remain a helpful resource for the community,
-not a breeding ground for
-<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on parasites…">help vampires</a>.</p>
-
-<h4>Notes</h4>
-
-<p>Flickr Creative Commons image by
-<a href="http://www.flickr.com/photos/angellic/47031159/">si_si_ay</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -486,6 +585,10 @@ not a breeding ground for
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/03/16/sync/">BitTorrent Sync Alpha</a>
       </li>
     
@@ -499,10 +602,6 @@ not a breeding ground for
     
       <li class="post">
         <a href="/blog/2013/01/25/uefi/">Hi-UEFI Way</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a>
       </li>
     
   </ul>

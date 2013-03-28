@@ -5,14 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Building rtorrent on Debian Squeeze - jasonwryan.com</title>
+  <title>Building Vim - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="After setting up my server,
-I wanted to use it as a torrent box. The version of
-rtorrent
-in the Debian stable repositories is 0.8.6, which is &hellip;">
+  <meta name="description" content="Apart from a brief, but nevertheless instructive, flirtation with
+Emacs1 I have
+been a consistent Vim user over the last three
+or four years. Like &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +21,7 @@ in the Debian stable repositories is 0.8.6, which is &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/2011/11/29/rtorrent">
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2013/03/29/vim">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -88,7 +88,7 @@ in the Debian stable repositories is 0.8.6, which is &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Building rtorrent on Debian Squeeze</h1>
+      <h1 class="entry-title">Building Vim</h1>
     
     
       <p class="meta">
@@ -104,76 +104,96 @@ in the Debian stable repositories is 0.8.6, which is &hellip;">
   
 
 
-<time datetime="2011-11-29T21:21:00+13:00" pubdate data-updated="true">Nov 29<span>th</span>, 2011</time>
+<time datetime="2013-03-29T10:17:00+13:00" pubdate data-updated="true">Mar 29<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/rtorrent.png" alt="image" /></p>
+<div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/vim-logo.png" title="'Vim logo'" >
+Apart from a brief, but nevertheless instructive, flirtation with
+<a href="http://www.gnu.org/software/emacs/" title="Emacs homepage">Emacs</a><sup>1</sup> I have
+been a consistent <a href="http://www.vim.org/" title="Vim home">Vim</a> user over the last three
+or four years. Like most Vim users, I have made some progress over that time
+in spite of Vim&#8217;s
+<a href="http://stackoverflow.com/a/1815372/712613" title="SO answer on Vim">notorious learning curve</a>
+and have now reached the point where, belatedly, I think I understand it just enough
+to really grasp how little I actually know. It&#8217;s a milestone that speaks more to
+necessity than gratification, granted.</p>
 
-<p>After <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Post on the HP microserver">setting up my server</a>,
-I wanted to use it as a torrent box. The version of
-<a href="http://libtorrent.rakshasa.no/" title="rtorrent &amp; libtorrent homepage">rtorrent</a>
-in the Debian stable repositories is 0.8.6, which is unfortunate as
-support for <a href="http://en.wikipedia.org/wiki/Magnet_URI_scheme" title="Wikipedia page on magnet URIs">magnet links</a>
-was introduced in 0.8.7.</p>
+<p>In any event, as part of confronting my Vim shortcomings (no
+<a href="http://www.vimgolf.com/" title="Vim golf…">golfing</a> for me), I have been able
+to land on the features of Vim that I require to be enabled so that I am moderately
+productive (in my own, admittedly cloistered, working environment). That, you will
+probably not be surprised to read, does not include needing support for Arabic or
+Farsi to be built into Vim.</p>
 
-<p>To remedy this, I decided to build the current stable version of
-rtorrent, 0.8.9. At the same time—seeing as I was getting my hands dirty
-anyway—I thought I’d patch in colour support.</p>
+<p>Part of the beauty of Vim is that, unlike it&#8217;s
+<a href="http://en.wikipedia.org/wiki/Editor_war#Humor" title="…lacking a decent editor">operating system counterpart Emacs</a>,
+you can choose how much functionality you wish to enable at compile-time. You do want
+support for Farsi? Then the <code>--with-features=big</code> option is what you are looking for.
+If, on the other hand, you just want the barest of bones, editor-wise, you could opt
+for the austere minimalism that is <code>--with-features=tiny</code> and find yourself happily
+transported back in time to
+<a href="https://en.wikipedia.org/wiki/Vi" title="Wikipedia page on Vi">Bill Joy&#8217;s lab in 1976</a>.</p>
 
-<p>This is a straightforward two-step process. First, build the current
-version of libtorrent, 0.12.9:</p>
+<p>You can peruse all of the various features available to Vim using the <code>:help version</code>
+command.<sup>2</sup> There is also
+<a href="http://www.drchip.org/astronaut/vim/vimfeat.html" title="Vim's versions and features">this table</a>
+where the various features are listed against the respective feature flags (tiny, small,
+normal, big &amp; huge).</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
-</span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
-</span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
-</span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
-</span><span class='line'>sudo checkinstall
+<p>After this
+<a href="https://bugs.archlinux.org/task/33019" title="Add +profile to gvim on Flyspray">bug report</a>
+late last year, the default Arch PKGBUILD ships with <code>huge</code> as the feature set. Make
+what you will of that, but for my purposes it is overkill. With all the magic of
+<a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Wiki page on ABS">ABS</a> and
+<code>makepkg</code>, however, it is simple enough to build a Vim package that is tailored
+to exactly your requirements. For me, that means this set of simplified <code>configure</code>
+options:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>  ./configure <span class="se">\</span>
+</span><span class='line'>    --prefix<span class="o">=</span>/usr <span class="se">\</span>
+</span><span class='line'>    --localstatedir<span class="o">=</span>/var/lib/vim <span class="se">\</span>
+</span><span class='line'>    --with-features<span class="o">=</span>normal <span class="se">\</span>
+</span><span class='line'>    --with-compiledby<span class="o">=</span>Arch:jwr <span class="se">\</span>
+</span><span class='line'>    --with-x<span class="o">=</span>yes <span class="se">\</span>
+</span><span class='line'>    --enable-acl <span class="se">\</span>
+</span><span class='line'>    --disable-gui <span class="se">\</span>
+</span><span class='line'>    --disable-signs <span class="se">\</span>
+</span><span class='line'>    --disable-netbeans <span class="se">\</span>
+</span><span class='line'>    --enable-multibyte
 </span></code></pre></div></figure>
 
 
-<p>Once libtorrent is successfully built and installed, you can begin the
-rtorrent build:</p>
+<p>With these options, I have the minimum amount of functionality I comfortably
+require (including the ability to access the system clipboard, <code>--with-x=yes</code>)
+but without the other bloat.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
-</span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
-</span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
-</span></code></pre></div></figure>
+<p>In addition to these changes to the config options, I also strip out all of the
+<code>gvim</code>-related stuff from the PKGBUILD as I do not require it. Even though it
+is a split package, just building <code>vim</code> still includes options superfluous to
+my needs.  As a result, I get Vim with just the features I need, without the
+dependencies of <code>ruby</code> and <code>lua</code> and god knows what else.</p>
 
+<p>I&#8217;m not operating under any illusions about the fact that this is
+really saving a huge amount of space or, for that matter, drastically reducing the
+number of dependencies I have installed. It is partly about understanding how Vim
+works at another level while also catering for the obsessive-compulsive drive to
+micro-control what is and isn&#8217;t installed on my systems. If you want to scratch either
+of the same itches, you can see the full
+<a href="https://bitbucket.org/jasonwryan/shiv/src/e6ccbe61780dfe24a5f7edda0d4b082dbb572e4a/Build/vim/PKGBUILD?at=default" title="Eviscerated Vim PKGBUILD">PKGBUILD in Bitbucket</a>.</p>
 
-<p>Then, if you want colour support, you need the patch. I used the version
-in the
-<a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
-but you can also grab a copy from a paste site:</p>
+<h4>Notes</h4>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
-</span><span class='line'>mv canvas_colour.patch src/
-</span><span class='line'>patch -uNp1 -i canvas_colour.patch
-</span></code></pre></div></figure>
+<ol>
+<li>Still visible in some of my early Arch screenshots
+<a href="http://www.flickr.com/photos/jasonwryan/3748882572/in/photostream" title="Emacs in Openbox">on Flickr</a>…</li>
+<li>The official documentation for the features is also
+<a href="http://vimdoc.sourceforge.net/htmldoc/various.html#+feature-list" title="Vim Feature list">online</a>.</li>
+</ol>
 
-
-<p>The patch should apply cleanly. Then specify where libtorrent is
-installed to ensure that it is linked during the rtorrent build:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
-</span><span class='line'>make
-</span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure>
-
-
-<p>Once again, this should compile cleanly and you will now have rtorrent
-with colour and magnet link support installed in
-<span class="file">/usr/local/bin/rtorrent</span>.</p>
-
-<h5>Notes</h5>
-
-<p>I prefer to use
-<a href="http://asic-linux.com.mx/~izto/checkinstall/" title="checkinstall homepage">checkinstall</a>
-so that self-installed applications are tracked by
-<a href="http://wiki.debian.org/Apt" title="Debian wiki entry">Apt</a>.</p>
 </div>
 
 
@@ -196,12 +216,12 @@ so that self-installed applications are tracked by
   
 
 
-<time datetime="2011-11-29T21:21:00+13:00" pubdate data-updated="true">Nov 29<span>th</span>, 2011</time>
+<time datetime="2013-03-29T10:17:00+13:00" pubdate data-updated="true">Mar 29<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/debian/'>debian</a>, <a class='category' href='/blog/categories/linux/'>linux</a>
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/vim/'>vim</a>
   
 </span>
 
@@ -217,10 +237,8 @@ so that self-installed applications are tracked by
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2011/11/28/rsync/" title="Previous Post: rsync + SSH Backups">&laquo; rsync + SSH Backups</a>
+        <a class="basic-alignment left" href="/blog/2013/03/16/sync/" title="Previous Post: BitTorrent Sync Alpha">&laquo; BitTorrent Sync Alpha</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2011/12/01/readline/" title="Next Post: Readline Bindings in Vi Mode">Readline Bindings in Vi Mode &raquo;</a>
       
     </p>
   </footer>
@@ -373,8 +391,8 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://jasonwryan.github.com/blog/2011/11/29/rtorrent/';
-        var disqus_url = 'http://jasonwryan.github.com/blog/2011/11/29/rtorrent/';
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2013/03/29/vim/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2013/03/29/vim/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-03-16T11:49:52+13:00</updated>
+  <updated>2013-03-29T10:15:47+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,97 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building Vim]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/03/29/vim/"/>
+    <updated>2013-03-29T10:17:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/03/29/vim</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/vim-logo.png" title="'Vim logo'" >
+Apart from a brief, but nevertheless instructive, flirtation with
+<a href="http://www.gnu.org/software/emacs/" title="Emacs homepage">Emacs</a><sup>1</sup> I have
+been a consistent <a href="http://www.vim.org/" title="Vim home">Vim</a> user over the last three
+or four years. Like most Vim users, I have made some progress over that time
+in spite of Vim&#8217;s
+<a href="http://stackoverflow.com/a/1815372/712613" title="SO answer on Vim">notorious learning curve</a>
+and have now reached the point where, belatedly, I think I understand it just enough
+to really grasp how little I actually know. It&#8217;s a milestone that speaks more to
+necessity than gratification, granted.</p>
+
+<p>In any event, as part of confronting my Vim shortcomings (no
+<a href="http://www.vimgolf.com/" title="Vim golf…">golfing</a> for me), I have been able
+to land on the features of Vim that I require to be enabled so that I am moderately
+productive (in my own, admittedly cloistered, working environment). That, you will
+probably not be surprised to read, does not include needing support for Arabic or
+Farsi to be built into Vim.</p>
+
+<p>Part of the beauty of Vim is that, unlike it&#8217;s
+<a href="http://en.wikipedia.org/wiki/Editor_war#Humor" title="…lacking a decent editor">operating system counterpart Emacs</a>,
+you can choose how much functionality you wish to enable at compile-time. You do want
+support for Farsi? Then the <code>--with-features=big</code> option is what you are looking for.
+If, on the other hand, you just want the barest of bones, editor-wise, you could opt
+for the austere minimalism that is <code>--with-features=tiny</code> and find yourself happily
+transported back in time to
+<a href="https://en.wikipedia.org/wiki/Vi" title="Wikipedia page on Vi">Bill Joy&#8217;s lab in 1976</a>.</p>
+
+<p>You can peruse all of the various features available to Vim using the <code>:help version</code>
+command.<sup>2</sup> There is also
+<a href="http://www.drchip.org/astronaut/vim/vimfeat.html" title="Vim's versions and features">this table</a>
+where the various features are listed against the respective feature flags (tiny, small,
+normal, big &amp; huge).</p>
+
+<p>After this
+<a href="https://bugs.archlinux.org/task/33019" title="Add +profile to gvim on Flyspray">bug report</a>
+late last year, the default Arch PKGBUILD ships with <code>huge</code> as the feature set. Make
+what you will of that, but for my purposes it is overkill. With all the magic of
+<a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Wiki page on ABS">ABS</a> and
+<code>makepkg</code>, however, it is simple enough to build a Vim package that is tailored
+to exactly your requirements. For me, that means this set of simplified <code>configure</code>
+options:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>  ./configure <span class="se">\</span>
+</span><span class='line'>    --prefix<span class="o">=</span>/usr <span class="se">\</span>
+</span><span class='line'>    --localstatedir<span class="o">=</span>/var/lib/vim <span class="se">\</span>
+</span><span class='line'>    --with-features<span class="o">=</span>normal <span class="se">\</span>
+</span><span class='line'>    --with-compiledby<span class="o">=</span>Arch:jwr <span class="se">\</span>
+</span><span class='line'>    --with-x<span class="o">=</span>yes <span class="se">\</span>
+</span><span class='line'>    --enable-acl <span class="se">\</span>
+</span><span class='line'>    --disable-gui <span class="se">\</span>
+</span><span class='line'>    --disable-signs <span class="se">\</span>
+</span><span class='line'>    --disable-netbeans <span class="se">\</span>
+</span><span class='line'>    --enable-multibyte
+</span></code></pre></div></figure>
+
+
+<p>With these options, I have the minimum amount of functionality I comfortably
+require (including the ability to access the system clipboard, <code>--with-x=yes</code>)
+but without the other bloat.</p>
+
+<p>In addition to these changes to the config options, I also strip out all of the
+<code>gvim</code>-related stuff from the PKGBUILD as I do not require it. Even though it
+is a split package, just building <code>vim</code> still includes options superfluous to
+my needs.  As a result, I get Vim with just the features I need, without the
+dependencies of <code>ruby</code> and <code>lua</code> and god knows what else.</p>
+
+<p>I&#8217;m not operating under any illusions about the fact that this is
+really saving a huge amount of space or, for that matter, drastically reducing the
+number of dependencies I have installed. It is partly about understanding how Vim
+works at another level while also catering for the obsessive-compulsive drive to
+micro-control what is and isn&#8217;t installed on my systems. If you want to scratch either
+of the same itches, you can see the full
+<a href="https://bitbucket.org/jasonwryan/shiv/src/e6ccbe61780dfe24a5f7edda0d4b082dbb572e4a/Build/vim/PKGBUILD?at=default" title="Eviscerated Vim PKGBUILD">PKGBUILD in Bitbucket</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Still visible in some of my early Arch screenshots
+<a href="http://www.flickr.com/photos/jasonwryan/3748882572/in/photostream" title="Emacs in Openbox">on Flickr</a>…</li>
+<li>The official documentation for the features is also
+<a href="http://vimdoc.sourceforge.net/htmldoc/various.html#+feature-list" title="Vim Feature list">online</a>.</li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[BitTorrent Sync Alpha]]></title>
@@ -2011,111 +2102,6 @@ open source; we are going to be doing our best to accelerate that adoption.</p>
 
 <p>Creative Commons image by <a href="http://www.flickr.com/photos/swamibu/4153715570/lightbox/">Swamibu</a>
 on Flickr</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Moving to Octopress]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/03/30/octopress/"/>
-    <updated>2012-03-30T12:30:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/03/30/octopress</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
-
-<p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
-a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
-the static site generator powering <a href="http://pages.github.com/">Github Pages</a>. I had previously
-been posting to a <a href="https://www.tumblr.com/">tumblr</a> page and, over the nearly four years that
-I had been doing that I had somehow racked up just over 4000 posts. I was <em>not</em>
-looking forward to migrating across.</p>
-
-<p>However, the fact that the Jekyll project has a number of scripts for
-<a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">migrating from other platforms</a>
-assuaged my concerns about the difficulty of this task. That sense of relief was shortlived.
-Neither of the two tumblr migration scripts were of any assistance: both would die during their
-initial runs, probably due to some funky characters in the post titles, or perhaps the posts themselves.</p>
-
-<p>I certainly had no intention of trying to wade through the entire back catalogue identifying the
-rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the
-“straightforward” nature of the task, I saw this setback as an opportunity to cull all of the
-cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
-some interest.</p>
-
-<p>Being an assiduous record keeper, all of the posts were helpfully bookmarked on
-<a href="https://pinboard.in/u:jasonwryan/t:jwr/">Pinboard under one tag</a>, and therefore it was
-simple enough to create a list of the required <acronym title="Unique Resource Locator">URLs</acronym>.
-Armed with this list, it was just a matter of cobbling together a script to do the bulk of
-the work for me.</p>
-
-<p>The first task was to retrieve the posts from the list:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grab files</span>
-</span><span class='line'><span class="k">while </span><span class="nb">read </span>url; <span class="k">do </span>
-</span><span class='line'><span class="k">    </span>wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
-</span><span class='line'><span class="k">done</span> &lt; /home/jason/Scripts/list
-</span></code></pre></div></figure>
-
-
-<p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
-surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># strip HTML cruft</span>
-</span><span class='line'><span class="k">for </span>file in *.html; <span class="k">do</span>
-</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.*}&quot;</span>
-</span><span class='line'><span class="k">done</span>
-</span><span class='line'>mkdir html <span class="o">&amp;&amp;</span> mv *.html html/
-</span></code></pre></div></figure>
-
-
-<p>The final task of this part of the migration was to convert the HTML into
-<a href="http://daringfireball.net/projects/markdown/">markdown</a>,
-the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
-the &#8220;universal document converter&#8221; handled that job:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># convert to markdown format</span>
-</span><span class='line'><span class="k">for </span>file in *; <span class="k">do </span>
-</span><span class='line'><span class="k">    </span>pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;$file&quot;</span>.md
-</span><span class='line'><span class="k">done</span>
-</span></code></pre></div></figure>
-
-
-<p>The final result was fifty markdown files holding all of my posts, almost ready to
-be committed to github. I say “almost” because the files still required what turned out to
-be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would
-inexpicably break <a href="http://www.notareallink.com">multi word
-hyperlinks</a> over two lines. Similarly all of the internal
-links to my other posts pointed to the (meaningless) tumblr URLs<sup>2</sup>.</p>
-
-<p>Setting up Octopress was extremely simple and quick by comparison: the
-<a href="http://octopress.org/docs/">documentation is very helpful</a>. There was one slight
-hitch, a <a href="https://github.com/tmm1/pygments.rb/issues/10">known issue on Arch x86_64</a>,
-which was simple enough to deal with.</p>
-
-<p>While the migration was not entirely pain-free, I am pleased that I have done it. Tumblr&#8217;s service
-increasingly <a href="https://twitter.com/#!/jasonwryan/statuses/176543962276954112">left a lot to be desired</a>
-but as it was a free service, I couldn&#8217;t complain too much. Or, more accurately, when I did complain,
-no-one actually listened…</p>
-
-<p>Indeed, moving to a paid service like Github
-(yes, it&#8217;s free at first, but once you have enough data there you need to pay a small amount
-every month) <a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/">makes a lot of sense</a>.
-The paid services I do use, like <a href="http://pinboard.in/">Pinboard</a> and
-<a href="http://www.tarsnap.com/">Tarsnap</a> are both inexpensive and much more
-reliable than their free counterparts<sup>3</sup>; and you get to invest in great
-software that is a pleasure to use.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Initially, I had set up the site as a simple holding page and dumped a whole lot
-of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
-mostly just that sort of internet detritus…</li>
-<li>For creating redirections (Github pages do <em>not</em> support <span class="file">.htaccess</span>)
-I can&#8217;t recommend enough the
-<a href="https://github.com/rawsyntax/jekyll_alias_generator/blob/master/_plugins/alias_generator.rb">Jekyll Alias Generator</a>.
-Just. Brilliant.</li>
-<li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
-</ol>
-
 ]]></content>
   </entry>
   

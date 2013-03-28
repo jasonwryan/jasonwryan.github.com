@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-03-16T11:49:52+13:00</updated>
+  <updated>2013-03-29T10:15:47+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,100 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building Vim]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/03/29/vim/"/>
+    <updated>2013-03-29T10:17:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/03/29/vim</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/vim-logo.png" title="'Vim logo'" >
+Apart from a brief, but nevertheless instructive, flirtation with
+<a href="http://www.gnu.org/software/emacs/" title="Emacs homepage">Emacs</a><sup>1</sup> I have
+been a consistent <a href="http://www.vim.org/" title="Vim home">Vim</a> user over the last three
+or four years. Like most Vim users, I have made some progress over that time
+in spite of Vim's
+<a href="http://stackoverflow.com/a/1815372/712613" title="SO answer on Vim">notorious learning curve</a>
+and have now reached the point where, belatedly, I think I understand it just enough
+to really grasp how little I actually know. It's a milestone that speaks more to
+necessity than gratification, granted.</p>
+
+<p>In any event, as part of confronting my Vim shortcomings (no
+<a href="http://www.vimgolf.com/" title="Vim golf…">golfing</a> for me), I have been able
+to land on the features of Vim that I require to be enabled so that I am moderately
+productive (in my own, admittedly cloistered, working environment). That, you will
+probably not be surprised to read, does not include needing support for Arabic or
+Farsi to be built into Vim.</p>
+
+<p>Part of the beauty of Vim is that, unlike it's
+<a href="http://en.wikipedia.org/wiki/Editor_war#Humor" title="…lacking a decent editor">operating system counterpart Emacs</a>,
+you can choose how much functionality you wish to enable at compile-time. You do want
+support for Farsi? Then the <code>--with-features=big</code> option is what you are looking for.
+If, on the other hand, you just want the barest of bones, editor-wise, you could opt
+for the austere minimalism that is <code>--with-features=tiny</code> and find yourself happily
+transported back in time to
+<a href="https://en.wikipedia.org/wiki/Vi" title="Wikipedia page on Vi">Bill Joy's lab in 1976</a>.</p>
+
+<p>You can peruse all of the various features available to Vim using the <code>:help version</code>
+command.<sup>2</sup> There is also
+<a href="http://www.drchip.org/astronaut/vim/vimfeat.html" title="Vim's versions and features">this table</a>
+where the various features are listed against the respective feature flags (tiny, small,
+normal, big &amp; huge).</p>
+
+<p>After this
+<a href="https://bugs.archlinux.org/task/33019" title="Add +profile to gvim on Flyspray">bug report</a>
+late last year, the default Arch PKGBUILD ships with <code>huge</code> as the feature set. Make
+what you will of that, but for my purposes it is overkill. With all the magic of
+<a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Wiki page on ABS">ABS</a> and
+<code>makepkg</code>, however, it is simple enough to build a Vim package that is tailored
+to exactly your requirements. For me, that means this set of simplified <code>configure</code>
+options:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>  ./configure <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;--prefix<span class="o">=</span>/usr <span class="se">\</span>
+</span><span class='line'>--localstatedir<span class="o">=</span>/var/lib/vim <span class="se">\</span>
+</span><span class='line'>--with-features<span class="o">=</span>normal <span class="se">\</span>
+</span><span class='line'>--with-compiledby<span class="o">=</span>Arch:jwr <span class="se">\</span>
+</span><span class='line'>--with-x<span class="o">=</span>yes <span class="se">\</span>
+</span><span class='line'>--enable-acl <span class="se">\</span>
+</span><span class='line'>--disable-gui <span class="se">\</span>
+</span><span class='line'>--disable-signs <span class="se">\</span>
+</span><span class='line'>--disable-netbeans <span class="se">\</span>
+</span><span class='line'>--enable-multibyte
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>With these options, I have the minimum amount of functionality I comfortably
+require (including the ability to access the system clipboard, <code>--with-x=yes</code>)
+but without the other bloat.</p>
+
+<p>In addition to these changes to the config options, I also strip out all of the
+<code>gvim</code>-related stuff from the PKGBUILD as I do not require it. Even though it
+is a split package, just building <code>vim</code> still includes options superfluous to
+my needs.  As a result, I get Vim with just the features I need, without the
+dependencies of <code>ruby</code> and <code>lua</code> and god knows what else.</p>
+
+<p>I'm not operating under any illusions about the fact that this is
+really saving a huge amount of space or, for that matter, drastically reducing the
+number of dependencies I have installed. It is partly about understanding how Vim
+works at another level while also catering for the obsessive-compulsive drive to
+micro-control what is and isn't installed on my systems. If you want to scratch either
+of the same itches, you can see the full
+<a href="https://bitbucket.org/jasonwryan/shiv/src/e6ccbe61780dfe24a5f7edda0d4b082dbb572e4a/Build/vim/PKGBUILD?at=default" title="Eviscerated Vim PKGBUILD">PKGBUILD in Bitbucket</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Still visible in some of my early Arch screenshots
+<a href="http://www.flickr.com/photos/jasonwryan/3748882572/in/photostream" title="Emacs in Openbox">on Flickr</a>…</li>
+<li>The official documentation for the features is also
+<a href="http://vimdoc.sourceforge.net/htmldoc/various.html#+feature-list" title="Vim Feature list">online</a>.</li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[BitTorrent Sync Alpha]]></title>
@@ -415,119 +509,6 @@ cavalcade of fail)…</p></li>
 GNU/Linux, in the coming weeks.</p></li>
 </ol>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Replacing TrueCrypt]]></title>
-    <link href="http://jasonwryan.github.com/blog/2013/01/10/truecrypt/"/>
-    <updated>2013-01-10T16:02:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2013/01/10/truecrypt</id>
-    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/lock.jpg" title="'Flickr image of lock'" >
-I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
-I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
-It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
-the fly and—for the especially paranoid—to hide the existence of those volumes from
-inquisitive others.</p>
-
-<p>In the intervening years, with all aspects of my personal life
-increasingly mediated digitally, in order to properly safeguard my privacy,
-and that of my family, I have taken to using LUKS to
-<a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on LVM on LUKS">fully encrypt all of my machines</a>.
-And I have used TrueCrypt, both personally and for work, to encrypt some of my USB drives and as
-a container in <a href="http://dropbox.com/" title="Dropbox homepage">Dropbox</a>
-, for as long as
-<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on sharing dotfiles with Dropbox">I have used that service</a>.</p>
-
-<p>Early last year, however, I became aware of concerns that TrueCrypt was not truly open source; that almost
-all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
-free (as in Freedom) software:</p>
-
-<p><blockquote><p>The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered "free" by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.</p><footer><strong>Wikipedia entry on TrueCrypt</strong> <cite><a href='https://en.wikipedia.org/wiki/Truecrypt'>en.wikipedia.org/wiki/Truecrypt/&hellip;</a></cite></footer></blockquote></p>
-
-<p>When I initially accessed the page, in February 2012, there was also a paragraph—now removed—that
-highlighted further, more alarmist, concerns about the shadowy identity of the people behind
-TrueCrypt:</p>
-
-<p><blockquote><p>The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]</p><footer><strong>Wikipedia entry retrieved in February 2012</strong> <cite><a href='https://en.wikipedia.org/w/index.php?title=TrueCrypt&amp;diff=478623780&amp;oldid=478608477'>en.wikipedia.org/w/&hellip;</a></cite></footer></blockquote></p>
-
-<p>While I don't subscribe to the theory that the CIA have planted a backdoor in the software (if they
-had, <a href="https://en.wikipedia.org/wiki/Truecrypt#Operation_Satyagraha" title="FBI operation foiled by TC">it clearly doesn't work</a>),
-I was relieved to see at the end of last year that someone had written a simple utility that allows
-you to manage TrueCrypt containers from the command line; <a href="https://github.com/bwalex/tc-play" title="tcplay on Guthub">tcplay</a>
-is decribed as:</p>
-
-<p><blockquote><p>a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.</p></blockquote></p>
-
-<p>With a <a href="https://github.com/bwalex/tc-play/blob/master/LICENSE" title="tcplay license">simple, two paragraph license</a>
-and a brief but comprehensive <code>man</code> page, I was sold. I uninstalled TrueCrypt late last year and haven't missed it since. Quite
-the contrary. The only “issue” that I have had with tcplay is remembering the commands to map and mount a drive.
-Initially, I jotted down some notes, but opening them up several times a week to refer to them quickly seemed
-pointless so I eventually wised up and wrote a wrapper script to do the job for me…</p>
-
-<p>The script is quite simple, it finds the first available loop device, maps the encrypted volume to it and
-mounts it read-writeable for your user.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;manage truecrypt containers using tcplay&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;user<span class="o">=</span>jason
-</span><span class='line'><span class="nv">cryptdev</span><span class="o">=</span>Safebox
-</span><span class='line'><span class="nv">cryptpath</span><span class="o">=</span>/home/jason/Dropbox/<span class="s2">&quot;$cryptdev&quot;</span>
-</span><span class='line'><span class="nv">loopdev</span><span class="o">=</span><span class="k">$(</span>losetup -f<span class="k">)</span>
-</span><span class='line'><span class="nv">mountpt</span><span class="o">=</span>/media/<span class="s2">&quot;$cryptdev&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;must be run as root&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$EUID</span> !<span class="o">=</span> 0 <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;You must be root to run this.&quot;</span>
-</span><span class='line'>  <span class="nb">exit </span>1
-</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;unecrypt and mount container&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span>losetup <span class="s2">&quot;$loopdev&quot;</span> <span class="s2">&quot;$cryptpath&quot;</span>
-</span><span class='line'>  tcplay --map<span class="o">=</span><span class="s2">&quot;$cryptdev&quot;</span> --device<span class="o">=</span><span class="s2">&quot;$loopdev&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="c"># read passphrase</span>
-</span><span class='line'>  <span class="nb">read</span> -r -s passphrase &amp;lt;&amp;lt;EOF
-</span><span class='line'>  <span class="s2">&quot;$passphrase&quot;</span>
-</span><span class='line'>EOF&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="c"># mount container</span>
-</span><span class='line'>  <span class="o">[[</span> -d <span class="s2">&quot;$mountpt&quot;</span> <span class="o">]]</span> <span class="o">||</span> mkdir <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="c"># mount options</span>
-</span><span class='line'>  <span class="nv">userid</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="s2">&quot;[=(]&quot;</span> <span class="s1">&#39;{print $2,$4}&#39;</span> &amp;lt;<span class="o">(</span>id <span class="s2">&quot;$user&quot;</span><span class="k">)</span><span class="o">)</span>
-</span><span class='line'>  mount -o nosuid,uid<span class="o">=</span><span class="s2">&quot;${userid% &lt;em&gt;}&quot;</span>,gid<span class="o">=</span><span class="s2">&quot;${userid#&lt;/em&gt; }&quot;</span> /dev/mapper/<span class="s2">&quot;$cryptdev&quot;</span> <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;close and clean up…&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;close&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nv">device</span><span class="o">=</span><span class="k">$(</span>awk -v <span class="nv">dev</span><span class="o">=</span><span class="nv">$cryptdev</span> -F<span class="s2">&quot;:&quot;</span> <span class="s1">&#39;/dev/ {print $1}&#39;</span> &amp;lt;<span class="o">(</span>losetup -a<span class="k">)</span><span class="o">)</span>
-</span><span class='line'>  umount <span class="s2">&quot;$mountpt&quot;</span>
-</span><span class='line'>  dmsetup remove <span class="s2">&quot;$cryptdev&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;demapping failed&quot;</span>
-</span><span class='line'>  losetup -d <span class="s2">&quot;$device&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;deleting $loopdev failed&quot;</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Options are open or close.&quot;</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Once you are done, the script will unmount your volume and clean up. Undoubtedly, the
-script could be improved; patches are welcome.</p>
-
-<p>There is a
-<a href="https://aur.archlinux.org/packages/tcplay-git/" title="Arch User Repository">PKGBUILD in the AUR</a>.
-Uninstall TrueCrypt and give tcplay a go, it is a simple, powerful application; and it <em>is</em>
-free software…</p>
-
-<h4>Notes</h4>
-
-<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
 ]]></content>
   </entry>
   
