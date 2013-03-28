@@ -1,0 +1,87 @@
+---
+layout: post
+title:  "Building Vim"
+date: 2013-03-29 10:17
+comments: true
+categories: [archlinux, vim]
+---
+    
+{% img left http://dl.dropbox.com/u/261312/Blog-images/vim-logo.png 'Vim logo' %}
+Apart from a brief, but nevertheless instructive, flirtation with 
+[Emacs](http://www.gnu.org/software/emacs/ 'Emacs homepage')<sup>1</sup> I have
+been a consistent [Vim](http://www.vim.org/ 'Vim home') user over the last three
+or four years. Like most Vim users, I have made some progress over that time
+in spite of Vim's 
+[notorious learning curve](http://stackoverflow.com/a/1815372/712613 'SO answer on Vim')
+and have now reached the point where, belatedly, I think I understand it just enough
+to really grasp how little I actually know. It's a milestone that speaks more to
+necessity than gratification, granted.
+
+In any event, as part of confronting my Vim shortcomings (no 
+[golfing](http://www.vimgolf.com/ 'Vim golf…') for me), I have been able
+to land on the features of Vim that I require to be enabled so that I am moderately
+productive (in my own, admittedly cloistered, working environment). That, you will
+probably not be surprised to read, does not include needing support for Arabic or
+Farsi to be built into Vim.
+
+Part of the beauty of Vim is that, unlike it's 
+[operating system counterpart Emacs](http://en.wikipedia.org/wiki/Editor_war#Humor '…lacking a decent editor'),
+you can choose how much functionality you wish to enable at compile-time. You do want
+support for Farsi? Then the `--with-features=big` option is what you are looking for.
+If, on the other hand, you just want the barest of bones, editor-wise, you could opt
+for the austere minimalism that is `--with-features=tiny` and find yourself happily
+transported back in time to 
+[Bill Joy's lab in 1976](https://en.wikipedia.org/wiki/Vi 'Wikipedia page on Vi').
+
+You can peruse all of the various features available to Vim using the `:help version`
+command.<sup>2</sup> There is also 
+[this table](http://www.drchip.org/astronaut/vim/vimfeat.html 'Vim's versions and features')
+where the various features are listed against the respective feature flags (tiny, small,
+normal, big &amp; huge).
+
+After this 
+[bug report](https://bugs.archlinux.org/task/33019 'Add +profile to gvim on Flyspray')
+late last year, the default Arch PKGBUILD ships with `huge` as the feature set. Make 
+what you will of that, but for my purposes it is overkill. With all the magic of
+[ABS](https://wiki.archlinux.org/index.php/Abs 'Arch Wiki page on ABS') and 
+`makepkg`, however, it is simple enough to build a Vim package that is tailored
+to exactly your requirements. For me, that means this set of simplified `configure` 
+options:
+
+{% codeblock lang:sh %}
+  ./configure \
+    --prefix=/usr \
+    --localstatedir=/var/lib/vim \
+    --with-features=normal \
+    --with-compiledby=Arch:jwr \
+    --with-x=yes \
+    --enable-acl \
+    --disable-gui \
+    --disable-signs \
+    --disable-netbeans \
+    --enable-multibyte 
+{% endcodeblock %}
+
+With these options, I have the minimum amount of functionality I comfortably
+require (including the ability to access the system clipboard, `--with-x=yes`)
+but without the other bloat.
+
+In addition to these changes to the config options, I also strip out all of the
+`gvim`-related stuff from the PKGBUILD as I do not require it. Even though it
+is a split package, just building `vim` still includes options superfluous to
+my needs.  As a result, I get Vim with just the features I need, without the
+dependencies of `ruby` and `lua` and god knows what else. 
+
+I'm not operating under any illusions about the fact that this is
+really saving a huge amount of space or, for that matter, drastically reducing the
+number of dependencies I have installed. It is partly about understanding how Vim
+works at another level while also catering for the obsessive-compulsive drive to
+micro-control what is and isn't installed on my systems. If you want to scratch either
+of the same itches, you can see the full
+[PKGBUILD in Bitbucket](https://bitbucket.org/jasonwryan/shiv/src/e6ccbe61780dfe24a5f7edda0d4b082dbb572e4a/Build/vim/PKGBUILD?at=default 'Eviscerated Vim PKGBUILD').
+
+#### Notes
+1. Still visible in some of my early Arch screenshots
+[on Flickr](http://www.flickr.com/photos/jasonwryan/3748882572/in/photostream 'Emacs in Openbox')…
+2. The official documentation for the features is also
+[online](http://vimdoc.sourceforge.net/htmldoc/various.html#+feature-list 'Vim Feature list').
