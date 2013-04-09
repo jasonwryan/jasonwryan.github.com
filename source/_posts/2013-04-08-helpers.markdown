@@ -1,0 +1,108 @@
+---
+layout: post
+title: "AUR Helpers"
+date: 2013-04-09 19:07
+comments: true
+categories: [archlinux, community, hack]
+---
+{% img left http://dl.dropbox.com/u/261312/Blog-images/crutches.jpg 'Crutches on Flickr' %}
+### Or, "Why you should uninstall Yaourt and embrace *makepkg*…"
+The [release of Pacman 4.1](https://bbs.archlinux.org/viewtopic.php?id=160655 'Announcement on the Arch boards')
+saw the same flurry of posts on the boards, in IRC and the mailing lists about
+people being “unable” to upgrade or, worse, claiming that pacman was “broken”
+because their upgrade was failing due to unsatisfied dependencies, that pretty
+much every pacman upgrade ocassions. How is it possible that so many people can
+run an operating system designed for competent users without having even a
+basic understanding of how the package manager—one of the single most critical
+component of the distribution—works?
+
+Even a cursory perusal of the resulting threads on the boards will quickly
+identify the common denominator in these cases:
+
+{% blockquote %}
+resolving dependencies...
+looking for inter-conflicts...
+error: failed to prepare transaction (could not satisfy dependencies)
+:: package-query: requires pacman<4.1
+{% endblockquote %}
+
+[package-query](https://aur.archlinux.org/packages/package-query/ 'AUR page')
+is required by [yaourt](https://aur.archlinux.org/packages/yaourt/ 'yaourt on AUR');
+so these upgrades have been stymied by a package that is in the (unsupported) 
+<acronym title="Arch User Repository">AUR</acronym>? There are a 
+[multitude of AUR helpers](https://wiki.archlinux.org/index.php/AUR_Helpers 'Arch Wiki entry'),
+but `yaourt` is most commonly used by people who are new to Arch<sup>1</sup>
+for two reasons.  First, it is one of the most “featureful” and secondly, and
+more to the point of my argument, it can be installed by simply adding an
+unsupported repo to `pacman.conf`; thereby effectively bypassing the need for
+the hapless user ever having to use or understand `makepkg`.
+
+Consequently, over time, people who are habitually using `yaourt -Syu --aur` to
+update both the packages in the supported repositories and those they have
+installed from the AUR lose the conceptual distinction between the two.
+`yaourt` obscures this from them and—if they are completely reliant upon it, as
+these threads attest they are—they have abnegated responsibility for managing
+those unsupported packages and in doing so have found themselves incapable of
+understanding the bind they are in.
+
+This sort of obscuring of fundamental operating principles in the pursuit of
+“convenience” is anathema to Arch and is precisely the reason I moved away from
+using `yaourt` (and indeed from using Ubuntu when I jumped from that sinking 
+ship). Any convenience is purely illusory, in reality it just fosters 
+[learned helplessness](http://en.wikipedia.org/wiki/Learned_helplessness 'Wikipedia entry').
+
+I understand that the `yaourt` developer(s) was scratching their own itch, and
+this post is not about maligning the project; but there are significant
+unintended consequences of giving people a tool that abstracts such a
+signifcant element of the distribution away from the user, especially for a
+distribution where you are expected to have
+[complete control *and responsbility* over your system](https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric 'The Arch Way').
+
+To be clear, I don't have a complaint with the *concept* of AUR helpers. I used
+`yaourt` initially before switching to 
+[aurget](http://pbrisbin.com/posts/aurget 'Patrick Brisbin's AUR helper') and then 
+alighting on 
+[cower](https://github.com/falconindy/cower 'Cower on github'), or more particularly, 
+a partial wrapper for `cower`:
+
+{% codeblock lang:sh cowerd %}
+#!/bin/sh
+# install AUR packages with cower
+
+cd $HOME/Build && cower -d "$1"
+builddir="$_"
+cd "$builddir" && ${EDITOR:-vi} PKGBUILD
+
+makepkg -si && cd - &>/dev/null
+
+read -p "Remove Build directory? [Y/n]? " yn
+if [ "$yn" = "y" ]; then
+    printf "\n%s\n" "Removing build directory..." 
+    cd ../ && rm -rf "$builddir"
+else
+    printf "%s\n" "Build completed."
+fi
+{% endcodeblock %}
+
+This provides me the minimum level of automation I require—essentially only
+around downloading and installing a package. It doesn't automatically handle
+dependencies, nor manage updating the packages; that remains, rightly in my
+view, *my* responsibility.
+
+If I were to look to a more fully featured wrapper, I would undoubtedly choose
+[meat](https://github.com/e36freak/meat 'meat on Github'), however as on my
+desktop machine, I only have ~30 AUR packages installed, I don't really need
+anything more sophisticated.
+
+So by all means, use an AUR helper. But recognize that it is intended to help
+you, not preclude you from being able to accomplish the most simple and
+critical task of system maintenance, updating your package manager. Uninstall
+`yaourt` if you are using it and familiarize yourself with `makepkg`; once you
+do understand the relationship between the official repositories and the AUR,
+download `cower` or `meat`, they are both *much* better solutions.
+
+#### Notes
+1. [Myself included](http://jasonwryan.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/ 'Post from 2009')…
+
+Creative Commons image of crutches by 
+[net_efekt on Flickr](http://www.flickr.com/photos/wheatfields/118700600/ 'Flickr CC image').
