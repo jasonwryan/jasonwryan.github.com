@@ -3,7 +3,7 @@ layout: post
 title: "Install .otf Fonts in OpenOffice"
 date: 2009-03-17 19:51
 comments: true
-categories: [linux,unix,hack]
+categories: [linux, hack]
 ---
 
 OpenOffice won’t recognize TrueType fonts with the extension `.otf`, so you need to convert them to `.ttf`
