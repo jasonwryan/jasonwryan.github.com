@@ -1,0 +1,138 @@
+---
+layout: post
+title: "Replacing Google Reader"
+date: 2013-05-25 09:10
+comments: true
+categories: [archlinux, browser] 
+---
+{% img left http://dl.dropbox.com/u/261312/Blog-images/commafeed.png 'CommaFeed Logo' %}
+I have been using [Google Reader](https://en.wikipedia.org/wiki/Google_reader 'Wikipedi page')
+everyday since I first discovered the service over seven years ago. It is my
+primary source of news and information and the announcement that Google is, on July 1 this year,
+set to [shut down Reader](http://googlereader.blogspot.ca/2013/03/powering-down-google-reader.html 'Official announcemet on Google Blog')
+was something considerably more than just an inconvenience for me.
+
+Over the years, I had looked at other <acronym title="Rich Site Summary">RSS</acronym> 
+readers but, for a variety of reasons, had invariably found that the speed,
+simplicity and flexibility that Google Reader offered meant that any dalliances
+were unsatisfactory and short-lived. I resigned myself to having to settle for 
+an inferior alternative, rather than moving to a genuine replacement.
+
+On the recommendation of [@pinboard](https://pinboard.in/ 'Not so-social bookmarking'), 
+I first signed up for a premium account at 
+[NewsBlur](https://www.newsblur.com/ 'NewsBlur website'). It is open source and,
+given the recommendation from Maciej<sup>1</sup>, I was hopeful that it would
+bridge the gap. Newsblur is a good service (especially considering the rush of
+signups in the days after the Google announcement), but it has a couple of
+critical weaknesses for me: no search (yes, you read that correctly—there is *no
+way to search through your feeds*) and, less importantly but just as annoying,
+occasionally sluggish performance.
+
+After a couple of weeks using NewBlur I happily stumbled across
+[CommaFeed](https://www.commafeed.com/ 'CommaFeed homepage'), a
+Reader clone that emulates the austere minimalism of Google Reader. Apart from
+the fact that it is open source, the other aspect that attracted me to it 
+was the ability to run it on Red Hat's Platform as a Service offering, 
+[OpenShift](http://www.openshift.com/ 'Red Hat PaaS'). 
+
+The README on the [Github repo](https://github.com/Athou/commafeed 'CommaFeed repo') 
+explains how to set it all up. Unfortunately, due to an 
+[open issue](https://github.com/Athou/commafeed/issues/91 'OpenShift fails silently'), 
+some manual intervention is required, but it is still a very
+straightforward and painless process to get your own instance of CommaFeed up
+and running.
+
+Creat an OpenShift account, log in and add the JBoss application (or
+cartridge as it is called on OpenShift) and the MySQL cartridge. Once your setup
+is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
+under your `My Applications` tab, copy down your Git repo address, which will be
+of the form:
+
+{% codeblock lang:sh %}
+ssh://76758382475ef809976543@$appname-$namespace.rhcloud.com/~/git/feeds.git/
+{% endcodeblock %}
+
+Then you need to make a local clone of CommaFeed and push it to the Red Hat
+server:
+
+{% codeblock lang:sh %}
+git clone https://github.com/Athou/commafeed.git
+cd commafeed
+# add OpenShift as a repo
+git remote add openshift -f ssh://76758382475ef809976543@$appname-$namespace.etc…
+git merge openshift/master -s recursive -X ours
+git push openshift master
+{% endcodeblock %}
+
+This will then trigger a series of hooks that build the application and restart
+the server. If everything goes well you will see something like:
+
+{% codeblock lang:sh %}
+remote: [INFO] ------------------------------------------------------------------------
+remote: [INFO] BUILD SUCCESS
+remote: [INFO] ------------------------------------------------------------------------
+remote: [INFO] Total time: 3:18.195s
+remote: [INFO] Finished at: Mon May 20 03:21:37 EDT 2013
+remote: [INFO] Final Memory: 42M/185M
+remote: [INFO] ------------------------------------------------------------------------
+remote: Running .openshift/action_hooks/build
+remote: Running .openshift/action_hooks/deploy
+remote: hot_deploy_added=false
+remote: MySQL already running
+remote: Found 127.12.712.712:8080 listening port
+remote: Done
+remote: Running .openshift/action_hooks/post_deploy
+To ssh://76758382475ef809976543@$appname-$namespace.rhcloud.com/~/git/feeds.git/
+{% endcodeblock %}
+
+You now have CommaFeed successfully running on OpenShift. After a couple of
+minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
+and you will be able to login to your CommaFeed instance. Updating your 
+CommaFeed is as simple as pulling to your local repo, merging and
+then pushing to `openshift master`.
+
+Importing directly from Google Reader still seems broken (I was  getting
+errors from builds late this week), but if you import from an existing `.opml`
+or `.xml` file you will see CommaFeed in all it's glory:
+
+{% img left http://dl.dropbox.com/u/261312/Blog-images/commafeed_screen.png 'ComaFeed screenshot' %}
+
+As you can see, it is remarkably similar to the Google Reader interface; a
+clean, minimalist design that is focussed—quite rightly—on the content. There
+is an option to load your own `.css` if you want to apply some additional
+styling, but for me the base style is just about perfect.
+
+More impressively, in the week or so that I have been using CommaFeed, the
+developer, 
+[Athou](https://github.com/Athou 'Athou on Github'), has been committing
+enhancements and bug fixes several times *a day*; almost every night, 
+I have pushed changes to OpenShift, reloaded my browser and found a 
+smoother, enhanced feed reader with additional functionality; it is
+literally growing in leaps and bounds, and is a great reminder of the power 
+of open source<sup>2</sup>.
+
+The performance of OpenShift has also been solid; feeds are delivered
+seemingly instantaneously and, apart from the slight lag after restarting
+the application, I haven't experienced any issues whatsoever in terms
+of availability.
+
+There are still a couple of areas where CommaFeed can be improved. Most
+notably, there is an open feature request for a 
+[mobile friendly CSS](https://github.com/Athou/commafeed/issues/54 'Github Issue')
+and this is badly needed, the site is pretty much unusable on my phone. With
+any luck, some enterprising Android developer will build a CommaFeed app (for
+which I would happily pay good money)…
+
+In any event, if you are looking for a Google Reader replacement, try
+running CommaFeed (either on your own server or one of Red Hat's); for
+a project that is only a couple of months old, it has covered a 
+tremendous amount of ground and will undoubtedly continue to grow
+and improve. 
+
+#### Notes
+1. In conjunction with his great advice about not being a 
+[free user](http://blog.pinboard.in/2011/12/don_t_be_a_free_user/ 'Pinboard blog').
+2. The [about page](http://feeds-jwr.rhcloud.com/#/feeds/help 'About and Help page')
+has a donate button: if you want to support an application which I have no doubt
+will soon be even better than Google Reader, you might want to use it.
+
