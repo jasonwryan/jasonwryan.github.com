@@ -4,7 +4,7 @@
   <title><![CDATA[Category: hack | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/hack/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-03-29T10:15:47+13:00</updated>
+  <updated>2013-06-22T17:25:39+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -14,11 +14,316 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Hacking PKGBUILDs]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/05/18/pkgbuilds/"/>
+    <updated>2013-05-18T10:10:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/05/18/pkgbuilds</id>
+    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/woodcutting.jpg 'Cutting wood' %}
+I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on Vim">Building Vim</a> and how,
+using <a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Build System on the Wiki">ABS</a>
+and <code>makepkg</code> it is possible to customize packages in the repositories to suit your
+individual requirements, in that case with a specific feature set.</p>
+
+<p>One of Arch's real strengths is in the flexibility that <code>makepkg</code> and PKGBUILDs provide
+the community; the ability to adapt official packages—or unofficial ones in the
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>—as you see fit. As PKGBUILDs
+are just shell scripts, the entry level to start playing around with them is quite
+low<sup>1</sup>.</p>
+
+<p>A fairly standard, and simple, example of the type of customization that I might make
+is with <a href="http://tools.suckless.org/dmenu/" title="dmenu page">dmenu</a>, the suckless dynamic
+menu, where the
+<a href="https://www.archlinux.org/packages/community/x86_64/dmenu/" title="Arch package">standard package</a>
+in the Arch repositories is not patched for Xft support. There is a patch for this on the
+<a href="http://tools.suckless.org/dmenu/patches/xft" title="Xft patch on suckless.org">suckless wiki</a>, so it
+is just a case of making the requisite changes in the PKGBUILD from ABS and building it.</p>
+
+<p>As you can see from the <code>diff</code> below, there is not a lot involved in this exercize; essentially,
+adding <code>libxft</code> as a dependency, sourcing the patch from the suckless site (and including the
+hash for it), and then in the <code>build</code> function ensuring that the patch is applied and the
+Makefile updated with the new library:</p>
+
+<p>{% codeblock lang:diff %}
+--- PKGBUILD   2013-05-18 09:33:07.156328812 +1200
++++ PKGBUILD   2012-11-14 09:25:15.915335588 +1300
+@@ -11,16 +6,22 @@
+ pkgdesc="A generic menu for X"
+ url="http://tools.suckless.org/dmenu/"
+ arch=('i686' 'x86_64')
++groups=('modified')
+ license=('MIT')
+-depends=('sh' 'libxinerama')
+-source=(http://dl.suckless.org/tools/$pkgname-$pkgver.tar.gz)
+-md5sums=('9c46169ed703732ec52ed946c27d84b4')
++depends=('sh' 'libxinerama' 'libxft')
++source=(http://dl.suckless.org/tools/$pkgname-$pkgver.tar.gz
++http://tools.suckless.org/dmenu/patches/$pkgname-$pkgver-xft.diff)
++md5sums=('9c46169ed703732ec52ed946c27d84b4'
++         'd448ec9120718b0aedbdb338f4fa69ba')</p>
+
+<p> build(){
+   cd $srcdir/$pkgname-$pkgver
++  patch -p1 &lt; ../$pkgname-$pkgver-xft.diff
++  sed -i 's:-I/usr/local/include/freetype2:-I/usr/include/freetype2:' config.mk
++
+   make \
+{% endcodeblock %}</p>
+
+<p>Running <code>makepkg -i</code> will build and install dmenu with Xft support. This is the most
+straightforward approach. I also, primarily by way of experimentation and in an effort
+to try an understand how this actually works, have slightly more convoluted examples.
+<a href="https://www.archlinux.org/packages/extra/x86_64/msmtp/" title="Arch package">msmtp</a>, the
+<acronym title="Simple Mail Transfer Protocol">SMTP</acronym> client has a couple
+of makedepends in
+<a href="https://www.archlinux.org/packages/extra/x86_64/libgnome-keyring/" title="Arch package">libgnome-keyring</a>
+and <a href="https://www.archlinux.org/packages/extra/any/texlive-core/" title="Arch package">texlive-core</a>; the former
+I have zero use for and the latter is only installed on my desktop, so I have no wish to install it on
+my laptop just to be able to send emails…</p>
+
+<p>In this case, I modified the PKGBUILD to completely remove the <code>libgnome-keyring</code> dependency
+and to only build the <code>msmtp</code> documentation in <code>.pdf</code> and <code>.html</code> if <code>texlive-core</code> was
+already installed on the machine. Unfortunately, I wasn't able to test for the presence of
+<code>texlive-core</code> with the standard utilities like <code>type</code> or <code>which</code>, so—as it is installed
+on all my boxes—I went with <code>expac</code> (<code>pacman -Q</code> would also work):</p>
+
+<p>{% codeblock lang:diff %}
+--- PKGBUILD    2013-05-18 09:32:07.393095131 +1200
++++ PKGBUILD    2013-05-18 09:31:55.449986364 +1200
+@@ -1,7 +1,8 @@
+ arch=('i686' 'x86_64')
++groups=('modified')
+ license=('GPL3')
+ url="http://msmtp.sourceforge.net"
+-makedepends=('texlive-core' 'gsasl' 'libgnome-keyring')
++makedepends=('gsasl')
+ source=(http://download.sourceforge.net/sourceforge/msmtp/${pkgbase}-${pkgver}.tar.bz2)
+ sha1sums=('c0edce1e1951968853f15209c8509699ff9e9ab5')</p>
+
+<p>@@ -12,19 +13,24 @@</p>
+
+<p> build() {
+   cd ${pkgbase}-${pkgver}
+-  ./configure --prefix=/usr --sysconfdir=/etc --with-ssl=gnutls
++  ./configure --prefix=/usr --sysconfdir=/etc --with-ssl=gnutls --without-gnome-keyring
+   make
+-  make -C doc html pdf
++  if [[ -n $(expac -Q '%n' texlive-core) ]]; then
++      make -C doc html pdf
++  fi
+ }</p>
+
+<p> package_msmtp() {
+   pkgdesc="A mini smtp client"
+-  depends=('gsasl' 'libgnome-keyring')
++  depends=('gsasl')
+   install=msmtp.install</p>
+
+<p>   cd ${pkgbase}-${pkgver}
+   make DESTDIR="${pkgdir}" install
++
++  if [[ -n $(expac -Q '%n' texlive-core) ]]; then
+   make DESTDIR="${pkgdir}" -C doc install-html install-pdf
++  fi</p>
+
+<p> # Installing example configs and scripts to /usr/share/doc/msmtp
+{% endcodeblock %}</p>
+
+<p>It isn't necessarily an attractive solution, but it works for me…
+On the subject of unattractive solutions, as of pacman 4.1, released
+last month, the packaging standards for
+<a href="https://wiki.archlinux.org/index.php/VCS_PKGBUILD_Guidelines" title="Arch Wiki page">VCS PKGBUILDs</a>
+have been changed, principally around how sources and versioning is handled. For
+the couple of VCS packages I maintain in the <acronym title="Arch User
+Repository">AUR</acronym><sup>2</sup>, I have been
+experimenting with how to capture the <code>pkgver</code> in a way that conforms to the
+standards and provides people with a meaningful version number.</p>
+
+<p>By default, the version number for these projects from their git repos
+is not that helpful:</p>
+
+<p>{% codeblock lang:sh %}
+git describe --always
+4861046
+{% endcodeblock %}</p>
+
+<p>After looking through the git logs, and playing around with <code>awk</code> to filter
+the results, I came up with this:</p>
+
+<p>{% codeblock lang:sh %}
+pkgver() {
+  cd "$<em>gitname"
+  printf '%s\n' "$(awk '/^ / {print $2}' &lt;(git log --grep=version -1))</em>\
+  $(git describe --always)"
+}
+{% endcodeblock %}</p>
+
+<p>This prints a more, for me anyway, intelligble package version: <code>vimprobable2-git
+1.2.1_c5936cc-1</code> that relates back to the last stable release and appends the
+current commit. I'm sure that this could be improved upon; suggestions are
+welcome.</p>
+
+<p>The other change to note in all of these PKGBUILDs is the inclusion of the
+<code>groups</code> variable. By adding all of the modified packages from the official
+repositories to the—imaginatively titled—<code>modified</code> group, I can then add a line
+to <code>/etc/pacman.conf</code> that prevents those packages from being overwritten on
+upgrade<sup>3</sup>:</p>
+
+<p>{% codeblock lang:sh %}
+IgnoreGroup = modified
+{% endcodeblock %}</p>
+
+<p>Issuing <code>pacman -Syu</code>, or running <code>checkupdates</code> from a <code>cron</code> job, will
+notify you that the packages have had a version bump and that they need
+to be rebuilt. The PKGBUILDs for all of these packages can be found in
+<a href="https://bitbucket.org/jasonwryan/centurion/src/ff3b3c9d805e197f35aa28dbeb6a9a6555ee7b63/Build?at=default" title="Files in bitbucket">my bitbucket repo</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>As my experiments attest…</li>
+<li><a href="https://aur.archlinux.org/packages/vimprobable2-git/">Vimprobable2-git</a>,
+<a href="https://aur.archlinux.org/packages/surfraw-git/">Surfraw-git</a> and
+<a href="https://aur.archlinux.org/packages/ruby-build-git/">ruby-build-git</a>.</li>
+<li>All credit to ataraxia <a href="https://bbs.archlinux.org/viewtopic.php?pid=623841#p623841">for this idea</a>.</li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by
+<a href="http://www.flickr.com/photos/wellspwilson/6481217091/" title="Wood
+Cutting Wood">Wells P. Wilson</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[AUR Helpers]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/04/09/helpers/"/>
+    <updated>2013-04-09T19:07:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/04/09/helpers</id>
+    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/crutches.jpg 'Crutches on Flickr' %}</p>
+
+<h3>Or, "Why you should uninstall Yaourt and embrace <em>makepkg</em>…"</h3>
+
+<p>The <a href="https://bbs.archlinux.org/viewtopic.php?id=160655" title="Announcement on the Arch boards">release of Pacman 4.1</a>
+saw the same flurry of posts on the boards, in IRC and the mailing lists about
+people being “unable” to upgrade or, worse, claiming that pacman was “broken”
+because their upgrade was failing due to unsatisfied dependencies, that pretty
+much every pacman upgrade ocassions. How is it possible that so many people can
+run an operating system designed for competent users without having even a
+basic understanding of how the package manager—one of the single most critical
+components of the distribution—works?</p>
+
+<p>Even a cursory perusal of the resulting threads on the boards will quickly
+identify the common denominator in these cases:</p>
+
+<p>{% blockquote %}
+resolving dependencies...
+looking for inter-conflicts...
+error: failed to prepare transaction (could not satisfy dependencies)
+:: package-query: requires pacman&lt;4.1
+{% endblockquote %}</p>
+
+<p><a href="https://aur.archlinux.org/packages/package-query/" title="AUR page">package-query</a>
+is required by <a href="https://aur.archlinux.org/packages/yaourt/" title="yaourt on AUR">yaourt</a>;
+so these upgrades have been stymied by a package that is in the (unsupported)
+<acronym title="Arch User Repository">AUR</acronym>? There are a
+<a href="https://wiki.archlinux.org/index.php/AUR_Helpers" title="Arch Wiki entry">multitude of AUR helpers</a>,
+but <code>yaourt</code> is most commonly used by people who are new to Arch<sup>1</sup>
+for two reasons.  First, it is one of the most “featureful” and secondly, and
+more to the point of my argument, it can be installed by simply adding an
+unsupported repo to <code>pacman.conf</code>; thereby effectively bypassing the need for
+the hapless user ever having to use or understand <code>makepkg</code>.</p>
+
+<p>Consequently, over time, people who are habitually using <code>yaourt -Syu --aur</code> to
+update both the packages in the supported repositories and those they have
+installed from the AUR lose the conceptual distinction between the two.
+<code>yaourt</code> obscures this from them and—if they are completely reliant upon it, as
+these threads attest they are—they have abnegated responsibility for managing
+those unsupported packages and in doing so have found themselves incapable of
+understanding the bind they are in.</p>
+
+<p>This sort of obscuring of fundamental operating principles in the pursuit of
+“convenience” is anathema to Arch and is precisely the reason I moved away from
+using <code>yaourt</code> (and indeed from using Ubuntu when I jumped from that sinking
+ship). Any convenience is purely illusory, in reality it just fosters
+<a href="http://en.wikipedia.org/wiki/Learned_helplessness" title="Wikipedia entry">learned helplessness</a>.</p>
+
+<p>I understand that the <code>yaourt</code> developer(s) was scratching their own itch, and
+this post is not about maligning the project; but there are significant
+unintended consequences of giving people a tool that abstracts such a
+fundamental element of the distribution away from the user, especially for a
+distribution where you are expected to have
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric" title="The Arch Way">complete control <em>and responsbility</em> over your system</a>.</p>
+
+<p>To be clear, I don't have a complaint with the <em>concept</em> of AUR helpers. I used
+<code>yaourt</code> initially before switching to
+<a href="http://pbrisbin.com/posts/aurget" title="Patrick Brisbin's AUR helper">aurget</a> and then
+alighting on
+<a href="https://github.com/falconindy/cower" title="Cower on github">cower</a>, or more particularly,
+a partial wrapper for <code>cower</code>:</p>
+
+<p>{% codeblock lang:sh cowerd %}</p>
+
+<h1>!/bin/sh</h1>
+
+<h1>install AUR packages with cower</h1>
+
+<p>cd $HOME/Build &amp;&amp; cower -d "$1"
+builddir="$_"
+cd "$builddir" &amp;&amp; ${EDITOR:-vi} PKGBUILD</p>
+
+<p>makepkg -si &amp;&amp; cd - &amp;>/dev/null</p>
+
+<p>read -p "Remove Build directory? [Y/n]? " yn
+if [ "$yn" = "y" ]; then</p>
+
+<pre><code>printf "\n%s\n" "Removing build directory..." 
+rm -rf "$builddir"
+</code></pre>
+
+<p>else</p>
+
+<pre><code>printf "%s\n" "Build completed."
+</code></pre>
+
+<p>fi
+{% endcodeblock %}</p>
+
+<p>This provides me the minimum level of automation I require—essentially only
+around downloading and installing a package. It doesn't automatically handle
+dependencies, nor manage updating the packages; that remains, rightly in my
+view, <em>my</em> responsibility.</p>
+
+<p>If I were to look to a more fully featured wrapper, I would undoubtedly choose
+<a href="https://github.com/e36freak/meat" title="meat on Github">meat</a>, however as on my
+desktop machine, I only have ~30 AUR packages installed, I don't really need
+anything more sophisticated.</p>
+
+<p>So by all means, use an AUR helper. But recognize that it is intended to help
+you, not preclude you from being able to accomplish the most simple and
+critical task of system maintenance, updating your package manager. Uninstall
+<code>yaourt</code> if you are using it and familiarize yourself with <code>makepkg</code>; once you
+do understand the relationship between the official repositories and the AUR,
+download <code>cower</code> or <code>meat</code>, they are both <em>much</em> better solutions.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li><a href="http://jasonwryan.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/" title="Post from 2009">Myself included</a>…</li>
+</ol>
+
+
+<p>Creative Commons image of crutches by
+<a href="http://www.flickr.com/photos/wheatfields/118700600/" title="Flickr CC image">net_efekt on Flickr</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Replacing TrueCrypt]]></title>
     <link href="http://jasonwryan.github.com/blog/2013/01/10/truecrypt/"/>
     <updated>2013-01-10T16:02:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/01/10/truecrypt</id>
-    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/lock.jpg" title="'Flickr image of lock'" >
+    <content type="html"><![CDATA[<p>{% img left https://dl.dropbox.com/u/261312/Blog-images/lock.jpg 'Flickr image of lock' %}
 I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
 I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
 It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
@@ -38,13 +343,17 @@ a container in <a href="http://dropbox.com/" title="Dropbox homepage">Dropbox</a
 all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
 free (as in Freedom) software:</p>
 
-<p><blockquote><p>The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered "free" by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.</p><footer><strong>Wikipedia entry on TrueCrypt</strong> <cite><a href='https://en.wikipedia.org/wiki/Truecrypt'>en.wikipedia.org/wiki/Truecrypt/&hellip;</a></cite></footer></blockquote></p>
+<p>{% blockquote Wikipedia entry on TrueCrypt https://en.wikipedia.org/wiki/Truecrypt %}
+The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered "free" by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.
+{% endblockquote %}</p>
 
 <p>When I initially accessed the page, in February 2012, there was also a paragraph—now removed—that
 highlighted further, more alarmist, concerns about the shadowy identity of the people behind
 TrueCrypt:</p>
 
-<p><blockquote><p>The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]</p><footer><strong>Wikipedia entry retrieved in February 2012</strong> <cite><a href='https://en.wikipedia.org/w/index.php?title=TrueCrypt&amp;diff=478623780&amp;oldid=478608477'>en.wikipedia.org/w/&hellip;</a></cite></footer></blockquote></p>
+<p>{% blockquote Wikipedia entry retrieved in February 2012 https://en.wikipedia.org/w/index.php?title=TrueCrypt&amp;diff=478623780&amp;oldid=478608477 %}
+The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]
+{% endblockquote %}</p>
 
 <p>While I don't subscribe to the theory that the CIA have planted a backdoor in the software (if they
 had, <a href="https://en.wikipedia.org/wiki/Truecrypt#Operation_Satyagraha" title="FBI operation foiled by TC">it clearly doesn't work</a>),
@@ -52,7 +361,9 @@ I was relieved to see at the end of last year that someone had written a simple 
 you to manage TrueCrypt containers from the command line; <a href="https://github.com/bwalex/tc-play" title="tcplay on Guthub">tcplay</a>
 is decribed as:</p>
 
-<p><blockquote><p>a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.</p></blockquote></p>
+<p>{% blockquote %}
+a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.
+{% endblockquote %}</p>
 
 <p>With a <a href="https://github.com/bwalex/tc-play/blob/master/LICENSE" title="tcplay license">simple, two paragraph license</a>
 and a brief but comprehensive <code>man</code> page, I was sold. I uninstalled TrueCrypt late last year and haven't missed it since. Quite
@@ -63,54 +374,54 @@ pointless so I eventually wised up and wrote a wrapper script to do the job for 
 <p>The script is quite simple, it finds the first available loop device, maps the encrypted volume to it and
 mounts it read-writeable for your user.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;manage truecrypt containers using tcplay&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;user<span class="o">=</span>jason
-</span><span class='line'><span class="nv">cryptdev</span><span class="o">=</span>Safebox
-</span><span class='line'><span class="nv">cryptpath</span><span class="o">=</span>/home/jason/Dropbox/<span class="s2">&quot;$cryptdev&quot;</span>
-</span><span class='line'><span class="nv">loopdev</span><span class="o">=</span><span class="k">$(</span>losetup -f<span class="k">)</span>
-</span><span class='line'><span class="nv">mountpt</span><span class="o">=</span>/media/<span class="s2">&quot;$cryptdev&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;must be run as root&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$EUID</span> !<span class="o">=</span> 0 <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;You must be root to run this.&quot;</span>
-</span><span class='line'>  <span class="nb">exit </span>1
-</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;unecrypt and mount container&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span>losetup <span class="s2">&quot;$loopdev&quot;</span> <span class="s2">&quot;$cryptpath&quot;</span>
-</span><span class='line'>  tcplay --map<span class="o">=</span><span class="s2">&quot;$cryptdev&quot;</span> --device<span class="o">=</span><span class="s2">&quot;$loopdev&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="c"># read passphrase</span>
-</span><span class='line'>  <span class="nb">read</span> -r -s passphrase &amp;lt;&amp;lt;EOF
-</span><span class='line'>  <span class="s2">&quot;$passphrase&quot;</span>
-</span><span class='line'>EOF&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="c"># mount container</span>
-</span><span class='line'>  <span class="o">[[</span> -d <span class="s2">&quot;$mountpt&quot;</span> <span class="o">]]</span> <span class="o">||</span> mkdir <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="c"># mount options</span>
-</span><span class='line'>  <span class="nv">userid</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="s2">&quot;[=(]&quot;</span> <span class="s1">&#39;{print $2,$4}&#39;</span> &amp;lt;<span class="o">(</span>id <span class="s2">&quot;$user&quot;</span><span class="k">)</span><span class="o">)</span>
-</span><span class='line'>  mount -o nosuid,uid<span class="o">=</span><span class="s2">&quot;${userid% &lt;em&gt;}&quot;</span>,gid<span class="o">=</span><span class="s2">&quot;${userid#&lt;/em&gt; }&quot;</span> /dev/mapper/<span class="s2">&quot;$cryptdev&quot;</span> <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;close and clean up…&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;close&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nv">device</span><span class="o">=</span><span class="k">$(</span>awk -v <span class="nv">dev</span><span class="o">=</span><span class="nv">$cryptdev</span> -F<span class="s2">&quot;:&quot;</span> <span class="s1">&#39;/dev/ {print $1}&#39;</span> &amp;lt;<span class="o">(</span>losetup -a<span class="k">)</span><span class="o">)</span>
-</span><span class='line'>  umount <span class="s2">&quot;$mountpt&quot;</span>
-</span><span class='line'>  dmsetup remove <span class="s2">&quot;$cryptdev&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;demapping failed&quot;</span>
-</span><span class='line'>  losetup -d <span class="s2">&quot;$device&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;deleting $loopdev failed&quot;</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Options are open or close.&quot;</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}</p>
+
+<h1>!/bin/bash</h1>
+
+<h1>manage truecrypt containers using tcplay</h1>
+
+<p>user=jason
+cryptdev=Safebox
+cryptpath=/home/jason/Dropbox/"$cryptdev"
+loopdev=$(losetup -f)
+mountpt=/media/"$cryptdev"</p>
+
+<h1>must be run as root</h1>
+
+<p>if [[ $EUID != 0 ]]; then
+  printf "%s\n" "You must be root to run this."
+  exit 1
+fi</p>
+
+<h1>unecrypt and mount container</h1>
+
+<p>if [[ "$1" == "open" ]]; then
+  losetup "$loopdev" "$cryptpath"
+  tcplay --map="$cryptdev" --device="$loopdev"</p>
+
+<p>  # read passphrase
+  read -r -s passphrase &lt;&lt;EOF
+  "$passphrase"
+EOF</p>
+
+<p>  # mount container
+  [[ -d "$mountpt" ]] || mkdir "$mountpt"</p>
+
+<p>  # mount options
+  userid=$(awk -F"[=(]" '{print $2,$4}' &lt;(id "$user"))
+  mount -o nosuid,uid="${userid% <em>}",gid="${userid#</em> }" /dev/mapper/"$cryptdev" "$mountpt"</p>
+
+<h1>close and clean up…</h1>
+
+<p>elif [[ "$1" == "close" ]]; then
+  device=$(awk -v dev=$cryptdev -F":" '/dev/ {print $1}' &lt;(losetup -a))
+  umount "$mountpt"
+  dmsetup remove "$cryptdev" || printf "%s\n" "demapping failed"
+  losetup -d "$device" || printf "%s\n" "deleting $loopdev failed"
+else
+  printf "%s\n" "Options are open or close."
+fi
+{% endcodeblock %}</p>
 
 <p>Once you are done, the script will unmount your volume and clean up. Undoubtedly, the
 script could be improved; patches are welcome.</p>
@@ -131,7 +442,7 @@ free software…</p>
     <link href="http://jasonwryan.github.com/blog/2012/09/01/notes-updated/"/>
     <updated>2012-09-01T10:09:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2012/09/01/notes-updated</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/notes.jpg" title="'Notepad image on Flickr'" >
+    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/notes.jpg 'Notepad image on Flickr' %}
 Nearly two years ago, I posted about my adaption of a simple
 <a href="http://jasonwryan.com/blog/2010/09/28/command-line-notes/" title="My post in 2010">command line note utility</a>.
 I have used this setup on all of my machines on a daily basis since and it has worked
@@ -165,24 +476,25 @@ as to how to accomplish this.<sup>2</sup> Undeterred, I decided to hack up a com
 function that worked for nested directories.</p>
 
 <p>What I arrived at was this:
-<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">shopt</span> -s globstar
-</span><span class='line'><span class="nb">shopt</span> -s progcomp&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> <span class="nv">$HOME</span>/.notes/<span class="s2">&quot;$*&quot;</span>.txt ;<span class="o">}</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="c"># completion for notes</span>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>cur
-</span><span class='line'>    <span class="nv">cur</span><span class="o">=</span><span class="k">${</span><span class="nv">COMP_WORDS</span><span class="p">[COMP_CWORD]</span><span class="k">}</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;files<span class="o">=(</span><span class="nv">$HOME</span>/.notes/**<span class="o">)</span>
-</span><span class='line'><span class="nv">file</span><span class="o">=</span><span class="s2">&quot;${files[@]##*/}&quot;</span>
-</span><span class='line'><span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="k">$(</span> <span class="nb">compgen</span> -f <span class="s2">&quot;${file[@]}&quot;</span> -- <span class="k">${</span><span class="nv">cur</span><span class="k">}</span> <span class="k">)</span> <span class="o">)</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
-</span></code></pre></div></figure></notextile></div></p>
+{% codeblock lang:sh %}
+shopt -s globstar
+shopt -s progcomp</p>
+
+<p>n() { $EDITOR $HOME/.notes/"$*".txt ;}</p>
+
+<p> # completion for notes
+_notes() {
+local cur
+    cur=${COMP_WORDS[COMP_CWORD]}</p>
+
+<pre><code>files=($HOME/.notes/**)
+file="${files[@]##*/}"
+COMPREPLY=( $( compgen -f "${file[@]}" -- ${cur} ) )
+</code></pre>
+
+<p>}
+complete -o default -F _notes n
+{% endcodeblock %}</p>
 
 <p>The best that can be said about it is that it <em>nearly</em> works…<sup>3</sup></p>
 
@@ -191,52 +503,54 @@ I was indeed fortunate that
 <a href="https://github.com/geirha" title="geirha's Gitgub">geihra</a> offered some much needed
 assistance. geirha's solution is an elegant one:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
-</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
-</span><span class='line'><span class="o">}</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/&lt;em&gt;*/<span class="s2">&quot;$2&quot;</span>&lt;/em&gt;<span class="o">)</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;<span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> &amp;amp;&amp;amp; <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+n() {
+local arg files=(); for arg; do files+=( ~/".notes/$arg" ); done
+${EDITOR:-vi} "${files[@]}"
+}</p>
+
+<p>_notes() {
+local files=($HOME/.notes/<em>*/"$2"</em>)</p>
+
+<pre><code>[[ -e ${files[0]} ]] &amp;&amp; COMPREPLY=( "${files[@]##~/.notes/}" )
+</code></pre>
+
+<p>}
+complete -o default -F _notes n
+{% endcodeblock %}</p>
 
 <p>In addition to working exactly as I hoped, it had the benefit of introducing me
 to a couple more bash concepts that I hadn't encountered;
 <a href="http://mywiki.wooledge.org/BashGuide/Arrays" title="Bash Guide on Greg's Wiki">adding elements to an array</a>
 with <code>+=()</code> being one. For posterity, the full script is:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
-</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
-</span><span class='line'><span class="o">}</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;nls<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>tree -CR --noreport <span class="nv">$HOME</span>/.notes | awk <span class="s1">&#39;{&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">&lt;pre&gt;&lt;code&gt;if (NF==1) print $1; </span>
-</span><span class='line'><span class="s1">else if (NF==2) print $2; </span>
-</span><span class='line'><span class="s1">else if (NF==3) printf &quot;  %s\n&quot;, $3 </span>
-</span><span class='line'><span class="s1">}&#39;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="c"># TAB completion for notes</span>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/&lt;em&gt;*/<span class="s2">&quot;$2&quot;</span>&lt;/em&gt;<span class="o">)</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;<span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> &amp;amp;&amp;amp; <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+n() {
+local arg files=(); for arg; do files+=( ~/".notes/$arg" ); done
+${EDITOR:-vi} "${files[@]}"
+}</p>
+
+<p>nls() {
+tree -CR --noreport $HOME/.notes | awk '{</p>
+
+<pre><code>if (NF==1) print $1; 
+else if (NF==2) print $2; 
+else if (NF==3) printf "  %s\n", $3 
+}'
+</code></pre>
+
+<p>}</p>
+
+<p> # TAB completion for notes
+_notes() {
+local files=($HOME/.notes/<em>*/"$2"</em>)</p>
+
+<pre><code>[[ -e ${files[0]} ]] &amp;&amp; COMPREPLY=( "${files[@]##~/.notes/}" )
+</code></pre>
+
+<p>}
+complete -o default -F _notes n
+{% endcodeblock %}</p>
 
 <h4>Notes</h4>
 
@@ -268,7 +582,7 @@ to the official documentation:
     <link href="http://jasonwryan.github.com/blog/2012/07/24/queues/"/>
     <updated>2012-07-24T19:18:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2012/07/24/queues</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
+    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/queue.jpg 'Queue image on Flickr' %}
 Over the last week or so, I have finally gotten around to digging into the whole concept of
 using
 <a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
@@ -284,7 +598,9 @@ impressed: both the concept and the execution are simple and powerful. The conce
 of Mercurial Queues is best described in the Mercurial book: the aptly titled,
 <em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
 
-<p><blockquote><p>MQ's marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don't like a patch, you can drop it. If a patch isn't quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote></p>
+<p>{% blockquote Mercurial, The Definitive Guide http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html %}
+MQ's marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don't like a patch, you can drop it. If a patch isn't quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.
+{% endblockquote %}</p>
 
 <p>I followed Filippo Negroni's excellent
 <a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
@@ -315,15 +631,17 @@ repository and build the binary.  Then you need to make sure that the mercurial
 queue extension is enabled, so your <span class="file">.hgrc</span> needs to
 contain:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
-</span><span class='line'>hgext.mq <span class="o">=</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+[extensions]
+hgext.mq =
+{% endcodeblock %}</p>
 
 <p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
 is <span class="file">dwm-hg/src/dwm</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+hg qinit -c
+{% endcodeblock %}</p>
 
 <p>The next step is to start applying the various patches that you want to comprise
 your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
@@ -339,51 +657,55 @@ This is taken care of by the PKGBUILD in this case.</p>
 <p>From here, it is very much as Filippo describes it in his tutorial: make
 some changes, add them to the queue and rinse and repeat:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
-</span><span class='line'> <span class="c"># “hack hack hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+hg qnew base.customizations
+ # “hack hack hack…”
+hg qrefresh
+hg qcommit -m 'Added changes to config.def.h to customize'
+{% endcodeblock %}</p>
 
 <p>After committing each of your changes as a discrete patch, you can review the queue
 with <code>hg qseries</code>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries
-</span><span class='line'>config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+┌─[Centurion ~/Build/dwm-hg/src/dwm]
+└─╼ hg qseries
+config.customizations
+statuscolours
+cycle
+push
+{% endcodeblock %}</p>
 
 <p>And <code>hg qapplied</code> will tell you which of the patches is currently
 applied in the working repository; at this stage the list should look
 the same as that in <code>hg qseries</code>. The next step is to remove all of the
 patches from the queue so that we have a clean repository:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpop -a
-</span><span class='line'>popping push
-</span><span class='line'>popping cycle
-</span><span class='line'>popping statuscolours
-</span><span class='line'>popping config.customizations
-</span><span class='line'>patch queue now empty
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+┌─[Centurion ~/Build/dwm-hg/src/dwm]
+└─╼ hg qpop -a
+popping push
+popping cycle
+popping statuscolours
+popping config.customizations
+patch queue now empty
+{% endcodeblock %}</p>
 
 <p>Should you need to edit a patch, it is simply a matter of popping
 to that spot in the stack (you can do so by name or by index
 number, beginning at 0):</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpop config.customizations
-</span><span class='line'>popping push
-</span><span class='line'>popping cycle
-</span><span class='line'>popping statuscolours
-</span><span class='line'>now at: config.customizations
-</span><span class='line'> <span class="c"># “hack hack hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qpush -a
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+┌─[Centurion ~/Build/dwm-hg/src/dwm]
+└─╼ hg qpop config.customizations
+popping push
+popping cycle
+popping statuscolours
+now at: config.customizations
+ # “hack hack hack…”
+hg qrefresh
+hg qpush -a
+{% endcodeblock %}</p>
 
 <p>Once you are satisfied with the state of the stack, remove all of the
 patches to return to the original clean working directory and <code>cd</code> back
@@ -391,15 +713,16 @@ to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> t
 rebuild the package and you should see the pushed patches as part of
 the output:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
-</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
-</span><span class='line'>applying config.customizations
-</span><span class='line'>applying statuscolours
-</span><span class='line'>applying cycle
-</span><span class='line'>applying push
-</span><span class='line'>now at: push
-</span><span class='line'>dwm build options:
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+==> Starting build()...
+==> Pushing queued patchset
+applying config.customizations
+applying statuscolours
+applying cycle
+applying push
+now at: push
+dwm build options:
+{% endcodeblock %}</p>
 
 <p>…and when you restart dwm, your customizations will be applied.
 When new changes are pushed to
@@ -438,250 +761,6 @@ your system is not an issue at all.</li>
 
 <p>Flickr Creative Commons image by
 <a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using mutt, LDAP and SSL]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/04/21/lbdb/"/>
-    <updated>2012-04-21T11:23:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/04/21/lbdb</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/addressbook.png" title="'Address Book Icon by bertop on Flickr'" ></p>
-
-<p>One of the great things about starting a new job at
-<a href="http://jasonwryan.com/blog/2012/04/05/catalyst/" title="My post on joining Catalyst IT">an open source company</a>
-is having the freedom to use the tools that suit your workflow, rather than
-having to suffer the indignity of whatever the IT department consider to be the
-lowest comon denominator. Suffice to say, I have had a lot of fun this week
-setting up my working environment—and the ocassional hiccough as I was forced to learn
-something new…</p>
-
-<p>One of those “learning opportunities” consisted of trying to get my mail client,
-<a href="http://www.mutt.org/" title="All mail clients suck. This one just sucks less.">mutt</a>
-to talk to the <acronym title="Lightweight Directory Acces Protocol">LDAP</acronym>
-directory over <acronym title="Secure Sockets Layer">SSL</acronym> so that I could
-query the shared address book. There are a number of helpful blog posts that describe
-using <a href="http://www.spinnaker.de/lbdb/" title="The Little Brother Database homepage">lbdb</a>
-with <code>mutt</code><sup>1</sup>. Unfortunately, after a lot of searching, I was unable to find
-any documentation on achieving this integration over a secure connection.
-I kept seeing this error:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>Error: Search failed. LDAP server returned an error : 13, description: TLS
-</span><span class='line'>confidentiality required at /usr/lib/mutt_ldap_query line 198, &lt;DATA&gt; line 558.
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Several hours later, and with some
-help from <a href="https://twitter.com/#!/ibeardslee" title="Ian on Twitter: follow him…">@ibeardslee</a>,
-I managed to set it up, and it was definitely worth the effort.</p>
-
-<p>You will need to install <code>lbdb</code> from
-<a href="http://aur.archlinux.org/packages.php?ID=10225" title="AUR package">the AUR</a>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cowerd lbdb     <span class="c"># 2</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>…and a couple of packages from the repos to make it all work:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl-ldap perl-io-socket-ssl netkit-bsd-finger
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Then it is a matter of configuring <code>lbdb</code> to both
-query the LDAP directory and be able to be called from <code>mutt</code>.
-First, copy the config files into your <span class="file">$HOME</span>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir .lbdb
-</span><span class='line'>cp /etc/lbdb.rc .lbdb/lbdbrc
-</span><span class='line'>cp /etc/lbdb_ldap.rc .lbdb/ldap.rc
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>And then modify the two configuration files to suit your setup:
-The first, <span class="file">$HOME/.lbdb/lbdbrc</span>, is well commented and
-self-explanatory; add <code>ldap</code> to the methods and the
-nickname of your server:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">METHODS</span><span class="o">=</span><span class="s2">&quot;m_abook m_ldap&quot;</span>
-</span><span class='line'><span class="nv">LDAP_NICKS</span><span class="o">=</span><span class="s2">&quot;catalyst&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The second config file, <span class="file">$HOME/.lbdb/ldap.rc</span>
-is written in Perl and is a bit of a shocker:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='perl'><span class='line'><span class="nv">%ldap_server_db</span> <span class="o">=</span> <span class="p">(</span><span class="sr">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;</span><span class="s">&#39;catalyst&#39;</span> <span class="o">=&amp;</span><span class="ow">gt</span><span class="p">;</span> <span class="p">[</span><span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s">&#39;${mail}&#39;</span><span class="p">,</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">]</span>
-</span><span class='line'><span class="sr">&lt;/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;</span><span class="p">);</span><span class="sr">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;h1&gt;</span><span class="n">hostname</span> <span class="n">of</span> <span class="n">your</span> <span class="n">ldap</span> <span class="n">server</span><span class="sr">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;</span><span class="nv">$ldap_server</span> <span class="o">=</span> <span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$search_base</span> <span class="o">=</span> <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_search_fields</span>    <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_expected_answers</span> <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_result_email</span>     <span class="o">=</span> <span class="s">&#39;${mail}&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_result_realname</span>  <span class="o">=</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ignorant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_bind_dn</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_bind_password</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="mi">1</span><span class="p">;</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The key is to ensure that you use both the <code>ldaps</code>
-prefix <strong>and</strong> explicitely specify the SSL port, 636. Without both of these, you will
-get the TLS confidentiality error.</p>
-
-<p>You can then test that it is working correctly by running a query:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>lbdbq jemima
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>All going well, if there is indeed a Jemima in the shared address book, you will see her
-contact details miraculously appear before you. If there is more than one, you will have a
-list to choose from.</p>
-
-<p>Finally, you just need to set up <code>mutt</code> to query <code>lbdb</code>.
-In your <span class="file">muttrc</span>, add the following:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">query_command</span> <span class="o">=</span> <span class="s2">&quot;lbdbq %s 2&gt;/dev/null&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>I found that suppressing the errors made the whole experience a little smoother. You
-may not require it… Now, hitting <kbd>Shift</kbd><kbd>q</kbd> in <code>mutt</code>
-brings up a prompt to query the LDAP directory (and my <a href="http://abook.sourceforge.net/" title="abook homepage">abook</a> address book that I share via
-<a href="https://www.dropbox.com/" title="Dropbox homepage">dropbox</a>). You can also access the directory
-by starting to type an email address and then hitting <kbd>Ctrl</kbd><kbd>t</kbd> to see
-a list of possible completions.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk's post</a> got me started.</li>
-<li>A <a href="https://bitbucket.org/jasonwryan/eeepc/src/f15bf6e51e62/Scripts/cowerd" title="Script in bitbucket repo">wrapper script for cower</a></li>
-</ol>
-
-
-<p>Creative Commons image <a href="http://www.flickr.com/photos/bertop/2530620838/">by bertop on Flickr</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Moving to Octopress]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/03/30/octopress/"/>
-    <updated>2012-03-30T12:30:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/03/30/octopress</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
-
-<p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
-a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
-the static site generator powering <a href="http://pages.github.com/">Github Pages</a>. I had previously
-been posting to a <a href="https://www.tumblr.com/">tumblr</a> page and, over the nearly four years that
-I had been doing that I had somehow racked up just over 4000 posts. I was <em>not</em>
-looking forward to migrating across.</p>
-
-<p>However, the fact that the Jekyll project has a number of scripts for
-<a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">migrating from other platforms</a>
-assuaged my concerns about the difficulty of this task. That sense of relief was shortlived.
-Neither of the two tumblr migration scripts were of any assistance: both would die during their
-initial runs, probably due to some funky characters in the post titles, or perhaps the posts themselves.</p>
-
-<p>I certainly had no intention of trying to wade through the entire back catalogue identifying the
-rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the
-“straightforward” nature of the task, I saw this setback as an opportunity to cull all of the
-cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
-some interest.</p>
-
-<p>Being an assiduous record keeper, all of the posts were helpfully bookmarked on
-<a href="https://pinboard.in/u:jasonwryan/t:jwr/">Pinboard under one tag</a>, and therefore it was
-simple enough to create a list of the required <acronym title="Unique Resource Locator">URLs</acronym>.
-Armed with this list, it was just a matter of cobbling together a script to do the bulk of
-the work for me.</p>
-
-<p>The first task was to retrieve the posts from the list:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;grab files&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;while <span class="nb">read </span>url; <span class="k">do</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;done &amp;lt; /home/jason/Scripts/list
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
-surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;strip HTML cruft&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;for file in &lt;em&gt;.html; <span class="k">do</span>
-</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&amp;lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.&lt;/em&gt;}&quot;</span>
-</span><span class='line'><span class="k">done</span>
-</span><span class='line'>mkdir html &amp;amp;&amp;amp; mv *.html html/
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The final task of this part of the migration was to convert the HTML into
-<a href="http://daringfireball.net/projects/markdown/">markdown</a>,
-the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
-the "universal document converter" handled that job:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;convert to markdown format&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;for file in *; <span class="k">do</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &amp;gt; <span class="s2">&quot;$file&quot;</span>.md
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;done
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The final result was fifty markdown files holding all of my posts, almost ready to
-be committed to github. I say “almost” because the files still required what turned out to
-be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would
-inexpicably break <a href="http://www.notareallink.com">multi word
-hyperlinks</a> over two lines. Similarly all of the internal
-links to my other posts pointed to the (meaningless) tumblr URLs<sup>2</sup>.</p>
-
-<p>Setting up Octopress was extremely simple and quick by comparison: the
-<a href="http://octopress.org/docs/">documentation is very helpful</a>. There was one slight
-hitch, a <a href="https://github.com/tmm1/pygments.rb/issues/10">known issue on Arch x86_64</a>,
-which was simple enough to deal with.</p>
-
-<p>While the migration was not entirely pain-free, I am pleased that I have done it. Tumblr's service
-increasingly <a href="https://twitter.com/#!/jasonwryan/statuses/176543962276954112">left a lot to be desired</a>
-but as it was a free service, I couldn't complain too much. Or, more accurately, when I did complain,
-no-one actually listened…</p>
-
-<p>Indeed, moving to a paid service like Github
-(yes, it's free at first, but once you have enough data there you need to pay a small amount
-every month) <a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/">makes a lot of sense</a>.
-The paid services I do use, like <a href="http://pinboard.in/">Pinboard</a> and
-<a href="http://www.tarsnap.com/">Tarsnap</a> are both inexpensive and much more
-reliable than their free counterparts<sup>3</sup>; and you get to invest in great
-software that is a pleasure to use.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li>Initially, I had set up the site as a simple holding page and dumped a whole lot
-of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
-mostly just that sort of internet detritus…</li>
-<li>For creating redirections (Github pages do <em>not</em> support <span class="file">.htaccess</span>)
-I can't recommend enough the
-<a href="https://github.com/rawsyntax/jekyll_alias_generator/blob/master/_plugins/alias_generator.rb">Jekyll Alias Generator</a>.
-Just. Brilliant.</li>
-<li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
-</ol>
-
 ]]></content>
   </entry>
   

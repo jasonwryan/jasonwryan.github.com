@@ -4,7 +4,7 @@
   <title><![CDATA[Category: browser | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/browser/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-03-29T10:15:47+13:00</updated>
+  <updated>2013-06-22T17:25:39+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -14,11 +14,155 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Replacing Google Reader]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/05/25/greader/"/>
+    <updated>2013-05-25T09:10:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/05/25/greader</id>
+    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/commafeed.png 'CommaFeed Logo' %}
+I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
+everyday since I first discovered the service over seven years ago. It is my
+primary source of news and information and the announcement that Google is, on July 1 this year,
+set to <a href="http://googlereader.blogspot.ca/2013/03/powering-down-google-reader.html" title="Official announcemet on Google Blog">shut down Reader</a>
+was something considerably more than just an inconvenience for me.</p>
+
+<p>Over the years, I had looked at other <acronym title="Rich Site Summary">RSS</acronym>
+readers but, for a variety of reasons, had invariably found that the speed,
+simplicity and flexibility that Google Reader offered meant that any dalliances
+were unsatisfactory and short-lived. I resigned myself to having to settle for
+an inferior alternative, rather than moving to a genuine replacement.</p>
+
+<p>On the recommendation of <a href="https://pinboard.in/" title="Not so-social bookmarking">@pinboard</a>,
+I first signed up for a premium account at
+<a href="https://www.newsblur.com/" title="NewsBlur website">NewsBlur</a>. It is open source and,
+given the recommendation from Maciej<sup>1</sup>, I was hopeful that it would
+bridge the gap. Newsblur is a good service (especially considering the rush of
+signups in the days after the Google announcement), but it has a couple of
+critical weaknesses for me: no search (yes, you read that correctly—there is <em>no
+way to search through your feeds</em>) and, less importantly but just as annoying,
+occasionally sluggish performance.</p>
+
+<p>After a couple of weeks using NewBlur I happily stumbled across
+<a href="https://www.commafeed.com/" title="CommaFeed homepage">CommaFeed</a>, a
+Reader clone that emulates the austere minimalism of Google Reader. Apart from
+the fact that it is open source, the other aspect that attracted me to it
+was the ability to run it on Red Hat's Platform as a Service offering,
+<a href="http://www.openshift.com/" title="Red Hat PaaS">OpenShift</a>.</p>
+
+<p>The README on the <a href="https://github.com/Athou/commafeed" title="CommaFeed repo">Github repo</a>
+explains how to set it all up. Unfortunately, due to an
+<a href="https://github.com/Athou/commafeed/issues/91" title="OpenShift fails silently">open issue</a>,
+some manual intervention is required, but it is still a very
+straightforward and painless process to get your own instance of CommaFeed up
+and running.</p>
+
+<p>Creat an OpenShift account, log in and add the JBoss 6.0 application (or
+cartridge as it is called on OpenShift) and the MySQL cartridge. Once your setup
+is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
+under your <code>My Applications</code> tab, copy down your Git repo address, which will be
+of the form:</p>
+
+<p>{% codeblock lang:sh %}
+ssh://76758382475ef809976543@$appname-$namespace.rhcloud.com/~/git/feeds.git/
+{% endcodeblock %}</p>
+
+<p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
+server:</p>
+
+<p>{% codeblock lang:sh %}
+git clone https://github.com/Athou/commafeed.git
+cd commafeed</p>
+
+<h1>add OpenShift as a repo</h1>
+
+<p>git remote add openshift -f ssh://76758382475ef809976543@$appname-$namespace.etc…
+git merge openshift/master -s recursive -X ours
+git push openshift master
+{% endcodeblock %}</p>
+
+<p>This will then trigger a series of hooks that build the application and restart
+the server. If everything goes well you will see something like:</p>
+
+<p>{% codeblock lang:sh %}
+remote: [INFO] ------------------------------------------------------------------------
+remote: [INFO] BUILD SUCCESS
+remote: [INFO] ------------------------------------------------------------------------
+remote: [INFO] Total time: 3:18.195s
+remote: [INFO] Finished at: Mon May 20 03:21:37 EDT 2013
+remote: [INFO] Final Memory: 42M/185M
+remote: [INFO] ------------------------------------------------------------------------
+remote: Running .openshift/action_hooks/build
+remote: Running .openshift/action_hooks/deploy
+remote: hot_deploy_added=false
+remote: MySQL already running
+remote: Found 127.12.712.712:8080 listening port
+remote: Done
+remote: Running .openshift/action_hooks/post_deploy
+To ssh://76758382475ef809976543@$appname-$namespace.rhcloud.com/~/git/feeds.git/
+{% endcodeblock %}</p>
+
+<p>You now have CommaFeed successfully running on OpenShift. After a couple of
+minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
+and you will be able to login to your CommaFeed instance. Updating your
+CommaFeed is as simple as pulling to your local repo, merging and
+then pushing to <code>openshift master</code>.</p>
+
+<p>Importing directly from Google Reader still seems broken (I was  getting
+errors from builds late this week), but if you import from an existing <code>.opml</code>
+or <code>.xml</code> file you will see CommaFeed in all it's glory:</p>
+
+<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/commafeed_screen.png 'ComaFeed screenshot' %}</p>
+
+<p>As you can see, it is remarkably similar to the Google Reader interface; a
+clean, minimalist design that is focussed—quite rightly—on the content. There
+is an option to load your own <code>.css</code> if you want to apply some additional
+styling, but for me the base style is just about perfect.</p>
+
+<p>More impressively, in the week or so that I have been using CommaFeed, the
+developer,
+<a href="https://github.com/Athou" title="Athou on Github">Athou</a>, has been committing
+enhancements and bug fixes several times <em>a day</em>; almost every night,
+I have pushed changes to OpenShift, reloaded my browser and found a
+smoother, enhanced feed reader with additional functionality; it is
+literally growing in leaps and bounds, and is a great reminder of the power
+of open source<sup>2</sup>.</p>
+
+<p>The performance of OpenShift has also been solid; feeds are delivered
+seemingly instantaneously and, apart from the slight lag after restarting
+the application, I haven't experienced any issues whatsoever in terms
+of availability.</p>
+
+<p>There are still a couple of areas where CommaFeed can be improved. Most
+notably, there is an open feature request for a
+<a href="https://github.com/Athou/commafeed/issues/54" title="Github Issue">mobile friendly CSS</a>
+and this is badly needed, the site is pretty much unusable on my phone. With
+any luck, some enterprising Android developer will build a CommaFeed app (for
+which I would happily pay good money)…</p>
+
+<p>In any event, if you are looking for a Google Reader replacement, try
+running CommaFeed (either on your own server or one of Red Hat's); for
+a project that is only a couple of months old, it has covered a
+tremendous amount of ground and will undoubtedly continue to grow
+and improve.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In conjunction with his great advice about not being a
+<a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/" title="Pinboard blog">free user</a>.</li>
+<li>The <a href="http://feeds-jwr.rhcloud.com/#/feeds/help" title="About and Help page">about page</a>
+has a donate button: if you want to support an application which I have no doubt
+will soon be even better than Google Reader, you might want to use it.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[A Vimprobable Walkthrough]]></title>
     <link href="http://jasonwryan.github.com/blog/2012/11/20/vimprobable/"/>
     <updated>2012-11-20T18:58:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2012/11/20/vimprobable</id>
-    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/vimprobable-logo.png" title="'Vimprobable logo'" >
+    <content type="html"><![CDATA[<p>{% img left https://dl.dropbox.com/u/261312/Blog-images/vimprobable-logo.png 'Vimprobable logo' %}
 I have written about <a href="http://vimprobable.org" title="Vimprobable homepage">Vimprobable</a>
 a couple of times over the last two years<sup>1</sup>,
 it is one of those projects that, for a variety of reasons, I have picked up
@@ -99,9 +243,10 @@ you can do it all from the keyboard.</p>
 <kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
 return to normal mode:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
-</span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+map &lt;C-c>=:set caret=true
+map &lt;S-c>=:set caret=false
+{% endcodeblock %}</p>
 
 <p>Then, it is just a matter of identifying the text that you wish to copy
 (in the photo above I was copying a script to launch <code>tabbed</code>), and
@@ -146,37 +291,40 @@ in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
 <p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
 <psan class="file">/tmp</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&amp;lt;/tmp/tabbed.xid)&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+"$(tabbed -d >/tmp/tabbed.xid); vimprobable2 -e $(&lt;/tmp/tabbed.xid)"
+{% endcodeblock %}</p>
 
 <p>Then it is just a matter of setting up other applications to pass links
 to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
 <span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> %s
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+openurl_command = vimprobable2 -e $(&lt;/tmp/tabbed.xid) %s
+{% endcodeblock %}</p>
 
 <p>The workaround for Urxvtc was a little trickier. I finally got there
 with some help from
 <a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
 In my <span class="file">~/.Xdefaults</span> I have:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
-</span><span class='line'>URxvt.perl-ext-common: default,matcher
-</span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
-</span><span class='line'>URxvt.matcher.button: 1
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+! -- Clickable urls -- !
+URxvt.perl-ext-common: default,matcher
+URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
+URxvt.matcher.button: 1
+{% endcodeblock %}</p>
 
 <p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Script to open Vimprobable instances in tabbed&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;exec vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}</p>
+
+<h1>!/bin/bash</h1>
+
+<h1>Script to open Vimprobable instances in tabbed</h1>
+
+<p>exec vimprobable2 -e $(&lt;/tmp/tabbed.xid) "$1"
+{% endcodeblock %}</p>
 
 <p>Now whenever I open a link in an application or by clicking a link in
 the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
@@ -254,9 +402,10 @@ It was just a matter then of adding some intuitive keybinds – as the <kbd>M</k
 and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
 <a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN    <span class="p">&lt;</span><span class="k">br</span>/<span class="p">&gt;</span>
-</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:vim %}
+keymap y EXTERN    <br/>
+keymap Y EXTERN_LINK
+{% endcodeblock %}</p>
 
 <p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
 
@@ -264,8 +413,9 @@ and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
 
 <p>Gilles has edited and updated his answer with a slight change:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+sh -c 'printf %s "$0" | xsel'
+{% endcodeblock %}</p>
 
 <p>This prevents a new line being appended.</p>
 ]]></content>
@@ -312,8 +462,9 @@ Should you wish to use it, you will need to create this file in
 Helpfully, there is a man page for all of the options in this file, to
 read it issue:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>man vimprobablerc
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+man vimprobablerc
+{% endcodeblock %}</p>
 
 <p>Despite it’s spartan appearance, Vimprobable is a full-featured browser
 — with the advantage of being driven solely from the keyboard. It
@@ -351,74 +502,6 @@ Vimprobable hinting style, and I could only find this
 which will give you an idea…</p></li>
 </ol>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Uzbl]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/02/27/using-uzbl/"/>
-    <updated>2010-02-27T10:19:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/02/27/using-uzbl</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/4352140405/" title="Arch &amp; uzbl by jasonwryan, on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/uzbl.jpg" alt="Arch &amp;
-uzbl" /></a></p>
-
-<p>A couple of weeks ago, I switched my default browser from
-<a href="http://conkeror.org/" title="Conkeror homepage">Conkeror</a> to
-<a href="http://www.uzbl.org/" title="uzbl homepage">uzbl</a>. It wasn’t that I was
-dissatisfied with Conkeror <em>per se</em>; more that as I was almost
-exclusively using vim-like applications, it seemed almost perverse to be
-browsing with an application that used Emacs-style keybindings. Over
-time, the simplest operations seemed—in comparison to
-<a href="http://www.vim.org/" title="THE $EDITOR">Vim</a>— to demand ridiculously complex
-key strokes.</p>
-
-<p>So, I installed uzbl.</p>
-
-<blockquote><p>Uzbl follows the UNIX philosophy - “Write programs that do one thing
-and do it well. Write programs to work together. Write programs to
-handle text streams, because that is a universal interface.”
-<a href="http://www.uzbl.org/">uzbl homepage</a></p></blockquote>
-
-<p>Consequently, the default uzbl version is designed to do little more
-than browse web pages. It doesn’t handle cookies, manage downloads,
-block ads, save bookmarks, or do any of the things that you would expect
-of its WebKit kin, <del>Firefox</del> Safari and Chrome.</p>
-
-<p>This isn’t to say that it <em>can’t</em> do any of these things; like any
-well-designed
-<a href="http://en.wikipedia.org/wiki/UNIX" title="Wikipedia entry">UNIX</a> program, it
-is extensible and interoperable with programs through a range of
-scripts. The difference is that you get to choose which functionality
-matters to you, and implement it on an as-needs basis. This makes uzbl
-very light, very fast, and very powerful.</p>
-
-<p>The version I installed, uzbl-tabbed, ships with a number of default
-scripts that perform most of the functions that you will need. There is
-also a <a href="http://www.uzbl.org/wiki/scripts" title="uzbl wiki: scripts">scripts page</a>
-on the wiki that has a growing number of scripts contributed by users.</p>
-
-<p>I installed a couple of <a href="http://pbrisbin.com:8080/pages/scripts.html" title="Pat's scripts page">Pat Brisbin’s scripts</a>;
-an ingenious bash script for bookmarking that creates an HTML page of
-your bookmarks that you can serve locally or remotely (I keep mine on
-<a href="http://www.dropbox.com" title="Dropbox home">Dropbox</a> so I can access it from
-my phone as well), and a tidy little download manager.</p>
-
-<p>Like Vim, uzbl is modal; you switch between command and insert mode. By
-configuring uzbl to use Vim key bindings, you can seamless integrate it
-into your desktop environment. Here you can see the status bar showing
-uzbl in command mode, on the Arch forums home page, which has completely
-loaded (the other figure is the X root window number).</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/uzbl-bar.png" alt="image" /></p>
-
-<p>As an Arch Linux user, I’m keen to support a project that has been
-developed by the Arch community (if you want to see the history of the
-project, there is a <a href="http://bbs.archlinux.org/viewtopic.php?id=70700&amp;p=1" title="uzbl history">long thread</a>
-on the Arch boards); but ultimately this software appeals because it is
-so configurable: you can customize it to your heart’s content (see my
-config file on my <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/uzbl/" title="uzbl file on bitbucket">mercurial repo</a>).</p>
-
-<p>There are packages for most of the major distros: <a href="http://www.uzbl.org/get.php" title="Download and install details on the wiki">give it a go</a>.</p>
 ]]></content>
   </entry>
   

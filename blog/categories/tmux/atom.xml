@@ -4,7 +4,7 @@
   <title><![CDATA[Category: tmux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/tmux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-03-29T10:15:47+13:00</updated>
+  <updated>2013-06-22T17:25:39+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -39,20 +39,19 @@ on my Arch machines, I wanted to make it work with
 <a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
 Enter a simple shell script:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;echo <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;done
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock highlights.sh %}</p>
+
+<h1>!/bin/sh</h1>
+
+<p>dir="$HOME/Dropbox/irssi/"</p>
+
+<p>while inotifywait -qqre attrib "$dir" >/dev/null 2>&1; do</p>
+
+<pre><code>echo "IRC: You have been pinged..." | dzen2 -p 3
+</code></pre>
+
+<p>done
+{% endcodeblock %}</p>
 
 <p>I have included this in my <span class="file">$HOME/.xinitrc</span>
 so that it runs in the background after login. Whenever the metadata
@@ -100,9 +99,10 @@ consequence, but each necessary.</p>
 
 <p>First, in your <span class="file">$HOME/.tmux.conf</span> you need to enable update-environment:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set</span> -g update-environment <span class="s2">&quot;DISPLAY SSH_ASKPASS SSH_AUTH_SOCK</span>
-</span><span class='line'><span class="s2">SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+set -g update-environment "DISPLAY SSH_ASKPASS SSH_AUTH_SOCK
+SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY"
+{% endcodeblock %}</p>
 
 <p>From the <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="tmux manual">man page</a>:</p>
 
@@ -117,36 +117,36 @@ command).</p></blockquote>
 launch from scratch, you can adopt a simpler approach) that starts tmux
 and initializes ssh-agent:<sup>2</sup></p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;PID<span class="o">=</span><span class="k">$(</span>pgrep tmux<span class="k">)</span>
-</span><span class='line'><span class="nv">new</span><span class="o">=</span><span class="s2">&quot;tmux -f $HOME/.tmux/conf new -s secured&quot;</span>
-</span><span class='line'><span class="nv">old</span><span class="o">=</span><span class="s2">&quot;tmux attach -t secured -d&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="s2">&quot;$SSH_AUTH_SOCK&quot;</span> <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;eval <span class="sb">`</span>ssh-agent<span class="sb">`</span>
-</span><span class='line'><span class="nb">trap</span> <span class="s2">&quot;kill $SSH_AGENT_PID&quot;</span> 0
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="s2">&quot;$PID&quot;</span> <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${new}&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;else&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${old}&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;ssh-add
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}</p>
+
+<h1>!/bin/bash</h1>
+
+<p>PID=$(pgrep tmux)
+new="tmux -f $HOME/.tmux/conf new -s secured"
+old="tmux attach -t secured -d"</p>
+
+<p>if [[ -z "$SSH_AUTH_SOCK" ]]; then</p>
+
+<pre><code>eval `ssh-agent`
+trap "kill $SSH_AGENT_PID" 0
+</code></pre>
+
+<p>fi</p>
+
+<p>if [[ -z "$PID" ]]; then</p>
+
+<pre><code>urxvtc -title "SSH" -e sh -c "${new}"
+</code></pre>
+
+<p>else</p>
+
+<pre><code>urxvtc -title "SSH" -e sh -c "${old}"
+</code></pre>
+
+<p>fi</p>
+
+<p>ssh-add
+{% endcodeblock %}</p>
 
 <p>The final step is to install
 <a href="http://www.funtoo.org/wiki/Keychain" title="Keychain homepage">keychain</a>, and
@@ -154,14 +154,14 @@ set it up. I followed the
 <a href="https://wiki.archlinux.org/index.php/SSH_Keys#Using_keychain" title="...because it rocks!">instructions on the Arch Wiki</a>
 and opted for a couple of lines in <span class="file">$HOME/.bash_profile</span><sup>3</sup>, like so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
-</span><span class='line'><span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span> &amp;amp;&amp;amp;&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;source <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
+[[ -f $HOME/.keychain/$HOSTNAME-sh ]] &amp;&amp;</p>
+
+<pre><code>source $HOME/.keychain/$HOSTNAME-sh
+</code></pre>
+
+<p>{% endcodeblock %}</p>
 
 <p>That’s it. Now, hitting a key sequence opens a terminal, I am prompted
 for my passphrase and then, if I open another window, or another tmux
@@ -174,18 +174,19 @@ not</em>, I am authenticated and can SSH or push without a prompt.</p>
 keychain is only called if I start a specific named tmux session. To do
 this, I changed my <span class="file">$HOME/.bash_profile</span> to test for that session:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">tsess</span><span class="o">=</span><span class="k">$(</span>tmux ls<span class="k">)</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;${tsess%%:*}&quot;</span> <span class="o">=</span> <span class="s2">&quot;secured&quot;</span> <span class="o">]]</span> &amp;amp;&amp;amp;
-</span><span class='line'>   <span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;# start keychain
-</span><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
-</span><span class='line'>. <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+tsess=$(tmux ls)</p>
+
+<p>if [[ "${tsess%%:*}" = "secured" ]] &amp;&amp;
+   [[ -f $HOME/.keychain/$HOSTNAME-sh ]]; then</p>
+
+<pre><code># start keychain
+/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
+. $HOME/.keychain/$HOSTNAME-sh
+</code></pre>
+
+<p>fi
+{% endcodeblock %}</p>
 
 <h5>Notes</h5>
 
@@ -227,14 +228,13 @@ and then working up from there. There is a section
 <a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
 that has always puzzled me, and so I decided to get to the bottom of it.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;show some useful stats but only when tmux is started&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;outside of Xorg, otherwise dwm statusbar shows these already&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}</p>
+
+<h1>show some useful stats but only when tmux is started</h1>
+
+<h1>outside of Xorg, otherwise dwm statusbar shows these already</h1>
+
+<p>{% endcodeblock %}</p>
 
 <p>It is a great idea. If you are running tmux in X, then you have
 <a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
@@ -256,28 +256,28 @@ source-file option in <span class="file">.tmux.conf</span> to call the relevant 
 depending if X was running or not. I just adapted Thayer’s code, like
 so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Statusbar starting in X or not&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
-</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}</p>
+
+<h1>Statusbar starting in X or not</h1>
+
+<p>if '[ -n "$DISPLAY" ]' 'source-file ~/.tmux/inx'
+if '[ -z "$DISPLAY" ]' 'source-file ~/.tmux/xless'
+{% endcodeblock %}</p>
 
 <p>And then created those files with the desired statusbar options. So, for
 example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
 loaded:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Statusbar <span class="k">if </span>tmux run in console&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;information normally in dwm bar&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;set -g status-right-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}</p>
+
+<h1>Statusbar if tmux run in console</h1>
+
+<h1>information normally in dwm bar</h1>
+
+<p>set -g status-right-length 50
+set -g status-left-length 50
+set -g status-left "#[fg=green] #H #[default] …blah, blah, blah…
+{% endcodeblock %}</p>
 
 <p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
 
@@ -318,21 +318,23 @@ explained there, I thought I would share my approach anyway.</p>
 
 <p>First, I set tmux to use vi keys:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setw -g mode-keys vi
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+setw -g mode-keys vi
+{% endcodeblock %}</p>
 
 <p>Then I change the default keybinds to suit my workflow. As explained in
 the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
 and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
 to more intuitive and Vim-like keys:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
-</span><span class='line'><span class="nb">bind </span>Escape copy-mode
-</span><span class='line'>unbind p
-</span><span class='line'><span class="nb">bind </span>p paste-buffer
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+unbind [
+bind Escape copy-mode
+unbind p
+bind p paste-buffer
+bind-key -t vi-copy 'v' begin-selection
+bind-key -t vi-copy 'y' copy-selection
+{% endcodeblock %}</p>
 
 <p>This seems a lot closer to all of the other Vim-like apps that I run -
 where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
@@ -392,10 +394,11 @@ running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux
 <p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
 colours, gave me the default:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> &amp;amp;&amp;amp; tput colors
-</span><span class='line'>linux
-</span><span class='line'>8
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+$ echo $TERM &amp;&amp; tput colors
+linux
+8
+{% endcodeblock %}</p>
 
 <p>Which, under my current configuration of Vim, rendered colours like so:</p>
 
@@ -406,26 +409,29 @@ colours, gave me the default:</p>
 <p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
 colours:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+set t_Co=256
+{% endcodeblock %}</p>
 
 <p>Then I had to rewrite my colourscheme to change all of the references to
 the terminal colour numbers to colour <em>names</em>, as apparently that is
 what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
-</span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
-</span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
-</span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:vim %}
+hi Normal          ctermfg=15
+hi Ignore          ctermfg=8
+hi Comment         ctermfg=7
+hi LineNr          ctermfg=8
+{% endcodeblock %}</p>
 
 <p>…to the more literal:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
-</span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
-</span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:vim %}
+hi Normal         ctermfg=white    cterm=bold
+hi Ignore         ctermfg=black    cterm=bold
+hi Comment        ctermfg=grey
+hi LineNr         ctermfg=black    cterm=bold
+{% endcodeblock %}</p>
 
 <p>Once I had made the necessary changes, I saved this new colourscheme as
 <span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
@@ -442,46 +448,47 @@ to the console. Fortunately,
 <a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
 made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Linux console colors <span class="o">(</span>jwr dark<span class="o">)</span>&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
-</span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}</p>
+
+<h1>Linux console colors (jwr dark)</h1>
+
+<p>if [ "$TERM" = "linux" ]; then
+   echo -en "\e]P0000000" #black
+   echo -en "\e]P83d3d3d" #darkgrey
+   echo -en "\e]P18c4665" #darkred
+   echo -en "\e]P9bf4d80" #red
+   echo -en "\e]P2287373" #darkgreen
+   echo -en "\e]PA53a6a6" #green
+   echo -en "\e]P37c7c99" #brown
+   echo -en "\e]PB9e9ecb" #yellow
+   echo -en "\e]P4395573" #darkblue
+   echo -en "\e]PC477ab3" #blue
+   echo -en "\e]P55e468c" #darkmagenta
+   echo -en "\e]PD7e62b3" #magenta
+   echo -en "\e]P631658c" #darkcyan
+   echo -en "\e]PE6096bf" #cyan
+   echo -en "\e]P7899ca1" #lightgrey
+   echo -en "\e]PFc0c0c0" #white
+   clear # bring us back to default input colours
+fi
+{% endcodeblock %}</p>
 
 <p>Then it was just a case of setting the relevant colourscheme in my
 <span class="file">.vimrc</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;amp;<span class="nb">t_Co</span> &amp;<span class="k">lt</span>; <span class="m">256</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
-</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">else</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miromiro
-</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">endif</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:vim %}
+if &amp;t_Co &lt; 256</p>
+
+<pre><code>colorscheme miro8   " colourscheme for the 8 colour linux term
+</code></pre>
+
+<p>else</p>
+
+<pre><code>colorscheme miromiro 
+</code></pre>
+
+<p>endif
+{% endcodeblock %}</p>
 
 <p>And you can see
 <a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>

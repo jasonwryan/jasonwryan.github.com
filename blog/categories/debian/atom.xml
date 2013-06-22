@@ -4,7 +4,7 @@
   <title><![CDATA[Category: debian | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/debian/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-03-29T10:15:47+13:00</updated>
+  <updated>2013-06-22T17:25:39+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -34,38 +34,42 @@ anyway—I thought I’d patch in colour support.</p>
 <p>This is a straightforward two-step process. First, build the current
 version of libtorrent, 0.12.9:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
-</span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
-</span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
-</span><span class='line'>./configure &amp;amp;&amp;amp; make
-</span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
+tar -xvf libtorrent-0.12.9.tar.gz
+cd libtorrent-0.12.9/
+./configure &amp;&amp; make
+sudo checkinstall
+{% endcodeblock %}</p>
 
 <p>Once libtorrent is successfully built and installed, you can begin the
 rtorrent build:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
-</span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
-</span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
+tar -xvf rtorrent-0.8.9.tar.gz
+cd rtorrent-0.8.9/
+{% endcodeblock %}</p>
 
 <p>Then, if you want colour support, you need the patch. I used the version
 in the
 <a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
 but you can also grab a copy from a paste site:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
-</span><span class='line'>mv canvas_colour.patch src/
-</span><span class='line'>patch -uNp1 -i canvas_colour.patch
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
+mv canvas_colour.patch src/
+patch -uNp1 -i canvas_colour.patch
+{% endcodeblock %}</p>
 
 <p>The patch should apply cleanly. Then specify where libtorrent is
 installed to ensure that it is linked during the rtorrent build:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
-</span><span class='line'>make
-</span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+./configure --libdir=/usr/local/lib
+make
+sudo checkinstall
+{% endcodeblock %}</p>
 
 <p>Once again, this should compile cleanly and you will now have rtorrent
 with colour and magnet link support installed in
@@ -124,57 +128,56 @@ I’ll set up a
 <a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
 automate the task.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Backup to remote server over NFS&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
-</span><span class='line'> <span class="nb">exit </span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
-</span><span class='line'> mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">fi</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;sync directories&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
-</span><span class='line'> /home/jason /etc /media/Sentinel/Backups/Centurion
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
-</span><span class='line'> umount /media/Sentinel
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">fi</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock runbackup.sh %}</p>
+
+<h1>!/bin/sh</h1>
+
+<h1>Backup to remote server over NFS</h1>
+
+<p>if [ $(id -u) -ne 0 ]; then</p>
+
+<pre><code> printf '%s\n' "You must run this as root. Terminating."
+ exit 1
+</code></pre>
+
+<p>fi</p>
+
+<p>if [ -d /media/Sentinel/Backups ]; then</p>
+
+<pre><code> printf '%s\n' "Sentinel mounted."
+</code></pre>
+
+<p> else</p>
+
+<pre><code> printf '%s\n' "Mounting Sentinel."
+ mount.nfs 192.168.1.200:/home/jason /media/Sentinel || exit 1
+</code></pre>
+
+<p> fi</p>
+
+<h1>sync directories</h1>
+
+<p> printf '%s\n' "Starting sync..."</p>
+
+<p> rsync -azP --delete --exclude-from=Scripts/excludes.txt \</p>
+
+<pre><code> --log-file=Documents/rsync.log \
+ /home/jason /etc /media/Sentinel/Backups/Centurion
+</code></pre>
+
+<p> if [ "$?" -eq 0 ]; then</p>
+
+<pre><code> printf '%s\n' "Synched successfully; now unmounting."
+ umount /media/Sentinel
+</code></pre>
+
+<p> else</p>
+
+<pre><code> printf '%s\n' "Fail!"
+</code></pre>
+
+<p> fi
+{% endcodeblock %}</p>
 
 <h5>Notes</h5>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: vim | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/vim/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-03-29T10:15:47+13:00</updated>
+  <updated>2013-06-22T17:25:39+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -18,7 +18,7 @@
     <link href="http://jasonwryan.github.com/blog/2013/03/29/vim/"/>
     <updated>2013-03-29T10:17:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/03/29/vim</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/vim-logo.png" title="'Vim logo'" >
+    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/vim-logo.png 'Vim logo' %}
 Apart from a brief, but nevertheless instructive, flirtation with
 <a href="http://www.gnu.org/software/emacs/" title="Emacs homepage">Emacs</a><sup>1</sup> I have
 been a consistent <a href="http://www.vim.org/" title="Vim home">Vim</a> user over the last three
@@ -60,22 +60,22 @@ what you will of that, but for my purposes it is overkill. With all the magic of
 to exactly your requirements. For me, that means this set of simplified <code>configure</code>
 options:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>  ./configure <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;--prefix<span class="o">=</span>/usr <span class="se">\</span>
-</span><span class='line'>--localstatedir<span class="o">=</span>/var/lib/vim <span class="se">\</span>
-</span><span class='line'>--with-features<span class="o">=</span>normal <span class="se">\</span>
-</span><span class='line'>--with-compiledby<span class="o">=</span>Arch:jwr <span class="se">\</span>
-</span><span class='line'>--with-x<span class="o">=</span>yes <span class="se">\</span>
-</span><span class='line'>--enable-acl <span class="se">\</span>
-</span><span class='line'>--disable-gui <span class="se">\</span>
-</span><span class='line'>--disable-signs <span class="se">\</span>
-</span><span class='line'>--disable-netbeans <span class="se">\</span>
-</span><span class='line'>--enable-multibyte
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+  ./configure \</p>
+
+<pre><code>--prefix=/usr \
+--localstatedir=/var/lib/vim \
+--with-features=normal \
+--with-compiledby=Arch:jwr \
+--with-x=yes \
+--enable-acl \
+--disable-gui \
+--disable-signs \
+--disable-netbeans \
+--enable-multibyte 
+</code></pre>
+
+<p>{% endcodeblock %}</p>
 
 <p>With these options, I have the minimum amount of functionality I comfortably
 require (including the ability to access the system clipboard, <code>--with-x=yes</code>)
@@ -145,32 +145,33 @@ prefer to work at the top of the console.</p>
 it was a trivial exercize to restore this functionality to my bash shell
 in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;h1>for vi mode&lt;/h1>
-</span><span class='line'>
-</span><span class='line'>&lt;p>set editing-mode vi
-</span><span class='line'>$if mode=vi&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;p>set keymap vi-command&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;h1>these are for vi-command mode&lt;/h1>
-</span><span class='line'>
-</span><span class='line'>&lt;p>"\e[A": history-search-backward            # arrow up
-</span><span class='line'>"\e[B": history-search-forward             # arrow down
-</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
-</span><span class='line'>Control-l: clear-screen&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;p>set keymap vi-insert&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;h1>these are for vi-insert mode&lt;/h1>
-</span><span class='line'>
-</span><span class='line'>&lt;p>"\e[A": history-search-backward
-</span><span class='line'>"\e[B": history-search-forward
-</span><span class='line'>"\ep": yank-last-arg
-</span><span class='line'>Control-l: clear-screen
-</span><span class='line'>$endif</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock ~/inputrc %}
+$include /etc/inputrc</p>
+
+<h1>for vi mode</h1>
+
+<p>set editing-mode vi
+$if mode=vi</p>
+
+<p>set keymap vi-command</p>
+
+<h1>these are for vi-command mode</h1>
+
+<p>"\e[A": history-search-backward            # arrow up
+"\e[B": history-search-forward             # arrow down
+"\ep": yank-last-arg                       # bind to Alt-p
+Control-l: clear-screen</p>
+
+<p>set keymap vi-insert</p>
+
+<h1>these are for vi-insert mode</h1>
+
+<p>"\e[A": history-search-backward
+"\e[B": history-search-forward
+"\ep": yank-last-arg
+Control-l: clear-screen
+$endif
+{% endcodeblock %}</p>
 
 <p>There is an extensive list of
 <a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
@@ -206,10 +207,11 @@ running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux
 <p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
 colours, gave me the default:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> &amp;amp;&amp;amp; tput colors
-</span><span class='line'>linux
-</span><span class='line'>8
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+$ echo $TERM &amp;&amp; tput colors
+linux
+8
+{% endcodeblock %}</p>
 
 <p>Which, under my current configuration of Vim, rendered colours like so:</p>
 
@@ -220,26 +222,29 @@ colours, gave me the default:</p>
 <p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
 colours:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+set t_Co=256
+{% endcodeblock %}</p>
 
 <p>Then I had to rewrite my colourscheme to change all of the references to
 the terminal colour numbers to colour <em>names</em>, as apparently that is
 what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
-</span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
-</span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
-</span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:vim %}
+hi Normal          ctermfg=15
+hi Ignore          ctermfg=8
+hi Comment         ctermfg=7
+hi LineNr          ctermfg=8
+{% endcodeblock %}</p>
 
 <p>…to the more literal:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
-</span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
-</span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:vim %}
+hi Normal         ctermfg=white    cterm=bold
+hi Ignore         ctermfg=black    cterm=bold
+hi Comment        ctermfg=grey
+hi LineNr         ctermfg=black    cterm=bold
+{% endcodeblock %}</p>
 
 <p>Once I had made the necessary changes, I saved this new colourscheme as
 <span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
@@ -256,46 +261,47 @@ to the console. Fortunately,
 <a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
 made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Linux console colors <span class="o">(</span>jwr dark<span class="o">)</span>&lt;/h1&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
-</span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}</p>
+
+<h1>Linux console colors (jwr dark)</h1>
+
+<p>if [ "$TERM" = "linux" ]; then
+   echo -en "\e]P0000000" #black
+   echo -en "\e]P83d3d3d" #darkgrey
+   echo -en "\e]P18c4665" #darkred
+   echo -en "\e]P9bf4d80" #red
+   echo -en "\e]P2287373" #darkgreen
+   echo -en "\e]PA53a6a6" #green
+   echo -en "\e]P37c7c99" #brown
+   echo -en "\e]PB9e9ecb" #yellow
+   echo -en "\e]P4395573" #darkblue
+   echo -en "\e]PC477ab3" #blue
+   echo -en "\e]P55e468c" #darkmagenta
+   echo -en "\e]PD7e62b3" #magenta
+   echo -en "\e]P631658c" #darkcyan
+   echo -en "\e]PE6096bf" #cyan
+   echo -en "\e]P7899ca1" #lightgrey
+   echo -en "\e]PFc0c0c0" #white
+   clear # bring us back to default input colours
+fi
+{% endcodeblock %}</p>
 
 <p>Then it was just a case of setting the relevant colourscheme in my
 <span class="file">.vimrc</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;amp;<span class="nb">t_Co</span> &amp;<span class="k">lt</span>; <span class="m">256</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
-</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">else</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miromiro
-</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">endif</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:vim %}
+if &amp;t_Co &lt; 256</p>
+
+<pre><code>colorscheme miro8   " colourscheme for the 8 colour linux term
+</code></pre>
+
+<p>else</p>
+
+<pre><code>colorscheme miromiro 
+</code></pre>
+
+<p>endif
+{% endcodeblock %}</p>
 
 <p>And you can see
 <a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>

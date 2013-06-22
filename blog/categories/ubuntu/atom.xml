@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ubuntu | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/ubuntu/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-03-29T10:15:47+13:00</updated>
+  <updated>2013-06-22T17:25:39+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -48,8 +48,9 @@ started mpd, one of my ports was being flooded: 46560</p>
 
 <p><code>lsof</code> showed that pulse audio was the culprit:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751->224.0.0.56:46560
+{% endcodeblock %}</p>
 
 <p>Quelle surprise… When software engineers want a case study of opacity
 and abstraction from the user, this should be their first port of call.</p>
@@ -62,8 +63,9 @@ are trying to fix…</em></p>
 
 <p>Install the Pulse audio preferences tool:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install papref
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+sudo apt-get install papref
+{% endcodeblock %}</p>
 
 <p>…and disable Multicast/RTP.</p>
 
@@ -107,15 +109,17 @@ any authoritative guide to setting your console font permanently. I
 edited <span class="file">/etc/default/console-setup</span>
 and added Terminus as the font, like so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">CODESET</span><span class="o">=</span><span class="s2">&quot;Lat15&quot;</span>
-</span><span class='line'><span class="nv">FONTFACE</span><span class="o">=</span><span class="s2">&quot;Terminus&quot;</span>
-</span><span class='line'><span class="nv">FONTSIZE</span><span class="o">=</span><span class="s2">&quot;16&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+CODESET="Lat15"
+FONTFACE="Terminus"
+FONTSIZE="16"
+{% endcodeblock %}</p>
 
 <p>Issuing, from the console:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo setupcon -v
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+sudo setupcon -v
+{% endcodeblock %}</p>
 
 <p>would change the font to Terminus for that session but a reboot soon
 reverted it to the default fixed (which, given
@@ -124,8 +128,9 @@ spectacularly ugly).</p>
 
 <p>I finally asked in #ubuntu and was pointed in the right direction:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo dpkg-reconfigure console-setup
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+sudo dpkg-reconfigure console-setup
+{% endcodeblock %}</p>
 
 <p>And <em>now</em> I have a workable framebuffer.</p>
 
@@ -136,8 +141,9 @@ spectacularly ugly).</p>
 </ol>
 
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">GRUB_GFXPAYLOAD_LINUX</span><span class="o">=</span>1680x1050
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+GRUB_GFXPAYLOAD_LINUX=1680x1050
+{% endcodeblock %}</p>
 ]]></content>
   </entry>
   
@@ -256,7 +262,7 @@ fetch mail</li>
 </li>
 <li><p><del><a href="http://www.uzbl.org/">uzbl</a>: a lightweight webkit browser that is
 infintely extensible and
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.config/uzbl/config">configurable</a></del><sup>2^</sup></p></li>
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.config/uzbl/config">configurable</a></del>^2^</p></li>
 <li><a href="http://www.vimprobable.org/">Vimprobable</a> in
 <a href="http://tools.suckless.org/tabbed">tabbed</a>: another lightweight
 webkit browser that can be
@@ -372,13 +378,15 @@ actually useful, <kbd>Esc</kbd>.</p>
 
 <p>First, create the <code>mapkey</code> file in your home directory:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>xmodmap -pke &gt; ~/.xmodmap.mapkey
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+xmodmap -pke > ~/.xmodmap.mapkey
+{% endcodeblock %}</p>
 
 <p>Then open the file and edit it:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vim ~/.xmodmap.mapkey
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+vim ~/.xmodmap.mapkey
+{% endcodeblock %}</p>
 
 <p>Look for the <kbd>CapsLock</kbd> key, on my machine it is 66 (you can use
 <a href="http://www.x.org/archive/X11R7.5/doc/man/man1/xev.1.html" title="xev man page">xev</a>
@@ -388,8 +396,9 @@ everything after <code>keycode 66 =</code></p>
 <p>will render it useless, which may suit your style. I change the entry to make
 it another <kbd>Escape</kbd> key:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>keycode <span class="nv">66</span> <span class="o">=</span> Escape NoSymbol Escape NoSymbol Escape
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+keycode 66 = Escape NoSymbol Escape NoSymbol Escape
+{% endcodeblock %}</p>
 
 <p>Log out and when you log back in, you have a useful key.</p>
 
@@ -405,8 +414,9 @@ two new items:</p>
 <ul>
 <li>Clear the <kbd>CapsLock</kbd> key with <code>xmodmap -e "clear Lock</code></li>
 <li>Map it to <kbd>Escape</kbd> by pointing to your xmodmap file
-<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>xmodmap ~/.xmodmap.mapkeys
-</span></code></pre></div></figure></notextile></div></li>
+{% codeblock lang:sh %}
+xmodmap ~/.xmodmap.mapkeys
+{% endcodeblock %}</li>
 </ul>
 
 
@@ -432,13 +442,15 @@ at <code>/usr/share/images/xsplash</code>.</p>
 
 <p>Before doing anything rash, make a copy of the directory:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
+{% endcodeblock %}</p>
 
 <p>Then delete all of the images that begin with <code>bg_</code>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo rm /usr/share/images/xsplash/bg_*
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+sudo rm /usr/share/images/xsplash/bg_*
+{% endcodeblock %}</p>
 
 <p>Use the gimp to create a background image for your desktop and save it into
 this directory, and name it <code>bg_2560x1600.jpg</code> …irrespective of the resolution
@@ -451,17 +463,19 @@ background. This is all controlled in
 
 <p>Again, make a copy:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc <span class="se">\</span>
-</span><span class='line'>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc-backup
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc \
+/usr/share/themes/HumanLogin/gtk-2.0/gtkrc-backup
+{% endcodeblock %}</p>
 
 <p>Then open the file and edit the relevant lines of code at the beginning of the
 file:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
-</span></code></pre></div></figure></notextile></div></p>
+<p>{% codeblock lang:sh %}
+sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
+{% endcodeblock %}</p>
 
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/karmic-text.png" title="'Screenshot of editing text'" ></p>
+<p>{% img http://dl.dropbox.com/u/261312/Blog-images/karmic-text.png 'Screenshot of editing text' %}</p>
 
 <p>As you can see, the colour scheme I have chosen uses dark grey to match my
 desktop. Feel free to experiment, you can’t really break anything…</p>
