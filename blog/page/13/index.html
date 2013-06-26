@@ -1,0 +1,515 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="I have a persistent tmux
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/13">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid.server" href="http://openid.claimid.com/server" />
+<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/07/irc-dzen/">IRC Notifications with dzen2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-07T19:48:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/irc-dzen.png" alt="image" /></p>
+
+<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective of whether I
+was connected to the session, or that particular machine at the time.</p>
+
+<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
+and there is a script called
+<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
+that will print any mentions in a channel to a file. I then configured
+the fnotify script to write to a folder in Dropbox. Now, whenever I am
+mentioned in freenode, the file is updated across all my machines.</p>
+
+<p>The next challenge was to translate the updating of the fnotify file
+into a notification on my current machine. As I don’t use
+<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
+on my Arch machines, I wanted to make it work with
+<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
+Enter a simple shell script:</p>
+
+<figure class='code'><figcaption><span>highlights.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">while </span>inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></div></figure>
+
+
+<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
+so that it runs in the background after login. Whenever the metadata
+(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
+written to my
+<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
+with the message.</p>
+
+<p>Simple; but does what I need…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Dropbox’s API won’t work with dzen2—or with other lightweight
+notifications like
+<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
+<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
+(that was closed without any progress)—hence my having to resort to a
+home-cooked solution…</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/10/01/pinboard-elvis/">Pinboard Elvis</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-10-01T10:29:00+13:00" pubdate data-updated="true">Oct 1<span>st</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/pinboard-elvis.png" alt="image" /></p>
+
+<p>After recovering from
+<a href="http://jasonwryan.com/blog/2011/09/28/delicious/" title="My post on the delicious fiasco">the shock of the botched delicious relaunch</a>,
+I have switched to
+<a href="http://pinboard.in/u:jasonwryan/" title="My bookmarks on Pinboard">Pinboard</a>
+for my bookmarking. Previously, I was just synching my bookmarks from
+delicious, but now I have abandoned that trainwreck completely.</p>
+
+<p>Two things made the transition painless. The first was the
+<a href="http://www.appbrain.com/app/me.mitnworb.save.to.pinboard/" title="Save to Pinboard page">Pinboard Android app</a>
+so I could access and manage bookmarks from my phone; the second was a
+little trickier.</p>
+
+<p>As I have previously mentioned, I use bookmarking not just to retrieve
+my own saved pages, but as a search repository for material that other
+people have decided is interesting or valuable enough to want to save.
+And there is no better tool for this sort of searching than
+<a href="http://surfraw.alioth.debian.org/" title="Surfraw - Shell Users' Revolutionary Front Rage Against the Web">Surfraw</a><sup>1</sup></p>
+
+<p>I had written an elvis to search delicious bookmarks, so to complete the
+transition to Pinboard, I needed to do the same. It was a little
+trickier than I had anticipated, as some of the URLs (particularly when
+searching across multiple tags) were reasonably complex given my modest
+scripting skills. But
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.config/surfraw/elvi/pin" title="Pinboard elvis in mercurial repo">I got there in the end…</a></p>
+
+<p>Now searching for web pages that I or anyone else has saved to Pinboard
+is as simple as typing:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pin -t<span class="o">=</span>unix+linux+vim
+</span></code></pre></div></figure>
+
+
+<p>Which will return all saved pages that share those three tags. I can
+also refine my search to a particular user with the <code>-u</code>{ser} switch, or
+just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Previous posts on Surfraw:
+
+<ul>
+<li> <a href="http://jasonwryan.com/blog/2011/04/13/archwiki-elvis-for-surfraw/" title="My post on the Arch Wiki elvis">Arch Wiki elvis for Surfraw</a></li>
+<li> <a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Yanking links in w3m">w3m, Surfraw and yanking  URLs</a></li>
+</ul>
+</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/09/28/delicious/">Delicious? Not after the first bite…</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-09-28T09:27:00+13:00" pubdate data-updated="true">Sep 28<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/delicious1.png" alt="image" /></p>
+
+<p>I have used
+<a href="http://delicious.com" title="Once great social bookmarking site...">delicious</a>,
+the bookmarking service, for just on five years now and over that time
+added around 1500 bookmarks. This suggests to me that I am a heavy, but
+not compulsive boomarker—I tend to only add pages that I think I will
+have a reasonably good chance of wanting to reference in the future.</p>
+
+<p>I am (or rather, was) an unabashed fan of the service. To the point
+where earlier this year I wrote
+<a href="http://anonscm.debian.org/gitweb/?p=surfraw/surfraw.git;a=blob_plain;f=elvi/deli;hb=8e32f5edaf26b7a65e5535d81b513f6d63e82847" title="Elvis in the Surfraw CVS tree">a Surfraw elvis to search the site</a>.
+As this would suggest, I use the site frequently, not just to bookmark
+or retrieve my own pages, but to search for other pages that people have
+considered “bookmark-worthy” (which is generally a pretty good indicator
+of quality).</p>
+
+<p>Like many comitted users, when the news leaked out late last year that
+<a href="http://www.readwriteweb.com/archives/rip_delicious_you_were_so_beautiful_to_me.php" title="RWW">Yahoo was shuttering delicious</a>,
+I jumped to Pinboard and have been
+<a href="http://pinboard.in/u:jasonwryan/" title="My boomarks on Pinboard">synching my bookmarks</a>
+between the two sites since. In retrospect, that turned out to be an
+excellent decision.</p>
+
+<p>The “new” delicious was launched overnight and I think it is fair to say
+that it has been completely and utterly eviscerated. It has gone from
+being a site that served a very specific (and incredibly useful)
+purpose—saving and tagging web pages for future use—to a bland,
+lowest-common-denominator, generic “social” site, like countless others
+that have arrived and disappeared with quirky names like Plurk, Plonker,
+etc..</p>
+
+<p>The site <em>looks good</em>; all light and airy and spacious (that space will,
+I am sure, be quickly filled with advertising), but they have stripped
+all the utility from the site. You can no longer actually access and
+manage your bookmarks. It is a colossal failure.</p>
+
+<p>I have 757 tags. I know that tag clouds are considered old hat, but on a
+site built on taxonomies, they are still an incredibly effective way of
+presenting information. The new delicious has dispensed with them. They
+have also decided that I don’t need to see all of my tags, so I can now
+only view 50 of them. <strong>Fifty out of seven hundred and fifty</strong>.
+Presumably I am expected to guess all the rest…</p>
+
+<p><img src="http://dl.dropbox.com/u/261312/Blog-images/delicious2.png" alt="image" /></p>
+
+<p><sup>The new tag display on the left and the old, as a cloud, on the right.</sup></p>
+
+<p>These aren’t options, though. All of the settings to display tags, tag
+bundles, etc., and the options to edit tags have been removed. You can’t
+access any of the tools to manage your bookmarks. The designers have
+decreed that you can no longer manage your information in a useful way.
+Morons.</p>
+
+<p>The clueless mediocrities responsible for this will probably think that
+they are reinventing the site and making it relevant for a broader, less
+geeky market. And they are probably right. The fact that the site looks
+remarkably like a phone app suggests that sort of studied rush to the
+bottom.</p>
+
+<p>What they have done is something of an achievement on one level, though.
+They have made Yahoo look good. In all the time that Yahoo owned
+delicious, they were only able to neglect it; these new clowns have
+completely fscked it…</p>
+
+<p>If you bookmark sites because you are semi-intelligent and you recognize
+that being able to easily access and manage information effectively is
+critical to your intellectual and social wellbeing, then head over to
+<a href="http://pinboard.in/" title="A real boomarking site">Pinboard</a> and sign up
+now.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/14/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/12/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks&#8230;</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: browser | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/browser/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-06-22T17:27:14+12:00</updated>
+  <updated>2013-06-26T13:59:38+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -18,7 +18,7 @@
     <link href="http://jasonwryan.github.com/blog/2013/05/25/greader/"/>
     <updated>2013-05-25T09:10:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/05/25/greader</id>
-    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/commafeed.png 'CommaFeed Logo' %}
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/commafeed.png" title="'CommaFeed Logo'" >
 I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
 everyday since I first discovered the service over seven years ago. It is my
 primary source of news and information and the announcement that Google is, on July 1 this year,
@@ -61,44 +61,41 @@ is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
 under your <code>My Applications</code> tab, copy down your Git repo address, which will be
 of the form:</p>
 
-<p>{% codeblock lang:sh %}
-ssh://76758382475ef809976543@$appname-$namespace.rhcloud.com/~/git/feeds.git/
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
 server:</p>
 
-<p>{% codeblock lang:sh %}
-git clone https://github.com/Athou/commafeed.git
-cd commafeed</p>
-
-<h1>add OpenShift as a repo</h1>
-
-<p>git remote add openshift -f ssh://76758382475ef809976543@$appname-$namespace.etc…
-git merge openshift/master -s recursive -X ours
-git push openshift master
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
+</span><span class='line'><span class="nb">cd </span>commafeed&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;add OpenShift as a repo&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;git remote add openshift -f ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.etc…
+</span><span class='line'>git merge openshift/master -s recursive -X ours
+</span><span class='line'>git push openshift master
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>This will then trigger a series of hooks that build the application and restart
 the server. If everything goes well you will see something like:</p>
 
-<p>{% codeblock lang:sh %}
-remote: [INFO] ------------------------------------------------------------------------
-remote: [INFO] BUILD SUCCESS
-remote: [INFO] ------------------------------------------------------------------------
-remote: [INFO] Total time: 3:18.195s
-remote: [INFO] Finished at: Mon May 20 03:21:37 EDT 2013
-remote: [INFO] Final Memory: 42M/185M
-remote: [INFO] ------------------------------------------------------------------------
-remote: Running .openshift/action_hooks/build
-remote: Running .openshift/action_hooks/deploy
-remote: hot_deploy_added=false
-remote: MySQL already running
-remote: Found 127.12.712.712:8080 listening port
-remote: Done
-remote: Running .openshift/action_hooks/post_deploy
-To ssh://76758382475ef809976543@$appname-$namespace.rhcloud.com/~/git/feeds.git/
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Total <span class="nb">time</span>: 3:18.195s
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Finished at: Mon May 20 03:21:37 EDT 2013
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Final Memory: 42M/185M
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: Running .openshift/action_hooks/build
+</span><span class='line'>remote: Running .openshift/action_hooks/deploy
+</span><span class='line'>remote: <span class="nv">hot_deploy_added</span><span class="o">=</span><span class="nb">false</span>
+</span><span class='line'>remote: MySQL already running
+</span><span class='line'>remote: Found 127.12.712.712:8080 listening port
+</span><span class='line'>remote: Done
+</span><span class='line'>remote: Running .openshift/action_hooks/post_deploy
+</span><span class='line'>To ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>You now have CommaFeed successfully running on OpenShift. After a couple of
 minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
@@ -110,7 +107,7 @@ then pushing to <code>openshift master</code>.</p>
 errors from builds late this week), but if you import from an existing <code>.opml</code>
 or <code>.xml</code> file you will see CommaFeed in all it's glory:</p>
 
-<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/commafeed_screen.png 'ComaFeed screenshot' %}</p>
+<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
 
 <p>As you can see, it is remarkably similar to the Google Reader interface; a
 clean, minimalist design that is focussed—quite rightly—on the content. There
@@ -162,7 +159,7 @@ will soon be even better than Google Reader, you might want to use it.</li>
     <link href="http://jasonwryan.github.com/blog/2012/11/20/vimprobable/"/>
     <updated>2012-11-20T18:58:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2012/11/20/vimprobable</id>
-    <content type="html"><![CDATA[<p>{% img left https://dl.dropbox.com/u/261312/Blog-images/vimprobable-logo.png 'Vimprobable logo' %}
+    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/vimprobable-logo.png" title="'Vimprobable logo'" >
 I have written about <a href="http://vimprobable.org" title="Vimprobable homepage">Vimprobable</a>
 a couple of times over the last two years<sup>1</sup>,
 it is one of those projects that, for a variety of reasons, I have picked up
@@ -243,10 +240,9 @@ you can do it all from the keyboard.</p>
 <kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
 return to normal mode:</p>
 
-<p>{% codeblock lang:sh %}
-map &lt;C-c>=:set caret=true
-map &lt;S-c>=:set caret=false
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
+</span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Then, it is just a matter of identifying the text that you wish to copy
 (in the photo above I was copying a script to launch <code>tabbed</code>), and
@@ -291,40 +287,37 @@ in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
 <p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
 <psan class="file">/tmp</span>:</p>
 
-<p>{% codeblock lang:sh %}
-"$(tabbed -d >/tmp/tabbed.xid); vimprobable2 -e $(&lt;/tmp/tabbed.xid)"
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&amp;lt;/tmp/tabbed.xid)&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Then it is just a matter of setting up other applications to pass links
 to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
 <span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
 
-<p>{% codeblock lang:sh %}
-openurl_command = vimprobable2 -e $(&lt;/tmp/tabbed.xid) %s
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> %s
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The workaround for Urxvtc was a little trickier. I finally got there
 with some help from
 <a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
 In my <span class="file">~/.Xdefaults</span> I have:</p>
 
-<p>{% codeblock lang:sh %}
-! -- Clickable urls -- !
-URxvt.perl-ext-common: default,matcher
-URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
-URxvt.matcher.button: 1
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
+</span><span class='line'>URxvt.perl-ext-common: default,matcher
+</span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
+</span><span class='line'>URxvt.matcher.button: 1
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
 
-<p>{% codeblock lang:sh %}</p>
-
-<h1>!/bin/bash</h1>
-
-<h1>Script to open Vimprobable instances in tabbed</h1>
-
-<p>exec vimprobable2 -e $(&lt;/tmp/tabbed.xid) "$1"
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Script to open Vimprobable instances in tabbed&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;exec vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Now whenever I open a link in an application or by clicking a link in
 the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
@@ -402,10 +395,9 @@ It was just a matter then of adding some intuitive keybinds – as the <kbd>M</k
 and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
 <a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
 
-<p>{% codeblock lang:vim %}
-keymap y EXTERN    <br/>
-keymap Y EXTERN_LINK
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN    <span class="p">&lt;</span><span class="k">br</span>/<span class="p">&gt;</span>
+</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
 
@@ -413,9 +405,8 @@ keymap Y EXTERN_LINK
 
 <p>Gilles has edited and updated his answer with a slight change:</p>
 
-<p>{% codeblock lang:sh %}
-sh -c 'printf %s "$0" | xsel'
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>This prevents a new line being appended.</p>
 ]]></content>
@@ -462,9 +453,8 @@ Should you wish to use it, you will need to create this file in
 Helpfully, there is a man page for all of the options in this file, to
 read it issue:</p>
 
-<p>{% codeblock lang:sh %}
-man vimprobablerc
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>man vimprobablerc
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Despite it’s spartan appearance, Vimprobable is a full-featured browser
 — with the advantage of being driven solely from the keyboard. It

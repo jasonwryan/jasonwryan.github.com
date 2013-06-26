@@ -22,11 +22,10 @@ happened over the last couple of weeks, the move of all binaries &hellip;">
   <link rel="canonical" href="http://jasonwryan.github.com/blog/2013/06/15/asking">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
 <link rel="openid.server" href="http://openid.claimid.com/server" />
 <link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
@@ -67,8 +66,9 @@ happened over the last couple of weeks, the move of all binaries &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:jasonwryan.github.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
 </form>
   
@@ -245,6 +245,8 @@ the more motivated among you will find them without difficulty.</li>
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2013/05/25/greader/" title="Previous Post: Replacing Google Reader">&laquo; Replacing Google Reader</a>
+      
       
     </p>
   </footer>
@@ -268,11 +270,27 @@ the more motivated among you will find them without difficulty.</li>
         <a href="/blog/2013/06/15/asking/">Asking for Help</a>
       </li>
     
+      <li class="post">
+        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+      </li>
+    
   </ul>
 </section>
 
 <section>
-  <h1>My Pinboard</h1>
+  <h1>Pinboard</h1>
   <ul id="pinboard_linkroll">Fetching linkroll...</ul>
   <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
 </section>
@@ -290,49 +308,50 @@ the more motivated among you will find them without difficulty.</li>
 </script>
 
 
-<section class="librefm">
-<h1>Scrobbled Tracks</h1>
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
 <style type="text/css">
-  #librefmList li { text-align: left; }
-  .librefmDate { color: #ccc; }
+  #lastfmList li{ text-align: left; }
 </style>
-<ul id="librefmList">
+<ul id="lastfmList">
   <li class="loading">Updating tracks...</li>
 </ul>
 <p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
 
 <script type="text/javascript">
-function showLibrefmFeed(xml){
-  var tracklist = document.getElementById('librefmList'),
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
       content = '',
       i=0;
-
-  $(xml).find('recenttracks').children().each(function(){
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
     var artist = $(this).find('artist').text(),
         name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
         url = $(this).find('url').text();
-    var date = ($(this).find('date').text() == '') ? 'right now' : $(this).find('date').text();
-    content += '<li id="librefmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="librefmDate"> - ' + date + '.</span></li>';
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
     i+=1;
   });
 
   tracklist.innerHTML = content;
 }
-
-function getLibrefmFeed(user,count) {
-  count = parseInt(count, 10);
-  $.ajax({
-         url: "http://libre.fm/2.0/?method=user.getrecenttracks&user=" + user + "&page=1&limit=" + count
-    , type: 'get'
-    , dataType: 'xml'
-    , error: function (err) { $('#librefmList li.loading').addClass('error').text("Libre.fm seems down…"); }
-    , success: function(data) { showLibrefmFeed(data); }
-  });
-}
-
-$(document).ready(function(){
-   getLibrefmFeed(jasonwryan,5);
-});
 </script>
 </section>
 

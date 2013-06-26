@@ -4,7 +4,7 @@
   <title><![CDATA[Category: community | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/community/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-06-22T17:27:14+12:00</updated>
+  <updated>2013-06-26T13:59:38+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -18,7 +18,7 @@
     <link href="http://jasonwryan.github.com/blog/2013/06/15/asking/"/>
     <updated>2013-06-15T10:39:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/06/15/asking</id>
-    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/bowl.jpg 'Flickr image of Begging Bowl' %}
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/bowl.jpg" title="'Flickr image of Begging Bowl'" >
 Another great peristaltic movement in Arch's rolling release digestive system
 happened over the last couple of weeks, the move of all binaries
 <a href="https://www.archlinux.org/news/binaries-move-to-usrbin-requiring-update-intervention/" title="Arch News update">to /usr/bin</a>.
@@ -119,7 +119,7 @@ the more motivated among you will find them without difficulty.</li>
     <link href="http://jasonwryan.github.com/blog/2013/04/09/helpers/"/>
     <updated>2013-04-09T19:07:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/04/09/helpers</id>
-    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/crutches.jpg 'Crutches on Flickr' %}</p>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/crutches.jpg" title="'Crutches on Flickr'" ></p>
 
 <h3>Or, "Why you should uninstall Yaourt and embrace <em>makepkg</em>…"</h3>
 
@@ -135,12 +135,7 @@ components of the distribution—works?</p>
 <p>Even a cursory perusal of the resulting threads on the boards will quickly
 identify the common denominator in these cases:</p>
 
-<p>{% blockquote %}
-resolving dependencies...
-looking for inter-conflicts...
-error: failed to prepare transaction (could not satisfy dependencies)
-:: package-query: requires pacman&lt;4.1
-{% endblockquote %}</p>
+<p><blockquote><p>resolving dependencies...<br/>looking for inter-conflicts...<br/>error: failed to prepare transaction (could not satisfy dependencies)<br/>:: package-query: requires pacman&lt;4.1</p></blockquote></p>
 
 <p><a href="https://aur.archlinux.org/packages/package-query/" title="AUR page">package-query</a>
 is required by <a href="https://aur.archlinux.org/packages/yaourt/" title="yaourt on AUR">yaourt</a>;
@@ -181,32 +176,33 @@ alighting on
 <a href="https://github.com/falconindy/cower" title="Cower on github">cower</a>, or more particularly,
 a partial wrapper for <code>cower</code>:</p>
 
-<p>{% codeblock lang:sh cowerd %}</p>
-
-<h1>!/bin/sh</h1>
-
-<h1>install AUR packages with cower</h1>
-
-<p>cd $HOME/Build &amp;&amp; cower -d "$1"
-builddir="$_"
-cd "$builddir" &amp;&amp; ${EDITOR:-vi} PKGBUILD</p>
-
-<p>makepkg -si &amp;&amp; cd - &amp;>/dev/null</p>
-
-<p>read -p "Remove Build directory? [Y/n]? " yn
-if [ "$yn" = "y" ]; then</p>
-
-<pre><code>printf "\n%s\n" "Removing build directory..." 
-rm -rf "$builddir"
-</code></pre>
-
-<p>else</p>
-
-<pre><code>printf "%s\n" "Build completed."
-</code></pre>
-
-<p>fi
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>cowerd </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;install AUR packages with cower&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;cd <span class="nv">$HOME</span>/Build &amp;amp;&amp;amp; cower -d <span class="s2">&quot;$1&quot;</span>
+</span><span class='line'><span class="nv">builddir</span><span class="o">=</span><span class="s2">&quot;$_&quot;</span>
+</span><span class='line'><span class="nb">cd</span> <span class="s2">&quot;$builddir&quot;</span> &amp;amp;&amp;amp; <span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> PKGBUILD&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;makepkg -si &amp;amp;&amp;amp; <span class="nb">cd</span> - &amp;amp;&gt;/dev/null&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;read -p <span class="s2">&quot;Remove Build directory? [Y/n]? &quot;</span> yn
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$yn&quot;</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span> <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;Removing build directory...&quot;</span>
+</span><span class='line'>rm -rf <span class="s2">&quot;$builddir&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;else&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Build completed.&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>This provides me the minimum level of automation I require—essentially only
 around downloading and installing a package. It doesn't automatically handle
@@ -242,7 +238,7 @@ download <code>cower</code> or <code>meat</code>, they are both <em>much</em> be
     <link href="http://jasonwryan.github.com/blog/2013/03/02/forking/"/>
     <updated>2013-03-02T10:04:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/03/02/forking</id>
-    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/fork.jpg 'Fork on Flickr' %}
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/fork.jpg" title="'Fork on Flickr'" >
 Over the last couple of months there have been a number of discussions on the Arch boards
 about the
 <a href="https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY" title="Forum Etiquette">forum policy</a>
@@ -285,9 +281,7 @@ nor in the long term interests of Arch. I have harped on in the past about
 and last year I came across the perfect illustration of the unchecked effects
 of this phenomena:</p>
 
-<p>{% blockquote Alison Randall, Ubuntu Technical Architect. Linux Format July 2012 %}
-Right now I'd say the bug queues are flooded with bugs that you can't really act on… It's a strain on the project that there are so many users that don't really get it.
-{% endblockquote %}</p>
+<p><blockquote><p>Right now I'd say the bug queues are flooded with bugs that you can't really act on… It's a strain on the project that there are so many users that don't really get it.</p><footer><strong>Alison Randall</strong> <cite>Ubuntu Technical Architect. Linux Format July 2012</cite></footer></blockquote></p>
 
 <p>Your bugtracker becomes essentially unusable. Your forums end up the same way.
 No-one ends up getting much in the way of assistance at all, let alone anything
@@ -343,7 +337,7 @@ not really possible to provide a simpler installation process.</li>
     <link href="http://jasonwryan.github.com/blog/2013/02/08/documentation/"/>
     <updated>2013-02-08T19:57:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/02/08/documentation</id>
-    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/documents.jpg 'Documents on Flickr' %}
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/documents.jpg" title="'Documents on Flickr'" >
 One of the canards about Free and Open Source Software that is peddled by the unscrupulous
 marketers of proprietary software is that their product is superior because, among other
 things, the scruffy, sandal-wearing Communists that write and distribute their software
@@ -358,16 +352,12 @@ as it is not in the same league as “professional,” proprietary product. This
 the usual suspects; it has also been raised by other, presumably more
 <a href="http://www.osnews.com/story/5180" title="Editorial on OS News">objective commentators</a>:</p>
 
-<p>{% blockquote OSNews Editorial, 2003 http://www.osnews.com/story/5180 %}
-Open Source documentation is terrible. There is no kinder way to put it. Even the commercially distributed software in the Open Source world has substandard documentation. (And believe me, as a technical writer coming from the Windows world, when I tell you that the commercial industrial standards are pretty low). Only a bare handful of Open Source software packages have any documentation at all. And out of the few that do, much of it is either unfinished, inaccurate, or outdated. What counts as explanatory text among geeks would bewilder a nuclear physicist, even a sober one.
-{% endblockquote %}</p>
+<p><blockquote><p>Open Source documentation is terrible. There is no kinder way to put it. Even the commercially distributed software in the Open Source world has substandard documentation. (And believe me, as a technical writer coming from the Windows world, when I tell you that the commercial industrial standards are pretty low). Only a bare handful of Open Source software packages have any documentation at all. And out of the few that do, much of it is either unfinished, inaccurate, or outdated. What counts as explanatory text among geeks would bewilder a nuclear physicist, even a sober one.</p><footer><strong>OSNews Editorial, 2003</strong> <cite><a href='http://www.osnews.com/story/5180'>www.osnews.com/story/5180/&hellip;</a></cite></footer></blockquote></p>
 
 <p>A more recent survey, published in 2010, identifed the same issue for businesses,
 in slightly less histrionic language:</p>
 
-<p>{% blockquote Zenoss 2010 Survey http://gigaom.com/2010/08/11/enterprise-yeah-were-cool-with-open-source/ %}
-The No. 1 reason for not choosing open-source solutions was lack of support followed by poor documentation.
-{% endblockquote %}</p>
+<p><blockquote><p>The No. 1 reason for not choosing open-source solutions was lack of support followed by poor documentation.</p><footer><strong>Zenoss 2010 Survey</strong> <cite><a href='http://gigaom.com/2010/08/11/enterprise-yeah-were-cool-with-open-source/'>gigaom.com/2010/08/11/&hellip;</a></cite></footer></blockquote></p>
 
 <p>My experience of FOSS documentation, particularly over the last twelve months, has been just the
 opposite.</p>
@@ -401,9 +391,7 @@ inherent complexity in the ecosystem, I would have thought possible.</p>
 
 <p>Then there is Zsh.</p>
 
-<p>{% blockquote zsh manual http://linux.die.net/man/1/zsh %}
-Because zsh contains many features, the zsh manual has been split into a number of sections…
-{% endblockquote %}</p>
+<p><blockquote><p>Because zsh contains many features, the zsh manual has been split into a number of sections…</p><footer><strong>zsh manual</strong> <cite><a href='http://linux.die.net/man/1/zsh'>linux.die.net/man/1/zsh/&hellip;</a></cite></footer></blockquote></p>
 
 <p>And goes it on to list those <em>seventeen</em> sections. If you are not a fan of <code>man</code> pages<sup>1</sup>,
 there is the
@@ -455,7 +443,7 @@ I am indebted to).</li>
     <link href="http://jasonwryan.github.com/blog/2012/08/18/trolls/"/>
     <updated>2012-08-18T10:47:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2012/08/18/trolls</id>
-    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/troll.jpg 'Troll on Flickr' %}
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/troll.jpg" title="'Troll on Flickr'" >
 I posted recently about
 <a href="http://jasonwryan.com/blog/2012/08/04/systemd/" title="Some thoughts on moving across…">my experiences shifting to systemd</a>
 and how I found it, for all three of my Arch machines, to be a relatively simple and
@@ -484,9 +472,7 @@ the suitably alarmist title
 The troll, who has had only minimal involvement with the Arch community up until this
 unfortunate moment starts by framing his “concern”<sup>1</sup>:</p>
 
-<p>{% blockquote Felipe Contreras %}
-I just became aware that Arch Linux plans to switch to systemd, and this worries me for several reasons.
-{% endblockquote %}</p>
+<p><blockquote><p>I just became aware that Arch Linux plans to switch to systemd, and this worries me for several reasons.</p></blockquote></p>
 
 <p>Felipe is worried. Ergo, <em>we</em> should be worried. Why should we be worried? Because,
 despite the fact that systemd has been discussed and used by Archers since the
@@ -494,9 +480,7 @@ despite the fact that systemd has been discussed and used by Archers since the
 it has just come to his attention and now, with the formidable powers of his intellect,
 he has detected a disturbance in the force.</p>
 
-<p>{% blockquote Felipe Contreras %}
-I tried systemd a while ago in a brand new machine with Arch Linux and the boot was <em>much slower</em>. After some exchanges with Lennart Poettering and other people in Google+[1], it became clear I was on my own. Eventually I found the culprit: Fedora uses CONFIG_HZ_1000, and Arch Linux uses CONFIG_HZ_300. It became clear to me that systemd was not ready for prime time, it wasn't thoroughly tested in a lot of machines, and if you have problems Lennart Poettering will blame you (PulseAudio sounds familiar?).
-{% endblockquote %}</p>
+<p><blockquote><p>I tried systemd a while ago in a brand new machine with Arch Linux and the boot was <em>much slower</em>. After some exchanges with Lennart Poettering and other people in Google+[1], it became clear I was on my own. Eventually I found the culprit: Fedora uses CONFIG_HZ_1000, and Arch Linux uses CONFIG_HZ_300. It became clear to me that systemd was not ready for prime time, it wasn't thoroughly tested in a lot of machines, and if you have problems Lennart Poettering will blame you (PulseAudio sounds familiar?).</p></blockquote></p>
 
 <p>The salient phrases here are “it became clear I was on my own” and the even more telling,
 “it became clear to me that systemd was not ready for prime time.” Once I had managed to

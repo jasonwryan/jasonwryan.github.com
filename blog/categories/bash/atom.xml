@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/blog/categories/bash/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-06-22T17:27:14+12:00</updated>
+  <updated>2013-06-26T13:59:38+12:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -18,7 +18,7 @@
     <link href="http://jasonwryan.github.com/blog/2013/01/10/truecrypt/"/>
     <updated>2013-01-10T16:02:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/01/10/truecrypt</id>
-    <content type="html"><![CDATA[<p>{% img left https://dl.dropbox.com/u/261312/Blog-images/lock.jpg 'Flickr image of lock' %}
+    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/lock.jpg" title="'Flickr image of lock'" >
 I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
 I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
 It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
@@ -38,17 +38,13 @@ a container in <a href="http://dropbox.com/" title="Dropbox homepage">Dropbox</a
 all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
 free (as in Freedom) software:</p>
 
-<p>{% blockquote Wikipedia entry on TrueCrypt https://en.wikipedia.org/wiki/Truecrypt %}
-The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered "free" by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.
-{% endblockquote %}</p>
+<p><blockquote><p>The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered "free" by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.</p><footer><strong>Wikipedia entry on TrueCrypt</strong> <cite><a href='https://en.wikipedia.org/wiki/Truecrypt'>en.wikipedia.org/wiki/Truecrypt/&hellip;</a></cite></footer></blockquote></p>
 
 <p>When I initially accessed the page, in February 2012, there was also a paragraph—now removed—that
 highlighted further, more alarmist, concerns about the shadowy identity of the people behind
 TrueCrypt:</p>
 
-<p>{% blockquote Wikipedia entry retrieved in February 2012 https://en.wikipedia.org/w/index.php?title=TrueCrypt&amp;diff=478623780&amp;oldid=478608477 %}
-The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]
-{% endblockquote %}</p>
+<p><blockquote><p>The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]</p><footer><strong>Wikipedia entry retrieved in February 2012</strong> <cite><a href='https://en.wikipedia.org/w/index.php?title=TrueCrypt&amp;diff=478623780&amp;oldid=478608477'>en.wikipedia.org/w/&hellip;</a></cite></footer></blockquote></p>
 
 <p>While I don't subscribe to the theory that the CIA have planted a backdoor in the software (if they
 had, <a href="https://en.wikipedia.org/wiki/Truecrypt#Operation_Satyagraha" title="FBI operation foiled by TC">it clearly doesn't work</a>),
@@ -56,9 +52,7 @@ I was relieved to see at the end of last year that someone had written a simple 
 you to manage TrueCrypt containers from the command line; <a href="https://github.com/bwalex/tc-play" title="tcplay on Guthub">tcplay</a>
 is decribed as:</p>
 
-<p>{% blockquote %}
-a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.
-{% endblockquote %}</p>
+<p><blockquote><p>a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.</p></blockquote></p>
 
 <p>With a <a href="https://github.com/bwalex/tc-play/blob/master/LICENSE" title="tcplay license">simple, two paragraph license</a>
 and a brief but comprehensive <code>man</code> page, I was sold. I uninstalled TrueCrypt late last year and haven't missed it since. Quite
@@ -69,54 +63,54 @@ pointless so I eventually wised up and wrote a wrapper script to do the job for 
 <p>The script is quite simple, it finds the first available loop device, maps the encrypted volume to it and
 mounts it read-writeable for your user.</p>
 
-<p>{% codeblock lang:sh %}</p>
-
-<h1>!/bin/bash</h1>
-
-<h1>manage truecrypt containers using tcplay</h1>
-
-<p>user=jason
-cryptdev=Safebox
-cryptpath=/home/jason/Dropbox/"$cryptdev"
-loopdev=$(losetup -f)
-mountpt=/media/"$cryptdev"</p>
-
-<h1>must be run as root</h1>
-
-<p>if [[ $EUID != 0 ]]; then
-  printf "%s\n" "You must be root to run this."
-  exit 1
-fi</p>
-
-<h1>unecrypt and mount container</h1>
-
-<p>if [[ "$1" == "open" ]]; then
-  losetup "$loopdev" "$cryptpath"
-  tcplay --map="$cryptdev" --device="$loopdev"</p>
-
-<p>  # read passphrase
-  read -r -s passphrase &lt;&lt;EOF
-  "$passphrase"
-EOF</p>
-
-<p>  # mount container
-  [[ -d "$mountpt" ]] || mkdir "$mountpt"</p>
-
-<p>  # mount options
-  userid=$(awk -F"[=(]" '{print $2,$4}' &lt;(id "$user"))
-  mount -o nosuid,uid="${userid% <em>}",gid="${userid#</em> }" /dev/mapper/"$cryptdev" "$mountpt"</p>
-
-<h1>close and clean up…</h1>
-
-<p>elif [[ "$1" == "close" ]]; then
-  device=$(awk -v dev=$cryptdev -F":" '/dev/ {print $1}' &lt;(losetup -a))
-  umount "$mountpt"
-  dmsetup remove "$cryptdev" || printf "%s\n" "demapping failed"
-  losetup -d "$device" || printf "%s\n" "deleting $loopdev failed"
-else
-  printf "%s\n" "Options are open or close."
-fi
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;manage truecrypt containers using tcplay&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;user<span class="o">=</span>jason
+</span><span class='line'><span class="nv">cryptdev</span><span class="o">=</span>Safebox
+</span><span class='line'><span class="nv">cryptpath</span><span class="o">=</span>/home/jason/Dropbox/<span class="s2">&quot;$cryptdev&quot;</span>
+</span><span class='line'><span class="nv">loopdev</span><span class="o">=</span><span class="k">$(</span>losetup -f<span class="k">)</span>
+</span><span class='line'><span class="nv">mountpt</span><span class="o">=</span>/media/<span class="s2">&quot;$cryptdev&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;must be run as root&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$EUID</span> !<span class="o">=</span> 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;You must be root to run this.&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;unecrypt and mount container&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span>losetup <span class="s2">&quot;$loopdev&quot;</span> <span class="s2">&quot;$cryptpath&quot;</span>
+</span><span class='line'>  tcplay --map<span class="o">=</span><span class="s2">&quot;$cryptdev&quot;</span> --device<span class="o">=</span><span class="s2">&quot;$loopdev&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># read passphrase</span>
+</span><span class='line'>  <span class="nb">read</span> -r -s passphrase &amp;lt;&amp;lt;EOF
+</span><span class='line'>  <span class="s2">&quot;$passphrase&quot;</span>
+</span><span class='line'>EOF&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># mount container</span>
+</span><span class='line'>  <span class="o">[[</span> -d <span class="s2">&quot;$mountpt&quot;</span> <span class="o">]]</span> <span class="o">||</span> mkdir <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="c"># mount options</span>
+</span><span class='line'>  <span class="nv">userid</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="s2">&quot;[=(]&quot;</span> <span class="s1">&#39;{print $2,$4}&#39;</span> &amp;lt;<span class="o">(</span>id <span class="s2">&quot;$user&quot;</span><span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  mount -o nosuid,uid<span class="o">=</span><span class="s2">&quot;${userid% &lt;em&gt;}&quot;</span>,gid<span class="o">=</span><span class="s2">&quot;${userid#&lt;/em&gt; }&quot;</span> /dev/mapper/<span class="s2">&quot;$cryptdev&quot;</span> <span class="s2">&quot;$mountpt&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;close and clean up…&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;close&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">device</span><span class="o">=</span><span class="k">$(</span>awk -v <span class="nv">dev</span><span class="o">=</span><span class="nv">$cryptdev</span> -F<span class="s2">&quot;:&quot;</span> <span class="s1">&#39;/dev/ {print $1}&#39;</span> &amp;lt;<span class="o">(</span>losetup -a<span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  umount <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>  dmsetup remove <span class="s2">&quot;$cryptdev&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;demapping failed&quot;</span>
+</span><span class='line'>  losetup -d <span class="s2">&quot;$device&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;deleting $loopdev failed&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Options are open or close.&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Once you are done, the script will unmount your volume and clean up. Undoubtedly, the
 script could be improved; patches are welcome.</p>
@@ -137,7 +131,7 @@ free software…</p>
     <link href="http://jasonwryan.github.com/blog/2012/09/01/notes-updated/"/>
     <updated>2012-09-01T10:09:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2012/09/01/notes-updated</id>
-    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/notes.jpg 'Notepad image on Flickr' %}
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/notes.jpg" title="'Notepad image on Flickr'" >
 Nearly two years ago, I posted about my adaption of a simple
 <a href="http://jasonwryan.com/blog/2010/09/28/command-line-notes/" title="My post in 2010">command line note utility</a>.
 I have used this setup on all of my machines on a daily basis since and it has worked
@@ -171,25 +165,24 @@ as to how to accomplish this.<sup>2</sup> Undeterred, I decided to hack up a com
 function that worked for nested directories.</p>
 
 <p>What I arrived at was this:
-{% codeblock lang:sh %}
-shopt -s globstar
-shopt -s progcomp</p>
-
-<p>n() { $EDITOR $HOME/.notes/"$*".txt ;}</p>
-
-<p> # completion for notes
-_notes() {
-local cur
-    cur=${COMP_WORDS[COMP_CWORD]}</p>
-
-<pre><code>files=($HOME/.notes/**)
-file="${files[@]##*/}"
-COMPREPLY=( $( compgen -f "${file[@]}" -- ${cur} ) )
-</code></pre>
-
-<p>}
-complete -o default -F _notes n
-{% endcodeblock %}</p>
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">shopt</span> -s globstar
+</span><span class='line'><span class="nb">shopt</span> -s progcomp&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> <span class="nv">$HOME</span>/.notes/<span class="s2">&quot;$*&quot;</span>.txt ;<span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="c"># completion for notes</span>
+</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>cur
+</span><span class='line'>    <span class="nv">cur</span><span class="o">=</span><span class="k">${</span><span class="nv">COMP_WORDS</span><span class="p">[COMP_CWORD]</span><span class="k">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;files<span class="o">=(</span><span class="nv">$HOME</span>/.notes/**<span class="o">)</span>
+</span><span class='line'><span class="nv">file</span><span class="o">=</span><span class="s2">&quot;${files[@]##*/}&quot;</span>
+</span><span class='line'><span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="k">$(</span> <span class="nb">compgen</span> -f <span class="s2">&quot;${file[@]}&quot;</span> -- <span class="k">${</span><span class="nv">cur</span><span class="k">}</span> <span class="k">)</span> <span class="o">)</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The best that can be said about it is that it <em>nearly</em> works…<sup>3</sup></p>
 
@@ -198,54 +191,52 @@ I was indeed fortunate that
 <a href="https://github.com/geirha" title="geirha's Gitgub">geihra</a> offered some much needed
 assistance. geirha's solution is an elegant one:</p>
 
-<p>{% codeblock lang:sh %}
-n() {
-local arg files=(); for arg; do files+=( ~/".notes/$arg" ); done
-${EDITOR:-vi} "${files[@]}"
-}</p>
-
-<p>_notes() {
-local files=($HOME/.notes/<em>*/"$2"</em>)</p>
-
-<pre><code>[[ -e ${files[0]} ]] &amp;&amp; COMPREPLY=( "${files[@]##~/.notes/}" )
-</code></pre>
-
-<p>}
-complete -o default -F _notes n
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
+</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/&lt;em&gt;*/<span class="s2">&quot;$2&quot;</span>&lt;/em&gt;<span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;<span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> &amp;amp;&amp;amp; <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>In addition to working exactly as I hoped, it had the benefit of introducing me
 to a couple more bash concepts that I hadn't encountered;
 <a href="http://mywiki.wooledge.org/BashGuide/Arrays" title="Bash Guide on Greg's Wiki">adding elements to an array</a>
 with <code>+=()</code> being one. For posterity, the full script is:</p>
 
-<p>{% codeblock lang:sh %}
-n() {
-local arg files=(); for arg; do files+=( ~/".notes/$arg" ); done
-${EDITOR:-vi} "${files[@]}"
-}</p>
-
-<p>nls() {
-tree -CR --noreport $HOME/.notes | awk '{</p>
-
-<pre><code>if (NF==1) print $1; 
-else if (NF==2) print $2; 
-else if (NF==3) printf "  %s\n", $3 
-}'
-</code></pre>
-
-<p>}</p>
-
-<p> # TAB completion for notes
-_notes() {
-local files=($HOME/.notes/<em>*/"$2"</em>)</p>
-
-<pre><code>[[ -e ${files[0]} ]] &amp;&amp; COMPREPLY=( "${files[@]##~/.notes/}" )
-</code></pre>
-
-<p>}
-complete -o default -F _notes n
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
+</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;nls<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>tree -CR --noreport <span class="nv">$HOME</span>/.notes | awk <span class="s1">&#39;{&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">&lt;pre&gt;&lt;code&gt;if (NF==1) print $1; </span>
+</span><span class='line'><span class="s1">else if (NF==2) print $2; </span>
+</span><span class='line'><span class="s1">else if (NF==3) printf &quot;  %s\n&quot;, $3 </span>
+</span><span class='line'><span class="s1">}&#39;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="c"># TAB completion for notes</span>
+</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/&lt;em&gt;*/<span class="s2">&quot;$2&quot;</span>&lt;/em&gt;<span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;<span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> &amp;amp;&amp;amp; <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>
+</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span></code></pre></div></figure></notextile></div></p>
 
 <h4>Notes</h4>
 
@@ -277,7 +268,7 @@ to the official documentation:
     <link href="http://jasonwryan.github.com/blog/2012/03/30/octopress/"/>
     <updated>2012-03-30T12:30:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2012/03/30/octopress</id>
-    <content type="html"><![CDATA[<p>{% img left http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png 240 240 Octopress Logo %}</p>
+    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
 
 <p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
 a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
@@ -306,47 +297,47 @@ the work for me.</p>
 
 <p>The first task was to retrieve the posts from the list:</p>
 
-<p>{% codeblock lang:sh %}</p>
-
-<h1>grab files</h1>
-
-<p>while read url; do</p>
-
-<pre><code>wget --adjust-extension "${url}"
-</code></pre>
-
-<p>done &lt; /home/jason/Scripts/list
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;grab files&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;while <span class="nb">read </span>url; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done &amp;lt; /home/jason/Scripts/list
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
 surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
 
-<p>{% codeblock lang:sh %}</p>
-
-<h1>strip HTML cruft</h1>
-
-<p>for file in <em>.html; do
-  awk '/<h3>/ {flag=1;next} /&lt;\/div>/{flag=0} flag {print}' "$file" > "${file%%.</em>}"
-done
-mkdir html &amp;&amp; mv *.html html/
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;strip HTML cruft&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;for file in &lt;em&gt;.html; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&amp;lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.&lt;/em&gt;}&quot;</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>mkdir html &amp;amp;&amp;amp; mv *.html html/
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The final task of this part of the migration was to convert the HTML into
 <a href="http://daringfireball.net/projects/markdown/">markdown</a>,
 the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
 the "universal document converter" handled that job:</p>
 
-<p>{% codeblock lang:sh %}</p>
-
-<h1>convert to markdown format</h1>
-
-<p>for file in *; do</p>
-
-<pre><code>pandoc -f html -t markdown "$file" &gt; "$file".md
-</code></pre>
-
-<p>done
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;convert to markdown format&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;for file in *; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &amp;gt; <span class="s2">&quot;$file&quot;</span>.md
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The final result was fifty markdown files holding all of my posts, almost ready to
 be committed to github. I say “almost” because the files still required what turned out to
@@ -418,27 +409,25 @@ obvious answer is some shell script and a cron job.</p>
 
 <p>First, the <code>cron</code> job:</p>
 
-<p>{% codeblock lang:sh %}
-crontab -e
-@hourly aurphan -a >/tmp/aurphans
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Then, as part of my
 <a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="Script in mercurial repo">dwm-status script</a>,
 a function to check that there are no new additions to the file and, if
 there are, flash a highlight:</p>
 
-<p>{% codeblock lang:sh %}
-aur(){</p>
-
-<pre><code>aurphans="$(awk '$0 !~ /^No /' /tmp/aurphans | wc -l)"
-if [ $aurphans -gt 0 ]; then
-    echo -en "\x03*\x01"
-fi
-</code></pre>
-
-<p>}
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;aurphans<span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>The awk filter excludes a null return, which is “No aurphans found.”
 Now, if any of the packages that I use from the AUR are disowned, I’ll
@@ -477,12 +466,12 @@ flexible approach to logging into X (or the console).</p>
 
 <p>My <span class="file">/etc/inittab</span> already boots me into runlevel 5:</p>
 
-<p>{% codeblock lang:sh %}</p>
-
-<h1>Boot to X11</h1>
-
-<p>id:5:initdefault:
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Boot to X11&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;id:5:initdefault:
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>So it was just a case of putting a couple of lines in the correct
 <a href="http://www.gnu.org/software/bash/manual/bashref.html#Bash-Startup-Files" title="GNU Bash reference: startup files">invocation file</a>.
@@ -490,13 +479,12 @@ I chose <span class="file">$HOME/.bash_profile</span> because I only use Bash; i
 shell you should probably go with <span class="file">$HOME/.profile</span>. The recommended lines
 from the Arch Wiki are:</p>
 
-<p>{% codeblock lang:sh %}
-if [[ -z $DISPLAY &amp;&amp; $(tty) = /dev/tty1 ]]; then
-  exec startx
-  # Could use xinit instead of startx
-  #exec xinit -- /usr/bin/X -nolisten tcp vt7
-fi
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="nv">$DISPLAY</span> &amp;amp;&amp;amp; <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">exec </span>startx
+</span><span class='line'>  <span class="c"># Could use xinit instead of startx</span>
+</span><span class='line'>  <span class="c">#exec xinit -- /usr/bin/X -nolisten tcp vt7</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>…and this works as advertised. If you are in TTY1 and you login, X is
 started. The disadvantage for me, though, was that when you shutdown,
@@ -508,48 +496,48 @@ to see the shutdown messages.</p>
 alighted on this helpful option: <code>-novtswitch</code>. So, my entry to start X
 now looked like:</p>
 
-<p>{% codeblock lang:sh %}</p>
-
-<h1>startx if on tty1</h1>
-
-<p>if [[ -z "$DISPLAY" ]] &amp;&amp; [[ $(tty) = /dev/tty1 ]]; then</p>
-
-<pre><code>exec xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
-logout
-</code></pre>
-
-<p>fi
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;startx <span class="k">if </span>on tty1&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> &amp;amp;&amp;amp; <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;exec xinit -- :0 -novtswitch &amp;amp;&amp;gt;/dev/null &amp;amp;
+</span><span class='line'><span class="nb">logout</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Now, on shutdown and reboot, I see all of the shutdown messages. All
 that remained was to add an option to log into a tmux session if I
 didn’t want to use X. The final code looks like this:</p>
 
-<p>{% codeblock lang:sh ~/.profile %}</p>
-
-<h1>startx if on tty1 and tmux on tty2</h1>
-
-<p>if [[ -z "$DISPLAY" ]] &amp;&amp; [[ $(tty) = /dev/tty1 ]]; then</p>
-
-<pre><code>exec xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
-logout
-</code></pre>
-
-<p>elif [[ $(tty) = /dev/tty2 ]]; then</p>
-
-<pre><code>tmux -f $HOME/.tmux/conf new -s secured
-</code></pre>
-
-<p>fi
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/.profile </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;startx <span class="k">if </span>on tty1 and tmux on tty2&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> &amp;amp;&amp;amp; <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;exec xinit -- :0 -novtswitch &amp;amp;&amp;gt;/dev/null &amp;amp;
+</span><span class='line'><span class="nb">logout</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty2 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;tmux -f <span class="nv">$HOME</span>/.tmux/conf new -s secured
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>Logging in from TTY1 takes me into my dwm session, if I switch to TTY2 I
 am logged into a tmux session with keychain running. To start consolekit
 with dwm, I have this in my <span class="file">$HOME/.xinitrc</span>:</p>
 
-<p>{% codeblock lang:sh %}
-exec ck-launch-session $HOME/Scripts/dwm-start.
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">exec </span>ck-launch-session <span class="nv">$HOME</span>/Scripts/dwm-start.
+</span></code></pre></div></figure></notextile></div></p>
 
 <p>You can see my full <span class="file">$HOME/.bash_profile</span> in
 <a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.profile" title="profile in mercurial repo">my mercurial repo</a>.</p>
