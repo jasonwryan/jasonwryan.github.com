@@ -1,0 +1,87 @@
+---
+layout: post
+title: "Encrypting Mutt"
+date: 2013-07-20 09:36
+comments: true
+categories: [archlinux, mutt]
+---
+{% img left https://dl.dropboxusercontent.com/u/261312/Blog-images/key-board.jpg Encrypted mail %}
+With the torrent of recent revelations about the enthusiasm with which
+the governments of most of the first world have been systematically and
+unlawfully violating the privacy of their citizens by intercepting their digital
+communications, I thought it worth adding to the posts I have written about
+[Mutt](http://jasonwryan.com/blog/categories/mutt/ 'Posts on mutt')—that most
+peerless of email clients—specifically how, combined with 
+[GnuPG](http://gnupg.org/ 'GPG home page'), you can encrypt all of your mail and
+ensure that the only person reading it is the intended recipient.
+
+The definitive guide for this setup remains Justin Miller's venerable page,
+[Everything You Need To Know To Start Using GnuPG with Mutt](http://codesorcery.net/old/mutt/mutt-gnupg-howto 'The title says it all, really…),
+last edited in 2001 and *still* the authoritative source. The setup I will
+describe differs only insofar as it covers how to use multiple keys associated
+with different mail accounts. Mutt gives you the flexibility sign or encrypt all
+of the email in your work account with one key, and your personal email with
+another.
+
+Once you have set up your GPG keys<sup>1</sup>, the first step is to configure
+Mutt to use your keys. You can include these directives in your 
+<span class="file">muttrc</span> but, in the interests of readability, I prefer
+to split them out into <span class="file">gpg.rc</span> and source them from
+<span class="file">muttrc</span>. The settings are self-explanatory, those most
+relevant to this post control how mutt handles your mail with respect to
+encryption or just signing<sup>2</sup>:
+
+{% codeblock lang:sh %}
+set pgp_use_gpg_agent = yes
+set pgp_sign_as = 43A5CE95
+set pgp_timeout = 3600
+set crypt_autosign = yes 
+set crypt_replyencrypt = yes 
+{% endcodeblock %}
+
+This sets my work key as the primary key and a couple of other sane (for me)
+defaults. All of these options are described in `muttrc(5)`. 
+You can see my complete file in my 
+[bitbucket repo](https://bitbucket.org/jasonwryan/shiv/src/default/.mutt/gpg.rc 'mutt config files').
+
+The rest of the recipe is in <span class="file">muttrc</span>:
+
+{% codeblock lang:sh %}
+source ~/.mutt/gpg.rc            # use GPG
+
+# gpg key
+send-hook "~f @catalyst.net.nz"  set pgp_sign_as=43A5CE95
+send-hook "~f @jasonwryan.com"   set pgp_sign_as=B1BD4E40
+
+# key binds
+bind compose p  pgp-menu
+macro compose Y pfy "send mail without GPG"
+{% endcodeblock %}
+
+Sourcing the <span class="file">gpg.rc</span> reads all the relevant options
+and then a series of `send-hooks` allow you to use specific keys for each of
+your accounts.
+
+Now, when you receive encrypted mail, if your key agent is running, Mutt will
+decrypt your mail on the fly. Otherwise you will be prompted for your key
+phrase. Similarly, when you send email, it will by default be signed by the key
+associated with that account, and you can encrypt individual mail by bringing up
+the GPG menu in the compose screen by hitting <kbd>p</kbd>.
+
+And for those friends and acquaintances you correspond with for whom
+encryption is the equivalent of white powder spilling from an envelope, you can
+always elect to send without any GPG by selecting <kbd>Y</kbd> to send the
+email.
+
+These and a number of other interesting tips and macros are on the
+[Mutt Wiki](http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG 'Using GPG')
+and are worth following up once you have the basics working. Like so much of
+this sort of software, it takes a little longer to set up *exactly* the way that
+you want it, but once you are done, it is good for decades…
+
+#### Notes
+1. A good introduction to this procedure is detailed in the 
+[Arch Wiki article](https://wiki.archlinux.org/index.php/GPG).
+2. This assumes that you do want to distinguish between the two; you could, of
+   course, just encrypt *everything*—assuming that your correspondents were
+   willing and able to decrypt it…
