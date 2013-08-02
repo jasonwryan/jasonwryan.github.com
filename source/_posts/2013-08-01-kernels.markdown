@@ -1,0 +1,88 @@
+---
+layout: post
+title: "Compiling Kernels"
+date: 2013-08-03 09:24
+comments: true
+categories: [archlinux]
+---
+{%img left http://miromiro.com/Blog-images/kernel.jpg Kernels on Flickr %}
+While chasing edits on the Arch Wiki a couple of weeks ago, I stumbled upon 
+this page: 
+[Kernels/Compilation/Traditional](https://wiki.archlinux.org/index.php/Kernels/Compilation/Traditional 'What it says on the tin…');
+fortuitously, it transpired. For it piqued my interest sufficiently for me to
+try my hand at compiling my own kernel, and—after half a dozen attempts at
+getting it right—I had no sooner switched to my custom built kernel as the
+default in my boot manager when 3.10.2 landed in [testing] and would not boot.
+[At all](https://bbs.archlinux.org/viewtopic.php?id=167090 'Forum thread').
+
+I still have no idea why 3.10.2 would do nothing other than fail silently, but
+the convenience of having another kernel to switch to without needing a rescue
+image or any other panicked interventions immediately won me over. In the years
+that I have used Arch, this was my 
+[first near brush](http://jasonwryan.com/blog/2012/07/19/breakage/ 'Post on the Myth of Breakage') 
+with an unbootable system<sup>1</sup> and the small amount of effort required to
+mitigate this risk with a custom or alternate kernel seems a smart investment to
+me at this point.<sup>2</sup>
+
+The documentation on the wiki is both comprehensive and easy to follow. The
+lessons I learned between kernels zero and three or four were mostly around
+ensuring the correct modules were configured into the build. One surefire way to
+make this a tedious and laborious process, should you be som inclined, is to
+blindly enable and disable settings in `menuconfig`.
+
+Around about the time of the fourth failed build (well, the builds were working
+but the kernel wasn't booting or was booting with missing functionality), I
+decided to switch approaches and go down the `localmodconfig` route. This, for
+someone with my limited experience with this aspect of GNU/Linux, was in
+retrospect a decision I should have made sooner. 
+
+First, I started with <span class="file">streamline_config.pl</span>, a helpful
+script that allows you to create a <span class="file">.config</span> file 
+containing only those modules necessary to your currently running
+kernel<sup>3</sup>. This yielded a booting kernel at the first attempt. It turns
+out, though, that you still need to ensure that *all* of the modules you are
+going to need, *at any time in the future*, are loaded. I missed a couple.
+
+Then I discovered this script by graysky,
+[modprobed_db](https://github.com/graysky2/modprobed_db 'In graysky2's github repo').
+For a newbie to kernel compilation, this is simply invaluable. It allows you to
+create a record of your used modules over time, compare it with those that are
+currently loaded and then—right before you `make localmodconfig`—load the
+remaining necessary ones. Foolproof kernel compilation. Just like that.
+Brilliant. And, naturally enough, it is in
+[the AUR](https://aur.archlinux.org/packages/modprobed_db/ 'AUR package').
+
+Run the script, create your <span class="file">.conf</span> file and database in 
+<span class="file">$XDG_CONFIG_HOME/modprobed_db.conf</span> and then either
+call it from a `cron` job or, if you are impatient like me, spend a frenzied 10
+minutes plugging ALL the devices you own into your machine, and you are good to
+go. Running `sudo modprobed_db recall` will load all of the required modules,
+you generate your kernel <span class="file">.config</span>, check it to make
+sure it is complete and then run `make`.
+
+On my laptop, I have 115 modules activated for a build, 10 of which need to be
+recalled prior to creating the <span class="file">.config</span>. When I was
+trying to debug 3.10.2, I compiled the vanilla Arch kernel using 
+[ABS](https://wiki.archlinux.org/index.php/Abs 'Wiki page on Arch Build System')
+and it took almost exactly 60 minutes using all four threads on my i5. Building 
+my own kernel is done and installed in under 10.
+
+I susbcribed to the [RSS feed for kernel versions](https://www.kernel.org/feeds/kdist.xml 'Kernel updates') 
+and now, whenever a new stable kernel is posted, I `wget` it, compile it and
+boot from it. As new Arch versions appear in the repositories, they are updated
+by `pacman` and happily coexist on my <span class="file">/boot</span>; thereby
+ensuring that the likelihood of me being unable to boot my machine (other than
+through 
+<acronym title="Problem Exists Between Keyboard And Chair">PEBKAC</acronym>)
+has hopefully been staved off for another five years.
+
+The next step would be to write a script that completely automates the process…
+
+#### Notes
+1. Other than those occassions for which I bear complete responsibility…
+2. There are, of course, other benefits such as the self-satisfied glow of geek
+   accomplishment.
+3. This is located in <span class="file">scripts/kconfig/</span>.
+
+Creative Commons image of kernels on Flickr by 
+[Nadia Prigoda-Lee](http://www.flickr.com/photos/the_girl/56432091).
