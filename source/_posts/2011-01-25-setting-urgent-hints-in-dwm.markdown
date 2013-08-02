@@ -5,7 +5,7 @@ date: 2011-01-25 17:45
 comments: true
 categories: [dwm, archlinux, bash]
 ---
-[![image](http://dl.dropbox.com/u/261312/Blog-images/dwm-urgent.png)](http://www.flickr.com/photos/jasonwryan/5379701719/#/photos/jasonwryan/5379701719/lightbox/ "Arch Linux: dwm with statuscolors patch")
+[![image](http://miromiro.com/Blog-images/dwm-urgent.png)](http://www.flickr.com/photos/jasonwryan/5379701719/#/photos/jasonwryan/5379701719/lightbox/ "Arch Linux: dwm with statuscolors patch")
 
 After nearly 12 months of running a pretty stable
 [dwm](http://dwm.suckless.org "dwm homepage"), with a consistent

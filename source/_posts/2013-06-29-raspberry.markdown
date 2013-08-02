@@ -5,7 +5,7 @@ date: 2013-06-29 09:40
 comments: true
 categories: [archlinux, hack]
 ---
-{% img left https://dl.dropboxusercontent.com/u/261312/Blog-images/raspberry-pi-logo.png Raspberry Pi logo %}
+{% img left http://miromiro.com/Blog-images/raspberry-pi-logo.png Raspberry Pi logo %}
 I was fortunate enough to be given a 
 [Raspberry Pi](http://www.raspberrypi.org/ 'Pi homepage') earlier this year 
 and, naturally enough, have been running 
@@ -81,7 +81,7 @@ a [bittorrent sync](http://jasonwryan.com/blog/2013/03/16/sync/ 'My post on Sync
 shared directory as <span class="file">~/Downloads</span>. All files are synched 
 to my desktop as they are downloaded to the Pi. Simple.
 
-{% img https://dl.dropboxusercontent.com/u/261312/Blog-images/rtorrent-2.png 'Screenshot of rtorrent in action…' %}
+{% img http://miromiro.com/Blog-images/rtorrent-2.png 'Screenshot of rtorrent in action…' %}
 
 As I mentioned above, you could also use a VPN and, with a service
 file, have it connect on boot if you wished to further protect your privacy.

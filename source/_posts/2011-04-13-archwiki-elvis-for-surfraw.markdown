@@ -5,7 +5,7 @@ date: 2011-04-13 19:29
 comments: true
 categories: [archlinux, surfraw, bash]
 ---
-![image](http://dl.dropbox.com/u/261312/Blog-images/arch-elvis.png)
+![image](http://miromiro.com/Blog-images/arch-elvis.png)
 
 I have been using
 [Surfraw](http://surfraw.alioth.debian.org/ "Surfraw manifesto") for the

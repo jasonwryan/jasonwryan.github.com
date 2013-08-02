@@ -5,7 +5,7 @@ date: 2011-01-08 11:04
 comments: true
 categories: [archlinux, dwm, bash, hack]
 ---
-![image](http://dl.dropbox.com/u/261312/Blog-images/mailcheck.png)
+![image](http://miromiro.com/Blog-images/mailcheck.png)
 
 I use [mutt](http://www.mutt.org/ "Mutt homepage") and
 [offlineimap](https://github.com/jgoerzen/offlineimap/wiki "Offlineimap on github")

@@ -53,7 +53,7 @@ status bar; otherwise `conky | dzen2` is obscured.
 
 Now, the “before” shot:
 
-{% img http://dl.dropbox.com/u/261312/Blog-images/conky-dzen.png %}
+{% img http://miromiro.com/Blog-images/conky-dzen.png %}
 
 …and the finished product:
 

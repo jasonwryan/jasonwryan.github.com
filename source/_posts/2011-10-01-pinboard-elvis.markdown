@@ -5,7 +5,7 @@ date: 2011-10-01 10:29
 comments: true
 categories: [surfraw, linux, bash]
 ---
-![image](http://dl.dropbox.com/u/261312/Blog-images/pinboard-elvis.png)
+![image](http://miromiro.com/Blog-images/pinboard-elvis.png)
 
 After recovering from 
 [the shock of the botched delicious relaunch](http://jasonwryan.com/blog/2011/09/28/delicious/ "My post on the delicious fiasco"),

@@ -6,7 +6,7 @@ comments: true
 categories: [archlinux, browser]
 ---
 [![Arch &
-uzbl](http://dl.dropbox.com/u/261312/Blog-images/uzbl.jpg)](http://www.flickr.com/photos/jasonwryan/4352140405/ "Arch & uzbl by jasonwryan, on Flickr")
+uzbl](http://miromiro.com/Blog-images/uzbl.jpg)](http://www.flickr.com/photos/jasonwryan/4352140405/ "Arch & uzbl by jasonwryan, on Flickr")
 
 A couple of weeks ago, I switched my default browser from
 [Conkeror](http://conkeror.org/ "Conkeror homepage") to
@@ -55,7 +55,7 @@ into your desktop environment. Here you can see the status bar showing
 uzbl in command mode, on the Arch forums home page, which has completely
 loaded (the other figure is the X root window number).
 
-![image](http://dl.dropbox.com/u/261312/Blog-images/uzbl-bar.png)
+![image](http://miromiro.com/Blog-images/uzbl-bar.png)
 
 As an Arch Linux user, I’m keen to support a project that has been
 developed by the Arch community (if you want to see the history of the

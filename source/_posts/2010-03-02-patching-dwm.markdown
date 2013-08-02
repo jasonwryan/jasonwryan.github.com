@@ -5,7 +5,7 @@ date: 2010-03-02 20:16
 comments: true
 categories: [dwm, archlinux]
 ---
-![image](http://dl.dropbox.com/u/261312/Blog-images/patching-dwm.png)
+![image](http://miromiro.com/Blog-images/patching-dwm.png)
 
 I had posted [a while back](http://jasonwryan.com/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/ "Patching dwm with pertag & bstack")
 about my (failed) attempt to patch [dwm](http://dwm.suckless.org "dwm homepage") 
@@ -19,7 +19,7 @@ any further patches won’t take.
 Further investigation, and some trial and a tolerable amount of error,
 have however demonstrated to me that it is quite possible to patch dwm
 to your heart’s content; or at least to my meagre needs. Which in the
-case of [my EeePC](http://dl.dropbox.com/u/261312/Configs/index.html "EeePC configs")
+case of [my EeePC](http://miromiro.com/Configs/index.html "EeePC configs")
 is pertag, cycle and push, with the addition of bstack on 
 [my workstation](https://bitbucket.org/jasonwryan/workstation/src/ "Workstation configs").
 

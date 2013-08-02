@@ -5,7 +5,7 @@ date: 2012-09-01 10:09
 comments: true
 categories: [archlinux, bash, hack]
 ---
-{% img left http://dl.dropbox.com/u/261312/Blog-images/notes.jpg 'Notepad image on Flickr' %}
+{% img left http://miromiro.com/Blog-images/notes.jpg 'Notepad image on Flickr' %}
 Nearly two years ago, I posted about my adaption of a simple
 [command line note utility](http://jasonwryan.com/blog/2010/09/28/command-line-notes/ 'My post in 2010').
 I have used this setup on all of my machines on a daily basis since and it has worked

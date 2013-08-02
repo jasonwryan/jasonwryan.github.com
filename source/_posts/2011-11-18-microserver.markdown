@@ -5,7 +5,7 @@ date: 2011-11-18 17:13
 comments: true
 categories: [debian, linux, bash]
 ---
-![image](http://dl.dropbox.com/u/261312/Blog-images/microserver.png)
+![image](http://miromiro.com/Blog-images/microserver.png)
 
 I recently picked up a 
 [HP Microserver](http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html "HP specs page");

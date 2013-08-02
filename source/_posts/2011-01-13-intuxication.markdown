@@ -5,7 +5,7 @@ date: 2011-01-13 10:00
 comments: true
 categories: [vcs, linux]
 ---
-![image](http://dl.dropbox.com/u/261312/Blog-images/intuxication.png)
+![image](http://miromiro.com/Blog-images/intuxication.png)
 
 I have previously posted about using 
 [Mercurial to share dotfiles](http://jasonwryan.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/ "My post on using mercurial"),

@@ -5,7 +5,7 @@ date: 2011-06-06 13:40
 comments: true
 categories: [ubuntu, linux]
 ---
-![image](http://dl.dropbox.com/u/261312/Blog-images/ubuntu-logo.png)
+![image](http://miromiro.com/Blog-images/ubuntu-logo.png)
 
 I have been experiencing problems with my wifi LAN when playing music
 through

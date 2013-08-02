@@ -5,7 +5,7 @@ date: 2010-10-21 20:38
 comments: true
 categories: [ubuntu, linux]
 ---
-![image](http://dl.dropbox.com/u/261312/Blog-images/ubuntu-fonts.png)
+![image](http://miromiro.com/Blog-images/ubuntu-fonts.png)
 
 Invariably, an [Ubuntu](http://www.ubuntu.com/ "Ubuntu homepage")
 upgrade only ever brings me pain in one area: the framebuffer. Granted,

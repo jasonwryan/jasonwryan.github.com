@@ -5,7 +5,7 @@ date: 2011-09-10 16:46
 comments: true
 categories: [tmux, linux, bash]
 ---
-![image](http://dl.dropbox.com/u/261312/Blog-images/tmux-ssh.jpg)
+![image](http://miromiro.com/Blog-images/tmux-ssh.jpg)
 
 I have posted before about tmux<sup>1</sup>, the terminal multiplexer. One of the
 (minor) frustrations that I have to-date done nothing about was setting

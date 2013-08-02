@@ -5,7 +5,7 @@ date: 2011-06-26 14:08
 comments: true
 categories: [linux, browser, hack]
 ---
-![image](http://dl.dropbox.com/u/261312/Blog-images/vimprobable2.png)
+![image](http://miromiro.com/Blog-images/vimprobable2.png)
 
 I [posted last year about Vimprobable](http://jasonwryan.com/blog/2010/10/07/vimprobable/ "Post on using Vimprobable")
 a [webkit browser](http://www.webkit.org/ "Webkit site") that uses

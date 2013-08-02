@@ -5,7 +5,7 @@ date: 2012-03-30 12:30
 comments: true
 categories: [archlinux, bash, hack]
 ---
-{% img left http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png 240 240 Octopress Logo %}
+{% img left http://miromiro.com/Blog-images/octopress_logo.png 240 240 Octopress Logo %}
 
 Over the last week I have been moving my blog over to [Octopress](http://octopress.org/),
 a lightweight blogging framework for [Jekyll](https://github.com/mojombo/jekyll),

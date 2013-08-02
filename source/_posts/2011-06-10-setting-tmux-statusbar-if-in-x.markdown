@@ -35,7 +35,7 @@ years, but never persevered with it. However, as I have been doing a bit
 of work making the console as functional as possible<sup>2</sup>, I thought I
 would revisit it.
 
-![image](http://dl.dropbox.com/u/261312/Blog-images/tmux-status1.png)
+![image](http://miromiro.com/Blog-images/tmux-status1.png)
 
 The insight that I had that got it working for me was to use the
 source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
@@ -62,7 +62,7 @@ set -g status-left "#[fg=green] #H #[default] …blah, blah, blah…
 
 Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:
 
-![image](http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png)
+![image](http://miromiro.com/Blog-images/tmux-status2.png)
 
 All the relevant files are in 
 [my mercurial repo](https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.tmux "My mercurial repository").

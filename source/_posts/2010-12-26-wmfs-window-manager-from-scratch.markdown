@@ -5,7 +5,7 @@ date: 2010-12-26 11:08
 comments: true
 categories: [archlinux]
 ---
-[![image](http://dl.dropbox.com/u/261312/Blog-images/wmfs.png)](http://www.flickr.com/photos/jasonwryan/5289976238/lightbox/ "Screenshot on Flickr")
+[![image](http://miromiro.com/Blog-images/wmfs.png)](http://www.flickr.com/photos/jasonwryan/5289976238/lightbox/ "Screenshot on Flickr")
 
 I have been experimenting with a couple of new window managers over the
 last week or so. Not that I am in any way dissatisfied with
