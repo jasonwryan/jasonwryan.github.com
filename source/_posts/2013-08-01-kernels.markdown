@@ -53,7 +53,7 @@ Brilliant. And, naturally enough, it is in
 [the AUR](https://aur.archlinux.org/packages/modprobed_db/ 'AUR package').
 
 Run the script, create your <span class="file">.conf</span> file and database in 
-<span class="file">$XDG_CONFIG_HOME/modprobed_db.conf</span> and then either
+<span class="file">$XDG_CONFIG_HOME/modprobed_db{,.conf}</span> and then either
 call it from a `cron` job or, if you are impatient like me, spend a frenzied 10
 minutes plugging ALL the devices you own into your machine, and you are good to
 go. Running `sudo modprobed_db recall` will load all of the required modules,
@@ -77,6 +77,20 @@ through
 has hopefully been staved off for another five years.
 
 The next step would be to write a script that completely automates the process…
+
+### Update 7/8/13
+After poring over PKGBUILDS in the AUR, principally graysky's
+[linux-ck PKGBUILD](https://aur.archlinux.org/packages/linux-ck/ 'Arch User Repository'),
+and the official 
+[ABS PKGBUILD](https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/linux 'Arch SVN Package Repo'),
+I decide to write my own to automate the above. It works well enough for me, but
+hasn't been tested more widely. You will need to ensure that you have an
+up-to-date `modprobed_db` database with all of your required modules listed and 
+that you have configured `sudoers` to have this run from the PKGBUILD.
+
+The PKGBUILD and the attendant files are in my
+[bitbucket repo](https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr 'PKGBUILD and related files'):
+let me know if there are any issues with this approach.
 
 #### Notes
 1. Other than those occassions for which I bear complete responsibility…
