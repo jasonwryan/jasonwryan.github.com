@@ -34,7 +34,7 @@ You will find me in a couple of other places around the web:
 
 ### Tip Jar ###
 If you enjoy these posts and would like to express your gratitude with a modest
-emolument , you are welcome to do so using 
+emolument, you are welcome to do so using 
 [bitcoin](http://bitcoin.org/en/ 'Open source P2P money'):
 [13VFRYdzMJX33H8kiqVkB56MhkKsvFKX5a](bitcoin:13VFRYdzMJX33H8kiqVkB56MhkKsvFKX5a)
 
