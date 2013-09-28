@@ -32,6 +32,12 @@ You will find me in a couple of other places around the web:
 * [Books I read](http://www.goodreads.com/review/list/3687231) on Goodreads
 * [Professional connections](http://www.linkedin.com/in/jasonwryan) on LinkedIn
 
+### Tip Jar ###
+If you enjoy these posts and would like to express your gratitude with a modest
+emolument , you are welcome to do so using 
+[bitcoin](http://bitcoin.org/en/ 'Open source P2P money'):
+bitcoin:13VFRYdzMJX33H8kiqVkB56MhkKsvFKX5a
+
 ### Old Blog ###
 You can also find all of my old posts on public sector communications
 on the Wayback Machine's archive of the 
