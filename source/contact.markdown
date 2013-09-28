@@ -36,7 +36,7 @@ You will find me in a couple of other places around the web:
 If you enjoy these posts and would like to express your gratitude with a modest
 emolument , you are welcome to do so using 
 [bitcoin](http://bitcoin.org/en/ 'Open source P2P money'):
-bitcoin:13VFRYdzMJX33H8kiqVkB56MhkKsvFKX5a
+[13VFRYdzMJX33H8kiqVkB56MhkKsvFKX5a](bitcoin:13VFRYdzMJX33H8kiqVkB56MhkKsvFKX5a)
 
 ### Old Blog ###
 You can also find all of my old posts on public sector communications
