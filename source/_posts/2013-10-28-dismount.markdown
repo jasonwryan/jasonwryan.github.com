@@ -1,0 +1,121 @@
+---
+layout: post
+title: "Simple Unmounting"
+date: 2013-10-28 15:29
+comments: true
+categories: [arch, hack]
+---
+{% img left http://miromiro.com/Blog-images/dismount.jpg Creative Commons image %}
+For those people that prefer to forego the full blown 
+<acronym title="Desktop Environment">DE</acronym> and—instead of all the
+“convenience” that this sort of setup offers—piece together their setup from a
+variety of different tools and knit it all together with some scripting,
+automounting external drives is, notwithstanding the inexplicable number of
+posts to the forums to the contrary, incredibly straightforward with
+[udisks](https://wiki.archlinux.org/index.php/Udev#Udisks 'Arch Wiki page on Udev').
+My approach in this respect is to use
+[udikskie](https://wiki.archlinux.org/index.php/Udiskie 'Wiki page'); it is
+lightweight, unobtrusive, configurable and foolproof, as far as I can tell.
+
+Where I have found a small gap, or more a minor irritation really, is with
+unmounting devices. `udiskie-umount /media/MY_USB_DRIVE` works just fine, but
+I often have a variety of media mounted, and not just standard 
+<acronym title="Universal Serial Bus">USB</acronym> drives. At work, for
+example, it is not uncommon for me to have mounted under 
+<span class="file">/media</span> any or all of the following:
+
++ A USB drive containing all of my music
++ An encrypted volume mounted with
+  [tcplay](http://jasonwryan.com/blog/2013/01/10/truecrypt/ 'My post on replacing TrueCrypt')
+  shared via [Bittorrent Sync](http://jasonwryan.com/blog/2013/03/16/sync/ 'Another postof mine…')
++ A <acronym title="Common Internet File System">CIFS</acronym> share
++ An <acronym title="Network File System">NFS</acronym> share or an 
+  <acronym title="SSH Filesystem">SSHFS</acronym> mount.
+
+In a couple of these cases, I don't want to or can't—just `umount` them with
+`udsikie`; they require a different approach. To facilitate this, I have adopted
+a simple convention: I use a standard naming convention for all external media
+or their mountpoints. When I first buy a USB drive, I give it a meaningful name,
+beginning with an uppercase letter, as this won't clash with any of my inetrnal
+drives and it hapilly accommodates drives from other operating systems. So:
+
+{% codeblock lang:sh %}
+sudo dosfslabel /dev/sdc1 EightBall
+{% endcodeblock %}
+
+sets up a new 8GB drive I found in the schwag bag at the conference I attended
+last week.
+
+Now that all external media are predictably named, it is just a matter of
+writing a script that check how many are mounted, presents a menu if there is
+more than one, and unmounts the respective device correctly:
+
+{% codeblock lang:sh dismount %}
+#!/usr/bin/env bash
+# unmount USB drives
+
+target=( $(awk '/media\/[\^A-Z]/ {print $3}' <(mount)) )
+shares=(Scout Sentinel)
+
+checkbusy() {
+  grep "PID" <(lsof +d "$target" &>/dev/null)
+  if [[ $? -eq 0 ]]; then
+    printf "%s\n" "${target##*/} busy…"
+    exit 1
+  fi
+}
+
+exstatus() {
+  if [[ $? -eq 0 ]]; then
+    printf "%s\n" "${target##*/} unmounted…"
+  else
+    printf "%s\n" "Failed to unmount."
+  fi
+}
+
+# check for multiple devices
+if (( "${#target[@]}" > 1 )); then
+  PS3="Select your device to unmount: "
+  printf "%s\n" "There are ${#target[@]} devices mounted"
+  select dev in "${target[@]}"; do
+    target="$dev"
+    break
+  done
+fi
+
+# check for share
+for drive in "${shares[@]}"; do
+  if [[ "$drive" =~ "${target##*/}" ]]; then
+    share="$drive"
+  fi
+done
+
+# options per filesystem
+if [[ -n "$target" ]]; then
+  if [[ -n "$share" ]]; then
+    cmd=$(sudo umount "$target")
+  elif [[ "${target##*/}" =~ "Safebox" ]]; then
+    cmd=$(sudo safebox close)
+  else
+    cmd=$(udiskie-umount -s "$target" &>/dev/null)
+  fi
+# do it
+checkbusy
+$cmd
+exstatus
+else
+  printf "%s\n" "No drive mounted!"
+fi
+
+# vim:set ts=2 sts=2 sw=2 et:
+{% endcodeblock %}
+
+Now, no matter the number or type of devices I currently have mounted, I can
+unmount them by typing `dismount` and selecting the appropriate drive via the
+`select` menu. Simple, but satisfying. The script is in my
+[bitbucket repo](https://bitbucket.org/jasonwryan/centurion/src/tip/Scripts/dismount 'Grab it!)
+
+#### Notes
+Creative Commons image, Dismount, by 
+[Chris](http://www.flickr.com/photos/chrisinplymouth/3659964278/).
+
