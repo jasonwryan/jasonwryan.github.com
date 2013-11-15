@@ -1,0 +1,106 @@
+---
+layout: post
+title: "BitTorrent Sync's API"
+date: 2013-11-14 09:51
+comments: true
+categories: [archlinux, bash, hack]
+---
+{%img left http://miromiro.com/Blog-images/sync.png Bittorrent logo %}
+I have 
+[written previously](http://jasonwryan.com/blog/2013/03/16/sync/ 'Post on the Alpha release')
+about 
+[BitTorrent Sync](http://www.bittorrent.com/sync 'Sync webpage'), the encrypted
+file syncing application that uses the bittorrent protocol to sync your data
+over your <acronym title="Local Area Network">LAN</acronym>, or over the Internet,
+using [P2P technology](https://en.wikipedia.org/wiki/Peer_to_peer 'Wikipedia page').
+I have been using it since early this year as a replacement for
+dropbox.<sup>1</sup>
+
+At the beginning of this month, BitTorrent unveiled the 
+[Beta API](http://blog.bittorrent.com/2013/11/05/bittorrent-sync-beta-api-now-available-to-developers/ 'Sync blog announcement')
+for developers (meaning you have to tell them what you plan to do in order to
+be issued a key). After some equivocation, I signed up with the rather flimsy
+excuse of “writing a shell wrapper for the command line” and found, to my
+chagrin, a key in my inbox the next morning. 
+
+This proved to be something of an unwelcome arrival. In theory, I was excited
+about having access to a tool to query the Sync application. One of the nodes is
+on my 
+[headless Raspberry Pi](http://jasonwryan.com/blog/2013/06/29/raspberry/ 'Post on setting up a torrent box') 
+and the idea of being able to issue a command from my laptop to ascertain what
+was going on in the Pi's synced folders was (and is) a tremendously attractive
+one.
+
+However, now that I was in
+possession of the key, I felt morally obliged to do something with it. The
+problem with this realization was that I had no idea how to work with an 
+<acronym title="Application Program Interface">API</acronym>, let alone writing
+a script to accomplish my purported goal.
+
+After spending some time looking at 
+[the documentation](http://www.bittorrent.com/sync/developers/api 'Such as it is…'),
+and buoyed by the optimism of ignorance, I decided to make good on my promise.
+My first attempt sort of worked, but was hampered as much by a serious
+conceptual flaw as it was by poor implementation. I decided, in spite of any number
+of Stack Overflow posts warning expressly not to do this, to use `awk` to parse
+the [JSON data](http://www.json.org/ 'JSON homepage')<sup>2</sup>. This was what I would
+euphemistically describe as a “learning opportunity.” The result is preserved
+for posterity in my [bitbucket repo](https://bitbucket.org/jasonwryan/shiv/commits/16c9dee17f097e83fb325e303d867e6fda488992?at=default 'Bit of a trainwreck, but you have to start somewhere…')
+(for the completists)…
+
+At this point, I was fortunate that Earnestly in #archlinux introduced me to 
+keenerd's purpose built tool, [Jshon](http://kmkeen.com/jshon/ 'Kyle's site: visit it. Now.).
+And by “introduced” I mean generously (and patiently) talked me through how it
+worked and how I could use it with the Sync API to achieve what I was after.
+After a while playing with it, there was the—inevitably belated—moment of
+realization: this thing is genius! It allows you to intelligently
+*interrogate* the data. Not blindly chopping at it with an increasingly complex
+series of actions in `awk`<sup>3</sup>; but quite directly traversing the structure and
+extracting the desired elements. 
+
+Now I was *cooking*. Well, more to the point, I was flailing about in a smoke
+filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
+asphyxiation. Once again, Earnestly's patience and bash skills were put to good effect.
+The resulting script, 
+[syncstat](https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/syncstat 'In bitbucket'),
+is undeniably a triumph of his good ideas over my own poor execution. In other
+words, the fact that it works so well is testament to his ability, but any and
+all faults are mine alone<sup>4</sup>.
+
+And it does work. It only requires
+[Jshon](https://www.archlinux.org/packages/?sort=&q=jshon 'Arch package db') 
+(which you will already have installed because you use 
+[aurphan, right?](http://jasonwryan.com/blog/2012/03/09/aurphan/ 'My post on this great utility')) 
+and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:
+
+{% codeblock lang:sh %}
+directory1 YourRe@llyTr1cky53cr3t
+directory2 H0p3fu11yY0uG3tTh31d3@
+{% endcodeblock %}
+
+The functionality in the script is limited at this stage to just querying the
+application; I wasn't interested in pushing changes at this point. So you can
+access the version of the currently installed Syncapp, upload and download
+speeds, the size of synced folders and list all of their contents.
+
+It is a beta release, so the odd bug is to be expected. Overall, though, the API is 
+a welcome addition to what is a great application. If you have an API key, add
+it to your <span class="file">sync.conf</span>, 
+[grab the script](https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/syncstat 'On bitbucket')
+and give it a whirl. Undoubtedly, over the coming weeks more polished versions
+will emerge in “proper” languages, but for the time being this does exactly what
+I need.
+
+#### Notes
+1. Yes, I would much prefer to use an open source tool to accomplish the same
+   thing but I haven't found anything comparable that is this good to date…
+2. In what I imagine is a complete coincidence, the JSON logo is uncannily
+   similar to the initial (and much better, I thought) Sync logo, as seen on
+   [my original post](http://jasonwryan.com/blog/2013/03/16/sync/). 
+3. This is not intended as a slight on `awk`; which I am undoubtedly
+   [fond of](http://jasonwryan.com/blog/2013/09/15/awking/), but rather the
+   limits of my ability with that language.
+4. I am also indebted to Scott (firecat53) for testing and providing helpful
+   feedback on the early versions of the script.
+5. It is worth noting that in the `$json` variable, I pass `curl` the -`n` option, 
+   which means it reads my credentials from <span class="file">$HOME/.netrc</span>.

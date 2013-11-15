@@ -3,7 +3,7 @@ layout: post
 title: "Hacking PKGBUILDs"
 date: 2013-05-18 10:10
 comments: true
-categories: [archlinux, hack]
+categories: [archlinux, bash, hack]
 ---
 {% img left http://miromiro.com/Blog-images/woodcutting.jpg 'Cutting wood' %}
 I posted a couple of weeks ago about 
