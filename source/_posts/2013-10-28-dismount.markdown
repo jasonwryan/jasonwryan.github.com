@@ -14,7 +14,7 @@ automounting external drives is, notwithstanding the inexplicable number of
 posts to the forums to the contrary, incredibly straightforward with
 [udisks](https://wiki.archlinux.org/index.php/Udev#Udisks 'Arch Wiki page on Udev').
 My approach in this respect is to use
-[udikskie](https://wiki.archlinux.org/index.php/Udiskie 'Wiki page'); it is
+[udiskie](https://wiki.archlinux.org/index.php/Udiskie 'Wiki page'); it is
 lightweight, unobtrusive, configurable and foolproof, as far as I can tell.
 
 Where I have found a small gap, or more a minor irritation really, is with
@@ -33,10 +33,10 @@ example, it is not uncommon for me to have mounted under
   <acronym title="SSH Filesystem">SSHFS</acronym> mount.
 
 In a couple of these cases, I don't want to—or can't—just `umount` them with
-`udsikie`; they require a different approach. To facilitate this, I have adopted
+`udiskie`; they require a different approach. To facilitate this, I have adopted
 a simple approach: I use a standard naming convention for all external media
 or their mountpoints. When I first buy a USB drive, I give it a meaningful name,
-beginning with an uppercase letter, as this won't clash with any of my inetrnal
+beginning with an uppercase letter, as this won't clash with any of my internal
 drives and it happily accommodates drives from other operating systems. So:
 
 {% codeblock lang:sh %}
@@ -92,13 +92,15 @@ done
 
 # options per filesystem
 if [[ -n "$target" ]]; then
-  if [[ -n "$share" ]]; then
-    cmd=$(sudo umount "$target")
-  elif [[ "${target##*/}" =~ "Safebox" ]]; then
-    cmd=$(sudo safebox close)
-  else
-    cmd=$(udiskie-umount -s "$target" &>/dev/null)
-  fi
+  for drive in "${shares[@]}"; do
+    if [[ "$drive" = "${target##*/}" && "${target##*/}" = Safebox ]]; then
+      cmd=$(sudo safebox close)
+    elif [[ "$drive" = "${target##*/}" ]]; then
+      cmd=$(sudo umount "$target")
+    else
+      cmd=$(udiskie-umount -d "$target" &>/dev/null)
+    fi
+  done
 # do it
 checkbusy
 $cmd
