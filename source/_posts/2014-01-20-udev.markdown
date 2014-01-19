@@ -1,0 +1,106 @@
+---
+layout: post
+title: "Scripting with udev"
+date: 2014-01-20 10:02
+comments: true
+categories: [archlinux, bash, hack]
+---
+{% img left http://miromiro.com/Blog-images/usb.jpg Creative Commons image %} 
+One of the most satisfying aspects of running free and open source software is
+the ability to be able to continually tinker with your setup, limited only by
+your imagination and ability.  The more you do tinker, the smaller the gap
+between the former and the latter, as each small project inevitably leads you
+into a deeper understanding of various aspects of your system<sup>1</sup> and
+how you can customize that system to suit your exact requirements.
+
+Over the last couple of days, I have been playing with 
+[udev](http://en.wikipedia.org/wiki/Udev 'Wikipedia page'), the kernel device
+manager, as I was attempting to run a script once a specific 
+<acronym title="Universal Serial Bus">USB</acronym> drive was plugged in. It
+turns out, as is so often the case, that udev is only *part* of the 
+picture…
+
+As both my work and personal laptops have relatively small 
+<acronym title="Solid State Drives">SSDs</acronym>, I carry around
+[my music](http://alpha.libre.fm/user/jasonwryan/ 'Libre.fm profile')
+on a 1TB external drive. As the drive only contains <span class="file">.flac</span>
+files, I wanted to autmate the process of `rsync`’ing music from my desktop to
+the drive and, for the laptops, repopulating the symlinks to 
+<span class="file">~/Music/</span> when the drive was plugged in.
+
+My first thought was a rule in <span class="file">/etc/udev/rules.d/</span>,
+using `RUN+=`. There are any number of blog posts espousing this approach and,
+as I quickly discovered, they are *all* wrong. The problem with using this key is
+that, as the `man` page makes clear, it is not designed for long running
+programs:
+
+{% blockquote udev manual http://www.freedesktop.org/software/systemd/man/udev.html %}
+This can only be used for very short-running foreground tasks. Running an event process for a long period of time may block all further events for this or a dependent device.
+
+Starting daemons or other long running processes is not appropriate for udev; the forked processes, detached or not, will be unconditionally killed after the event handling has finished.
+{% endblockquote %}
+
+The problem, as it manifest for me, was the drive would be blocked from
+mounting until *after* the script had run, meaning `rsync` or my symlinks would
+have no target.  There are various “workarounds” on the web for this, including
+using *two* scripts, one to trigger the other<sup>2</sup>. Even for me, this
+seemed like a 
+[Pyrrhic victory](http://en.wikipedia.org/wiki/Pyrrhic_victory 'Wikipedia entry').
+
+The correct way to do this, as I found once I uncovered 
+[this thread](https://bbs.archlinux.org/viewtopic.php?id=149419 'Arch BBS')
+on the Arch boards where WonderWoofy and 65kid helpfully pieced it together, is
+to use `SYSTEMD_WANTS`.  As it is described in the manual:
+
+{% blockquote man systemd.device http://www.freedesktop.org/software/systemd/man/systemd.device.html %}
+THE UDEV DATABASE
+  The settings of device units may either be configured via unit files, or directly from the udev database (which is recommended). The following udev properties are understood by systemd:
+
+  SYSTEMD_WANTS=
+  Adds dependencies of type Wants from this unit to all listed units. This may be used to activate arbitrary units, when a specific device becomes available. Note that this and the other tags are not taken into account unless the device is tagged with the "systemd" string in the udev database, because otherwise the device is not exposed as systemd unit.
+{% endblockquote %}
+
+So, I edited <span class="file">/etc/udev/rules.d/90-usb-music.rules</span> to
+remove the `RUN+=` key, using a systemd service file instead, like so<sup>3</sup>:
+
+{% codeblock lang:sh %}
+SUBSYSTEMS=="usb", ATTRS{idProduct}=="1905", ACTION=="add", ENV{SYSTEMD_WANTS}=="upmusic.service"
+{% endcodeblock %}
+
+And then wrote the corresponding service file to have systemd hand off to the bash script:
+
+{% codeblock lang:sh /usr/lib/systemd/system/upmusic.service %}
+[Unit]
+Description=Update music links from Apollo
+Requires=media-Apollo.mount
+After=media-Apollo.mount
+
+[Service]
+ExecStart=/home/jason/Scripts/upmusic
+
+[Install]
+WantedBy=media-Apollo.mount
+{% endcodeblock %}
+
+As I mentioned in my post on my
+[simple unmounting script](http://jasonwryan.com/blog/2013/10/28/dismount/ 'Unmount USB drives…'),
+I use a naming convention for all my USB drives. In this case, my music is stored on Apollo, and
+it is automounted with 
+[udiskie](https://wiki.archlinux.org/index.php/Udiskie 'Arch wiki page'). In the 
+service file, systemd uses a hyphen instead of a forward slash, so the correct
+designation is `media-Apollo.mount`.
+
+Then it is just a matter of enabling the service with `systemctl enable upmusic` and,
+whenever Apollo is plugged in to either my desktop of laptop, the appropriate
+script will run and either update the files on Apollo or the symlinks on one of the 
+laptops.
+
+#### Notes
+1. This shouldn't be taken as any sort of claim of expertise or deep
+understanding of this, or any other, part of my system. See below.
+2. Which is why you should never trust anything written by bloggers…
+3. The definitive reference for udev rules remains 
+[Writing udev rules](http://www.reactivated.net/writing_udev_rules.html 'Daniel Drake's page')
+
+Creative Commons image on Flickr by [Jacob Garcia](http://www.flickr.com/photos/jacobgarcia/2550146/ 'Licensed CC by Jacob Garcia').
+
