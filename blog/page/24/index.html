@@ -9,8 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Over the last couple of days I have been familiarising myself with tmux.
-As it says on the homepage, tmux is a terminal multiplexer: it enables a &hellip;">
+  <meta name="description" content="A couple of weeks ago, I came across these
+simple bash functions
+written by Jack Mottram of One Thing Well for managing text
+notes. The functions as &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -89,7 +91,7 @@ As it says on the homepage, tmux is a terminal multiplexer: it enables a &hellip
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/01/07/tmux-terminal-multiplexer/">tmux - terminal multiplexer</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/09/28/command-line-notes/">Command Line Notes</a></h1>
     
     
       <p class="meta">
@@ -105,131 +107,82 @@ As it says on the homepage, tmux is a terminal multiplexer: it enables a &hellip
   
 
 
-<time datetime="2010-01-07T15:10:00+13:00" pubdate data-updated="true">Jan 7<span>th</span>, 2010</time>
+<time datetime="2010-09-28T17:56:00+13:00" pubdate data-updated="true">Sep 28<span>th</span>, 2010</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Over the last couple of days I have been familiarising myself with <a href="http://tmux.sourceforge.net/">tmux</a>.
-As it says on the homepage,</p>
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/cli-notes-1.png" alt="image" /></p>
 
-<blockquote><p>tmux is a terminal multiplexer: it enables a number of terminals (or windows), each running a separate program, to be created, accessed, and controlled from a single screen. tmux may be detached from a screen and continue running in the background, then later reattached.</p></blockquote>
+<p>A couple of weeks ago, I came across these
+<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
+written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
+notes.</p>
 
+<p>The functions as described in the article are so:</p>
 
-<p>I was attracted to tmux after seeing a number of enthusiastic postings on the
-<a href="http://bbs.archlinux.org/viewtopic.php?id=84157">Arch forums</a>, and by the promise of
-better management of multiple terminals in a single <a href="http://dwm.suckless.org/">dwm tag</a>…</p>
-
-<p>It&#8217;s available in the community repo, so:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S tmux
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$*&quot;</span>.txt <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$*&quot;</span> <span class="o">}</span>
 </span></code></pre></div></figure>
 
 
-<p>Then it is just a matter of configuring it to suit your style of working,
-keyboard bindings etc. Helpfully, it comes with some example config files to
-start you off. These can be found at <span class="file">/usr/share/tmux/*.conf</span>.
-I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</a> for mine:</p>
+<p>Unfortunately, the second function – for retrieving the list of files in
+the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
+and it will only list files in the top level directory. If you are an
+inverterate note taker, this plainly won’t scale.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># set prefix key to ctrl+t</span>
-</span><span class='line'>unbind C-b
-</span><span class='line'><span class="nb">set</span> -g prefix C-t
-</span><span class='line'>
-</span><span class='line'><span class="c"># more intuitive keybindings for splitting</span>
-</span><span class='line'>unbind %
-</span><span class='line'><span class="nb">bind </span>h split-window -h
-</span><span class='line'>unbind <span class="s1">&#39;&quot;&#39;</span>
-</span><span class='line'><span class="nb">bind </span>v split-window -v
-</span><span class='line'>
-</span><span class='line'><span class="c"># set vi keys</span>
-</span><span class='line'>unbind <span class="o">[</span>
-</span><span class='line'><span class="nb">bind </span>Escape copy-mode
-</span><span class='line'>setw -g mode-keys vi
-</span><span class='line'>
-</span><span class='line'><span class="c"># send the prefix to client inside window (ala nested sessions)</span>
-</span><span class='line'><span class="nb">bind</span>-key a send-prefix
-</span><span class='line'>
-</span><span class='line'><span class="c"># toggle last window like screen</span>
-</span><span class='line'><span class="nb">bind</span>-key C-b last-window
-</span><span class='line'>
-</span><span class='line'><span class="c"># confirm before killing a window or the server</span>
-</span><span class='line'><span class="nb">bind</span>-key k confirm <span class="nb">kill</span>-window
-</span><span class='line'><span class="nb">bind</span>-key K confirm <span class="nb">kill</span>-server
-</span><span class='line'>
-</span><span class='line'><span class="c"># toggle statusbar</span>
-</span><span class='line'><span class="nb">bind</span>-key b <span class="nb">set</span>-option status
-</span><span class='line'>
-</span><span class='line'><span class="c"># ctrl+left/right cycles thru windows</span>
-</span><span class='line'><span class="nb">bind</span>-key -n C-right next
-</span><span class='line'><span class="nb">bind</span>-key -n C-left prev
-</span><span class='line'>
-</span><span class='line'><span class="c"># open a man page in new window</span>
-</span><span class='line'><span class="nb">bind</span> / <span class="nb">command</span>-prompt <span class="s2">&quot;split-window &#39;exec man %%&#39;&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># quick view of processes</span>
-</span><span class='line'><span class="nb">bind</span> <span class="s1">&#39;~&#39;</span> split-window <span class="s2">&quot;exec htop&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># scrollback buffer n lines</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">history</span>-limit 5000
-</span><span class='line'>
-</span><span class='line'><span class="c"># on-screen time for display-panes in ms</span>
-</span><span class='line'><span class="nb">set</span> -g display-panes-time 2000
-</span><span class='line'>
-</span><span class='line'><span class="c"># start window indexing at one instead of zero</span>
-</span><span class='line'><span class="nb">set</span> -g base-index 1
-</span><span class='line'>
-</span><span class='line'><span class="c"># enable wm window titles</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles on
-</span><span class='line'>
-</span><span class='line'><span class="c"># wm window title string (uses statusbar variables)</span>
-</span><span class='line'><span class="nb">set</span> -g <span class="nb">set</span>-titles-string <span class="s2">&quot;tmux:#I #W&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># session initialization</span>
-</span><span class='line'>new -s TTYtter ttytter
-</span><span class='line'>neww -t 2
-</span><span class='line'>neww -d -t 3
-</span><span class='line'>neww -d -t 5
-</span><span class='line'>selectw -t 1
-</span><span class='line'>
-</span><span class='line'><span class="c">#### statusbar ####</span>
-</span><span class='line'><span class="nb">set</span> -g status-interval 1
-</span><span class='line'><span class="nb">set</span> -g status-justify centre <span class="c"># center align window list</span>
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="s1">&#39;#[fg=green] #H #[default]&#39;</span>
-</span><span class='line'><span class="nb">set</span> -g status-right <span class="s1">&#39;#[fg=blue,bright]Up#(uptime | cut -f 4-5 -d &quot; &quot; | cut -f 1 -d &quot;,&quot;) </span>
-</span><span class='line'><span class="s1">#[default]:: #[fg=cyan]#(cut -d &quot; &quot; -f 1-4 /proc/loadavg) &#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># default statusbar colors</span>
-</span><span class='line'><span class="nb">set</span> -g status-fg white
-</span><span class='line'><span class="nb">set</span> -g status-bg default
-</span><span class='line'><span class="nb">set</span> -g status-attr bright
-</span><span class='line'>
-</span><span class='line'><span class="c"># default window title colors</span>
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-fg white
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-bg default
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-attr dim
-</span><span class='line'>
-</span><span class='line'><span class="c"># active window title colors</span>
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-fg white
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-bg default
-</span><span class='line'><span class="nb">set</span>-window-option -g window-status-current-attr bright
-</span><span class='line'>
-</span><span class='line'><span class="c"># command/message line colors</span>
-</span><span class='line'><span class="nb">set</span> -g message-fg white
-</span><span class='line'><span class="nb">set</span> -g message-bg black
-</span><span class='line'><span class="nb">set</span> -g message-attr bright
+<p>My first attempt at hacking a solution yielded this little beauty:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\ </span>
+</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
 </span></code></pre></div></figure>
 
 
-<p>Copy this file to <span class="file">~/.tmux.conf</span>. The final result:</p>
+<p>Which removes <code>ls</code> from the function and allows nested directories, but
+is needlessly complex and, with four pipes, hideously <del>inefficient</del>
+inelegant.</p>
 
-<p><a href="http://www.flickr.com/photos/jasonwryan/4252840248/" title="Archlinux:  tmux running in dwm by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2703/4252840248_01ca8e7cc1.jpg" width="500" height="293" alt="Archlinux:  tmux running in dwm"/></a></p>
+<p>After reading up on Awk, particularly
+<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
+I arrived at something marginally longer but relying solely on the
+awesome power of awk to make the various transformations I was seeking…</p>
 
-<h3>Updated 16/11/10</h3>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
+</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
+</span></code></pre></div></figure>
 
-<p>For a current version of my <span class="file">.tmux.conf</span>, check my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.tmux.conf" title="bitbucket site" target="_blank">mercurial repository</a>.</p>
+
+<p>An added advantage is that it is scalable irrespective of how deep the
+directories go. I’m sure that with some more awk-foo I could write a
+more effective set of conditionals, but this seemed a pretty good start
+for a simple note taking utility.</p>
+
+<h3>Updated 3/11/10</h3>
+
+<p>To remove a little of the visual clutter, I amended the awk script to
+strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
+</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
+in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
+symlink to it from <span class="file">~/.notes</span>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.</p></li>
+<li><p>Obligatory “after” screenshot:</p></li>
+</ol>
+
+
+<p><img src="http://miromiro.com/Blog-images/cli-notes-2.png" title="'Screenshot of editing text'" ></p>
 </div>
   
   
@@ -242,7 +195,7 @@ I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2009/12/28/changing-keybinds-in-vifm/">Changing Keybinds in vifm</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/08/06/mailers/">5 Alternate Mail Clients</a></h1>
     
     
       <p class="meta">
@@ -258,66 +211,25 @@ I borrowed heavily from <a href="http://cinderwick.ca/">Thayer Williams&#8217;</
   
 
 
-<time datetime="2009-12-28T13:50:00+13:00" pubdate data-updated="true">Dec 28<span>th</span>, 2009</time>
+<time datetime="2010-08-06T17:03:00+12:00" pubdate data-updated="true">Aug 6<span>th</span>, 2010</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><a href="http://vifm.sourceforge.net/">Vifm</a> is a ncurses based file manager with vi-like
-keybindings; it gives you complete keyboard control over your files without
-having to learn a new set of commands.</p>
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/462324481/lightbox/"><img src="http://miromiro.com/Blog-images/mail-5alts.png"/></a></p>
 
-<p><a href="http://www.flickr.com/photos/jasonwryan/4220632362/" title="Vifm by
-jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4039/4220632362_ea980811e1.jpg" width="500"
-height="227" alt="Vifm"/></a></p>
+<p>Rather than just download <a href="http://www.mozillamessaging.com/en-US/thunderbird/" title="Thunderbird homepage">Thunderbird</a>, you can always install something a little more interesting that will a) provide hours of fun setting up and configuring so that it works <em>exactly</em> the way you want it to, and b) will free you of the rodent…</p></p>
 
-<p>The only drawback, for me, is that as of the current version (0.5-1) you
-can&#8217;t map keys. While the developer has indicated it is on the todo list,
-he also flagged that it is some way off. If, like me, you <code>map : ;</code>
-in <a href="http://www.vim.org/">Vim</a>, then not having this functionality is a minor
-irritant. Fortunately, it is also easily fixed. Ken Steen, the Vifm developer,
-was kind enough to point me in the right direction…</p>
+<ul>
+<li><a href="http://www.mutt.org/" title="mutt homepage">Mutt</a> - a small but very powerful text-based mail client for Unix operating systems. Eminently extensible and configurable. mutt + imap + gmail ftw!</li>
+<li><a href="http://www.washington.edu/alpine/" title="Alpine homepage">Alpine</a> - based on the Pine® Message System. Not as intimidating for the novice as mutt…</li>
+<li><a href="http://sup.rubyforge.org/" title="sup homepage">Sup</a> - a console-based email client for people with a lot of email. “The goal of Sup is to become the email client of choice for nerds everywhere”</li>
+<li><a href="http://notmuchmail.org/">Notmuch</a> - an answer to Sup. Still in the early stages of development, there are two user interfaces available for it, one for <a href="http://www.vim.org/" title="THE text editor...">vim</a> and one for those poor benighted souls still using emacs…</li>
+<li><a href="http://www.courier-mta.org/cone/cone00index.html" title="Cone homepage">Cone</a> - a screen-oriented E-mail/News reader and writer. Cone contains an experimental implementation of a new remote mail access protocol, <a href="http://en.wikipedia.org/wiki/Simple_Mail_Access_Protocol" title="Wikipedia page">SMAP</a></li>
+</ul>
 
-<p>Download <a href="http://aur.archlinux.org/packages.php?ID=6011">the tarball</a> from
-<acronym title="Arch User Repository">AUR</acronym> and untar it etc.,</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span>tar -xzf vifm.tar.gz <span class="nb">cd </span>vifm/
-</span></code></pre></div></figure>
-
-
-<p>Build the package</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span>makepkg -s
-</span></code></pre></div></figure>
-
-
-<p>Then you will need to edit the file, keys.c</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vim src/vifm-0.5/src/keys.c
-</span></code></pre></div></figure>
-
-
-<p>Search for the command key</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>/case <span class="s1">&#39;:&#39;</span>:
-</span></code></pre></div></figure>
-
-
-<p>In this version it is at line 982. Change the entry to your key of choice —
-in my case <kbd>;</kbd> — and save and quit.</p>
-
-<p>Recompile Vifm and you are done&#8230;</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span>makepkg -efi
-</span></code></pre></div></figure>
-
-
-<h3>Update 18/2/10</h3>
-
-<p>Vifm has now been moved to Community, so you can use
-<a href="http://wiki.archlinux.org/index.php/Arch_Build_System%22">ABS</a> to build the package.</p>
 </div>
   
   
@@ -330,7 +242,7 @@ in my case <kbd>;</kbd> — and save and quit.</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/">Patching dwm with pertag and bstack</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/05/21/browsers/">5 Alternate Browsers</a></h1>
     
     
       <p class="meta">
@@ -346,81 +258,27 @@ in my case <kbd>;</kbd> — and save and quit.</p>
   
 
 
-<time datetime="2009-12-19T17:40:00+13:00" pubdate data-updated="true">Dec 19<span>th</span>, 2009</time>
+<time datetime="2010-05-21T15:22:00+12:00" pubdate data-updated="true">May 21<span>st</span>, 2010</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Over the last several months I have been using <a href="http://dwm.suckless.org/">dwm</a>
-as my window manager on two <a href="http://www.archlinux.org/">Arch Linux</a>
-machines:  my <a href="http://www.flickr.com/photos/jasonwryan/4196530478/" title="Flickr image"
-target="_blank">EeePC 901</a> and an <a href="http://www.flickr.com/photos/jasonwryan/4193384965/" title="Flickr image"
-target="_blank">old Dell</a> at work.</p>
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/4352140405/"><img src="http://miromiro.com/Blog-images/browser-5alt.png"/></a></p>
 
-<p>There is a lot to like about dwm, but the most attractive qualities for me
-are the fact that it is <a href="http://en.wikipedia.org/wiki/Source_lines_of_code">under 2000 SLOC</a>
-and is very configurable.</p>
+<p>Tired of Firefox&#8217;s bloated, buggy behaviour?</p>
 
-<p>The most recent version, 5.7.2, included some changes that meant that some
-of the patches wouldn&#8217;t play nicely together anymore; trying to combine
-any of the layout patches with <a href="http://dwm.suckless.org/patches/pertag">pertag</a>
-would result in the code failing to compile.</p>
+<p>Here are five alternatives that are lighter, faster and much more fun…</p>
 
-<p>Fortunately, there is a fix described on <a href="http://lists.suckless.org/dev/0911/2317.html">the mailing list</a>.
-Essentially, it involves manually applying the patch to the source code.</p>
+<ul>
+<li><a href="http://www.uzbl.org/" title="Uzbl homepage">Uzbl</a>. My current browser of choice. Completely customizable, integrates well with other programs and is scriptable.</li>
+<li><a href="http://surf.suckless.org/" title="Surf on the suckless wiki">Surf</a>. From suckless.org. &#8216;Nuff said.</li>
+<li><a href="http://conkeror.org/" title="Conkeror homepage">Conkeror</a>. I used this for a long time before moving to uzbl - the emacs-like keybindings are why I gave it up…</li>
+<li><a href="http://www.vimprobable.org/" title="Home of the wonderfully named  Vimprobable">Vimprobable</a>. Gets great raps on the Arch boards. One to watch (…and a homepage that telegraphs exactly what to expect).</li>
+<li><a href="http://bbs.archlinux.org/viewtopic.php?id=95589&amp;p=1" title="dwb thread on the Arch Forums">dwb</a>. Another browser, like uzbl, to come from the Arch community. As the name suggests, built for tilers…</li>
+</ul>
 
-<p>Start with a vanilla version of the code. Move to the source directory and
-apply the pertag patch:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd</span> <span class="nv">$BUILD</span>/dwm/src/dwm-5.7.2/ patch -p1 &lt; dwm-5.7.2-pertag.diff
-</span></code></pre></div></figure>
-
-
-<p>Then manually add the <a href="http://dwm.suckless.org/patches/bottom_stack">bstack</a>
-(or any of the other layout patches) to <span class="file">dwm.c</span>:</p>
-
-<p>Include the <code>bstack</code> declaring function with the others, beginning line 153. I
-inserted it alphabetically…</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='c'><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">attachstack</span><span class="p">(</span><span class="n">Client</span> <span class="o">*</span><span class="n">c</span><span class="p">);</span>
-</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">*</span><span class="n">m</span><span class="p">);</span>
-</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">buttonpress</span><span class="p">(</span><span class="n">XEvent</span> <span class="o">*</span><span class="n">e</span><span class="p">);</span>
-</span><span class='line'><span class="err">…</span>
-</span></code></pre></div></figure>
-
-
-<p>And then, <em>after</em> the <code>#include “config.h”</code> declaration at
-275, add in the rest of the patch. For consistency&#8217;s sake, I included it
-at line 415:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='c'><span class='line'><span class="kt">void</span> <span class="nf">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">*</span><span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">mh</span><span class="p">;</span>
-</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">Client</span> <span class="o">*</span><span class="n">c</span><span class="p">;</span> <span class="k">for</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">m</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">clients</span><span class="p">);</span> <span class="n">c</span><span class="p">;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">c</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">next</span><span class="p">),</span> <span class="n">n</span><span class="o">++</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'><span class="k">return</span><span class="p">;</span>
-</span><span class='line'><span class="err">…</span>
-</span></code></pre></div></figure>
-
-
-<p>Add you keybindings into your header file (<span class="file">config.h</span>) and recompile:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>makepkg -efi
-</span></code></pre></div></figure>
-
-
-<p>Done.</p>
-
-<p>The only fly in the ointment is that, for me anyway, I have been unable to
-get any of the other layout patches to work with this setup; either by regular
-patching or using the above method. YMMV.</p>
-
-<h3>Update</h3>
-
-<p>So I was wrong: you can get pertag to work with all the
-other patches, and it is <a href="http://jasonwryan.com/blog/2010/03/02/patching-dwm/">not that difficult</a>…</p>
 </div>
   
   
@@ -445,23 +303,23 @@ other patches, and it is <a href="http://jasonwryan.com/blog/2010/03/02/patching
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -548,7 +406,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

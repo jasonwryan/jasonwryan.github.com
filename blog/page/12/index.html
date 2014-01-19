@@ -9,10 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="After setting up my server,
-I wanted to use it as a torrent box. The version of
-rtorrent
-in the Debian stable repositories is 0.8.6, which is &hellip;">
+  <meta name="description" content="After eight years as a bureaucrat1 working in a
+central agency
+in New Zealand&#8217;s public service, I have hung up the grey cardigan. While I am &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -91,7 +90,7 @@ in the Debian stable repositories is 0.8.6, which is &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/11/29/rtorrent/">Building rtorrent on Debian Squeeze</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/04/05/catalyst/">The Next Thing</a></h1>
     
     
       <p class="meta">
@@ -107,76 +106,69 @@ in the Debian stable repositories is 0.8.6, which is &hellip;">
   
 
 
-<time datetime="2011-11-29T21:21:00+13:00" pubdate data-updated="true">Nov 29<span>th</span>, 2011</time>
+<time datetime="2012-04-05T15:54:00+12:00" pubdate data-updated="true">Apr 5<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/rtorrent.png" alt="image" /></p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/change.jpg" title="'Climate Change by Swamibu on Flickr'" ></p>
 
-<p>After <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Post on the HP microserver">setting up my server</a>,
-I wanted to use it as a torrent box. The version of
-<a href="http://libtorrent.rakshasa.no/" title="rtorrent &amp; libtorrent homepage">rtorrent</a>
-in the Debian stable repositories is 0.8.6, which is unfortunate as
-support for <a href="http://en.wikipedia.org/wiki/Magnet_URI_scheme" title="Wikipedia page on magnet URIs">magnet links</a>
-was introduced in 0.8.7.</p>
+<p>After eight years as a bureaucrat<sup>1</sup> working in a
+<a href="http://ssc.govt.nz" title="State Services Commission website">central agency</a>
+in New Zealand&#8217;s public service, I have hung up the grey cardigan.</p>
 
-<p>To remedy this, I decided to build the current stable version of
-rtorrent, 0.8.9. At the same time—seeing as I was getting my hands dirty
-anyway—I thought I’d patch in colour support.</p>
+<p>While I am sure that I will never shed some of the qualities of being an
+official (think discretion and a belief in the importance of sound
+governance—rather than a keen ear for the rattle of the tea trolley),
+I am looking forward to the opportunity to stretch out a little<sup>2</sup>.</p>
 
-<p>This is a straightforward two-step process. First, build the current
-version of libtorrent, 0.12.9:</p>
+<p>When I first joined the Commission, it was to work in the E-government Unit. I
+was strongly attracted to a role that combined communications and technology
+and, at the time, the EGU was the epicentre of a huge amount of really interesting
+initiatives. The
+<a href="http://archive.ict.govt.nz/plone/archive/policy/open-source.1.html" title="Policy Paper in the egovernment archive">Open Source Policy</a>,
+the <a href="http://archive.ict.govt.nz/plone/archive/services/authentication/library/docs/authentication-bpf/index.html" title="BPF in the egovernment archive">Authentication Framework</a>,
+work on <a href="http://archive.ict.govt.nz/plone/archive/policy/tc-and-drm/oldindex.html" title="TC &amp; DRM paper in egovt archive">Digital Rights Management</a>
+and <a href="http://archive.ict.govt.nz/plone/archive/policy/trust-security/niip-report.1.html" title="Security in the egovt archive">security</a>
+to name just a few; it was a geek&#8217;s paradise (certainly from a policy perspective).</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
-</span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
-</span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
-</span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
-</span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure>
+<p>I have no doubt that the foundation of much of what I was later able to achieve
+was fostered in this environment; whether it was originally making the code available
+for the <a href="http://e.govt.nz" title="The original Plone site">e-government website</a>,
+<a href="http://psnetwork.org.nz/blog/" title="More than you would ever want to read on this…">blogging about social media in the public sector</a>,
+working with the other public service communications managers on the
+<a href="http://www.psnetwork.org.nz/resources-comms-function-review/" title="A Review of the Communications Function in NZ Govt">Review of the Function</a>,
+or issuing the <acronym title="Request For Proposal">RFP</acronym> for the rebuild
+of the SSC website with the stipulation that the solution had to be
+open source so that we could reuse it across government.</p>
 
+<p>You can probably see a theme emerging here. If you have read this blog at all, you will
+definitely see where this is heading…</p>
 
-<p>Once libtorrent is successfully built and installed, you can begin the
-rtorrent build:</p>
+<p>Anyway, I am about to start focussing on technology—and open source technology in
+particular—on a full time basis. From the middle of this month, I join the team at
+<a href="http://catalyst.net.nz/" title="Catalyst homepage">Catalyst</a>, New Zealand&#8217;s leading
+open source company, where I will be the newly minted Strategy and Relations Manager.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
-</span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
-</span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
-</span></code></pre></div></figure>
-
-
-<p>Then, if you want colour support, you need the patch. I used the version
-in the
-<a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
-but you can also grab a copy from a paste site:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
-</span><span class='line'>mv canvas_colour.patch src/
-</span><span class='line'>patch -uNp1 -i canvas_colour.patch
-</span></code></pre></div></figure>
-
-
-<p>The patch should apply cleanly. Then specify where libtorrent is
-installed to ensure that it is linked during the rtorrent build:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
-</span><span class='line'>make
-</span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure>
-
-
-<p>Once again, this should compile cleanly and you will now have rtorrent
-with colour and magnet link support installed in
-<span class="file">/usr/local/bin/rtorrent</span>.</p>
+<p>I&#8217;m thrilled to be able to work for a company that is dedicated to driving the uptake
+of open source by businesses and government. Both the
+<a href="http://arstechnica.com/business/news/2012/03/red-hat-hits-a-billion-dollars-in-revenue-a-milestone-for-open-source.ars" title="Red Hat hits $1billion">private</a>
+and <a href="http://www.zdnet.co.uk/news/business-of-it/2012/03/22/iceland-swaps-windows-for-linux-in-open-source-push-40154870/" title="Iceland dumps windows for Linux in the public sector">public sectors</a>
+around the world are really starting to grasp the strategic and economic benefits of using
+open source; we are going to be doing our best to accelerate that adoption.</p>
 
 <h5>Notes</h5>
 
-<p>I prefer to use
-<a href="http://asic-linux.com.mx/~izto/checkinstall/" title="checkinstall homepage">checkinstall</a>
-so that self-installed applications are tracked by
-<a href="http://wiki.debian.org/Apt" title="Debian wiki entry">Apt</a>.</p>
+<ol>
+<li>I have used the term proudly for the last eight years, and will continue to do so…</li>
+<li>Yes, my <a href="http://twitter.com/jasonwryan">twitter stream</a> will likely become a little more colourful.</li>
+</ol>
+
+
+<p>Creative Commons image by <a href="http://www.flickr.com/photos/swamibu/4153715570/lightbox/">Swamibu</a>
+on Flickr</p>
 </div>
   
   
@@ -189,7 +181,7 @@ so that self-installed applications are tracked by
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/11/28/rsync/">rsync + SSH Backups</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/03/30/octopress/">Moving to Octopress</a></h1>
     
     
       <p class="meta">
@@ -205,90 +197,110 @@ so that self-installed applications are tracked by
   
 
 
-<time datetime="2011-11-28T12:23:00+13:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
+<time datetime="2012-03-30T12:30:00+13:00" pubdate data-updated="true">Mar 30<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/rsync-ssh.png" alt="image" /></p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
 
-<p>I <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
-and included a
-<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
-script for backing up my files to the server. At the time, I was running
-it manually, but since have sorted out the excludes list and have now
-automated it.</p>
+<p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
+a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
+the static site generator powering <a href="http://pages.github.com/">Github Pages</a>. I had previously
+been posting to a <a href="https://www.tumblr.com/">tumblr</a> page and, over the nearly four years that
+I had been doing that I had somehow racked up just over 4000 posts. I was <em>not</em>
+looking forward to migrating across.</p>
 
-<p>My original scheme was to set up a
-<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
-mount an
-<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
-before rsync’ing the directories across. In the end, I went with SSH and
-<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
-as debugging all of the various permissions issues with the NFS share
-did not seem worth the effort.</p>
+<p>However, the fact that the Jekyll project has a number of scripts for
+<a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">migrating from other platforms</a>
+assuaged my concerns about the difficulty of this task. That sense of relief was shortlived.
+Neither of the two tumblr migration scripts were of any assistance: both would die during their
+initial runs, probably due to some funky characters in the post titles, or perhaps the posts themselves.</p>
 
-<p>First, on my local desktop, I created the keypair called, inventively,
-rsync:</p>
+<p>I certainly had no intention of trying to wade through the entire back catalogue identifying the
+rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the
+“straightforward” nature of the task, I saw this setback as an opportunity to cull all of the
+cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
+some interest.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
-</span><span class='line'>mv rsync ~/.ssh <span class="o">&amp;&amp;</span> chmod 600 ~/.ssh/rsync
-</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
+<p>Being an assiduous record keeper, all of the posts were helpfully bookmarked on
+<a href="https://pinboard.in/u:jasonwryan/t:jwr/">Pinboard under one tag</a>, and therefore it was
+simple enough to create a list of the required <acronym title="Unique Resource Locator">URLs</acronym>.
+Armed with this list, it was just a matter of cobbling together a script to do the bulk of
+the work for me.</p>
+
+<p>The first task was to retrieve the posts from the list:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grab files</span>
+</span><span class='line'><span class="k">while </span><span class="nb">read </span>url; <span class="k">do </span>
+</span><span class='line'><span class="k">    </span>wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
+</span><span class='line'><span class="k">done</span> &lt; /home/jason/Scripts/list
 </span></code></pre></div></figure>
 
 
-<p>This keypair was created <em>without a passphrase</em> so that the script could
-be successfully called from <code>cron</code>. To slightly increase the security
-around a key without a passphrase, I used the from option in
-authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
-machine(s), like so:</p>
+<p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
+surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># strip HTML cruft</span>
+</span><span class='line'><span class="k">for </span>file in *.html; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.*}&quot;</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>mkdir html <span class="o">&amp;&amp;</span> mv *.html html/
 </span></code></pre></div></figure>
 
 
-<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
+<p>The final task of this part of the migration was to convert the HTML into
+<a href="http://daringfireball.net/projects/markdown/">markdown</a>,
+the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
+the &#8220;universal document converter&#8221; handled that job:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
-</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># convert to markdown format</span>
+</span><span class='line'><span class="k">for </span>file in *; <span class="k">do </span>
+</span><span class='line'><span class="k">    </span>pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;$file&quot;</span>.md
+</span><span class='line'><span class="k">done</span>
 </span></code></pre></div></figure>
 
 
-<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
-the SSH command:</p>
+<p>The final result was fifty markdown files holding all of my posts, almost ready to
+be committed to github. I say “almost” because the files still required what turned out to
+be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would
+inexpicably break <a href="http://www.notareallink.com">multi word
+hyperlinks</a> over two lines. Similarly all of the internal
+links to my other posts pointed to the (meaningless) tumblr URLs<sup>2</sup>.</p>
 
-<figure class='code'><figcaption><span>.ssh/config </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>Host backups
-</span><span class='line'>   Hostname 192.168.1.200
-</span><span class='line'>   Port 0000
-</span><span class='line'>   User jason
-</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></div></figure>
+<p>Setting up Octopress was extremely simple and quick by comparison: the
+<a href="http://octopress.org/docs/">documentation is very helpful</a>. There was one slight
+hitch, a <a href="https://github.com/tmm1/pygments.rb/issues/10">known issue on Arch x86_64</a>,
+which was simple enough to deal with.</p>
 
+<p>While the migration was not entirely pain-free, I am pleased that I have done it. Tumblr&#8217;s service
+increasingly <a href="https://twitter.com/#!/jasonwryan/statuses/176543962276954112">left a lot to be desired</a>
+but as it was a free service, I couldn&#8217;t complain too much. Or, more accurately, when I did complain,
+no-one actually listened…</p>
 
-<p>And I was done. Everynight at 10pm, all of my data will be backed up to
-the server. The rsync command in the script:</p>
-
-<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># Backup to remote server over SSH</span>
-</span><span class='line'>
-</span><span class='line'>rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\</span>
-</span><span class='line'>    --log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
-</span><span class='line'>    -e ssh /home/jason /etc backups:Backups/Centurion
-</span></code></pre></div></figure>
-
+<p>Indeed, moving to a paid service like Github
+(yes, it&#8217;s free at first, but once you have enough data there you need to pay a small amount
+every month) <a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/">makes a lot of sense</a>.
+The paid services I do use, like <a href="http://pinboard.in/">Pinboard</a> and
+<a href="http://www.tarsnap.com/">Tarsnap</a> are both inexpensive and much more
+reliable than their free counterparts<sup>3</sup>; and you get to invest in great
+software that is a pleasure to use.</p>
 
 <h5>Notes</h5>
 
 <ol>
-<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
+<li>Initially, I had set up the site as a simple holding page and dumped a whole lot
+of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
+mostly just that sort of internet detritus…</li>
+<li>For creating redirections (Github pages do <em>not</em> support <span class="file">.htaccess</span>)
+I can&#8217;t recommend enough the
+<a href="https://github.com/rawsyntax/jekyll_alias_generator/blob/master/_plugins/alias_generator.rb">Jekyll Alias Generator</a>.
+Just. Brilliant.</li>
+<li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
 </ol>
 
-
-<p>Creative Commons image from
-<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
 </div>
   
   
@@ -301,7 +313,7 @@ the server. The rsync command in the script:</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/11/18/microserver/">Microserver</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/03/23/key/">Signing Your Own Key</a></h1>
     
     
       <p class="meta">
@@ -317,90 +329,108 @@ the server. The rsync command in the script:</p>
   
 
 
-<time datetime="2011-11-18T17:13:00+13:00" pubdate data-updated="true">Nov 18<span>th</span>, 2011</time>
+<time datetime="2012-03-23T11:36:00+13:00" pubdate data-updated="true">Mar 23<span>rd</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/microserver.png" alt="image" /></p>
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/key.jpg" alt="image" /></p>
 
-<p>I recently picked up a
-<a href="http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html" title="HP specs page">HP Microserver</a>;
-a small, silent server to use primarily to back up
-<a href="http://jasonwryan.com/blog/2010/10/04/the-setup" title="Slightly out-of-date setup post">my other boxes</a>.
-I went for the 2GB version without any preinstalled operating system.</p>
+<p>Some time in the last couple of days, the last of the packages in the
+Community repository were signed and, thanks to the tremendous work of
+the Arch developers and Trusted Users, you can fully implement package
+signing in your <span class="file">/etc/pacman.conf</span>.</p>
 
-<p>As I want this machine to just sit quietly in my garage for the next 5
-or 6 years, I opted for
-<a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
-base system. After installing two 1TB drives, I set them up as an
-<a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
-RAID 1 array, in a
-<a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
+<p>You can check the state of the signed packages with this <code>expac</code>
+one-liner; it will return a list of any <em>unsigned</em> packages:</p>
 
-<p><strong>Pro tip</strong> when you get to the part of the partitioning where you
-configure the volume for encryption, make sure you select <em>No</em> for
-<em>erase data</em>. It took close to 90 hours to scrub both the hard drives.
-And, as I am not really expecting
-<a href="http://www.extremetech.com/computing/105931-full-disk-encryption-is-too-good-says-us-intelligence-agency" title="FDE defeats the NSA">a visit from the spooks</a>,
-that seems a little like overkill…</p>
-
-<p>Once the base install was complete, I set up my SSH keys,
-<a href="http://tmux.sourceforge.net/" title="tmux page">tmux</a>, configured the
-firewall and forwarded the necessary ports, set up
-<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia page: network file system">NFS</a>,
-and that was it. The box is deathly quite, can be mounted locally for
-<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync entry">rsync backups</a> and
-accessed remotely (for a tmux session running
-<a href="http://irssi.org/" title="Irssi homepage">irssi</a>), and all for less than
-NZD700.</p>
-
-<p>I knocked together a quick script<sup>1</sup> to manage the backing up; currently
-I run it manually, but once I have the excludes file tweaked properly,
-I’ll set up a
-<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
-automate the task.</p>
-
-<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># Backup to remote server over NFS</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
-</span><span class='line'>     <span class="nb">exit </span>1
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'><span class="k"> </span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then </span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
-</span><span class='line'> <span class="k">else</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
-</span><span class='line'>     mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
-</span><span class='line'> <span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># sync directories</span>
-</span><span class='line'> <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>
-</span><span class='line'>
-</span><span class='line'> rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\</span>
-</span><span class='line'>     --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
-</span><span class='line'>     /home/jason /etc /media/Sentinel/Backups/Centurion
-</span><span class='line'>
-</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
-</span><span class='line'>     umount /media/Sentinel
-</span><span class='line'> <span class="k">else</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
-</span><span class='line'> <span class="k">fi</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
 </span></code></pre></div></figure>
 
 
-<h5>Notes</h5>
+<p>Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
+take advantage of this. My overall <code>SigLevel</code> setting requires signed
+packages, and—as of yesterday—I was able to move the last repository
+entry over to do the same:</p>
 
-<ol>
-<li>Any faults aside, it should be reasonably portable…</li>
-</ol>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>core<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>extra<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>community<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>multilib<span class="o">]</span>
+</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
+</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+</span></code></pre></div></figure>
 
+
+<p>The next step was to add my key to pacman’s keychain so that I could
+sign the packages that I build using ABS or from the
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>. Allan has an
+<a href="http://allanmcrae.com/2011/08/pacman-package-signing-1-makepkg-and-repo-add/" title="The first in a series of four posts on signing: read them all">excellent post on setting this up</a>.</p>
+
+<p>First, import your key into pacman’s keyring:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
+</span></code></pre></div></figure>
+
+
+<p>Then follow the prompts as you edit the key to sign, set a trust level
+and save your key:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
+</span><span class='line'>gpg&gt; lsign
+</span><span class='line'>...
+</span><span class='line'>gpg&gt; trust
+</span><span class='line'>...
+</span><span class='line'>gpg&gt; save
+</span></code></pre></div></figure>
+
+
+<p>Then it is just a matter of changing the <code>BUILDENV</code> option in your
+<span class="file">/etc/makepkg.conf</span>, which is set to <code>!sign</code>
+by default. Remove the bang and include the details of the key you wish to use:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#-- Packager: name/email of the person or organization building packages</span>
+</span><span class='line'><span class="nv">PACKAGER</span><span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
+</span><span class='line'><span class="c">#-- Specify a key to use for package signing</span>
+</span><span class='line'><span class="nv">GPGKEY</span><span class="o">=</span><span class="s2">&quot;B1BD4E40&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Now, when you build a package, you will be prompted for your key’s
+passphrase:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...
+</span><span class='line'>
+</span><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
+</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
+</span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21
+</span><span class='line'>
+</span><span class='line'>Enter passphrase:
+</span></code></pre></div></figure>
+
+
+<p>Enter the correct passphrase and your package is built and signed:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
+</span></code></pre></div></figure>
+
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/donovan_beeson/3185668524/" title="Coraline key on Flickr">donovanbeeson</a>
+on Flickr.</p>
 </div>
   
   
@@ -425,23 +455,23 @@ automate the task.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -528,7 +558,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

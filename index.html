@@ -9,8 +9,8 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Another great peristaltic movement in Arch&#8217;s rolling release digestive system
-happened over the last couple of weeks, the move of all binaries &hellip;">
+  <meta name="description" content="One of the most satisfying aspects of running free and open source software is
+the ability to be able to continually tinker with your setup, limited &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -89,7 +89,7 @@ happened over the last couple of weeks, the move of all binaries &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/06/15/asking/">Asking for Help</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/01/20/udev/">Scripting with udev</a></h1>
     
     
       <p class="meta">
@@ -105,106 +105,108 @@ happened over the last couple of weeks, the move of all binaries &hellip;">
   
 
 
-<time datetime="2013-06-15T10:39:00+12:00" pubdate data-updated="true">Jun 15<span>th</span>, 2013</time>
+<time datetime="2014-01-20T10:02:00+13:00" pubdate data-updated="true">Jan 20<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/bowl.jpg" title="'Flickr image of Begging Bowl'" >
-Another great peristaltic movement in Arch&#8217;s rolling release digestive system
-happened over the last couple of weeks, the move of all binaries
-<a href="https://www.archlinux.org/news/binaries-move-to-usrbin-requiring-update-intervention/" title="Arch News update">to /usr/bin</a>.
-This move had been foreshadowed for several months and, despite announcements
-on the front page of the Arch website, the mailing lists and the release going
-through [testing] and the resulting thread on the forums, there was still a
-surprising amount of carnage<sup>1</sup> in it&#8217;s wake.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/usb.jpg" title="Creative Commons image" >
+One of the most satisfying aspects of running free and open source software is
+the ability to be able to continually tinker with your setup, limited only by
+your imagination and ability.  The more you do tinker, the smaller the gap
+between the former and the latter, as each small project inevitably leads you
+into a deeper understanding of various aspects of your system<sup>1</sup> and
+how you can customize that system to suit your exact requirements.</p>
 
-<p>In the aftermath (although I expect that it will take some months for it to
-completely pass through the system), what struck me was not so much the variety
-and ingenuity of the ways people had managed to break their installs<sup>2</sup>
-as how they approached the community seeking help afterwards.</p>
+<p>Over the last couple of days, I have been playing with
+<a href="http://en.wikipedia.org/wiki/Udev" title="Wikipedia page">udev</a>, the kernel device
+manager, as I was attempting to run a script once a specific
+<acronym title="Universal Serial Bus">USB</acronym> drive was plugged in. It
+turns out, as is so often the case, that udev is only <em>part</em> of the
+picture…</p>
 
-<p>There are already some fine guides on how to do this, notably
-ESR&#8217;s <a href="http://www.catb.org/esr/faqs/smart-questions.html" title="Just read it…">How to ask Questions the Smart Way</a>
-and—specifically for Arch—zendeavour&#8217;s
-<a href="http://redd.it/tjjwr" title="On Reddit">troubleshooting for newcomers</a>;
-this isn&#8217;t an attempt to add or expand on that genre. Rather, it is
-a look at a subset of attitudes that some people adopt<sup>3</sup>
-as they seek the assistance of the community.</p>
+<p>As both my work and personal laptops have relatively small
+<acronym title="Solid State Drives">SSDs</acronym>, I carry around
+<a href="http://alpha.libre.fm/user/jasonwryan/" title="Libre.fm profile">my music</a>
+on a 1TB external drive. As the drive only contains <span class="file">.flac</span>
+files, I wanted to autmate the process of <code>rsync</code>’ing music from my desktop to
+the drive and, for the laptops, repopulating the symlinks to
+<span class="file">~/Music/</span> when the drive was plugged in.</p>
 
-<p>The first is the <strong>blamer</strong>. The proponent of the  “all-guns-blazing” approach.
-I&#8217;ll paraphrase, but there are enough examples on the boards to illustrate the
-point: “my system can&#8217;t boot, it&#8217;s not my fault and I am here to let you know
-that I am unhappy and demand recourse.” This is, unquestionably, the most
-puzzling of all the strategies. It is often coupled with the (sadly almost
-always empty) threat to abandon the distro and it&#8217;s apparently beleaguered
-community.</p>
+<p>My first thought was a rule in <span class="file">/etc/udev/rules.d/</span>,
+using <code>RUN+=</code>. There are any number of blog posts espousing this approach and,
+as I quickly discovered, they are <em>all</em> wrong. The problem with using this key is
+that, as the <code>man</code> page makes clear, it is not designed for long running
+programs:</p>
 
-<p>Puzzling because I have yet to encounter a single situation in life, online
-or off, where opening with hostility and blame is an intelligent approach to
-seeking assistance. If you are going to adopt this approach, please supersize
-to “rage quit” and expend your energy actually delivering on your threat.</p>
+<blockquote><p>This can only be used for very short-running foreground tasks. Running an event process for a long period of time may block all further events for this or a dependent device.</p><p>Starting daemons or other long running processes is not appropriate for udev; the forked processes, detached or not, will be unconditionally killed after the event handling has finished.</p><footer><strong>udev manual</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/udev.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
 
-<p>The next is the <strong>wheedler</strong>. Less objectionable than the incendiary approach,
-it is nonetheless similarly ineffective. Wheedlers are distinguished by
-peppering their posts liberally with declarations of their ineptitude and
-“noobness”, in the mistaken belief that this will engender a wave of sympathy
-prior to soothing hand-holding and spoon-feeding. There is a strong correlation
-between this behaviour and the various types of
-<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on the taxonomy of vampires">help vampirism</a>.</p>
 
-<p>Wheedling won&#8217;t lead to quicker, or more informed, advice and assistance; in
-all likelihood it will just discourage others from helping because
-they can see that rewarding this sort of behaviour has a longer-term
-deleterious impact on the health of the community.</p>
+<p>The problem, as it manifest for me, was the drive would be blocked from
+mounting until <em>after</em> the script had run, meaning <code>rsync</code> or my symlinks would
+have no target.  There are various “workarounds” on the web for this, including
+using <em>two</em> scripts, one to trigger the other<sup>2</sup>. Even for me, this
+seemed like a
+<a href="http://en.wikipedia.org/wiki/Pyrrhic_victory" title="Wikipedia entry">Pyrrhic victory</a>.</p>
 
-<p>Then there is the <strong>Vulcan</strong>. A curiosity more than an annoyance, these
-people seem to inhabit some sort of adolescent fantasy land where the Internet
-is a venue for them to revel in their almost superhero-like powers of technical
-<em>awesomeness</em>; said powers manifesting to others as a sort of benign
-cluelessness.</p>
+<p>The correct way to do this, as I found once I uncovered
+<a href="https://bbs.archlinux.org/viewtopic.php?id=149419" title="Arch BBS">this thread</a>
+on the Arch boards where WonderWoofy and 65kid helpfully pieced it together, is
+to use <code>SYSTEMD_WANTS</code>.  As it is described in the manual:</p>
 
-<p>Their posts are invariably brief and completely devoid of relevant detail to the
-point of cryptic because, “hey, we all <em>know</em> what this issue is,” and are
-littered with smilies and that stupid emoticon with the sunglasses. Rather than
-actually describing their problem, they want people to think that, by a process
-of <a href="http://en.memory-alpha.org/wiki/Vulcan_mind_meld" title="There is a Star Trek wiki?">mind-melding</a>,
-other “hackers” will intuit the subtle depth and intricacy of the issue and
-then type out a detailed step-by-step guide of how to solve it.</p>
+<blockquote><p>THE UDEV DATABASE<br/>  The settings of device units may either be configured via unit files, or directly from the udev database (which is recommended). The following udev properties are understood by systemd:</p><p>  SYSTEMD_WANTS=<br/>  Adds dependencies of type Wants from this unit to all listed units. This may be used to activate arbitrary units, when a specific device becomes available. Note that this and the other tags are not taken into account unless the device is tagged with the &#8220;systemd&#8221; string in the udev database, because otherwise the device is not exposed as systemd unit.</p><footer><strong>man systemd.device</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/systemd.device.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
 
-<p>Finally, there is the <strong>conspiracist</strong>. These malcontents see every
-significant change in Arch as being part of a wider agenda to corrupt the purity
-of the UNIX® philosophy. They also tend to blame
-<a href="https://en.wikipedia.org/wiki/Lennart_Poettering" title="Lennarts wikipedia page">Lennart Poettering</a>
-for <em>everything</em>. These unfortunates are clearly already suffering such mental anguish
-trying to reconcile their obsessiveness about the past with a rolling
-release that they deserve our pity more than our contempt (but I am equally
-happy providing either)…</p>
 
-<p>As I said, these are fortunately just a subset and very much represent the
-minority of attitudes.  The vast majority tend to be aware that, at
-one time or another, <em>everyone</em> will need some help to solve a problem.
-Therefore it is best to approach it in a matter-of-fact way, using the practical
-guidance on asking questions on a technical forum, and with a degree of humility
-and a willingness to learn from the people who are prepared to share their
-knowledge and experience.</p>
+<p>So, I edited <span class="file">/etc/udev/rules.d/90-usb-music.rules</span> to
+remove the <code>RUN+=</code> key, using a systemd service file instead, like so<sup>3</sup>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SUBSYSTEMS</span><span class="o">==</span><span class="s2">&quot;usb&quot;</span>, ATTRS<span class="o">{</span>idProduct<span class="o">}==</span><span class="s2">&quot;1905&quot;</span>, <span class="nv">ACTION</span><span class="o">==</span><span class="s2">&quot;add&quot;</span>, ENV<span class="o">{</span>SYSTEMD_WANTS<span class="o">}==</span><span class="s2">&quot;upmusic.service&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>And then wrote the corresponding service file to have systemd hand off to the bash script:</p>
+
+<figure class='code'><figcaption><span>/usr/lib/systemd/system/upmusic.service </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>Unit<span class="o">]</span>
+</span><span class='line'><span class="nv">Description</span><span class="o">=</span>Update music links from Apollo
+</span><span class='line'><span class="nv">Requires</span><span class="o">=</span>media-Apollo.mount
+</span><span class='line'><span class="nv">After</span><span class="o">=</span>media-Apollo.mount
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>Service<span class="o">]</span>
+</span><span class='line'><span class="nv">ExecStart</span><span class="o">=</span>/home/jason/Scripts/upmusic
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>Install<span class="o">]</span>
+</span><span class='line'><span class="nv">WantedBy</span><span class="o">=</span>media-Apollo.mount
+</span></code></pre></div></figure>
+
+
+<p>As I mentioned in my post on my
+<a href="http://jasonwryan.com/blog/2013/10/28/dismount/" title="Unmount USB drives…">simple unmounting script</a>,
+I use a naming convention for all my USB drives. In this case, my music is stored on Apollo, and
+it is automounted with
+<a href="https://wiki.archlinux.org/index.php/Udiskie" title="Arch wiki page">udiskie</a>. In the
+service file, systemd uses a hyphen instead of a forward slash, so the correct
+designation is <code>media-Apollo.mount</code>.</p>
+
+<p>Then it is just a matter of enabling the service with <code>systemctl enable upmusic</code> and,
+whenever Apollo is plugged in to either my desktop of laptop, the appropriate
+script will run and either update the files on Apollo or the symlinks on one of the
+laptops.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>Where “carnage” should be understood as a minor PEBKAC epidemia…</li>
-<li>From shutting down mid-update (because a reboot fixes <em>everything</em>) to
-still using <code>consolekit</code>, <code>initscripts</code> and <code>grub-legacy</code>: all deprecated some time
-ago.</li>
-<li>I resisted linking to specific posts on the boards to provide actual examples,
-the more motivated among you will find them without difficulty.</li>
+<li>This shouldn&#8217;t be taken as any sort of claim of expertise or deep
+understanding of this, or any other, part of my system. See below.</li>
+<li>Which is why you should never trust anything written by bloggers…</li>
+<li>The definitive reference for udev rules remains
+<a href="http://www.reactivated.net/writing_udev_rules.html" title="Daniel Drake's page">Writing udev rules</a></li>
 </ol>
 
 
-<p>Flickr Creative Commons image by
-<a href="http://www.flickr.com/photos/buddhist_fox/4795942625/">Buddhist Fox</a>.</p>
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/jacobgarcia/2550146/" title="Licensed CC by Jacob Garcia">Jacob Garcia</a>.</p>
 </div>
   
   
@@ -217,7 +219,7 @@ the more motivated among you will find them without difficulty.</li>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/05/25/greader/">Replacing Google Reader</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a></h1>
     
     
       <p class="meta">
@@ -233,147 +235,79 @@ the more motivated among you will find them without difficulty.</li>
   
 
 
-<time datetime="2013-05-25T09:10:00+12:00" pubdate data-updated="true">May 25<span>th</span>, 2013</time>
+<time datetime="2013-12-28T10:09:00+13:00" pubdate data-updated="true">Dec 28<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/commafeed.png" title="'CommaFeed Logo'" >
-I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
-everyday since I first discovered the service over seven years ago. It is my
-primary source of news and information and the announcement that Google is, on July 1 this year,
-set to <a href="http://googlereader.blogspot.ca/2013/03/powering-down-google-reader.html" title="Official announcemet on Google Blog">shut down Reader</a>
-was something considerably more than just an inconvenience for me.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/ad_free.png" title="Flickr CC Image" >
+The relentless commercialization of traditional holidays, not just the December
+variety but all of them now, means that what was ostensibly an occasion for
+celebrating your particular flavour of $deity, pagan ritual or just an
+opportunity to reconnect with your wider family, has been co-opted to the
+worship of the most pernicious of all cults, consumerism.</p>
 
-<p>Over the years, I had looked at other <acronym title="Rich Site Summary">RSS</acronym>
-readers but, for a variety of reasons, had invariably found that the speed,
-simplicity and flexibility that Google Reader offered meant that any dalliances
-were unsatisfactory and short-lived. I resigned myself to having to settle for
-an inferior alternative, rather than moving to a genuine replacement.</p>
+<p>Concomitant with this is the increasing corporatisation of the Internet; the
+deliberate and seemingly ineluctable effort by a relatively small number of
+global interests to turn most of the Internet into something more like cable
+television. As someone who has not lived with a television for decades
+precisely because I don&#8217;t want to live in a
+<a href="http://en.wikipedia.org/wiki/Operant_conditioning_chamber" title="Wikipedia page">Skinner box</a>
+that is solely designed to condition me to compliantly purchase more product,
+I find this rankly offensive (in the sense of morally repugnant as well as a
+coordinated and remorseless assault).</p>
 
-<p>On the recommendation of <a href="https://pinboard.in/" title="Not so-social bookmarking">@pinboard</a>,
-I first signed up for a premium account at
-<a href="https://www.newsblur.com/" title="NewsBlur website">NewsBlur</a>. It is open source and,
-given the recommendation from Maciej<sup>1</sup>, I was hopeful that it would
-bridge the gap. Newsblur is a good service (especially considering the rush of
-signups in the days after the Google announcement), but it has a couple of
-critical weaknesses for me: no search (yes, you read that correctly—there is <em>no
-way to search through your feeds</em>) and, less importantly but just as annoying,
-occasionally sluggish performance.</p>
+<p>With the escalation of both the level and nauseating intensity of advertising
+around the “holiday season” and the almost hysterical exhortations to purchase
+more happiness, I decided that the one thing that I would be really thankful for
+this Christmas was better ad blocking.</p>
 
-<p>After a couple of weeks using NewBlur I happily stumbled across
-<a href="https://www.commafeed.com/" title="CommaFeed homepage">CommaFeed</a>, a
-Reader clone that emulates the austere minimalism of Google Reader. Apart from
-the fact that it is open source, the other aspect that attracted me to it
-was the ability to run it on Red Hat&#8217;s Platform as a Service offering,
-<a href="http://www.openshift.com/" title="Red Hat PaaS">OpenShift</a>.</p>
+<p>I had been using
+<a href="https://wiki.archlinux.org/index.php/Privoxy" title="Arch wiki entry">Privoxy</a> and an
+<acronym title="Arch User Repository">AUR</acronym> script,
+<a href="https://aur.archlinux.org/packages/blocklist-to-privoxy/?ID=63431" title="AUR page">blocklist-to-privoxy</a>
+but I was still experiencing a lot of ads sneaking through (particularly local
+ones) and some unintended side effects of using Privoxy for this job, so I
+decide to give Jake VanderKolk&#8217;s
+<a href="http://gaenserich.github.io/hostsblock/" title="Homepage for Hostsblock">Hostsblock</a>
+a shot.</p>
 
-<p>The README on the <a href="https://github.com/Athou/commafeed" title="CommaFeed repo">Github repo</a>
-explains how to set it all up. Unfortunately, due to an
-<a href="https://github.com/Athou/commafeed/issues/91" title="OpenShift fails silently">open issue</a>,
-some manual intervention is required, but it is still a very
-straightforward and painless process to get your own instance of CommaFeed up
-and running.</p>
+<p>I went with the basic, entry level setup:
+<a href="https://aur.archlinux.org/packages/kwakd/" title="AUR page">kwakd</a> for serving blank
+<acronym title="HyperText Markup Language">HTML</acronym> in place of ads and
+<a href="https://aur.archlinux.org/packages.php?ID=58976" title="AUR package">hostsblock</a> to
+write to my <span class="file">/etc/hosts</span>. I didn&#8217;t see the need for
+<a href="https://wiki.archlinux.org/index.php/Dnsmasq" title="Arch Wiki page">dnsmasq</a> and,
+after a week or so or using it haven&#8217;t seen the need to revisit that decision.</p>
 
-<p>Creat an OpenShift account, log in and add the JBoss 6.0 application (or
-cartridge as it is called on OpenShift) and the MySQL cartridge. Once your setup
-is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
-under your <code>My Applications</code> tab, copy down your Git repo address, which will be
-of the form:</p>
+<p>Suffice to say, it is working brilliantly. Where once web pages were festooned
+with garish advertisements promising me ripped abdominals, tropical holidays and the
+lasting serenity that only Apple products can really truly deliver, I now have
+<a href="http://miromiro.com/Blog-images/herald.png" title="Screenshot of the local rag…">glorious whitespace</a></p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
-</span></code></pre></div></figure>
+<p>There are a couple of other factors to consider with Hostsblock. There is a very
+simple command line interface for managing black and white listing of websites,
+and the various “content distribution networks” that infest most commercial
+sites like fleas. You can easily allow advertisements on or from sites and
+organizations that you want to support, while forever muting the inane drivel
+from the likes of Failbook <em>et al</em>.</p>
 
+<p>Installation and setup are very straightforward, with simple instructions on the
+<a href="http://gaenserich.github.io/hostsblock/" title="Two or three steps, max…">Hostsblock site</a>.
+There is also an active thread on the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=139784" title="Arch forum thread">Arch boards</a>
+where Jake and a couple of others are extremely helpful.</p>
 
-<p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
-server:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
-</span><span class='line'><span class="nb">cd </span>commafeed
-</span><span class='line'><span class="c"># add OpenShift as a repo</span>
-</span><span class='line'>git remote add openshift -f ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.etc…
-</span><span class='line'>git merge openshift/master -s recursive -X ours
-</span><span class='line'>git push openshift master
-</span></code></pre></div></figure>
-
-
-<p>This will then trigger a series of hooks that build the application and restart
-the server. If everything goes well you will see something like:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Total <span class="nb">time</span>: 3:18.195s
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Finished at: Mon May 20 03:21:37 EDT 2013
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Final Memory: 42M/185M
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
-</span><span class='line'>remote: Running .openshift/action_hooks/build
-</span><span class='line'>remote: Running .openshift/action_hooks/deploy
-</span><span class='line'>remote: <span class="nv">hot_deploy_added</span><span class="o">=</span><span class="nb">false</span>
-</span><span class='line'>remote: MySQL already running
-</span><span class='line'>remote: Found 127.12.712.712:8080 listening port
-</span><span class='line'>remote: Done
-</span><span class='line'>remote: Running .openshift/action_hooks/post_deploy
-</span><span class='line'>To ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
-</span></code></pre></div></figure>
-
-
-<p>You now have CommaFeed successfully running on OpenShift. After a couple of
-minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
-and you will be able to login to your CommaFeed instance. Updating your
-CommaFeed is as simple as pulling to your local repo, merging and
-then pushing to <code>openshift master</code>.</p>
-
-<p>Importing directly from Google Reader still seems broken (I was  getting
-errors from builds late this week), but if you import from an existing <code>.opml</code>
-or <code>.xml</code> file you will see CommaFeed in all it&#8217;s glory:</p>
-
-<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
-
-<p>As you can see, it is remarkably similar to the Google Reader interface; a
-clean, minimalist design that is focussed—quite rightly—on the content. There
-is an option to load your own <code>.css</code> if you want to apply some additional
-styling, but for me the base style is just about perfect.</p>
-
-<p>More impressively, in the week or so that I have been using CommaFeed, the
-developer,
-<a href="https://github.com/Athou" title="Athou on Github">Athou</a>, has been committing
-enhancements and bug fixes several times <em>a day</em>; almost every night,
-I have pushed changes to OpenShift, reloaded my browser and found a
-smoother, enhanced feed reader with additional functionality; it is
-literally growing in leaps and bounds, and is a great reminder of the power
-of open source<sup>2</sup>.</p>
-
-<p>The performance of OpenShift has also been solid; feeds are delivered
-seemingly instantaneously and, apart from the slight lag after restarting
-the application, I haven&#8217;t experienced any issues whatsoever in terms
-of availability.</p>
-
-<p>There are still a couple of areas where CommaFeed can be improved. Most
-notably, there is an open feature request for a
-<a href="https://github.com/Athou/commafeed/issues/54" title="Github Issue">mobile friendly CSS</a>
-and this is badly needed, the site is pretty much unusable on my phone. With
-any luck, some enterprising Android developer will build a CommaFeed app (for
-which I would happily pay good money)…</p>
-
-<p>In any event, if you are looking for a Google Reader replacement, try
-running CommaFeed (either on your own server or one of Red Hat&#8217;s); for
-a project that is only a couple of months old, it has covered a
-tremendous amount of ground and will undoubtedly continue to grow
-and improve.</p>
+<p>If you are feeling listless, run-down and lacking in energy, why not try
+Hostsblock? It will make your web pages brighter, speed up your page loads,
+protect your privacy and make you insanely popular. Try Hostsblock today!</p>
 
 <h4>Notes</h4>
 
-<ol>
-<li>In conjunction with his great advice about not being a
-<a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/" title="Pinboard blog">free user</a>.</li>
-<li>The <a href="http://feeds-jwr.rhcloud.com/#/feeds/help" title="About and Help page">about page</a>
-has a donate button: if you want to support an application which I have no doubt
-will soon be even better than Google Reader, you might want to use it.</li>
-</ol>
-
+<p>ad free, a Creative Commons image by
+<a href="http://www.flickr.com/photos/louisa_catlover/2875951548/">Louisa Billeter on Flickr</a>.</p>
 </div>
   
   
@@ -386,7 +320,7 @@ will soon be even better than Google Reader, you might want to use it.</li>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a></h1>
     
     
       <p class="meta">
@@ -402,187 +336,116 @@ will soon be even better than Google Reader, you might want to use it.</li>
   
 
 
-<time datetime="2013-05-18T10:10:00+12:00" pubdate data-updated="true">May 18<span>th</span>, 2013</time>
+<time datetime="2013-11-14T09:51:00+13:00" pubdate data-updated="true">Nov 14<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/woodcutting.jpg" title="'Cutting wood'" >
-I posted a couple of weeks ago about
-<a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on Vim">Building Vim</a> and how,
-using <a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Build System on the Wiki">ABS</a>
-and <code>makepkg</code> it is possible to customize packages in the repositories to suit your
-individual requirements, in that case with a specific feature set.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/sync.png" title="Bittorrent logo" >
+I have
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on the Alpha release">written previously</a>
+about
+<a href="http://www.bittorrent.com/sync" title="Sync webpage">BitTorrent Sync</a>, the encrypted
+file syncing application that uses the bittorrent protocol to sync your data
+over your <acronym title="Local Area Network">LAN</acronym>, or over the Internet,
+using <a href="https://en.wikipedia.org/wiki/Peer_to_peer" title="Wikipedia page">P2P technology</a>.
+I have been using it since early this year as a replacement for
+dropbox.<sup>1</sup></p>
 
-<p>One of Arch&#8217;s real strengths is in the flexibility that <code>makepkg</code> and PKGBUILDs provide
-the community; the ability to adapt official packages—or unofficial ones in the
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>—as you see fit. As PKGBUILDs
-are just shell scripts, the entry level to start playing around with them is quite
-low<sup>1</sup>.</p>
+<p>At the beginning of this month, BitTorrent unveiled the
+<a href="http://blog.bittorrent.com/2013/11/05/bittorrent-sync-beta-api-now-available-to-developers/" title="Sync blog announcement">Beta API</a>
+for developers (meaning you have to tell them what you plan to do in order to
+be issued a key). After some equivocation, I signed up with the rather flimsy
+excuse of “writing a shell wrapper for the command line” and found, to my
+chagrin, a key in my inbox the next morning.</p>
 
-<p>A fairly standard, and simple, example of the type of customization that I might make
-is with <a href="http://tools.suckless.org/dmenu/" title="dmenu page">dmenu</a>, the suckless dynamic
-menu, where the
-<a href="https://www.archlinux.org/packages/community/x86_64/dmenu/" title="Arch package">standard package</a>
-in the Arch repositories is not patched for Xft support. There is a patch for this on the
-<a href="http://tools.suckless.org/dmenu/patches/xft" title="Xft patch on suckless.org">suckless wiki</a>, so it
-is just a case of making the requisite changes in the PKGBUILD from ABS and building it.</p>
+<p>This proved to be something of an unwelcome arrival. In theory, I was excited
+about having access to a tool to query the Sync application. One of the nodes is
+on my
+<a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on setting up a torrent box">headless Raspberry Pi</a>
+and the idea of being able to issue a command from my laptop to ascertain what
+was going on in the Pi&#8217;s synced folders was (and is) a tremendously attractive
+one.</p>
 
-<p>As you can see from the <code>diff</code> below, there is not a lot involved in this exercize; essentially,
-adding <code>libxft</code> as a dependency, sourcing the patch from the suckless site (and including the
-hash for it), and then in the <code>build</code> function ensuring that the patch is applied and the
-Makefile updated with the new library:</p>
+<p>However, now that I was in
+possession of the key, I felt morally obliged to do something with it. The
+problem with this realization was that I had no idea how to work with an
+<acronym title="Application Program Interface">API</acronym>, let alone writing
+a script to accomplish my purported goal.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='diff'><span class='line'><span class="gd">--- PKGBUILD   2013-05-18 09:33:07.156328812 +1200</span>
-</span><span class='line'><span class="gi">+++ PKGBUILD   2012-11-14 09:25:15.915335588 +1300</span>
-</span><span class='line'><span class="gu">@@ -11,16 +6,22 @@</span>
-</span><span class='line'> pkgdesc=&quot;A generic menu for X&quot;
-</span><span class='line'> url=&quot;http://tools.suckless.org/dmenu/&quot;
-</span><span class='line'> arch=(&#39;i686&#39; &#39;x86_64&#39;)
-</span><span class='line'><span class="gi">+groups=(&#39;modified&#39;)</span>
-</span><span class='line'> license=(&#39;MIT&#39;)
-</span><span class='line'><span class="gd">-depends=(&#39;sh&#39; &#39;libxinerama&#39;)</span>
-</span><span class='line'><span class="gd">-source=(http://dl.suckless.org/tools/$pkgname-$pkgver.tar.gz)</span>
-</span><span class='line'><span class="gd">-md5sums=(&#39;9c46169ed703732ec52ed946c27d84b4&#39;)</span>
-</span><span class='line'><span class="gi">+depends=(&#39;sh&#39; &#39;libxinerama&#39; &#39;libxft&#39;)</span>
-</span><span class='line'><span class="gi">+source=(http://dl.suckless.org/tools/$pkgname-$pkgver.tar.gz</span>
-</span><span class='line'><span class="gi">+http://tools.suckless.org/dmenu/patches/$pkgname-$pkgver-xft.diff)</span>
-</span><span class='line'><span class="gi">+md5sums=(&#39;9c46169ed703732ec52ed946c27d84b4&#39;</span>
-</span><span class='line'><span class="gi">+         &#39;d448ec9120718b0aedbdb338f4fa69ba&#39;)</span>
-</span><span class='line'>
-</span><span class='line'> build(){
-</span><span class='line'>   cd $srcdir/$pkgname-$pkgver
-</span><span class='line'><span class="gi">+  patch -p1 &lt; ../$pkgname-$pkgver-xft.diff</span>
-</span><span class='line'><span class="gi">+  sed -i &#39;s:-I/usr/local/include/freetype2:-I/usr/include/freetype2:&#39; config.mk</span>
-</span><span class='line'><span class="gi">+</span>
-</span><span class='line'>   make \
+<p>After spending some time looking at
+<a href="http://www.bittorrent.com/sync/developers/api" title="Such as it is…">the documentation</a>,
+and buoyed by the optimism of ignorance, I decided to make good on my promise.
+My first attempt sort of worked, but was hampered as much by a serious
+conceptual flaw as it was by poor implementation. I decided, in spite of any number
+of Stack Overflow posts warning expressly not to do this, to use <code>awk</code> to parse
+the <a href="http://www.json.org/" title="JSON homepage">JSON data</a><sup>2</sup>. This was what I would
+euphemistically describe as a “learning opportunity.” The result is preserved
+for posterity in my <a href="https://bitbucket.org/jasonwryan/shiv/commits/16c9dee17f097e83fb325e303d867e6fda488992?at=default" title="Bit of a trainwreck, but you have to start somewhere…">bitbucket repo</a>
+(for the completists)…</p>
+
+<p>At this point, I was fortunate that Earnestly in #archlinux introduced me to
+keenerd&#8217;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
+And by “introduced” I mean generously (and patiently) talked me through how it
+worked and how I could use it with the Sync API to achieve what I was after.
+After a while playing with it, there was the—inevitably belated—moment of
+realization: this thing is genius! It allows you to intelligently
+<em>interrogate</em> the data. Not blindly chopping at it with an increasingly complex
+series of actions in <code>awk</code><sup>3</sup>; but quite directly traversing the structure and
+extracting the desired elements.</p>
+
+<p>Now I was <em>cooking</em>. Well, more to the point, I was flailing about in a smoke
+filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
+asphyxiation. Once again, Earnestly&#8217;s patience and bash skills were put to good effect.
+The resulting script,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/syncstat" title="In bitbucket">syncstat</a>,
+is undeniably a triumph of his good ideas over my own poor execution. In other
+words, the fact that it works so well is testament to his ability, but any and
+all faults are mine alone<sup>4</sup>.</p>
+
+<p>And it does work. It only requires
+<a href="https://www.archlinux.org/packages/?sort=&amp;q=jshon" title="Arch package db">Jshon</a>
+(which you will already have installed because you use
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="My post on this great utility">aurphan, right?</a>)
+and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
+</span><span class='line'>directory2 H0p3fu11yY0uG3tTh31d3@
 </span></code></pre></div></figure>
 
 
-<p>Running <code>makepkg -i</code> will build and install dmenu with Xft support. This is the most
-straightforward approach. I also, primarily by way of experimentation and in an effort
-to try an understand how this actually works, have slightly more convoluted examples.
-<a href="https://www.archlinux.org/packages/extra/x86_64/msmtp/" title="Arch package">msmtp</a>, the
-<acronym title="Simple Mail Transfer Protocol">SMTP</acronym> client has a couple
-of makedepends in
-<a href="https://www.archlinux.org/packages/extra/x86_64/libgnome-keyring/" title="Arch package">libgnome-keyring</a>
-and <a href="https://www.archlinux.org/packages/extra/any/texlive-core/" title="Arch package">texlive-core</a>; the former
-I have zero use for and the latter is only installed on my desktop, so I have no wish to install it on
-my laptop just to be able to send emails…</p>
+<p>The functionality in the script is limited at this stage to just querying the
+application; I wasn&#8217;t interested in pushing changes at this point. So you can
+access the version of the currently installed Syncapp, upload and download
+speeds, the size of synced folders and list all of their contents.</p>
 
-<p>In this case, I modified the PKGBUILD to completely remove the <code>libgnome-keyring</code> dependency
-and to only build the <code>msmtp</code> documentation in <code>.pdf</code> and <code>.html</code> if <code>texlive-core</code> was
-already installed on the machine. Unfortunately, I wasn&#8217;t able to test for the presence of
-<code>texlive-core</code> with the standard utilities like <code>type</code> or <code>which</code>, so—as it is installed
-on all my boxes—I went with <code>expac</code> (<code>pacman -Q</code> would also work):</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='diff'><span class='line'><span class="gd">--- PKGBUILD    2013-05-18 09:32:07.393095131 +1200</span>
-</span><span class='line'><span class="gi">+++ PKGBUILD    2013-05-18 09:31:55.449986364 +1200</span>
-</span><span class='line'><span class="gu">@@ -1,7 +1,8 @@</span>
-</span><span class='line'> arch=(&#39;i686&#39; &#39;x86_64&#39;)
-</span><span class='line'><span class="gi">+groups=(&#39;modified&#39;)</span>
-</span><span class='line'> license=(&#39;GPL3&#39;)
-</span><span class='line'> url=&quot;http://msmtp.sourceforge.net&quot;
-</span><span class='line'><span class="gd">-makedepends=(&#39;texlive-core&#39; &#39;gsasl&#39; &#39;libgnome-keyring&#39;)</span>
-</span><span class='line'><span class="gi">+makedepends=(&#39;gsasl&#39;)</span>
-</span><span class='line'> source=(http://download.sourceforge.net/sourceforge/msmtp/${pkgbase}-${pkgver}.tar.bz2)
-</span><span class='line'> sha1sums=(&#39;c0edce1e1951968853f15209c8509699ff9e9ab5&#39;)
-</span><span class='line'>
-</span><span class='line'><span class="gu">@@ -12,19 +13,24 @@</span>
-</span><span class='line'>
-</span><span class='line'> build() {
-</span><span class='line'>   cd ${pkgbase}-${pkgver}
-</span><span class='line'><span class="gd">-  ./configure --prefix=/usr --sysconfdir=/etc --with-ssl=gnutls</span>
-</span><span class='line'><span class="gi">+  ./configure --prefix=/usr --sysconfdir=/etc --with-ssl=gnutls --without-gnome-keyring</span>
-</span><span class='line'>   make
-</span><span class='line'><span class="gd">-  make -C doc html pdf</span>
-</span><span class='line'><span class="gi">+  if [[ -n $(expac -Q &#39;%n&#39; texlive-core) ]]; then</span>
-</span><span class='line'><span class="gi">+      make -C doc html pdf</span>
-</span><span class='line'><span class="gi">+  fi</span>
-</span><span class='line'> }
-</span><span class='line'>
-</span><span class='line'> package_msmtp() {
-</span><span class='line'>   pkgdesc=&quot;A mini smtp client&quot;
-</span><span class='line'><span class="gd">-  depends=(&#39;gsasl&#39; &#39;libgnome-keyring&#39;)</span>
-</span><span class='line'><span class="gi">+  depends=(&#39;gsasl&#39;)</span>
-</span><span class='line'>   install=msmtp.install
-</span><span class='line'>
-</span><span class='line'>   cd ${pkgbase}-${pkgver}
-</span><span class='line'>   make DESTDIR=&quot;${pkgdir}&quot; install
-</span><span class='line'><span class="gi">+</span>
-</span><span class='line'><span class="gi">+  if [[ -n $(expac -Q &#39;%n&#39; texlive-core) ]]; then</span>
-</span><span class='line'>   make DESTDIR=&quot;${pkgdir}&quot; -C doc install-html install-pdf
-</span><span class='line'><span class="gi">+  fi</span>
-</span><span class='line'>
-</span><span class='line'> # Installing example configs and scripts to /usr/share/doc/msmtp
-</span></code></pre></div></figure>
-
-
-<p>It isn&#8217;t necessarily an attractive solution, but it works for me…
-On the subject of unattractive solutions, as of pacman 4.1, released
-last month, the packaging standards for
-<a href="https://wiki.archlinux.org/index.php/VCS_PKGBUILD_Guidelines" title="Arch Wiki page">VCS PKGBUILDs</a>
-have been changed, principally around how sources and versioning is handled. For
-the couple of VCS packages I maintain in the <acronym title="Arch User
-Repository">AUR</acronym><sup>2</sup>, I have been
-experimenting with how to capture the <code>pkgver</code> in a way that conforms to the
-standards and provides people with a meaningful version number.</p>
-
-<p>By default, the version number for these projects from their git repos
-is not that helpful:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git describe --always
-</span><span class='line'>4861046
-</span></code></pre></div></figure>
-
-
-<p>After looking through the git logs, and playing around with <code>awk</code> to filter
-the results, I came up with this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pkgver<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nb">cd</span> <span class="s2">&quot;$_gitname&quot;</span>
-</span><span class='line'>  <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;$(awk &#39;/^ / {print $2}&#39; &lt;(git log --grep=version -1))_\</span>
-</span><span class='line'><span class="s2">  $(git describe --always)&quot;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></div></figure>
-
-
-<p>This prints a more, for me anyway, intelligble package version: <code>vimprobable2-git
-1.2.1_c5936cc-1</code> that relates back to the last stable release and appends the
-current commit. I&#8217;m sure that this could be improved upon; suggestions are
-welcome.</p>
-
-<p>The other change to note in all of these PKGBUILDs is the inclusion of the
-<code>groups</code> variable. By adding all of the modified packages from the official
-repositories to the—imaginatively titled—<code>modified</code> group, I can then add a line
-to <code>/etc/pacman.conf</code> that prevents those packages from being overwritten on
-upgrade<sup>3</sup>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">IgnoreGroup</span> <span class="o">=</span> modified
-</span></code></pre></div></figure>
-
-
-<p>Issuing <code>pacman -Syu</code>, or running <code>checkupdates</code> from a <code>cron</code> job, will
-notify you that the packages have had a version bump and that they need
-to be rebuilt. The PKGBUILDs for all of these packages can be found in
-<a href="https://bitbucket.org/jasonwryan/centurion/src/ff3b3c9d805e197f35aa28dbeb6a9a6555ee7b63/Build?at=default" title="Files in bitbucket">my bitbucket repo</a>.</p>
+<p>It is a beta release, so the odd bug is to be expected. Overall, though, the API is
+a welcome addition to what is a great application. If you have an API key, add
+it to your <span class="file">sync.conf</span>,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/syncstat" title="On bitbucket">grab the script</a>
+and give it a whirl. Undoubtedly, over the coming weeks more polished versions
+will emerge in “proper” languages, but for the time being this does exactly what
+I need.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>As my experiments attest…</li>
-<li><a href="https://aur.archlinux.org/packages/vimprobable2-git/">Vimprobable2-git</a>,
-<a href="https://aur.archlinux.org/packages/surfraw-git/">Surfraw-git</a> and
-<a href="https://aur.archlinux.org/packages/ruby-build-git/">ruby-build-git</a>.</li>
-<li>All credit to ataraxia <a href="https://bbs.archlinux.org/viewtopic.php?pid=623841#p623841">for this idea</a>.</li>
+<li>Yes, I would much prefer to use an open source tool to accomplish the same
+thing but I haven&#8217;t found anything comparable that is this good to date…</li>
+<li>In what I imagine is a complete coincidence, the JSON logo is uncannily
+similar to the initial (and much better, I thought) Sync logo, as seen on
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/">my original post</a>.</li>
+<li>This is not intended as a slight on <code>awk</code>; which I am undoubtedly
+<a href="http://jasonwryan.com/blog/2013/09/15/awking/">fond of</a>, but rather the
+limits of my ability with that language.</li>
+<li>I am also indebted to Scott (firecat53) for testing and providing helpful
+feedback on the early versions of the script.</li>
+<li>It is worth noting that in the <code>$json</code> variable, I pass <code>curl</code> the -<code>n</code> option,
+which means it reads my credentials from <span class="file">$HOME/.netrc</span>.</li>
 </ol>
 
-
-<p>Creative Commons image on Flickr by
-<a href="http://www.flickr.com/photos/wellspwilson/6481217091/" title="Wood
-Cutting Wood">Wells P. Wilson</a></p>
 </div>
   
   
@@ -605,23 +468,23 @@ Cutting Wood">Wells P. Wilson</a></p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -708,7 +571,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

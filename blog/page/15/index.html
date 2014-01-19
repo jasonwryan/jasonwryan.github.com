@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I posted last year about Vimprobable
-a webkit browser that uses
-Vim-like keybinds and can be run completely without the rodent. Over the last couple &hellip;">
+  <meta name="description" content="I recently threw caution to the wind and
+changed my shell over to vi mode.
+I wanted to take advantage of the superior command editing ability that &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,7 +90,7 @@ Vim-like keybinds and can be run completely without the rodent. Over the last co
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/06/26/using-vimprobable/">Using Vimprobable</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/12/01/readline/">Readline Bindings in Vi Mode</a></h1>
     
     
       <p class="meta">
@@ -106,123 +106,72 @@ Vim-like keybinds and can be run completely without the rodent. Over the last co
   
 
 
-<time datetime="2011-06-26T14:08:00+12:00" pubdate data-updated="true">Jun 26<span>th</span>, 2011</time>
+<time datetime="2011-12-01T18:43:00+13:00" pubdate data-updated="true">Dec 1<span>st</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/vimprobable2.png" alt="image" /></p>
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/readline.png" alt="image" /></p>
 
-<p>I <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/" title="Post on using Vimprobable">posted last year about Vimprobable</a>
-a <a href="http://www.webkit.org/" title="Webkit site">webkit browser</a> that uses
-Vim-like keybinds and can be run completely without the rodent.</p>
+<p>I recently threw caution to the wind and
+<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
+I wanted to take advantage of the superior command editing ability that
+this mode offered, and also to continue to bake vi[m] methods into every
+aspect of my working environment.</p>
 
-<p>Over the last couple of months I have become increasingly comfortable
-with it, and with the addition of
-<a href="http://vimprobable.org/pipermail/vimprobable-users/2011-June/000800.html" title="External handlers patch on ML">some great recent functionality</a>,
-it has become my default browser.</p>
+<p>The change has been relatively straightforward; the only issues I have
+experienced are really just around a couple of keybinds that I had
+become accustomed to in normal/Emacs mode:</p>
 
-<p>The project has good documentation, in the form of two man pages:
-<code>vimprobable</code> and <code>vimprobablerc</code>, but I thought I’d share some of my
-customizations and working methods.</p>
-
-<h3>Copy &amp; Paste</h3>
-
-<p>The only time I have been tempted to take my hand off the keyboard was
-to insert the cursor at the correct character to begin a selection to
-copy and paste. This is unnecessary. With the right options in
-<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span>,
-you can do it all from the keyboard.</p>
-
-<p>Map the keys you would like to use to enter and exit caret mode. I use
-<kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
-return to normal mode:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
-</span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
-</span></code></pre></div></figure>
+<ul>
+<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
+<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
+</ul>
 
 
-<p>Then, it is just a matter of identifying the text that you wish to copy
-(in the photo above I was copying a script to launch <code>tabbed</code>), and
-highlighting it via search. So the sequence is:</p>
+<p>The first, the ability to recall the final arguments of previous
+commands was a showstopper for me: I really struggled without this.
+Being able to recall a long file path and append it to a new command is
+invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
+exactly this. Why it is not bound by default in vi mode is beyond me…</p>
 
-<pre>
-1.  <kbd>/</kbd> - to enter search mode
-2.  <kbd>#</kbd><kbd>!</kbd> <kbd>Enter</kbd> - the shebang and then enter to highlight the correct
-    sequence
-3.  <kbd>Ctrl</kbd><kbd>c</kbd> to enter caret mode
-4.  and then <kbd>Shift</kbd><kbd>Up</kbd> or <kbd>Shift</kbd><kbd>Down</kbd> to highlight the following or
-    preceding lines
-5.  yanking the selected text is <kbd>Shift</kbd><kbd>y</kbd>, and the text is now stored in
-    your clipboard.
-</pre>
+<p>The other was purely cosmetic, really. I am an inveterate clearer of the
+screen—unless I am referring to something printed to stdout, I always
+prefer to work at the top of the console.</p>
 
+<p>In any event, with the
+<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
+it was a trivial exercize to restore this functionality to my bash shell
+in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
 
-<h3>Opening new instances in tabbed</h3>
-
-<p>I highlighted the section on tabbed from the
-<a href="http://www.vimprobable.org/" title="Vimprobable website">Vimprobable site</a> for a reason.
-The second tip is how to set up
-<a href="http://tools.suckless.org/tabbed" title="tabbed on suckless.org">tabbed</a> to
-work well with other applications.</p>
-
-<p>By default, any new windows (ie., instances of Vimprobable) opened from
-within Vimprobable are “caught”—and managed— by <code>tabbed</code>. However, if you
-open a link from, say
-<a href="http://newsbeuter.org/" title="ncurses rss reader">newsbeuter</a> or
-<a href="http://tyrs.nicosphere.net/index.html" title="ncurses twitter/identi.ca client">Tyrs</a>,
-this will open an instance outside <code>tabbed</code> which, if you are using a
-tiling window manager like
-<a href="http://dwm.suckless.org/" title="THE titling wm">dwm</a>, means this window gets
-pushed to master in your stack. This is not entirely satisfactory.</p>
-
-<p>Thanks to
-<a href="http://lists.suckless.org/dev/1106/8761.html" title="Tabbed thread on suckless ML">Connor Lane Smith on the suckless ML</a>,
-I have a solution to have all new instances of Vimprobable sent to
-<code>tabbed</code>, whether opened in another application, or if I click on a link
-in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
-
-<p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
-<psan class="file">/tmp</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&lt;/tmp/tabbed.xid)&quot;</span>
-</span></code></pre></div></figure>
+<figure class='code'><figcaption><span>~/inputrc </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc
+</span><span class='line'>
+</span><span class='line'># for vi mode
+</span><span class='line'>set editing-mode vi
+</span><span class='line'>$if mode=vi
+</span><span class='line'>
+</span><span class='line'>set keymap vi-command
+</span><span class='line'># these are for vi-command mode
+</span><span class='line'>"\e[A": history-search-backward            # arrow up
+</span><span class='line'>"\e[B": history-search-forward             # arrow down
+</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>
+</span><span class='line'>set keymap vi-insert
+</span><span class='line'># these are for vi-insert mode
+</span><span class='line'>"\e[A": history-search-backward
+</span><span class='line'>"\e[B": history-search-forward
+</span><span class='line'>"\ep": yank-last-arg
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>$endif</span></code></pre></div></figure>
 
 
-<p>Then it is just a matter of setting up other applications to pass links
-to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
-<span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> %s
-</span></code></pre></div></figure>
-
-
-<p>The workaround for Urxvtc was a little trickier. I finally got there
-with some help from
-<a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
-In my <span class="file">~/.Xdefaults</span> I have:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
-</span><span class='line'>URxvt.perl-ext-common: default,matcher
-</span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
-</span><span class='line'>URxvt.matcher.button: 1
-</span></code></pre></div></figure>
-
-
-<p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="c"># Script to open Vimprobable instances in tabbed</span>
-</span><span class='line'><span class="nb">exec </span>vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>Now whenever I open a link in an application or by clicking a link in
-the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
-it is passed to Vimprobable in <code>tabbed</code>.</p>
+<p>There is an extensive list of
+<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
+with which you can customize your shell environment.</p>
 </div>
   
   
@@ -235,7 +184,7 @@ it is passed to Vimprobable in <code>tabbed</code>.</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/06/10/setting-tmux-statusbar-if-in-x/">Setting tmux statusbar if in X</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/11/29/rtorrent/">Building rtorrent on Debian Squeeze</a></h1>
     
     
       <p class="meta">
@@ -251,179 +200,188 @@ it is passed to Vimprobable in <code>tabbed</code>.</p>
   
 
 
-<time datetime="2011-06-10T22:56:00+12:00" pubdate data-updated="true">Jun 10<span>th</span>, 2011</time>
+<time datetime="2011-11-29T21:21:00+13:00" pubdate data-updated="true">Nov 29<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5636783883/" title="Arch Linux: dwm, tmux &amp; scratchpad by jasonwryan, on Flickr"><img src="http://farm6.static.flickr.com/5303/5636783883_5b7272453b.jpg" alt="Arch Linux: dwm, tmux &amp; scratchpad" /></a></p>
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/rtorrent.png" alt="image" /></p>
 
-<p>I have been posting quite a bit about
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a> of late<sup>1</sup>.
-It is a marvellous application and lends itself to all sorts of interesting
-uses. When you first install it, you will find a number of user config
-files in <span class="file">/usr/share/tmux/</span>. I started with tmux by copying
-<a href="http://cinderwick.ca/" title="Thayer Williams' site">Thayer’s</a> config across
-and then working up from there. There is a section
-<a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
-that has always puzzled me, and so I decided to get to the bottom of it.</p>
+<p>After <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Post on the HP microserver">setting up my server</a>,
+I wanted to use it as a torrent box. The version of
+<a href="http://libtorrent.rakshasa.no/" title="rtorrent &amp; libtorrent homepage">rtorrent</a>
+in the Debian stable repositories is 0.8.6, which is unfortunate as
+support for <a href="http://en.wikipedia.org/wiki/Magnet_URI_scheme" title="Wikipedia page on magnet URIs">magnet links</a>
+was introduced in 0.8.7.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># show some useful stats but only when tmux is started</span>
-</span><span class='line'><span class="c"># outside of Xorg, otherwise dwm statusbar shows these already </span>
+<p>To remedy this, I decided to build the current stable version of
+rtorrent, 0.8.9. At the same time—seeing as I was getting my hands dirty
+anyway—I thought I’d patch in colour support.</p>
+
+<p>This is a straightforward two-step process. First, build the current
+version of libtorrent, 0.12.9:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
+</span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
+</span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
+</span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
+</span><span class='line'>sudo checkinstall
 </span></code></pre></div></figure>
 
 
-<p>It is a great idea. If you are running tmux in X, then you have
-<a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
-what the time is,
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="dwm status bar in my mercurial repo">how much battery you have left</a>
-etc,. You don’t need to replicate that functionality in tmux. If,
-however, you are in the console, you don’t have that information, unless
-you print it in tmux’s statusbar.</p>
+<p>Once libtorrent is successfully built and installed, you can begin the
+rtorrent build:</p>
 
-<p>I had tried to get this to work once or twice over the last couple of
-years, but never persevered with it. However, as I have been doing a bit
-of work making the console as functional as possible<sup>2</sup>, I thought I
-would revisit it.</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status1.png" alt="image" /></p>
-
-<p>The insight that I had that got it working for me was to use the
-source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
-depending if X was running or not. I just adapted Thayer’s code, like
-so:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Statusbar starting in X or not</span>
-</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
-</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
+</span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
+</span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
 </span></code></pre></div></figure>
 
 
-<p>And then created those files with the desired statusbar options. So, for
-example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
-loaded:</p>
+<p>Then, if you want colour support, you need the patch. I used the version
+in the
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
+but you can also grab a copy from a paste site:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Statusbar if tmux run in console</span>
-</span><span class='line'><span class="c"># information normally in dwm bar</span>
-</span><span class='line'><span class="nb">set</span> -g status-right-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
+</span><span class='line'>mv canvas_colour.patch src/
+</span><span class='line'>patch -uNp1 -i canvas_colour.patch
 </span></code></pre></div></figure>
 
 
-<p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
+<p>The patch should apply cleanly. Then specify where libtorrent is
+installed to ensure that it is linked during the rtorrent build:</p>
 
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-status2.png" alt="image" /></p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
+</span><span class='line'>make
+</span><span class='line'>sudo checkinstall
+</span></code></pre></div></figure>
 
-<p>All the relevant files are in
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.tmux" title="My mercurial repository">my mercurial repo</a>.</p>
+
+<p>Once again, this should compile cleanly and you will now have rtorrent
+with colour and magnet link support installed in
+<span class="file">/usr/local/bin/rtorrent</span>.</p>
+
+<h5>Notes</h5>
+
+<p>I prefer to use
+<a href="http://asic-linux.com.mx/~izto/checkinstall/" title="checkinstall homepage">checkinstall</a>
+so that self-installed applications are tracked by
+<a href="http://wiki.debian.org/Apt" title="Debian wiki entry">Apt</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/28/rsync/">rsync + SSH Backups</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-28T12:23:00+13:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/rsync-ssh.png" alt="image" /></p>
+
+<p>I <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
+and included a
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
+script for backing up my files to the server. At the time, I was running
+it manually, but since have sorted out the excludes list and have now
+automated it.</p>
+
+<p>My original scheme was to set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
+mount an
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
+before rsync’ing the directories across. In the end, I went with SSH and
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
+as debugging all of the various permissions issues with the NFS share
+did not seem worth the effort.</p>
+
+<p>First, on my local desktop, I created the keypair called, inventively,
+rsync:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
+</span><span class='line'>mv rsync ~/.ssh <span class="o">&amp;&amp;</span> chmod 600 ~/.ssh/rsync
+</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
+</span></code></pre></div></figure>
+
+
+<p>This keypair was created <em>without a passphrase</em> so that the script could
+be successfully called from <code>cron</code>. To slightly increase the security
+around a key without a passphrase, I used the from option in
+authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
+machine(s), like so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
+</span></code></pre></div></figure>
+
+
+<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
+</span></code></pre></div></figure>
+
+
+<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
+the SSH command:</p>
+
+<figure class='code'><figcaption><span>.ssh/config </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>Host backups
+</span><span class='line'>   Hostname 192.168.1.200
+</span><span class='line'>   Port 0000
+</span><span class='line'>   User jason
+</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></div></figure>
+
+
+<p>And I was done. Everynight at 10pm, all of my data will be backed up to
+the server. The rsync command in the script:</p>
+
+<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># Backup to remote server over SSH</span>
+</span><span class='line'>
+</span><span class='line'>rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\</span>
+</span><span class='line'>    --log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
+</span><span class='line'>    -e ssh /home/jason /etc backups:Backups/Centurion
+</span></code></pre></div></figure>
+
 
 <h5>Notes</h5>
 
 <ol>
-<li><p><a href="http://jasonwryan.com/blog/2011/06/07/copy-and-paste-in-tmux/" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
-<a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/" title="Sessions in tmux">Sessions in tmux</a>
-&amp; <a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/" title="Intro to tmux">Introduction to tmux</a></p></li>
-<li><p><a href="http://jasonwryan.com/blog/2011/04/06/vim-colours-in-the-console/" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
-<li><p>Image squashed to fit the requirements of this blog…</p></li>
+<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
 </ol>
 
-</div>
-  
-  
 
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/07/copy-and-paste-in-tmux/">Copy &amp; Paste in tmux</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-06-07T19:54:00+12:00" pubdate data-updated="true">Jun 7<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/tmux-copy.png" alt="image" /></p>
-
-<p>I’ve posted a couple of times<sup>1</sup> about
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
-terminal mutliplexer. One question I see raised a lot in #tmux is how
-to copy and paste.</p>
-
-<p>The documentation for tmux is excellent: the
-<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
-one of the most clear and thorough I have read. And while it is
-explained there, I thought I would share my approach anyway.</p>
-
-<p>First, I set tmux to use vi keys:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setw -g mode-keys vi
-</span></code></pre></div></figure>
-
-
-<p>Then I change the default keybinds to suit my workflow. As explained in
-the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
-and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
-to more intuitive and Vim-like keys:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
-</span><span class='line'><span class="nb">bind </span>Escape copy-mode
-</span><span class='line'>unbind p
-</span><span class='line'><span class="nb">bind </span>p paste-buffer
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
-</span></code></pre></div></figure>
-
-
-<p>This seems a lot closer to all of the other Vim-like apps that I run -
-where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
-<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
-
-<p>So, to string it all together, the command sequence necessary to copy
-some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
-
-<pre>
-<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
-# move cursor to the start or end of the desired text string
-<kbd>v</kbd>                        # to activate highlighting
-# move cursor to cover the requisite string
-<kbd>y</kbd>                        # to capture the string
-<kbd>q</kbd>                        # exit copy mode
-<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
-</pre>
-
-
-<p>Simple.</p>
-
-<p>This means that you can scroll back through the output of <em>anything</em> in
-your terminal, and copy and paste it anywhere. Once you set it up, it is
-a very powerful tool…</p>
-
-<h5>Notes</h5>
-
-<p>1.<a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/">Sessions in tmux</a></p>
+<p>Creative Commons image from
+<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
 </div>
   
   
@@ -448,23 +406,23 @@ a very powerful tool…</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -551,7 +509,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

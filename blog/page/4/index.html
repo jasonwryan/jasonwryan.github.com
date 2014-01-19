@@ -9,9 +9,11 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have used TrueCrypt since just before
-I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
-It is an &hellip;">
+  <meta name="description" content="I was fortunate enough to be given a
+Raspberry Pi earlier this year
+and, naturally enough, have been running
+Arch ARM on it over the
+last several &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,7 +92,7 @@ It is an &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/06/29/raspberry/">RPi Headless Torrent Box</a></h1>
     
     
       <p class="meta">
@@ -106,195 +108,104 @@ It is an &hellip;">
   
 
 
-<time datetime="2013-01-10T16:02:00+13:00" pubdate data-updated="true">Jan 10<span>th</span>, 2013</time>
+<time datetime="2013-06-29T09:40:00+12:00" pubdate data-updated="true">Jun 29<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/lock.jpg" title="'Flickr image of lock'" >
-I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
-I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
-It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
-the fly and—for the especially paranoid—to hide the existence of those volumes from
-inquisitive others.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/raspberry-pi-logo.png" title="Raspberry Pi logo" >
+I was fortunate enough to be given a
+<a href="http://www.raspberrypi.org/" title="Pi homepage">Raspberry Pi</a> earlier this year
+and, naturally enough, have been running
+<a href="http://archlinuxarm.org/" title="Arch Linux ARM site">Arch ARM</a> on it over the
+last several months. Initially, I was at somewhat of a loss as to what to do
+with it, so was just (under)using it<sup>1</sup> for a persistent IRC connection.
+I have now, with very little effort, set it up as a headless torrent box and it is
+working nicely.</p>
 
-<p>In the intervening years, with all aspects of my personal life
-increasingly mediated digitally, in order to properly safeguard my privacy,
-and that of my family, I have taken to using LUKS to
-<a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on LVM on LUKS">fully encrypt all of my machines</a>.
-And I have used TrueCrypt, both personally and for work, to encrypt some of my USB drives and as
-a container in <a href="http://dropbox.com/" title="Dropbox homepage">Dropbox</a>
-, for as long as
-<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on sharing dotfiles with Dropbox">I have used that service</a>.</p>
+<p>As is generally the case, this involved little more than stitching together a
+few lightweight tools to accomplish the task. In this case, it is a combination
+of
+<a href="http://libtorrent.rakshasa.no/" title="rotrrent homepage">rtorrent</a>
+(with the canvas-colour patch applied),
+<a href="http://jasonwryan.com/blog/categories/surfraw/" title="Posts on surfraw">surfraw</a>
+and
+<a href="http://w3m.sourceforge.net/" title="w3m homepage">w3m</a> for discovering
+torrents,<sup>2</sup>
+<a href="http://labs.bittorrent.com/experiments/sync.html" title="Peer to Peer synching">bittorrent sync</a>
+and, optionally, a <acronym title="Virtual Private Network">VPN</acronym>.</p>
 
-<p>Early last year, however, I became aware of concerns that TrueCrypt was not truly open source; that almost
-all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
-free (as in Freedom) software:</p>
+<p>I use a 16GB <acronym title="Universal Serial Bus">USB</acronym> drive to act as
+storage for the device, and mount it at <span class="file">~/Downloads</span>
+via <span class="file">/etc/fstab</span>; depending on the size of your
+<acronym title="Secure Digital">SD card</acronym>, this may be superfluous.</p>
 
-<blockquote><p>The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered &#8220;free&#8221; by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.</p><footer><strong>Wikipedia entry on TrueCrypt</strong> <cite><a href='https://en.wikipedia.org/wiki/Truecrypt'>en.wikipedia.org/wiki/Truecrypt/&hellip;</a></cite></footer></blockquote>
+<p>First a note on building packages; building <em>anything</em> on the Pi—with only
+512MB <acronym title="Random Access Memory">RAM</acronym>—is a protracted
+and thankless task. So if you intend to do more of this, or do it regularly,
+set up
+<a href="http://archlinuxarm.org/developers/distcc-cross-compiling" title="Arch ARM instructions">cross-compiling</a>;
+you won&#8217;t regret the initial investment.</p>
 
+<p><code>rtorrent</code> is in the ARM repos, but I wanted to patch in colour, so I wrote
+<a href="https://gist.github.com/jasonwryan/5794623" title="Gist of the thing…">a PKGBUILD</a>,
+based on the package in [community] and
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="Arch User Repository">ashren&#8217;s AUR package</a>.
+Once you have rtorrent installed and working, the rest is straightforward.</p>
 
-<p>When I initially accessed the page, in February 2012, there was also a paragraph—now removed—that
-highlighted further, more alarmist, concerns about the shadowy identity of the people behind
-TrueCrypt:</p>
+<p>The default config for w3m is perfectly functional, but can be easily customized
+further. The key to this setup is being able to find a torrent and then easily
+add it to rtorrent&#8217;s queue.  To do this, I modified the hack that I wrote up
+<a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Post on yanking URLs in w3m">a couple years back</a>.
+Essentially, you use w3m&#8217;s external link function to trigger a script to grab
+the magnet link. Like so:</p>
 
-<blockquote><p>The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]</p><footer><strong>Wikipedia entry retrieved in February 2012</strong> <cite><a href='https://en.wikipedia.org/w/index.php?title=TrueCrypt&diff=478623780&oldid=478608477'>en.wikipedia.org/w/&hellip;</a></cite></footer></blockquote>
-
-
-<p>While I don&#8217;t subscribe to the theory that the CIA have planted a backdoor in the software (if they
-had, <a href="https://en.wikipedia.org/wiki/Truecrypt#Operation_Satyagraha" title="FBI operation foiled by TC">it clearly doesn&#8217;t work</a>),
-I was relieved to see at the end of last year that someone had written a simple utility that allows
-you to manage TrueCrypt containers from the command line; <a href="https://github.com/bwalex/tc-play" title="tcplay on Guthub">tcplay</a>
-is decribed as:</p>
-
-<blockquote><p>a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.</p></blockquote>
-
-
-<p>With a <a href="https://github.com/bwalex/tc-play/blob/master/LICENSE" title="tcplay license">simple, two paragraph license</a>
-and a brief but comprehensive <code>man</code> page, I was sold. I uninstalled TrueCrypt late last year and haven&#8217;t missed it since. Quite
-the contrary. The only “issue” that I have had with tcplay is remembering the commands to map and mount a drive.
-Initially, I jotted down some notes, but opening them up several times a week to refer to them quickly seemed
-pointless so I eventually wised up and wrote a wrapper script to do the job for me…</p>
-
-<p>The script is quite simple, it finds the first available loop device, maps the encrypted volume to it and
-mounts it read-writeable for your user.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="c"># manage truecrypt containers using tcplay</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">user</span><span class="o">=</span>jason
-</span><span class='line'><span class="nv">cryptdev</span><span class="o">=</span>Safebox
-</span><span class='line'><span class="nv">cryptpath</span><span class="o">=</span>/home/jason/Dropbox/<span class="s2">&quot;$cryptdev&quot;</span>
-</span><span class='line'><span class="nv">loopdev</span><span class="o">=</span><span class="k">$(</span>losetup -f<span class="k">)</span>
-</span><span class='line'><span class="nv">mountpt</span><span class="o">=</span>/media/<span class="s2">&quot;$cryptdev&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># must be run as root</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$EUID</span> !<span class="o">=</span> 0 <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;You must be root to run this.&quot;</span>
-</span><span class='line'>  <span class="nb">exit </span>1
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># unecrypt and mount container</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span>losetup <span class="s2">&quot;$loopdev&quot;</span> <span class="s2">&quot;$cryptpath&quot;</span>
-</span><span class='line'>  tcplay --map<span class="o">=</span><span class="s2">&quot;$cryptdev&quot;</span> --device<span class="o">=</span><span class="s2">&quot;$loopdev&quot;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># read passphrase</span>
-</span><span class='line'>  <span class="nb">read</span> -r -s passphrase <span class="s">&lt;&lt;EOF</span>
-</span><span class='line'><span class="s">  &quot;$passphrase&quot;</span>
-</span><span class='line'><span class="s">EOF</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># mount container</span>
-</span><span class='line'>  <span class="o">[[</span> -d <span class="s2">&quot;$mountpt&quot;</span> <span class="o">]]</span> <span class="o">||</span> mkdir <span class="s2">&quot;$mountpt&quot;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c"># mount options</span>
-</span><span class='line'>  <span class="nv">userid</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="s2">&quot;[=(]&quot;</span> <span class="s1">&#39;{print $2,$4}&#39;</span> &lt;<span class="o">(</span>id <span class="s2">&quot;$user&quot;</span><span class="k">)</span><span class="o">)</span>
-</span><span class='line'>  mount -o nosuid,uid<span class="o">=</span><span class="s2">&quot;${userid% *}&quot;</span>,gid<span class="o">=</span><span class="s2">&quot;${userid#* }&quot;</span> /dev/mapper/<span class="s2">&quot;$cryptdev&quot;</span> <span class="s2">&quot;$mountpt&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># close and clean up…</span>
-</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;close&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nv">device</span><span class="o">=</span><span class="k">$(</span>awk -v <span class="nv">dev</span><span class="o">=</span><span class="nv">$cryptdev</span> -F<span class="s2">&quot;:&quot;</span> <span class="s1">&#39;/dev/ {print $1}&#39;</span> &lt;<span class="o">(</span>losetup -a<span class="k">)</span><span class="o">)</span>
-</span><span class='line'>  umount <span class="s2">&quot;$mountpt&quot;</span>
-</span><span class='line'>  dmsetup remove <span class="s2">&quot;$cryptdev&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;demapping failed&quot;</span>
-</span><span class='line'>  losetup -d <span class="s2">&quot;$device&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;deleting $loopdev failed&quot;</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Options are open or close.&quot;</span>
-</span><span class='line'><span class="k">fi</span>
+<figure class='code'><figcaption><span>~/.w3m/config </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>extbrowser /home/jason/Scripts/magnets %s
 </span></code></pre></div></figure>
 
 
-<p>Once you are done, the script will unmount your volume and clean up. Undoubtedly, the
-script could be improved; patches are welcome.</p>
+<p>and the script from the
+<a href="http://wiki.rtorrent.org/MagnetUri#Handling_.22magnet:.22_URIs_via_a_bash_script" title="Script for magnet links">rtorrent wiki</a>:</p>
 
-<p>There is a
-<a href="https://aur.archlinux.org/packages/tcplay-git/" title="Arch User Repository">PKGBUILD in the AUR</a>.
-Uninstall TrueCrypt and give tcplay a go, it is a simple, powerful application; and it <em>is</em>
-free software…</p>
-
-<h4>Notes</h4>
-
-<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
-</div>
-  
-  
+<figure class='code'><figcaption><span>~/Scripts/magnets </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nb">cd</span> <span class="nv">$HOME</span>/Downloads/Queue/watch/    <span class="c"># set your watch directory here</span>
+</span><span class='line'><span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span>~ <span class="nv">xt</span><span class="o">=</span>urn:btih:<span class="o">([</span>^&amp;/<span class="o">]</span>+<span class="o">)</span> <span class="o">]]</span> <span class="o">||</span> <span class="nb">exit</span>;
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;d10:magnet-uri${#1}:${1}e&quot;</span> &gt; <span class="s2">&quot;meta-${BASH_REMATCH[1]}.torrent&quot;</span>
+</span></code></pre></div></figure>
 
 
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a></h1>
-    
-    
-      <p class="meta">
-        
+<p>Remapping the w3m key to trigger the script to make it more Vim-like:</p>
+
+<figure class='code'><figcaption><span>~/.w3m/keymap </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>keymap Y EXTERN_LINK
+</span></code></pre></div></figure>
 
 
+<p>And now hitting <kbd>Shift</kbd><kbd>y</kbd> over a magnet link adds it to your
+queue.</p>
 
+<p>The final piece was to ameliorate the step of transferring the completed files
+from the Pi, or for allowing me to add torrents remotely. To do this, I used
+a <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="My post on Sync">bittorrent sync</a>
+shared directory as <span class="file">~/Downloads</span>. All files are synched
+to my desktop as they are downloaded to the Pi. Simple.</p>
 
+<p><img src="http://miromiro.com/Blog-images/rtorrent-2.png" title="'Screenshot of rtorrent in action…'" ></p>
 
-
-
-
-  
-
-
-<time datetime="2012-11-20T18:58:00+13:00" pubdate data-updated="true">Nov 20<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/vimprobable-logo.png" title="'Vimprobable logo'" >
-I have written about <a href="http://vimprobable.org" title="Vimprobable homepage">Vimprobable</a>
-a couple of times over the last two years<sup>1</sup>,
-it is one of those projects that, for a variety of reasons, I have picked up
-and stuck with.  Like <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>,
-<a href="http://vim.org" title="Vim homepage">Vim</a> and
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>,
-it is an essential part of my working environment and is installed on all of my
-machines, where it is my default browser. It&#8217;s simplicity, power and
-configurability are why, despite looking at a few other similar projects, I
-have stuck with Vimprobable since first installing it.</p>
-
-<p>After my last post, a <a href="http://jasonwryan.com/blog/2012/09/28/screencast/" title="An intro to dwm">dwm screencast</a>,
-I wanted to have another crack at making a decent screencast. Sadly,
-this is not it.  I can say that making a <em>good</em> screencast is not a simple
-accomplishment; there are so many elements that require significant attention. I
-spent a good many hours this time around playing with custom Xorg modelines,
-<code>ffmpeg</code>&#8217;s arcane encoding options and, to be frank, the final product is just not worth
-all that effort.</p>
-
-<p>I&#8217;m going to stick with plain text from now on. It requires little more from me
-than a passing acquaintance with the subject matter, some loosely held and
-<a href="http://jasonwryan.com/blog/2012/08/18/trolls/" title="Trolling Arch Linux">firmly expressed opinions</a>
-and my unbridled confidence in the fact that anyone who
-has read this far down the page is so bereft of other, more pressing things to
-think about that they may inadvertently find a scintilla of amusement in here…</p>
-
-<p>With that explanation out of the way, I give you my final screencast:</p>
-
-<iframe src="http://player.vimeo.com/video/53829053?byline=0&amp;portrait=0&amp;badge=0&amp;color=ffffff" 
-width="350" height="197" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-
-
-<p></p>
-
-<p><a href="http://vimeo.com/53829053">An Introduction to Vimprobable</a> on 
-<a href="http://vimeo.com">Vimeo</a>.</p>
-
+<p>As I mentioned above, you could also use a VPN and, with a service
+file, have it connect on boot if you wished to further protect your privacy.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>First back in <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/">October, 2010</a> and then,
-more recently, in <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/">June, 2011</a>.</li>
+<li>This is not to say that I am now using it to it&#8217;s full potential; quite the
+opposite. Recommendations or suggestions gratefully received.</li>
+<li>Discovery is <em>your</em> business; what you choose to download and share may be the
+business of copyright holders…</li>
 </ol>
 
 </div>
@@ -309,7 +220,7 @@ more recently, in <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobab
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/09/28/screencast/">A dwm Screencast</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/06/15/asking/">Asking for Help</a></h1>
     
     
       <p class="meta">
@@ -325,48 +236,275 @@ more recently, in <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobab
   
 
 
-<time datetime="2012-09-28T09:18:00+12:00" pubdate data-updated="true">Sep 28<span>th</span>, 2012</time>
+<time datetime="2013-06-15T10:39:00+12:00" pubdate data-updated="true">Jun 15<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/dwm-logo.png" title="'dwm logo'" >
-Over the last week as I have been at home convalescing I have, quite unaccountably,
-found myself watching videos of tiling window managers. In all, I have probably watched
-between twenty and thirty of these videos so I feel, quite confidently, that I have a
-firm grasp of what constitutes the genre. Consequently, I also feel that I can&mdash;based
-on the range of the material I have reviewed, and the scrutiny and attention therein
-applied&mdash;share an unequivocal judgement as to the overall quality of the genre: it
-sucks.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/bowl.jpg" title="'Flickr image of Begging Bowl'" >
+Another great peristaltic movement in Arch&#8217;s rolling release digestive system
+happened over the last couple of weeks, the move of all binaries
+<a href="https://www.archlinux.org/news/binaries-move-to-usrbin-requiring-update-intervention/" title="Arch News update">to /usr/bin</a>.
+This move had been foreshadowed for several months and, despite announcements
+on the front page of the Arch website, the mailing lists and the release going
+through [testing] and the resulting thread on the forums, there was still a
+surprising amount of carnage<sup>1</sup> in it&#8217;s wake.</p>
 
-<p>Moreover, these videos invariably suck in the same couple of ways; they always lack
-any sort of narration, which means that you are stuck silently watching some sort of
-paroxysm of window rearrangement without <em>any</em> context or explanation, as if the fact
-that you can inflict this sort of injury on an X display is rationale enough. And,
-secondly, just as frequently, they feature a cursor being dragged around the screen
-doing the damage; using the mouse to demonstrate the capabilities of a tiling window
-manager is the sort of vestigial behaviour more commonly associated with pagan
-superstition or mild enfeeblement…</p>
+<p>In the aftermath (although I expect that it will take some months for it to
+completely pass through the system), what struck me was not so much the variety
+and ingenuity of the ways people had managed to break their installs<sup>2</sup>
+as how they approached the community seeking help afterwards.</p>
 
-<p>Rather that simply bask in the sense of superiority that these observations have
-afforded me, I thought that I would make my own, more lasting, contribution to the
-canon. I can only describe this process as instructive.</p>
+<p>There are already some fine guides on how to do this, notably
+ESR&#8217;s <a href="http://www.catb.org/esr/faqs/smart-questions.html" title="Just read it…">How to ask Questions the Smart Way</a>
+and—specifically for Arch—zendeavour&#8217;s
+<a href="http://redd.it/tjjwr" title="On Reddit">troubleshooting for newcomers</a>;
+this isn&#8217;t an attempt to add or expand on that genre. Rather, it is
+a look at a subset of attitudes that some people adopt<sup>3</sup>
+as they seek the assistance of the community.</p>
 
-<p><a href="http://www.youtube.com/watch?v=GQ5s6T25jCc"><img class="center" src="https://dl.dropbox.com/u/261312/Blog-images/tower.jpg" title="dwm screencast" ></a></p>
+<p>The first is the <strong>blamer</strong>. The proponent of the  “all-guns-blazing” approach.
+I&#8217;ll paraphrase, but there are enough examples on the boards to illustrate the
+point: “my system can&#8217;t boot, it&#8217;s not my fault and I am here to let you know
+that I am unhappy and demand recourse.” This is, unquestionably, the most
+puzzling of all the strategies. It is often coupled with the (sadly almost
+always empty) threat to abandon the distro and it&#8217;s apparently beleaguered
+community.</p>
 
-<p>The best that can be said of this video is that, while it sucks just as hard as the others
-that I have reviewed over the past week, it has the distinguishing feature of at least
-sucking <em>differently</em>. For example, it has an audio track, so in theory the actions on the
-screen should be accompanied by the narrator&#8217;s soothing tones. Sadly, this is not the case.
-The crappy quality of my headset, my hoarse throat, and most egregiously, my decision to eschew
-post production and shoot it in one take means that the audio is poorly recorded, and at times
-literally inarticulate, rambling.</p>
+<p>Puzzling because I have yet to encounter a single situation in life, online
+or off, where opening with hostility and blame is an intelligent approach to
+seeking assistance. If you are going to adopt this approach, please supersize
+to “rage quit” and expend your energy actually delivering on your threat.</p>
 
-<p>If nothing else, the exercise has taught me to really appreciate the work of people who
-do this thing well; Drew Neil&#8217;s excellent
-<a href="http://vimcasts.org/" title="The Vimcasts homepage">Vimcasts</a> being a case in point.</p>
+<p>The next is the <strong>wheedler</strong>. Less objectionable than the incendiary approach,
+it is nonetheless similarly ineffective. Wheedlers are distinguished by
+peppering their posts liberally with declarations of their ineptitude and
+“noobness”, in the mistaken belief that this will engender a wave of sympathy
+prior to soothing hand-holding and spoon-feeding. There is a strong correlation
+between this behaviour and the various types of
+<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on the taxonomy of vampires">help vampirism</a>.</p>
+
+<p>Wheedling won&#8217;t lead to quicker, or more informed, advice and assistance; in
+all likelihood it will just discourage others from helping because
+they can see that rewarding this sort of behaviour has a longer-term
+deleterious impact on the health of the community.</p>
+
+<p>Then there is the <strong>Vulcan</strong>. A curiosity more than an annoyance, these
+people seem to inhabit some sort of adolescent fantasy land where the Internet
+is a venue for them to revel in their almost superhero-like powers of technical
+<em>awesomeness</em>; said powers manifesting to others as a sort of benign
+cluelessness.</p>
+
+<p>Their posts are invariably brief and completely devoid of relevant detail to the
+point of cryptic because, “hey, we all <em>know</em> what this issue is,” and are
+littered with smilies and that stupid emoticon with the sunglasses. Rather than
+actually describing their problem, they want people to think that, by a process
+of <a href="http://en.memory-alpha.org/wiki/Vulcan_mind_meld" title="There is a Star Trek wiki?">mind-melding</a>,
+other “hackers” will intuit the subtle depth and intricacy of the issue and
+then type out a detailed step-by-step guide of how to solve it.</p>
+
+<p>Finally, there is the <strong>conspiracist</strong>. These malcontents see every
+significant change in Arch as being part of a wider agenda to corrupt the purity
+of the UNIX® philosophy. They also tend to blame
+<a href="https://en.wikipedia.org/wiki/Lennart_Poettering" title="Lennarts wikipedia page">Lennart Poettering</a>
+for <em>everything</em>. These unfortunates are clearly already suffering such mental anguish
+trying to reconcile their obsessiveness about the past with a rolling
+release that they deserve our pity more than our contempt (but I am equally
+happy providing either)…</p>
+
+<p>As I said, these are fortunately just a subset and very much represent the
+minority of attitudes.  The vast majority tend to be aware that, at
+one time or another, <em>everyone</em> will need some help to solve a problem.
+Therefore it is best to approach it in a matter-of-fact way, using the practical
+guidance on asking questions on a technical forum, and with a degree of humility
+and a willingness to learn from the people who are prepared to share their
+knowledge and experience.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Where “carnage” should be understood as a minor PEBKAC epidemia…</li>
+<li>From shutting down mid-update (because a reboot fixes <em>everything</em>) to
+still using <code>consolekit</code>, <code>initscripts</code> and <code>grub-legacy</code>: all deprecated some time
+ago.</li>
+<li>I resisted linking to specific posts on the boards to provide actual examples,
+the more motivated among you will find them without difficulty.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image by
+<a href="http://www.flickr.com/photos/buddhist_fox/4795942625/">Buddhist Fox</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/25/greader/">Replacing Google Reader</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-25T09:10:00+12:00" pubdate data-updated="true">May 25<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/commafeed.png" title="'CommaFeed Logo'" >
+I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
+everyday since I first discovered the service over seven years ago. It is my
+primary source of news and information and the announcement that Google is, on July 1 this year,
+set to <a href="http://googlereader.blogspot.ca/2013/03/powering-down-google-reader.html" title="Official announcemet on Google Blog">shut down Reader</a>
+was something considerably more than just an inconvenience for me.</p>
+
+<p>Over the years, I had looked at other <acronym title="Rich Site Summary">RSS</acronym>
+readers but, for a variety of reasons, had invariably found that the speed,
+simplicity and flexibility that Google Reader offered meant that any dalliances
+were unsatisfactory and short-lived. I resigned myself to having to settle for
+an inferior alternative, rather than moving to a genuine replacement.</p>
+
+<p>On the recommendation of <a href="https://pinboard.in/" title="Not so-social bookmarking">@pinboard</a>,
+I first signed up for a premium account at
+<a href="https://www.newsblur.com/" title="NewsBlur website">NewsBlur</a>. It is open source and,
+given the recommendation from Maciej<sup>1</sup>, I was hopeful that it would
+bridge the gap. Newsblur is a good service (especially considering the rush of
+signups in the days after the Google announcement), but it has a couple of
+critical weaknesses for me: no search (yes, you read that correctly—there is <em>no
+way to search through your feeds</em>) and, less importantly but just as annoying,
+occasionally sluggish performance.</p>
+
+<p>After a couple of weeks using NewBlur I happily stumbled across
+<a href="https://www.commafeed.com/" title="CommaFeed homepage">CommaFeed</a>, a
+Reader clone that emulates the austere minimalism of Google Reader. Apart from
+the fact that it is open source, the other aspect that attracted me to it
+was the ability to run it on Red Hat&#8217;s Platform as a Service offering,
+<a href="http://www.openshift.com/" title="Red Hat PaaS">OpenShift</a>.</p>
+
+<p>The README on the <a href="https://github.com/Athou/commafeed" title="CommaFeed repo">Github repo</a>
+explains how to set it all up. Unfortunately, due to an
+<a href="https://github.com/Athou/commafeed/issues/91" title="OpenShift fails silently">open issue</a>,
+some manual intervention is required, but it is still a very
+straightforward and painless process to get your own instance of CommaFeed up
+and running.</p>
+
+<p>Creat an OpenShift account, log in and add the JBoss 6.0 application (or
+cartridge as it is called on OpenShift) and the MySQL cartridge. Once your setup
+is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
+under your <code>My Applications</code> tab, copy down your Git repo address, which will be
+of the form:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></div></figure>
+
+
+<p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
+server:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
+</span><span class='line'><span class="nb">cd </span>commafeed
+</span><span class='line'><span class="c"># add OpenShift as a repo</span>
+</span><span class='line'>git remote add openshift -f ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.etc…
+</span><span class='line'>git merge openshift/master -s recursive -X ours
+</span><span class='line'>git push openshift master
+</span></code></pre></div></figure>
+
+
+<p>This will then trigger a series of hooks that build the application and restart
+the server. If everything goes well you will see something like:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Total <span class="nb">time</span>: 3:18.195s
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Finished at: Mon May 20 03:21:37 EDT 2013
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Final Memory: 42M/185M
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: Running .openshift/action_hooks/build
+</span><span class='line'>remote: Running .openshift/action_hooks/deploy
+</span><span class='line'>remote: <span class="nv">hot_deploy_added</span><span class="o">=</span><span class="nb">false</span>
+</span><span class='line'>remote: MySQL already running
+</span><span class='line'>remote: Found 127.12.712.712:8080 listening port
+</span><span class='line'>remote: Done
+</span><span class='line'>remote: Running .openshift/action_hooks/post_deploy
+</span><span class='line'>To ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></div></figure>
+
+
+<p>You now have CommaFeed successfully running on OpenShift. After a couple of
+minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
+and you will be able to login to your CommaFeed instance. Updating your
+CommaFeed is as simple as pulling to your local repo, merging and
+then pushing to <code>openshift master</code>.</p>
+
+<p>Importing directly from Google Reader still seems broken (I was  getting
+errors from builds late this week), but if you import from an existing <code>.opml</code>
+or <code>.xml</code> file you will see CommaFeed in all it&#8217;s glory:</p>
+
+<p><img class="left" src="http://miromiro.com/Blog-images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
+
+<p>As you can see, it is remarkably similar to the Google Reader interface; a
+clean, minimalist design that is focussed—quite rightly—on the content. There
+is an option to load your own <code>.css</code> if you want to apply some additional
+styling, but for me the base style is just about perfect.</p>
+
+<p>More impressively, in the week or so that I have been using CommaFeed, the
+developer,
+<a href="https://github.com/Athou" title="Athou on Github">Athou</a>, has been committing
+enhancements and bug fixes several times <em>a day</em>; almost every night,
+I have pushed changes to OpenShift, reloaded my browser and found a
+smoother, enhanced feed reader with additional functionality; it is
+literally growing in leaps and bounds, and is a great reminder of the power
+of open source<sup>2</sup>.</p>
+
+<p>The performance of OpenShift has also been solid; feeds are delivered
+seemingly instantaneously and, apart from the slight lag after restarting
+the application, I haven&#8217;t experienced any issues whatsoever in terms
+of availability.</p>
+
+<p>There are still a couple of areas where CommaFeed can be improved. Most
+notably, there is an open feature request for a
+<a href="https://github.com/Athou/commafeed/issues/54" title="Github Issue">mobile friendly CSS</a>
+and this is badly needed, the site is pretty much unusable on my phone. With
+any luck, some enterprising Android developer will build a CommaFeed app (for
+which I would happily pay good money)…</p>
+
+<p>In any event, if you are looking for a Google Reader replacement, try
+running CommaFeed (either on your own server or one of Red Hat&#8217;s); for
+a project that is only a couple of months old, it has covered a
+tremendous amount of ground and will undoubtedly continue to grow
+and improve.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In conjunction with his great advice about not being a
+<a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/" title="Pinboard blog">free user</a>.</li>
+<li>The <a href="http://feeds-jwr.rhcloud.com/#/feeds/help" title="About and Help page">about page</a>
+has a donate button: if you want to support an application which I have no doubt
+will soon be even better than Google Reader, you might want to use it.</li>
+</ol>
+
 </div>
   
   
@@ -391,23 +529,23 @@ do this thing well; Drew Neil&#8217;s excellent
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -494,7 +632,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

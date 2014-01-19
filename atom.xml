@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.github.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.github.com/"/>
-  <updated>2013-06-26T13:59:38+12:00</updated>
+  <updated>2014-01-20T10:48:55+13:00</updated>
   <id>http://jasonwryan.github.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -14,11 +14,1063 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Scripting with udev]]></title>
+    <link href="http://jasonwryan.github.com/blog/2014/01/20/udev/"/>
+    <updated>2014-01-20T10:02:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2014/01/20/udev</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/usb.jpg" title="Creative Commons image" >
+One of the most satisfying aspects of running free and open source software is
+the ability to be able to continually tinker with your setup, limited only by
+your imagination and ability.  The more you do tinker, the smaller the gap
+between the former and the latter, as each small project inevitably leads you
+into a deeper understanding of various aspects of your system<sup>1</sup> and
+how you can customize that system to suit your exact requirements.</p>
+
+<p>Over the last couple of days, I have been playing with
+<a href="http://en.wikipedia.org/wiki/Udev" title="Wikipedia page">udev</a>, the kernel device
+manager, as I was attempting to run a script once a specific
+<acronym title="Universal Serial Bus">USB</acronym> drive was plugged in. It
+turns out, as is so often the case, that udev is only <em>part</em> of the
+picture…</p>
+
+<p>As both my work and personal laptops have relatively small
+<acronym title="Solid State Drives">SSDs</acronym>, I carry around
+<a href="http://alpha.libre.fm/user/jasonwryan/" title="Libre.fm profile">my music</a>
+on a 1TB external drive. As the drive only contains <span class="file">.flac</span>
+files, I wanted to autmate the process of <code>rsync</code>’ing music from my desktop to
+the drive and, for the laptops, repopulating the symlinks to
+<span class="file">~/Music/</span> when the drive was plugged in.</p>
+
+<p>My first thought was a rule in <span class="file">/etc/udev/rules.d/</span>,
+using <code>RUN+=</code>. There are any number of blog posts espousing this approach and,
+as I quickly discovered, they are <em>all</em> wrong. The problem with using this key is
+that, as the <code>man</code> page makes clear, it is not designed for long running
+programs:</p>
+
+<blockquote><p>This can only be used for very short-running foreground tasks. Running an event process for a long period of time may block all further events for this or a dependent device.</p><p>Starting daemons or other long running processes is not appropriate for udev; the forked processes, detached or not, will be unconditionally killed after the event handling has finished.</p><footer><strong>udev manual</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/udev.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
+
+
+<p>The problem, as it manifest for me, was the drive would be blocked from
+mounting until <em>after</em> the script had run, meaning <code>rsync</code> or my symlinks would
+have no target.  There are various “workarounds” on the web for this, including
+using <em>two</em> scripts, one to trigger the other<sup>2</sup>. Even for me, this
+seemed like a
+<a href="http://en.wikipedia.org/wiki/Pyrrhic_victory" title="Wikipedia entry">Pyrrhic victory</a>.</p>
+
+<p>The correct way to do this, as I found once I uncovered
+<a href="https://bbs.archlinux.org/viewtopic.php?id=149419" title="Arch BBS">this thread</a>
+on the Arch boards where WonderWoofy and 65kid helpfully pieced it together, is
+to use <code>SYSTEMD_WANTS</code>.  As it is described in the manual:</p>
+
+<blockquote><p>THE UDEV DATABASE<br/>  The settings of device units may either be configured via unit files, or directly from the udev database (which is recommended). The following udev properties are understood by systemd:</p><p>  SYSTEMD_WANTS=<br/>  Adds dependencies of type Wants from this unit to all listed units. This may be used to activate arbitrary units, when a specific device becomes available. Note that this and the other tags are not taken into account unless the device is tagged with the &#8220;systemd&#8221; string in the udev database, because otherwise the device is not exposed as systemd unit.</p><footer><strong>man systemd.device</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/systemd.device.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
+
+
+<p>So, I edited <span class="file">/etc/udev/rules.d/90-usb-music.rules</span> to
+remove the <code>RUN+=</code> key, using a systemd service file instead, like so<sup>3</sup>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SUBSYSTEMS</span><span class="o">==</span><span class="s2">&quot;usb&quot;</span>, ATTRS<span class="o">{</span>idProduct<span class="o">}==</span><span class="s2">&quot;1905&quot;</span>, <span class="nv">ACTION</span><span class="o">==</span><span class="s2">&quot;add&quot;</span>, ENV<span class="o">{</span>SYSTEMD_WANTS<span class="o">}==</span><span class="s2">&quot;upmusic.service&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>And then wrote the corresponding service file to have systemd hand off to the bash script:</p>
+
+<figure class='code'><figcaption><span>/usr/lib/systemd/system/upmusic.service </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>Unit<span class="o">]</span>
+</span><span class='line'><span class="nv">Description</span><span class="o">=</span>Update music links from Apollo
+</span><span class='line'><span class="nv">Requires</span><span class="o">=</span>media-Apollo.mount
+</span><span class='line'><span class="nv">After</span><span class="o">=</span>media-Apollo.mount
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>Service<span class="o">]</span>
+</span><span class='line'><span class="nv">ExecStart</span><span class="o">=</span>/home/jason/Scripts/upmusic
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>Install<span class="o">]</span>
+</span><span class='line'><span class="nv">WantedBy</span><span class="o">=</span>media-Apollo.mount
+</span></code></pre></div></figure>
+
+
+<p>As I mentioned in my post on my
+<a href="http://jasonwryan.com/blog/2013/10/28/dismount/" title="Unmount USB drives…">simple unmounting script</a>,
+I use a naming convention for all my USB drives. In this case, my music is stored on Apollo, and
+it is automounted with
+<a href="https://wiki.archlinux.org/index.php/Udiskie" title="Arch wiki page">udiskie</a>. In the
+service file, systemd uses a hyphen instead of a forward slash, so the correct
+designation is <code>media-Apollo.mount</code>.</p>
+
+<p>Then it is just a matter of enabling the service with <code>systemctl enable upmusic</code> and,
+whenever Apollo is plugged in to either my desktop of laptop, the appropriate
+script will run and either update the files on Apollo or the symlinks on one of the
+laptops.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>This shouldn&#8217;t be taken as any sort of claim of expertise or deep
+understanding of this, or any other, part of my system. See below.</li>
+<li>Which is why you should never trust anything written by bloggers…</li>
+<li>The definitive reference for udev rules remains
+<a href="http://www.reactivated.net/writing_udev_rules.html" title="Daniel Drake's page">Writing udev rules</a></li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/jacobgarcia/2550146/" title="Licensed CC by Jacob Garcia">Jacob Garcia</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Ad Blocking with Hostsblock]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/12/28/hostsblock/"/>
+    <updated>2013-12-28T10:09:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/12/28/hostsblock</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/ad_free.png" title="Flickr CC Image" >
+The relentless commercialization of traditional holidays, not just the December
+variety but all of them now, means that what was ostensibly an occasion for
+celebrating your particular flavour of $deity, pagan ritual or just an
+opportunity to reconnect with your wider family, has been co-opted to the
+worship of the most pernicious of all cults, consumerism.</p>
+
+<p>Concomitant with this is the increasing corporatisation of the Internet; the
+deliberate and seemingly ineluctable effort by a relatively small number of
+global interests to turn most of the Internet into something more like cable
+television. As someone who has not lived with a television for decades
+precisely because I don&#8217;t want to live in a
+<a href="http://en.wikipedia.org/wiki/Operant_conditioning_chamber" title="Wikipedia page">Skinner box</a>
+that is solely designed to condition me to compliantly purchase more product,
+I find this rankly offensive (in the sense of morally repugnant as well as a
+coordinated and remorseless assault).</p>
+
+<p>With the escalation of both the level and nauseating intensity of advertising
+around the “holiday season” and the almost hysterical exhortations to purchase
+more happiness, I decided that the one thing that I would be really thankful for
+this Christmas was better ad blocking.</p>
+
+<p>I had been using
+<a href="https://wiki.archlinux.org/index.php/Privoxy" title="Arch wiki entry">Privoxy</a> and an
+<acronym title="Arch User Repository">AUR</acronym> script,
+<a href="https://aur.archlinux.org/packages/blocklist-to-privoxy/?ID=63431" title="AUR page">blocklist-to-privoxy</a>
+but I was still experiencing a lot of ads sneaking through (particularly local
+ones) and some unintended side effects of using Privoxy for this job, so I
+decide to give Jake VanderKolk&#8217;s
+<a href="http://gaenserich.github.io/hostsblock/" title="Homepage for Hostsblock">Hostsblock</a>
+a shot.</p>
+
+<p>I went with the basic, entry level setup:
+<a href="https://aur.archlinux.org/packages/kwakd/" title="AUR page">kwakd</a> for serving blank
+<acronym title="HyperText Markup Language">HTML</acronym> in place of ads and
+<a href="https://aur.archlinux.org/packages.php?ID=58976" title="AUR package">hostsblock</a> to
+write to my <span class="file">/etc/hosts</span>. I didn&#8217;t see the need for
+<a href="https://wiki.archlinux.org/index.php/Dnsmasq" title="Arch Wiki page">dnsmasq</a> and,
+after a week or so or using it haven&#8217;t seen the need to revisit that decision.</p>
+
+<p>Suffice to say, it is working brilliantly. Where once web pages were festooned
+with garish advertisements promising me ripped abdominals, tropical holidays and the
+lasting serenity that only Apple products can really truly deliver, I now have
+<a href="http://miromiro.com/Blog-images/herald.png" title="Screenshot of the local rag…">glorious whitespace</a></p>
+
+<p>There are a couple of other factors to consider with Hostsblock. There is a very
+simple command line interface for managing black and white listing of websites,
+and the various “content distribution networks” that infest most commercial
+sites like fleas. You can easily allow advertisements on or from sites and
+organizations that you want to support, while forever muting the inane drivel
+from the likes of Failbook <em>et al</em>.</p>
+
+<p>Installation and setup are very straightforward, with simple instructions on the
+<a href="http://gaenserich.github.io/hostsblock/" title="Two or three steps, max…">Hostsblock site</a>.
+There is also an active thread on the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=139784" title="Arch forum thread">Arch boards</a>
+where Jake and a couple of others are extremely helpful.</p>
+
+<p>If you are feeling listless, run-down and lacking in energy, why not try
+Hostsblock? It will make your web pages brighter, speed up your page loads,
+protect your privacy and make you insanely popular. Try Hostsblock today!</p>
+
+<h4>Notes</h4>
+
+<p>ad free, a Creative Commons image by
+<a href="http://www.flickr.com/photos/louisa_catlover/2875951548/">Louisa Billeter on Flickr</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[BitTorrent Sync's API]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/11/14/api/"/>
+    <updated>2013-11-14T09:51:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/11/14/api</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/sync.png" title="Bittorrent logo" >
+I have
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on the Alpha release">written previously</a>
+about
+<a href="http://www.bittorrent.com/sync" title="Sync webpage">BitTorrent Sync</a>, the encrypted
+file syncing application that uses the bittorrent protocol to sync your data
+over your <acronym title="Local Area Network">LAN</acronym>, or over the Internet,
+using <a href="https://en.wikipedia.org/wiki/Peer_to_peer" title="Wikipedia page">P2P technology</a>.
+I have been using it since early this year as a replacement for
+dropbox.<sup>1</sup></p>
+
+<p>At the beginning of this month, BitTorrent unveiled the
+<a href="http://blog.bittorrent.com/2013/11/05/bittorrent-sync-beta-api-now-available-to-developers/" title="Sync blog announcement">Beta API</a>
+for developers (meaning you have to tell them what you plan to do in order to
+be issued a key). After some equivocation, I signed up with the rather flimsy
+excuse of “writing a shell wrapper for the command line” and found, to my
+chagrin, a key in my inbox the next morning.</p>
+
+<p>This proved to be something of an unwelcome arrival. In theory, I was excited
+about having access to a tool to query the Sync application. One of the nodes is
+on my
+<a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on setting up a torrent box">headless Raspberry Pi</a>
+and the idea of being able to issue a command from my laptop to ascertain what
+was going on in the Pi&#8217;s synced folders was (and is) a tremendously attractive
+one.</p>
+
+<p>However, now that I was in
+possession of the key, I felt morally obliged to do something with it. The
+problem with this realization was that I had no idea how to work with an
+<acronym title="Application Program Interface">API</acronym>, let alone writing
+a script to accomplish my purported goal.</p>
+
+<p>After spending some time looking at
+<a href="http://www.bittorrent.com/sync/developers/api" title="Such as it is…">the documentation</a>,
+and buoyed by the optimism of ignorance, I decided to make good on my promise.
+My first attempt sort of worked, but was hampered as much by a serious
+conceptual flaw as it was by poor implementation. I decided, in spite of any number
+of Stack Overflow posts warning expressly not to do this, to use <code>awk</code> to parse
+the <a href="http://www.json.org/" title="JSON homepage">JSON data</a><sup>2</sup>. This was what I would
+euphemistically describe as a “learning opportunity.” The result is preserved
+for posterity in my <a href="https://bitbucket.org/jasonwryan/shiv/commits/16c9dee17f097e83fb325e303d867e6fda488992?at=default" title="Bit of a trainwreck, but you have to start somewhere…">bitbucket repo</a>
+(for the completists)…</p>
+
+<p>At this point, I was fortunate that Earnestly in #archlinux introduced me to
+keenerd&#8217;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
+And by “introduced” I mean generously (and patiently) talked me through how it
+worked and how I could use it with the Sync API to achieve what I was after.
+After a while playing with it, there was the—inevitably belated—moment of
+realization: this thing is genius! It allows you to intelligently
+<em>interrogate</em> the data. Not blindly chopping at it with an increasingly complex
+series of actions in <code>awk</code><sup>3</sup>; but quite directly traversing the structure and
+extracting the desired elements.</p>
+
+<p>Now I was <em>cooking</em>. Well, more to the point, I was flailing about in a smoke
+filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
+asphyxiation. Once again, Earnestly&#8217;s patience and bash skills were put to good effect.
+The resulting script,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/syncstat" title="In bitbucket">syncstat</a>,
+is undeniably a triumph of his good ideas over my own poor execution. In other
+words, the fact that it works so well is testament to his ability, but any and
+all faults are mine alone<sup>4</sup>.</p>
+
+<p>And it does work. It only requires
+<a href="https://www.archlinux.org/packages/?sort=&amp;q=jshon" title="Arch package db">Jshon</a>
+(which you will already have installed because you use
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="My post on this great utility">aurphan, right?</a>)
+and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
+</span><span class='line'>directory2 H0p3fu11yY0uG3tTh31d3@
+</span></code></pre></div></figure>
+
+
+<p>The functionality in the script is limited at this stage to just querying the
+application; I wasn&#8217;t interested in pushing changes at this point. So you can
+access the version of the currently installed Syncapp, upload and download
+speeds, the size of synced folders and list all of their contents.</p>
+
+<p>It is a beta release, so the odd bug is to be expected. Overall, though, the API is
+a welcome addition to what is a great application. If you have an API key, add
+it to your <span class="file">sync.conf</span>,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/syncstat" title="On bitbucket">grab the script</a>
+and give it a whirl. Undoubtedly, over the coming weeks more polished versions
+will emerge in “proper” languages, but for the time being this does exactly what
+I need.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Yes, I would much prefer to use an open source tool to accomplish the same
+thing but I haven&#8217;t found anything comparable that is this good to date…</li>
+<li>In what I imagine is a complete coincidence, the JSON logo is uncannily
+similar to the initial (and much better, I thought) Sync logo, as seen on
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/">my original post</a>.</li>
+<li>This is not intended as a slight on <code>awk</code>; which I am undoubtedly
+<a href="http://jasonwryan.com/blog/2013/09/15/awking/">fond of</a>, but rather the
+limits of my ability with that language.</li>
+<li>I am also indebted to Scott (firecat53) for testing and providing helpful
+feedback on the early versions of the script.</li>
+<li>It is worth noting that in the <code>$json</code> variable, I pass <code>curl</code> the -<code>n</code> option,
+which means it reads my credentials from <span class="file">$HOME/.netrc</span>.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Simple Unmounting]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/10/28/dismount/"/>
+    <updated>2013-10-28T15:29:00+13:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/10/28/dismount</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/dismount.jpg" title="Creative Commons image" >
+For those people that prefer to forego the full blown
+<acronym title="Desktop Environment">DE</acronym> and—instead of all the
+“convenience” that this sort of setup offers—piece together their setup from a
+variety of different tools and knit it all together with some scripting,
+automounting external drives is, notwithstanding the inexplicable number of
+posts to the forums to the contrary, incredibly straightforward with
+<a href="https://wiki.archlinux.org/index.php/Udev#Udisks" title="Arch Wiki page on Udev">udisks</a>.
+My approach in this respect is to use
+<a href="https://wiki.archlinux.org/index.php/Udiskie" title="Wiki page">udiskie</a>; it is
+lightweight, unobtrusive, configurable and foolproof, as far as I can tell.</p>
+
+<p>Where I have found a small gap, or more a minor irritation really, is with
+unmounting devices. <code>udiskie-umount /media/MY_USB_DRIVE</code> works just fine, but
+I often have a variety of media mounted, and not just standard
+<acronym title="Universal Serial Bus">USB</acronym> drives. At work, for
+example, it is not uncommon for me to have mounted under
+<span class="file">/media</span> any or all of the following:</p>
+
+<ul>
+<li>A USB drive containing all of my music</li>
+<li>An encrypted volume mounted with
+<a href="http://jasonwryan.com/blog/2013/01/10/truecrypt/" title="My post on replacing TrueCrypt">tcplay</a>
+shared via <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Another postof mine…">Bittorrent Sync</a></li>
+<li>A <acronym title="Common Internet File System">CIFS</acronym> share</li>
+<li>An <acronym title="Network File System">NFS</acronym> share or an
+<acronym title="SSH Filesystem">SSHFS</acronym> mount.</li>
+</ul>
+
+
+<p>In a couple of these cases, I don&#8217;t want to—or can&#8217;t—just <code>umount</code> them with
+<code>udiskie</code>; they require a different approach. To facilitate this, I have adopted
+a simple approach: I use a standard naming convention for all external media
+or their mountpoints. When I first buy a USB drive, I give it a meaningful name,
+beginning with an uppercase letter, as this won&#8217;t clash with any of my internal
+drives and it happily accommodates drives from other operating systems. So:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo dosfslabel /dev/sdc1 EightBall
+</span></code></pre></div></figure>
+
+
+<p>sets up a new 8GB drive I found in the schwag bag at the conference I attended
+last week.</p>
+
+<p>Now that all external media are predictably named, it is just a matter of
+writing a script that checks how many are mounted, presents a menu if there is
+more than one, and unmounts the respective device correctly:</p>
+
+<figure class='code'><figcaption><span>dismount </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># unmount USB drives</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">target</span><span class="o">=(</span> <span class="k">$(</span>awk <span class="s1">&#39;/media\/[\^A-Z]/ {print $3}&#39;</span> &lt;<span class="o">(</span>mount<span class="k">)</span><span class="o">)</span> <span class="o">)</span>
+</span><span class='line'><span class="nv">shares</span><span class="o">=(</span>Scout Sentinel<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>checkbusy<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  grep <span class="s2">&quot;PID&quot;</span> &lt;<span class="o">(</span>lsof +d <span class="s2">&quot;$target&quot;</span> &amp;&gt;/dev/null<span class="o">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${target##*/} busy…&quot;</span>
+</span><span class='line'>    <span class="nb">exit </span>1
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>exstatus<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${target##*/} unmounted…&quot;</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Failed to unmount.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># check for multiple devices</span>
+</span><span class='line'><span class="k">if</span> <span class="o">((</span> <span class="s2">&quot;${#target[@]}&quot;</span> &gt; 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">PS3</span><span class="o">=</span><span class="s2">&quot;Select your device to unmount: &quot;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;There are ${#target[@]} devices mounted&quot;</span>
+</span><span class='line'>  <span class="k">select </span>dev in <span class="s2">&quot;${target[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="nv">target</span><span class="o">=</span><span class="s2">&quot;$dev&quot;</span>
+</span><span class='line'>    <span class="nb">break</span>
+</span><span class='line'><span class="nb">  </span><span class="k">done</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># check for share</span>
+</span><span class='line'><span class="k">for </span>drive in <span class="s2">&quot;${shares[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">  if</span> <span class="o">[[</span> <span class="s2">&quot;$drive&quot;</span> <span class="o">=</span>~ <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nv">share</span><span class="o">=</span><span class="s2">&quot;$drive&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># options per filesystem</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -n <span class="s2">&quot;$target&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  for </span>drive in <span class="s2">&quot;${shares[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">    if</span> <span class="o">[[</span> <span class="s2">&quot;$drive&quot;</span> <span class="o">=</span> <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">&amp;&amp;</span> <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">=</span> Safebox <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cmd</span><span class="o">=</span><span class="k">$(</span>sudo safebox close<span class="k">)</span>
+</span><span class='line'>    <span class="k">elif</span> <span class="o">[[</span> <span class="s2">&quot;$drive&quot;</span> <span class="o">=</span> <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cmd</span><span class="o">=</span><span class="k">$(</span>sudo umount <span class="s2">&quot;$target&quot;</span><span class="k">)</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cmd</span><span class="o">=</span><span class="k">$(</span>udiskie-umount -d <span class="s2">&quot;$target&quot;</span> &amp;&gt;/dev/null<span class="k">)</span>
+</span><span class='line'>    <span class="k">fi</span>
+</span><span class='line'><span class="k">  done</span>
+</span><span class='line'><span class="c"># do it</span>
+</span><span class='line'>checkbusy
+</span><span class='line'><span class="nv">$cmd</span>
+</span><span class='line'>exstatus
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;No drive mounted!&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># vim:set ts=2 sts=2 sw=2 et:</span>
+</span></code></pre></div></figure>
+
+
+<p>Now, no matter the number or type of devices I currently have mounted, I can
+unmount them by typing <code>dismount</code> and choosing the appropriate drive via the
+<code>select</code> menu. Simple, but satisfying. The script is in my
+<a href="https://bitbucket.org/jasonwryan/centurion/src/tip/Scripts/dismount%20'Grab%20it!">bitbucket repo</a></p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, Dismount, by
+<a href="http://www.flickr.com/photos/chrisinplymouth/3659964278/">Chris</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Managing modules with Awk]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/09/15/awking/"/>
+    <updated>2013-09-15T09:23:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/09/15/awking</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/awk.jpg" title="The Great Auk" >
+This is an addendum to my two previous posts on
+<a href="http://jasonwryan.com/blog/2013/08/03/kernels/" title="The first post">compiling kernels</a>
+and <a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="The folow up">automating the process</a>.
+In the first of those posts I wrote about a wonderful tool to track the modules
+necessary for building a custom kernel with <code>make localmodconfig</code>, graysky&#8217;s
+<a href="https://github.com/graysky2/modprobed_db" title="Github repo">modprobed_db</a>. A simple
+bash script, <code>modprobed_db</code> allows you to build up an array of modules and—as
+the name suggests—<code>modprobe</code> all of them prior to compilation.</p>
+
+<p>I forked it on github and started to play around with the script (mostly because
+I am slightly <acronym title="Obsessive Compulsive Disorder">OCD</acronym> about
+constructions
+<a href="https://github.com/graysky2/modprobed_db/blob/master/common/modprobed_db#L62" title="awk pipeline">like this</a>:</p>
+
+<figure class='code'><figcaption><span>modprobed_db lines 62-63 </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/modules | awk <span class="s1">&#39;{print $1}&#39;</span> | sort -k 1,1 | <span class="se">\</span>
+</span><span class='line'>  grep -Ev <span class="s2">&quot;$(echo ${IGNORE[*]} | sed -e &#39;s/^/^(/&#39; -e &#39;s/ /|/g&#39; -e &#39;s/$/)$/&#39;)&quot;</span> <span class="se">\</span>
+</span><span class='line'>  &gt;/tmp/.inmem
+</span></code></pre></div></figure>
+
+
+<p><a href="https://github.com/jasonwryan/modprobed_db/blob/jwr/common/modprobed_db" title="My branch">After hacking a while</a>,
+I started to realize that the venerable UNIX programme
+<a href="http://www.gnu.org/software/gawk/manual/" title="gawk manual on GNU site">Awk</a>
+ would, in many ways, be a better tool for this job. Essentially, we want to
+ manage three lists: the modules in <span class="file">/proc/modules</span>, a
+ list of modules to ignore, and the master list of all modules required prior to
+ compilation. This seems perfectly suited to Awk.</p>
+
+<p> So, in the interests of learning Awk, I decided to rewrite the required
+ functionality (or, more correctly, the subset that I required) in this
+ language. This wasn&#8217;t a straightforward task for me. I got stuck a couple of
+ times and, as I work in a building full of
+ <a href="http://catalyst.net.nz" title="Catalyst website">neckbeards</a>, I thought I could ask
+ for a couple of pointers. To my surprise, no-one I asked seemed interested in
+ Awk. Typical responses were along the lines of “just use Perl.”</p>
+
+<p> Aside from not knowing any
+ <a href="http://www.perl.org/" title="Perl homepage">Perl</a>, and being unlikely to learn any
+ in the immediate future, I was bemused by the notion that none of these skilled
+ developers rated Awk as a language worth knowing. One of the #awk FAQ&#8217;s
+ specifically addresses this:
+ <a href="http://awk.freeshell.org/Frequently_Asked_Questions#toc14" title="#awk FAQs">Why would anyone still use awk instead of perl?</a>
+ The quote by Tom Christiansen is worth repeating here:</p>
+
+<p> <blockquote><p>Awk is a venerable, powerful, elegant, and simple tool that everyone should know. Perl is a superset and child of awk, but has much more power that comes at expense of sacrificing some of that simplicity.</p></blockquote></p>
+
+<p>In a happy coincidence, this
+<a href="http://unix.stackexchange.com/questions/90489/compare-two-files-with-first-column-and-remove-duplicate-row-from-2nd-file-in-sh/90490#90490" title="Comparing two files">question on Unix &amp; Linux SE</a>
+showed up just as I was completing my script and it neatly illustrates (to my
+unututored eye, anyway) an example of a typical situation where Awk&#8217;s strengths
+make it a better approach than Perl.</p>
+
+<p>In any event, my rewriting of <code>modprobed_db</code> in Awk<sup>1</sup> resulted in this:</p>
+
+<figure class='code'><figcaption><span>awkmodules </span></figcaption>
+ <div class="highlight"><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
+</span><span class='line'><span class="c1"># script to manage modules for kernel builds</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">BEGIN</span> <span class="p">{</span> <span class="nx">dbfile</span> <span class="o">=</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">red</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">printf</span> <span class="s2">&quot;\033[1;31m&quot;</span> <span class="nx">s</span> <span class="s2">&quot;\033[0m &quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># read in the array</span>
+</span><span class='line'><span class="nb">FILENAME</span> <span class="o">!=</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">modlist</span><span class="p">[</span><span class="o">$</span><span class="mi">1</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="kr">next</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># check for ignored modules</span>
+</span><span class='line'><span class="o">!</span><span class="nx">modlist</span><span class="p">[</span><span class="o">$</span><span class="mi">1</span><span class="p">]</span><span class="o">++</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span> <span class="o">&gt;&gt;</span> <span class="nx">dbfile</span>
+</span><span class='line'>  <span class="kr">close</span><span class="p">(</span><span class="nx">dbfile</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="c1"># modprobe modules</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nx">p</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">modload</span><span class="o">=</span><span class="s2">&quot;sudo modprobe -a $(&lt;&quot;</span><span class="nx">dbfile</span><span class="s2">&quot;)&quot;</span>
+</span><span class='line'>  <span class="kr">system</span><span class="p">(</span><span class="nx">modload</span><span class="p">)</span>
+</span><span class='line'>  <span class="kr">close</span><span class="p">(</span><span class="nx">modload</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="c1"># update module count</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span> <span class="kr">getline</span> <span class="o">&lt;</span> <span class="nx">dbfile</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">count</span><span class="o">++</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">END</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">print</span> <span class="nx">red</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="s2">&quot;modules listed.&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># vim:set ts=2 sts=2 sw=2 et:</span>
+</span></code></pre></div></figure>
+
+
+<p>Just prior to compiling a kernel, I can invoke this script with (the admittedly
+rather ungainly line):</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>awkmodules <span class="nv">p</span><span class="o">=</span>1 .config/kmod_db/ignored .config/kmod_db/modules_db /proc/modules
+</span></code></pre></div></figure>
+
+
+<p>It does work, but I don&#8217;t claim that it is either idiomatic or attractive. The
+use of <code>getline</code> to update the module count strikes me as especially kludgy but
+I haven&#8217;t been able to think of a more correct way to handle it.</p>
+
+<p>Incidentally, the gawk manual<sup>2</sup>,
+<a href="http://www.gnu.org/software/gawk/manual/" title="GNU goodness">Gawk: Effective AWK Programming</a>
+has only just been updated<sup>3</sup> so Awk is, unlike it&#8217;s homonym, clearly
+alive and well.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In my <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/awkmodules">bitbucket repo</a>.</li>
+<li>The number of variants of <code>awk</code> is as much a delight as it is perplexing…</li>
+<li>May, 2013</li>
+</ol>
+
+
+<p>Public Domain image of the Great Auk by John James Audubon, from his book
+<a href="https://en.wikipedia.org/wiki/File:PinguinusImpennus.jpg">The Birds of America</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Automating Kernel Builds]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/08/24/automating-kernels/"/>
+    <updated>2013-08-24T10:30:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/08/24/automating-kernels</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/robot.jpg" title="I Robot" >
+I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/blog/2013/08/03/kernels/" title="Check it if you haven't...">compiling a custom kernel</a>
+using <a href="https://github.com/graysky2/modprobed_db" title="graysky's github repo">modprobed_db</a>
+and at the time I talked about automating the process, essentially so that every
+kernel update, be it the standard Arch kernel or the stripped down custom one,
+would be a simple, streamlined process. I updated that post with
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr/PKGBUILD" title="bitbucket repo">a PKGBUILD</a>,
+which was the first step. This completes that process.</p>
+
+<p>There is not a lot to it. A
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/new_kernel" title="bitbucket repo">short bash wrapper</a>
+that sets up the required files, updates the aforementioned PKGBUILD and then
+triggers <code>makepkg</code> (providing nothing else fails). All it requires is that you
+have
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr%20'You%20guessed%20it%E2%80%A6">the necessary files</a>
+in a separate directory for the script to reference and
+you are set. If anything does go wrong with the new kernel, you still have the
+previous working custom kernel <code>.tar.xz</code> you can reinstall, or you can of course
+just boot into the vanilla Arch kernel.</p>
+
+<figure class='code'><figcaption><span>new_kernel </span></figcaption>
+ <div class="highlight"><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># install new kernel</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">vers</span><span class="o">=</span><span class="nv">$1</span>
+</span><span class='line'><span class="nv">cyn</span><span class="o">=</span><span class="s1">$&#39;\e[1;36m&#39;</span>
+</span><span class='line'><span class="nv">ylw</span><span class="o">=</span><span class="s1">$&#39;\e[1;33m&#39;</span>
+</span><span class='line'><span class="nv">red</span><span class="o">=</span><span class="s1">$&#39;\e[1;31m&#39;</span>
+</span><span class='line'><span class="nv">end</span><span class="o">=</span><span class="s1">$&#39;\e[0m&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$# </span>!<span class="o">=</span> 1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Usage: &quot;</span><span class="k">${</span><span class="nv">0</span><span class="p">##*/</span><span class="k">}</span><span class="s2">&quot; 3.10.8&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># back up last dir</span>
+</span><span class='line'><span class="nb">cd</span> ~/Build
+</span><span class='line'>rm -rf linux-jwr/<span class="o">{</span>pkg,src<span class="o">}</span>
+</span><span class='line'>mv linux-jwr linux-<span class="k">${</span><span class="nv">vers</span><span class="p">%.*</span><span class="k">}</span>.<span class="k">$((${</span><span class="nv">vers</span><span class="p">##*.</span><span class="k">}</span> <span class="o">-</span> <span class="m">1</span><span class="k">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># set up clean files</span>
+</span><span class='line'>cp -r kernel_files linux-jwr <span class="o">&amp;&amp;</span> <span class="nb">cd</span> <span class="s2">&quot;$_&quot;</span>
+</span><span class='line'>
+</span><span class='line'>sed -i <span class="s2">&quot;s:pkgver=[0-9].*:pkgver=${vers}:&quot;</span> PKGBUILD
+</span><span class='line'><span class="nv">newvers</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="o">=</span> <span class="s1">&#39;/pkgver=/ {print $2}&#39;</span> PKGBUILD<span class="k">)</span>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Package version updated to ${ylw}$newvers${end}&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${cyn}Updating checksums…${end}&quot;</span>
+</span><span class='line'>/usr/bin/updpkgsums
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${cyn}Starting build…${end}&quot;</span>
+</span><span class='line'>  /usr/bin/time /usr/bin/makepkg -i
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${red}Checksum failed${end}&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'><span class="nb">cd</span>
+</span></code></pre></div></figure>
+
+
+<p>That&#8217;s all there is to it. I see in my RSS reader that a new stable kernel is
+available, open a terminal and run the script specifying which version to use,
+for example, <code>new_kernel 3.10.9</code>.  Approximately 10 minutes later, my new kernel
+is compiled and installed and I can reboot into it. Simple.</p>
+
+<p>Undoubtedly, there is probably a cleaner way to do this, but it has worked well
+for the last couple of kernels. It will probably also require tweaking for the
+next series, but until that time, I am quite happy with it.</p>
+
+<h4>Notes</h4>
+
+<p>Flickr creative commons image
+<a href="http://www.flickr.com/photos/fringley/4244586360/">My robot</a> by fringley.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Terminal Conditions]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/08/17/terminal/"/>
+    <updated>2013-08-17T10:03:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/08/17/terminal</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/terminal.png" title="The Command Line" >
+One of the almost inevitable consequences of using Arch Linux for any length of
+time is that you will find yourself, if you weren&#8217;t already, sucked into the
+gravitational vortex of the command line. The drive to continually understand,
+refine and customize your setup, your workflow and the tools you use on a daily
+basis will surely lead you to the point where you go from having one of those
+dinky terminal emulators that scrolls down when you hit <kbd>F12</kbd>, to waking
+up one day after yet another sleepless night trying to get your head around
+<a href="https://en.wikipedia.org/wiki/C_%28programming_language%29" title="Wikipedia entry">C</a> or
+<a href="http://www.haskell.org/haskellwiki/Haskell" title="Haskell wiki">Haskell</a>—so that
+you can hack your tiling window manager to manage the dozen or so terminals
+you constantly have open to your increasingly exacting specifications…</p>
+
+<p>Once you resign yourself to this inevitability, it is a natural progression to
+invest some time in setting up your terminal so that it is a pleasant, productive
+environment. The first step is to choose your terminal emulator. After playing
+with a few, I have settled on
+<a href="http://software.schmorp.de/pkg/rxvt-unicode.html" title="Urxvt website">rxvt-unicode</a>.
+Urxvt has a number of nice features, principally the ability to run in daemon
+mode and, when combined with Bert Münnich&#8217;s
+<a href="https://github.com/muennich/urxvt-perls/" title="Frickin genius…">urxvt-perls</a> extension,
+to be able to interact with text and <acronym title="Unique Resources Locators">URLs</acronym>
+with the keyboard.</p>
+
+<p>I have also, over the last two or three months, been intermittently using
+<a href="https://github.com/thestinger/termite" title="Github repo">termite</a>; the VTE-based
+terminal developed by
+<a href="https://github.com/thestinger" title="Github repos">Daniel Micay</a> and
+<a href="https://github.com/vodik" title="Simon's Github repos">Simon Gomizelj</a>.</p>
+
+<p>The next step is to select a colour scheme that, after long hours of peering at
+the screen, won&#8217;t leave you with the eyesight of a mediæval monk. I have settled
+on a dark scheme that is relatively low contrast, so works well in natural and
+artificial light.<sup>1</sup> Combine this with a
+<a href="https://bitbucket.org/jasonwryan/centurion/src/tip/.vim/colors" title="bitbucket repo">custom Vim colourscheme</a>
+for syntax highlighting, and you have the base for a consistent aesthetic
+experience in your terms.</p>
+
+<p>The cornucopia of choice that is GNU/Linux means that in addition to choosing
+your font, you also can choose how it is rendered. I use the
+<a href="http://www.infinality.net/blog/" title="Infinality blog">infinality patchset</a>,
+but if you are looking for a pre-rolled version I can highly recommend
+bohoomil&#8217;s
+<a href="http://bohoomil.cu.cc/" title="bohoomil's documentation">infinality bundle</a>.</p>
+
+<p>The final element—and probably the most important—is the actual shell that you
+will run in your terminals.
+<a href="http://www.gnu.org/software/bash/bash.html" title="GNU bash page">Bash</a> is installed
+everywhere (or, more correctly, everywhere that matters), so that is a solid choice.
+If you are looking for a <em>lot</em> more power and flexibility, then you want
+<a href="http://www.zsh.org/" title="Zsh home">Zsh</a> (with the
+<a href="https://github.com/zsh-users/zsh-syntax-highlighting" title="Github repo">syntax highlights</a>
+plugin).</p>
+
+<p>If, on the other hand, you are the sort of person with tribal piercings
+and a fixie, you might want to look at
+<a href="http://www.tcsh.org/" title="Their website says it all, really…">tcsh</a>, or even
+<a href="https://en.wikipedia.org/wiki/C_shell" title="Wikipedia page">csh</a><sup>2</sup>.</p>
+
+<p>Customizing your shell can, in this context, be extended to practically Escheresque
+extremes. The prompt, particularly in Zsh, can print relevant information,
+helpfully colour coded; but it can also metastasize into a bloated ratmangle of
+unicode, complete with git branches, the weather in four different timezones and
+random <a href="https://en.wikipedia.org/wiki/Fortune_%28Unix%29" title="Wikipedia entry">fortunes</a>.
+If, through some inexplicable turn of events, you find yourself staring at
+something like this, it is time to seek help. Urgently.</p>
+
+<p>For Zsh, I have the hostname (to avoid confusion when SSH&#8217;ing between machines,
+the current working directory and, if the exit status is anything other than <code>0</code>
+for the last command, that status is appended.</p>
+
+<p>There is one other important choice to make in your shell: to run it in emacs
+mode (the default) or vi-mode. This decision says as much about your competence
+as it does about your overall contribution to the gene pool, so consider it carefully.
+I have previously expressed my
+<a href="http://jasonwryan.com/blog/2011/12/01/readline/" title="Blog post on same">preference for vi-mode</a>,
+and using Zsh (which doesn&#8217;t use readline) has just entrenched that view for me.</p>
+
+<p>Putting it all together, you end up with an interface that is as attractive to
+work with as it is powerful. You have syntax highlighting, command completion
+(and with Zsh, impressive correction), coloured URLs that
+can be activated with the keyboard, the ability to copy and paste between
+terminals and into documents or browsers, configurable keybinds, aliases and
+functions limited only by your imagination and the threshold of your indolence.</p>
+
+<p><img class="center" src="http://miromiro.com/Blog-images/terms.png"></p>
+
+<p>One final recommendation: consider using a terminal multiplexer like tmux to
+manage your terminal sessions. I have posted quite a bit about it
+<a href="http://jasonwryan.com/blog/categories/tmux/" title="tmux posts">in the past</a> and it
+continues to be a mainstay of my working environment. The
+<a href="https://wiki.archlinux.org" title="THE wiki">Arch Wiki</a>, naturally,
+has some very detailed pages on each and every aspect of using the terminal.
+All of my configs are available in my bitbucket repositories:
+<a href="http://bitbucket.jasonwryan.com/" title="Help yourself…">bitbucket.jasonwryan.com</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>My dark colour scheme is in my
+<a href="https://bitbucket.org/jasonwryan/centurion/src/tip/.colours/dark">bitbucket repo</a>.</li>
+<li><a href="http://www.grymoire.com/Unix/CshTop10.txt" title="Reasons not to use csh">Then again…</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Compiling Kernels]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/08/03/kernels/"/>
+    <updated>2013-08-03T09:24:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/08/03/kernels</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/kernel.jpg" title="Kernels on Flickr" >
+While chasing edits on the Arch Wiki a couple of weeks ago, I stumbled upon
+this page:
+<a href="https://wiki.archlinux.org/index.php/Kernels/Compilation/Traditional" title="What it says on the tin…">Kernels/Compilation/Traditional</a>;
+fortuitously, it transpired. For it piqued my interest sufficiently for me to
+try my hand at compiling my own kernel, and—after half a dozen attempts at
+getting it right—I had no sooner switched to my custom built kernel as the
+default in my boot manager when 3.10.2 landed in [testing] and would not boot.
+<a href="https://bbs.archlinux.org/viewtopic.php?id=167090" title="Forum thread">At all</a>.</p>
+
+<p>I still have no idea why 3.10.2 would do nothing other than fail silently, but
+the convenience of having another kernel to switch to without needing a rescue
+image or any other panicked interventions immediately won me over. In the years
+that I have used Arch, this was my
+<a href="http://jasonwryan.com/blog/2012/07/19/breakage/" title="Post on the Myth of Breakage">first near brush</a>
+with an unbootable system<sup>1</sup> and the small amount of effort required to
+mitigate this risk with a custom or alternate kernel seems a smart investment to
+me at this point.<sup>2</sup></p>
+
+<p>The documentation on the wiki is both comprehensive and easy to follow. The
+lessons I learned between kernels zero and three or four were mostly around
+ensuring the correct modules were configured into the build. One surefire way to
+make this a tedious and laborious process, should you be so inclined, is to
+blindly enable and disable settings in <code>menuconfig</code>.</p>
+
+<p>Around about the time of the fourth failed build (well, the builds were working
+but the kernel wasn&#8217;t booting or was booting with missing functionality), I
+decided to switch approaches and go down the <code>localmodconfig</code> route. This, for
+someone with my limited experience with this aspect of GNU/Linux, was in
+retrospect a decision I should have made sooner.</p>
+
+<p>First, I started with <span class="file">streamline_config.pl</span>, a helpful
+script that allows you to create a <span class="file">.config</span> file
+containing only those modules necessary to your currently running
+kernel<sup>3</sup>. This yielded a booting kernel at the first attempt. It turns
+out, though, that you still need to ensure that <em>all</em> of the modules you are
+going to need, <em>at any time in the future</em>, are loaded. I missed a couple.</p>
+
+<p>Then I discovered this script by graysky,
+<a href="https://github.com/graysky2/modprobed_db" title="In graysky2's github repo">modprobed_db</a>.
+For a newbie to kernel compilation, this is simply invaluable. It allows you to
+create a record of your used modules over time, compare it with those that are
+currently loaded and then—right before you <code>make localmodconfig</code>—load the
+remaining necessary ones. Foolproof kernel compilation. Just like that.
+Brilliant. And, naturally enough, it is in
+<a href="https://aur.archlinux.org/packages/modprobed_db/" title="AUR package">the AUR</a>.</p>
+
+<p>Run the script, create your <span class="file">.conf</span> file and database in
+<span class="file">$XDG_CONFIG_HOME/modprobed_db{,.conf}</span> and then either
+call it from a <code>cron</code> job or, if you are impatient like me, spend a frenzied 10
+minutes plugging ALL the devices you own into your machine, and you are good to
+go. Running <code>sudo modprobed_db recall</code> will load all of the required modules,
+you generate your kernel <span class="file">.config</span>, check it to make
+sure it is complete and then run <code>make</code>.</p>
+
+<p>On my laptop, I have 115 modules activated for a build, 10 of which need to be
+recalled prior to creating the <span class="file">.config</span>. When I was
+trying to debug 3.10.2, I compiled the vanilla Arch kernel using
+<a href="https://wiki.archlinux.org/index.php/Abs" title="Wiki page on Arch Build System">ABS</a>
+and it took almost exactly 60 minutes using all four threads on my i5. Building
+my own kernel is done and installed in under 10.</p>
+
+<p>I susbcribed to the <a href="https://www.kernel.org/feeds/kdist.xml" title="Kernel updates">RSS feed for kernel versions</a>
+and now, whenever a new stable kernel is posted, I <code>wget</code> it, compile it and
+boot from it. As new Arch versions appear in the repositories, they are updated
+by <code>pacman</code> and happily coexist on my <span class="file">/boot</span>; thereby
+ensuring that the likelihood of me being unable to boot my machine (other than
+through
+<acronym title="Problem Exists Between Keyboard And Chair">PEBKAC</acronym>)
+has hopefully been staved off for another five years.</p>
+
+<p>The next step would be to write a script that completely automates the process…</p>
+
+<h3>Update 7/8/13</h3>
+
+<p>After poring over PKGBUILDS in the AUR, principally graysky&#8217;s
+<a href="https://aur.archlinux.org/packages/linux-ck/" title="Arch User Repository">linux-ck PKGBUILD</a>,
+and the official
+<a href="https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/linux" title="Arch SVN Package Repo">ABS PKGBUILD</a>,
+I decide to write my own to automate the above. It works well enough for me, but
+hasn&#8217;t been tested more widely. You will need to ensure that you have an
+up-to-date <code>modprobed_db</code> database with all of your required modules listed and
+that you have configured <code>sudoers</code> to have this run from the PKGBUILD.</p>
+
+<p>The PKGBUILD and the attendant files are in my
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr" title="PKGBUILD and related files">bitbucket repo</a>:
+let me know if there are any issues with this approach.</p>
+
+<p><em>See also the follow up post on automating this process:</em> <a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="Newer post">Automating Kernel Builds</a></p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Other than those occassions for which I bear complete responsibility…</li>
+<li>There are, of course, other benefits such as the self-satisfied glow of geek
+accomplishment.</li>
+<li>This is located in <span class="file">scripts/kconfig/</span>.</li>
+</ol>
+
+
+<p>Creative Commons image of kernels on Flickr by
+<a href="http://www.flickr.com/photos/the_girl/56432091">Nadia Prigoda-Lee</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Encrypting Mutt]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/07/20/gnupg/"/>
+    <updated>2013-07-20T09:36:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/07/20/gnupg</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/key-board.jpg" title="Encrypted mail" >
+With the torrent of recent revelations about the enthusiasm with which
+the governments of most of the first world have been systematically and
+unlawfully violating the privacy of their citizens by intercepting their digital
+communications, I thought it worth adding to the posts I have written about
+<a href="http://jasonwryan.com/blog/categories/mutt/" title="Posts on mutt">Mutt</a>—that most
+peerless of email clients—specifically how, combined with
+<a href="http://gnupg.org/" title="GPG home page">GnuPG</a>, you can encrypt all of your mail and
+ensure that the only person reading it is the intended recipient.</p>
+
+<p>The definitive guide for this setup remains Justin Miller&#8217;s venerable page,
+<a href="http://codesorcery.net/old/mutt/mutt-gnupg-howto" title="The title says it all, really…">Everything You Need To Know To Start Using GnuPG with Mutt</a>,
+last edited in 2001 and <em>still</em> the authoritative source. The setup I will
+describe differs only insofar as it covers how to use multiple keys associated
+with different mail accounts. Mutt gives you the flexibility sign or encrypt all
+of the email in your work account with one key, and your personal email with
+another.</p>
+
+<p>Once you have set up your GPG keys<sup>1</sup>, the first step is to configure
+Mutt to use your keys. You can include these directives in your
+<span class="file">muttrc</span> but, in the interests of readability, I prefer
+to split them out into <span class="file">gpg.rc</span> and source them from
+<span class="file">muttrc</span>. The settings are self-explanatory, those most
+relevant to this post control how mutt handles your mail with respect to
+encryption or just signing<sup>2</sup>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">pgp_use_gpg_agent</span> <span class="o">=</span> yes
+</span><span class='line'><span class="nb">set </span><span class="nv">pgp_sign_as</span> <span class="o">=</span> 43A5CE95
+</span><span class='line'><span class="nb">set </span><span class="nv">pgp_timeout</span> <span class="o">=</span> 3600
+</span><span class='line'><span class="nb">set </span><span class="nv">crypt_autosign</span> <span class="o">=</span> yes
+</span><span class='line'><span class="nb">set </span><span class="nv">crypt_replyencrypt</span> <span class="o">=</span> yes
+</span></code></pre></div></figure>
+
+
+<p>This sets my work key as the primary key and a couple of other sane (for me)
+defaults. All of these options are described in <code>muttrc(5)</code>.
+You can see my complete file in my
+<a href="https://bitbucket.org/jasonwryan/shiv/src/default/.mutt/gpg.rc" title="mutt config files">bitbucket repo</a>.</p>
+
+<p>The rest of the recipe is in <span class="file">muttrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">source</span> ~/.mutt/gpg.rc            <span class="c"># use GPG</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># gpg key</span>
+</span><span class='line'>send-hook <span class="s2">&quot;~f @catalyst.net.nz&quot;</span>  <span class="nb">set </span><span class="nv">pgp_sign_as</span><span class="o">=</span>43A5CE95
+</span><span class='line'>send-hook <span class="s2">&quot;~f @jasonwryan.com&quot;</span>   <span class="nb">set </span><span class="nv">pgp_sign_as</span><span class="o">=</span>B1BD4E40
+</span><span class='line'>
+</span><span class='line'><span class="c"># key binds</span>
+</span><span class='line'><span class="nb">bind </span>compose p  pgp-menu
+</span><span class='line'>macro compose Y pfy <span class="s2">&quot;send mail without GPG&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Sourcing the <span class="file">gpg.rc</span> reads all the relevant options
+and then a series of <code>send-hooks</code> allow you to use specific keys for each of
+your accounts.</p>
+
+<p>Now, when you receive encrypted mail, if your key agent is running, Mutt will
+decrypt your mail on the fly. Otherwise you will be prompted for your key
+phrase. Similarly, when you send email, it will by default be signed by the key
+associated with that account, and you can encrypt individual mail by bringing up
+the GPG menu in the compose screen by hitting <kbd>p</kbd>.</p>
+
+<p>And for those friends and acquaintances you correspond with for whom
+encryption is the equivalent of white powder spilling from an envelope, you can
+always elect to send without any GPG by selecting <kbd>Y</kbd> to send the
+email.</p>
+
+<p>These and a number of other interesting tips and macros are on the
+<a href="http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG" title="Using GPG">Mutt Wiki</a>
+and are worth following up once you have the basics working. Like so much of
+this sort of software, it takes a little longer to set up <em>exactly</em> the way that
+you want it, but once you are done, it is good for decades…</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>A good introduction to this procedure is detailed in the
+<a href="https://wiki.archlinux.org/index.php/GPG">Arch Wiki article</a>.</li>
+<li>This assumes that you do want to distinguish between the two; you could, of
+course, just encrypt <em>everything</em>—assuming that your correspondents were
+willing and able to decrypt it…</li>
+</ol>
+
+
+<p>Creative Commons image by <a href="http://www.flickr.com/photos/54450095@N05/8229504229/">Intel Free Press</a> on Flickr.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RPi Headless Torrent Box]]></title>
+    <link href="http://jasonwryan.github.com/blog/2013/06/29/raspberry/"/>
+    <updated>2013-06-29T09:40:00+12:00</updated>
+    <id>http://jasonwryan.github.com/blog/2013/06/29/raspberry</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/raspberry-pi-logo.png" title="Raspberry Pi logo" >
+I was fortunate enough to be given a
+<a href="http://www.raspberrypi.org/" title="Pi homepage">Raspberry Pi</a> earlier this year
+and, naturally enough, have been running
+<a href="http://archlinuxarm.org/" title="Arch Linux ARM site">Arch ARM</a> on it over the
+last several months. Initially, I was at somewhat of a loss as to what to do
+with it, so was just (under)using it<sup>1</sup> for a persistent IRC connection.
+I have now, with very little effort, set it up as a headless torrent box and it is
+working nicely.</p>
+
+<p>As is generally the case, this involved little more than stitching together a
+few lightweight tools to accomplish the task. In this case, it is a combination
+of
+<a href="http://libtorrent.rakshasa.no/" title="rotrrent homepage">rtorrent</a>
+(with the canvas-colour patch applied),
+<a href="http://jasonwryan.com/blog/categories/surfraw/" title="Posts on surfraw">surfraw</a>
+and
+<a href="http://w3m.sourceforge.net/" title="w3m homepage">w3m</a> for discovering
+torrents,<sup>2</sup>
+<a href="http://labs.bittorrent.com/experiments/sync.html" title="Peer to Peer synching">bittorrent sync</a>
+and, optionally, a <acronym title="Virtual Private Network">VPN</acronym>.</p>
+
+<p>I use a 16GB <acronym title="Universal Serial Bus">USB</acronym> drive to act as
+storage for the device, and mount it at <span class="file">~/Downloads</span>
+via <span class="file">/etc/fstab</span>; depending on the size of your
+<acronym title="Secure Digital">SD card</acronym>, this may be superfluous.</p>
+
+<p>First a note on building packages; building <em>anything</em> on the Pi—with only
+512MB <acronym title="Random Access Memory">RAM</acronym>—is a protracted
+and thankless task. So if you intend to do more of this, or do it regularly,
+set up
+<a href="http://archlinuxarm.org/developers/distcc-cross-compiling" title="Arch ARM instructions">cross-compiling</a>;
+you won&#8217;t regret the initial investment.</p>
+
+<p><code>rtorrent</code> is in the ARM repos, but I wanted to patch in colour, so I wrote
+<a href="https://gist.github.com/jasonwryan/5794623" title="Gist of the thing…">a PKGBUILD</a>,
+based on the package in [community] and
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="Arch User Repository">ashren&#8217;s AUR package</a>.
+Once you have rtorrent installed and working, the rest is straightforward.</p>
+
+<p>The default config for w3m is perfectly functional, but can be easily customized
+further. The key to this setup is being able to find a torrent and then easily
+add it to rtorrent&#8217;s queue.  To do this, I modified the hack that I wrote up
+<a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Post on yanking URLs in w3m">a couple years back</a>.
+Essentially, you use w3m&#8217;s external link function to trigger a script to grab
+the magnet link. Like so:</p>
+
+<figure class='code'><figcaption><span>~/.w3m/config </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>extbrowser /home/jason/Scripts/magnets %s
+</span></code></pre></div></figure>
+
+
+<p>and the script from the
+<a href="http://wiki.rtorrent.org/MagnetUri#Handling_.22magnet:.22_URIs_via_a_bash_script" title="Script for magnet links">rtorrent wiki</a>:</p>
+
+<figure class='code'><figcaption><span>~/Scripts/magnets </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nb">cd</span> <span class="nv">$HOME</span>/Downloads/Queue/watch/    <span class="c"># set your watch directory here</span>
+</span><span class='line'><span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span>~ <span class="nv">xt</span><span class="o">=</span>urn:btih:<span class="o">([</span>^&amp;/<span class="o">]</span>+<span class="o">)</span> <span class="o">]]</span> <span class="o">||</span> <span class="nb">exit</span>;
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;d10:magnet-uri${#1}:${1}e&quot;</span> &gt; <span class="s2">&quot;meta-${BASH_REMATCH[1]}.torrent&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Remapping the w3m key to trigger the script to make it more Vim-like:</p>
+
+<figure class='code'><figcaption><span>~/.w3m/keymap </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>keymap Y EXTERN_LINK
+</span></code></pre></div></figure>
+
+
+<p>And now hitting <kbd>Shift</kbd><kbd>y</kbd> over a magnet link adds it to your
+queue.</p>
+
+<p>The final piece was to ameliorate the step of transferring the completed files
+from the Pi, or for allowing me to add torrents remotely. To do this, I used
+a <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="My post on Sync">bittorrent sync</a>
+shared directory as <span class="file">~/Downloads</span>. All files are synched
+to my desktop as they are downloaded to the Pi. Simple.</p>
+
+<p><img src="http://miromiro.com/Blog-images/rtorrent-2.png" title="'Screenshot of rtorrent in action…'" ></p>
+
+<p>As I mentioned above, you could also use a VPN and, with a service
+file, have it connect on boot if you wished to further protect your privacy.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>This is not to say that I am now using it to it&#8217;s full potential; quite the
+opposite. Recommendations or suggestions gratefully received.</li>
+<li>Discovery is <em>your</em> business; what you choose to download and share may be the
+business of copyright holders…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Asking for Help]]></title>
     <link href="http://jasonwryan.github.com/blog/2013/06/15/asking/"/>
     <updated>2013-06-15T10:39:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/06/15/asking</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/bowl.jpg" title="'Flickr image of Begging Bowl'" >
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/bowl.jpg" title="'Flickr image of Begging Bowl'" >
 Another great peristaltic movement in Arch&#8217;s rolling release digestive system
 happened over the last couple of weeks, the move of all binaries
 <a href="https://www.archlinux.org/news/binaries-move-to-usrbin-requiring-update-intervention/" title="Arch News update">to /usr/bin</a>.
@@ -119,7 +1171,7 @@ the more motivated among you will find them without difficulty.</li>
     <link href="http://jasonwryan.github.com/blog/2013/05/25/greader/"/>
     <updated>2013-05-25T09:10:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/05/25/greader</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/commafeed.png" title="'CommaFeed Logo'" >
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/commafeed.png" title="'CommaFeed Logo'" >
 I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
 everyday since I first discovered the service over seven years ago. It is my
 primary source of news and information and the announcement that Google is, on July 1 this year,
@@ -209,7 +1261,7 @@ then pushing to <code>openshift master</code>.</p>
 errors from builds late this week), but if you import from an existing <code>.opml</code>
 or <code>.xml</code> file you will see CommaFeed in all it&#8217;s glory:</p>
 
-<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
+<p><img class="left" src="http://miromiro.com/Blog-images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
 
 <p>As you can see, it is remarkably similar to the Google Reader interface; a
 clean, minimalist design that is focussed—quite rightly—on the content. There
@@ -261,7 +1313,7 @@ will soon be even better than Google Reader, you might want to use it.</li>
     <link href="http://jasonwryan.github.com/blog/2013/05/18/pkgbuilds/"/>
     <updated>2013-05-18T10:10:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/05/18/pkgbuilds</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/woodcutting.jpg" title="'Cutting wood'" >
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/woodcutting.jpg" title="'Cutting wood'" >
 I posted a couple of weeks ago about
 <a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on Vim">Building Vim</a> and how,
 using <a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Build System on the Wiki">ABS</a>
@@ -443,7 +1495,7 @@ Cutting Wood">Wells P. Wilson</a></p>
     <link href="http://jasonwryan.github.com/blog/2013/04/09/helpers/"/>
     <updated>2013-04-09T19:07:00+12:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/04/09/helpers</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/crutches.jpg" title="'Crutches on Flickr'" ></p>
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/crutches.jpg" title="'Crutches on Flickr'" ></p>
 
 <h3>Or, &#8220;Why you should uninstall Yaourt and embrace <em>makepkg</em>…&#8221;</h3>
 
@@ -555,7 +1607,7 @@ download <code>cower</code> or <code>meat</code>, they are both <em>much</em> be
     <link href="http://jasonwryan.github.com/blog/2013/03/29/vim/"/>
     <updated>2013-03-29T10:17:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/03/29/vim</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/vim-logo.png" title="'Vim logo'" >
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/vim-logo.png" title="'Vim logo'" >
 Apart from a brief, but nevertheless instructive, flirtation with
 <a href="http://www.gnu.org/software/emacs/" title="Emacs homepage">Emacs</a><sup>1</sup> I have
 been a consistent <a href="http://www.vim.org/" title="Vim home">Vim</a> user over the last three
@@ -646,7 +1698,7 @@ of the same itches, you can see the full
     <link href="http://jasonwryan.github.com/blog/2013/03/16/sync/"/>
     <updated>2013-03-16T10:17:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/03/16/sync</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/syncapp.png" title="'BitTorrent Sync logo'" >
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/syncapp.png" title="'BitTorrent Sync logo'" >
 I have posted about using <a href="http://dropbox.com" title="dropbox homepage">dropbox</a> quite
 <a href="https://duckduckgo.com/?sites=jasonwryan.com&amp;q=dropbox" title="DDG search results">a few times</a>
 over the last couple of years; it is one of those utilities that quickly insinuates itself
@@ -762,7 +1814,7 @@ and give that a shot instead…</p>
     <link href="http://jasonwryan.github.com/blog/2013/03/02/forking/"/>
     <updated>2013-03-02T10:04:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/03/02/forking</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/fork.jpg" title="'Fork on Flickr'" >
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/fork.jpg" title="'Fork on Flickr'" >
 Over the last couple of months there have been a number of discussions on the Arch boards
 about the
 <a href="https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY" title="Forum Etiquette">forum policy</a>
@@ -862,7 +1914,7 @@ not really possible to provide a simpler installation process.</li>
     <link href="http://jasonwryan.github.com/blog/2013/02/08/documentation/"/>
     <updated>2013-02-08T19:57:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/02/08/documentation</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/documents.jpg" title="'Documents on Flickr'" >
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/documents.jpg" title="'Documents on Flickr'" >
 One of the canards about Free and Open Source Software that is peddled by the unscrupulous
 marketers of proprietary software is that their product is superior because, among other
 things, the scruffy, sandal-wearing Communists that write and distribute their software
@@ -971,7 +2023,7 @@ I am indebted to).</li>
     <link href="http://jasonwryan.github.com/blog/2013/01/25/uefi/"/>
     <updated>2013-01-25T19:35:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/01/25/uefi</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/uefi.jpg" title="'Samsung Series 9 Laptop'" >
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/uefi.jpg" title="'Samsung Series 9 Laptop'" >
 Just before Christmas my
 <a href="https://bitbucket.org/jasonwryan/eeepc/src" title="Bitbucket repo for Archer">EeePC 901</a> started
 to behave erratically. Rather than prolong the final throes, I decided to replace it and,
@@ -1057,7 +2109,7 @@ GNU/Linux, in the coming weeks.</p></li>
     <link href="http://jasonwryan.github.com/blog/2013/01/10/truecrypt/"/>
     <updated>2013-01-10T16:02:00+13:00</updated>
     <id>http://jasonwryan.github.com/blog/2013/01/10/truecrypt</id>
-    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/lock.jpg" title="'Flickr image of lock'" >
+    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/lock.jpg" title="'Flickr image of lock'" >
 I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
 I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
 It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
@@ -1160,1132 +2212,6 @@ free software…</p>
 <h4>Notes</h4>
 
 <p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[A Vimprobable Walkthrough]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/11/20/vimprobable/"/>
-    <updated>2012-11-20T18:58:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/11/20/vimprobable</id>
-    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/vimprobable-logo.png" title="'Vimprobable logo'" >
-I have written about <a href="http://vimprobable.org" title="Vimprobable homepage">Vimprobable</a>
-a couple of times over the last two years<sup>1</sup>,
-it is one of those projects that, for a variety of reasons, I have picked up
-and stuck with.  Like <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>,
-<a href="http://vim.org" title="Vim homepage">Vim</a> and
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>,
-it is an essential part of my working environment and is installed on all of my
-machines, where it is my default browser. It&#8217;s simplicity, power and
-configurability are why, despite looking at a few other similar projects, I
-have stuck with Vimprobable since first installing it.</p>
-
-<p>After my last post, a <a href="http://jasonwryan.com/blog/2012/09/28/screencast/" title="An intro to dwm">dwm screencast</a>,
-I wanted to have another crack at making a decent screencast. Sadly,
-this is not it.  I can say that making a <em>good</em> screencast is not a simple
-accomplishment; there are so many elements that require significant attention. I
-spent a good many hours this time around playing with custom Xorg modelines,
-<code>ffmpeg</code>&#8217;s arcane encoding options and, to be frank, the final product is just not worth
-all that effort.</p>
-
-<p>I&#8217;m going to stick with plain text from now on. It requires little more from me
-than a passing acquaintance with the subject matter, some loosely held and
-<a href="http://jasonwryan.com/blog/2012/08/18/trolls/" title="Trolling Arch Linux">firmly expressed opinions</a>
-and my unbridled confidence in the fact that anyone who
-has read this far down the page is so bereft of other, more pressing things to
-think about that they may inadvertently find a scintilla of amusement in here…</p>
-
-<p>With that explanation out of the way, I give you my final screencast:</p>
-
-<iframe src="http://player.vimeo.com/video/53829053?byline=0&amp;portrait=0&amp;badge=0&amp;color=ffffff" 
-width="350" height="197" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-
-
-<p></p>
-
-<p><a href="http://vimeo.com/53829053">An Introduction to Vimprobable</a> on 
-<a href="http://vimeo.com">Vimeo</a>.</p>
-
-
-<h4>Notes</h4>
-
-<ol>
-<li>First back in <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/">October, 2010</a> and then,
-more recently, in <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/">June, 2011</a>.</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[A dwm Screencast]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/09/28/screencast/"/>
-    <updated>2012-09-28T09:18:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/09/28/screencast</id>
-    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/dwm-logo.png" title="'dwm logo'" >
-Over the last week as I have been at home convalescing I have, quite unaccountably,
-found myself watching videos of tiling window managers. In all, I have probably watched
-between twenty and thirty of these videos so I feel, quite confidently, that I have a
-firm grasp of what constitutes the genre. Consequently, I also feel that I can&mdash;based
-on the range of the material I have reviewed, and the scrutiny and attention therein
-applied&mdash;share an unequivocal judgement as to the overall quality of the genre: it
-sucks.</p>
-
-<p>Moreover, these videos invariably suck in the same couple of ways; they always lack
-any sort of narration, which means that you are stuck silently watching some sort of
-paroxysm of window rearrangement without <em>any</em> context or explanation, as if the fact
-that you can inflict this sort of injury on an X display is rationale enough. And,
-secondly, just as frequently, they feature a cursor being dragged around the screen
-doing the damage; using the mouse to demonstrate the capabilities of a tiling window
-manager is the sort of vestigial behaviour more commonly associated with pagan
-superstition or mild enfeeblement…</p>
-
-<p>Rather that simply bask in the sense of superiority that these observations have
-afforded me, I thought that I would make my own, more lasting, contribution to the
-canon. I can only describe this process as instructive.</p>
-
-<p><a href="http://www.youtube.com/watch?v=GQ5s6T25jCc"><img class="center" src="https://dl.dropbox.com/u/261312/Blog-images/tower.jpg" title="dwm screencast" ></a></p>
-
-<p>The best that can be said of this video is that, while it sucks just as hard as the others
-that I have reviewed over the past week, it has the distinguishing feature of at least
-sucking <em>differently</em>. For example, it has an audio track, so in theory the actions on the
-screen should be accompanied by the narrator&#8217;s soothing tones. Sadly, this is not the case.
-The crappy quality of my headset, my hoarse throat, and most egregiously, my decision to eschew
-post production and shoot it in one take means that the audio is poorly recorded, and at times
-literally inarticulate, rambling.</p>
-
-<p>If nothing else, the exercise has taught me to really appreciate the work of people who
-do this thing well; Drew Neil&#8217;s excellent
-<a href="http://vimcasts.org/" title="The Vimcasts homepage">Vimcasts</a> being a case in point.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Improved Notes Utility]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/09/01/notes-updated/"/>
-    <updated>2012-09-01T10:09:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/09/01/notes-updated</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/notes.jpg" title="'Notepad image on Flickr'" >
-Nearly two years ago, I posted about my adaption of a simple
-<a href="http://jasonwryan.com/blog/2010/09/28/command-line-notes/" title="My post in 2010">command line note utility</a>.
-I have used this setup on all of my machines on a daily basis since and it has worked
-marvellously. Symlinking to a folder in
-<a href="https://www.dropbox.com/home" title="Dropbox home">Dropbox</a> means that the notes are accessible
-from all my machines, including my phone. There has only really been one aspect of this setup
-that has been sub-optimal.</p>
-
-<p>As an inveterate note-taker (this is one of the “benefits” of ageing; the speed with
-which you forget information outpaces the acquisition of newer material) I have—in
-those intervening years—built up quite a store of notes. Consequently, in order to
-maintain a semblance of order, I have arranged them in a series of directories. There
-is a minor flaw with this approach: retreiving a note depended on two factors, a) excellent
-recall<sup>1</sup> and, b) accurately typing out the full path. Neither of these are things that I
-am inherently good at or inclined to master.</p>
-
-<p>This had been irritating me for some time before I came across this
-<a href="http://unix.stackexchange.com/questions/11906/how-to-change-the-target-directory-for-tab-completion" title="Tab completion for notes function">question on Unix &amp; Linux StackExchange</a>.
-This provided me with a partial solution to the issue but, as I note in my answer, I was not
-able to solve it for nested directories, which was my particular use case. Once I had
-muddled my way through the solution on U&amp;L I pushed it to the back of my mind and
-tried to ignore it.</p>
-
-<p>Recently, though, the accumulation of notes and the frustration of trying to access them
-without <kbd>Tab</kbd> completion drove me to do something about it.</p>
-
-<p>The documentation on
-<a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html" title="Bash Manual">programmable completion</a>
-is typically terse and searching the web returns very little in the way of instructions
-as to how to accomplish this.<sup>2</sup> Undeterred, I decided to hack up a completion
-function that worked for nested directories.</p>
-
-<p>What I arrived at was this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">shopt</span> -s globstar
-</span><span class='line'><span class="nb">shopt</span> -s progcomp
-</span><span class='line'>
-</span><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> <span class="nv">$HOME</span>/.notes/<span class="s2">&quot;$*&quot;</span>.txt ;<span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'> <span class="c"># completion for notes</span>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>cur
-</span><span class='line'>    <span class="nv">cur</span><span class="o">=</span><span class="k">${</span><span class="nv">COMP_WORDS</span><span class="p">[COMP_CWORD]</span><span class="k">}</span>
-</span><span class='line'>    <span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**<span class="o">)</span>
-</span><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;${files[@]##*/}&quot;</span>
-</span><span class='line'>    <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="k">$(</span> <span class="nb">compgen</span> -f <span class="s2">&quot;${file[@]}&quot;</span> -- <span class="k">${</span><span class="nv">cur</span><span class="k">}</span> <span class="k">)</span> <span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
-</span></code></pre></div></figure>
-
-
-<p>The best that can be said about it is that it <em>nearly</em> works…<sup>3</sup></p>
-
-<p>Realising that I was completely out of my depth, I turned to #bash for help, and
-I was indeed fortunate that
-<a href="https://github.com/geirha" title="geirha's Gitgub">geihra</a> offered some much needed
-assistance. geirha&#8217;s solution is an elegant one:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
-</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**/<span class="s2">&quot;$2&quot;</span>*<span class="o">)</span>
-</span><span class='line'>    <span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
-</span></code></pre></div></figure>
-
-
-<p>In addition to working exactly as I hoped, it had the benefit of introducing me
-to a couple more bash concepts that I hadn&#8217;t encountered;
-<a href="http://mywiki.wooledge.org/BashGuide/Arrays" title="Bash Guide on Greg's Wiki">adding elements to an array</a>
-with <code>+=()</code> being one. For posterity, the full script is:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
-</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>nls<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>tree -CR --noreport <span class="nv">$HOME</span>/.notes | awk <span class="s1">&#39;{ </span>
-</span><span class='line'><span class="s1">    if (NF==1) print $1; </span>
-</span><span class='line'><span class="s1">    else if (NF==2) print $2; </span>
-</span><span class='line'><span class="s1">    else if (NF==3) printf &quot;  %s\n&quot;, $3 </span>
-</span><span class='line'><span class="s1">    }&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'> <span class="c"># TAB completion for notes</span>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**/<span class="s2">&quot;$2&quot;</span>*<span class="o">)</span>
-</span><span class='line'>    <span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
-</span></code></pre></div></figure>
-
-
-<h4>Notes</h4>
-
-<ol>
-<li>The alternative to remembering the full path name is to list all of the notes before
-each operation with the <code>nls</code> function; this is not ideal either…</li>
-<li>Which means that it is either so straightforward that few have bothered to write up their
-experiences (most likely), or so arcane that not many have bothered (how it
-feels to me). However, there are a couple of pages that I referenced in addition
-to the official documentation:
-
-<ul>
-<li><a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html">Adam Backstrong&#8217;s post</a></li>
-<li><a href="http://fahdshariff.blogspot.co.nz/2011/04/writing-your-own-bash-completion.html">Fahd Shariff&#8217;s post</a></li>
-<li><a href="http://devmanual.gentoo.org/tasks-reference/completion/index.html">Gentoo Development Guide</a></li>
-</ul>
-</li>
-<li>It fails, as geirha pointed out, because it breaks the filenames on whitespace.</li>
-</ol>
-
-
-<p>Creative Commons image on Flickr by
-<a href="http://www.flickr.com/photos/nicholasjon/4101203095/" title="Field Notes etc on Flickr">nicholasjon</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Trolling Arch Linux]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/08/18/trolls/"/>
-    <updated>2012-08-18T10:47:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/08/18/trolls</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/troll.jpg" title="'Troll on Flickr'" >
-I posted recently about
-<a href="http://jasonwryan.com/blog/2012/08/04/systemd/" title="Some thoughts on moving across…">my experiences shifting to systemd</a>
-and how I found it, for all three of my Arch machines, to be a relatively simple and
-straightforward process which, in the intervening weeks, has borne out the views of
-the developers and other members of the community who have been using it for a longer
-period—it works, and works well. At the start of this week, Stéphane Gaudreault
-announced on Arch-dev-public the intention to
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-August/023389.html" title="ML post seeking developer views">replace the original initscripts with systemd</a>.</p>
-
-<p>The reaction by some to this announcement was, to me, quite disappointing. My view of
-open source communities is that by participating you are entering into a social contract.
-That contract is that, as you are reliant on the goodwill of the wider community it is
-incumbent on you to ensure that your overall contribution—in whatever form—brings
-more to the community than it takes away. At the very least, you can strive to ensure
-that it is a value neutral exchange.</p>
-
-<p>Sadly, for some of the trolls on the <acronym title="Mailing lists">MLs</acronym>, that
-is patently not the case. I want to take a closer look at just one of those threads, for two
-reasons. First, it is a textbook case of a particularly pernicious troll. And second, in
-conjunction with some other factors, it had an especially damaging effect on the wider
-community.</p>
-
-<p>The thread in question is on Arch-general, the largest of the mailing lists. It has
-the suitably alarmist title
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029856.html" title="A trolling we will go…">Think twice before moving to systemd</a>.
-The troll, who has had only minimal involvement with the Arch community up until this
-unfortunate moment starts by framing his “concern”<sup>1</sup>:</p>
-
-<blockquote><p>I just became aware that Arch Linux plans to switch to systemd, and this worries me for several reasons.</p></blockquote>
-
-
-<p>Felipe is worried. Ergo, <em>we</em> should be worried. Why should we be worried? Because,
-despite the fact that systemd has been discussed and used by Archers since the
-<a href="https://bbs.archlinux.org/viewtopic.php?id=96316" title="57 page thread on the Arch BBS">middle of 2010</a>,
-it has just come to his attention and now, with the formidable powers of his intellect,
-he has detected a disturbance in the force.</p>
-
-<blockquote><p>I tried systemd a while ago in a brand new machine with Arch Linux and the boot was *much slower*. After some exchanges with Lennart Poettering and other people in Google+[1], it became clear I was on my own. Eventually I found the culprit: Fedora uses CONFIG_HZ_1000, and Arch Linux uses CONFIG_HZ_300. It became clear to me that systemd was not ready for prime time, it wasn&#8217;t thoroughly tested in a lot of machines, and if you have problems Lennart Poettering will blame you (PulseAudio sounds familiar?).</p></blockquote>
-
-
-<p>The salient phrases here are “it became clear I was on my own” and the even more telling,
-“it became clear to me that systemd was not ready for prime time.” Once I had managed to
-wipe away the tears of gratitude that were coursing down my cheeks, I realized that Arch
-finally had finally found what it had been missing for all these years: a saviour. We
-were going to be OK after all.</p>
-
-<p>Felipe has “found the culprit.” Despite the best efforts of the Arch developers, upstream,
-the other distros that have been using it for considerably longer, and the experience of the
-<a href="https://bbs.archlinux.org/viewtopic.php?pid=1147676" title="Thread on systemd - one of many">Arch users reported on our boards</a>,
-no-one had the heroic ability to see through to the heart of this conundrum and expose
-systemd for the fraud that it is.</p>
-
-<p>But our gratitude should be tempered with some shame for we, the Arch community, have let
-Felipe down. We haven&#8217;t lived up to the standards he expects of us. As he gently admonishes us:
-“I was expecting more from the Arch Linux community.” Yes, Felipe, and you were right to.
-We let you down; can you forgive us?</p>
-
-<p>The thread goes on to generate more than 50 replies. All of them wasted.
-His trolling is not interested in facts, in reason or logic; his method of argumentation is
-not rational, and he is not interested in working toward an understanding
-of the truth; he just wants to be right. At whatever cost to the wider community. These posts,
-and trolls in other fora
-<a href="https://lkml.org/lkml/2012/4/12/434" title="LKML exchange with Linus Torvalds">like this one</a>,<sup>2</sup>
-are really about gratifying Felipe&#8217;s own voracious appetite for self-aggrandisement. In reality,
-of course, it is a stunning illustration of the
-<a href="https://secure.wikimedia.org/wikipedia/en/wiki/Dunning%E2%80%93Kruger_effect" title="Wikipedia entry">Dunning-Kruger effect</a>.
-It would be pathetic if it were a victimless pursuit; but it is not.</p>
-
-<p>Further down in the thread we see the inevitable frustration of the developer who leads
-this work for Arch,
-<a href="https://www.archlinux.org/developers/#tomegun" title="Tom's developer profile">Tom Gunderson</a>,
-finally <a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029933.html" title="Tom's reply quoting Linus">boil over</a>.
-This precipitates another thread where Tom announces that he will
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029960.html" title="Tom's mail to the list">no longer participate in this list</a>.
-This is from the developer that has patiently and constructively engaged with Arch users on the
-list around this issue for the past several months. On his own time.</p>
-
-<p>That is the impact of trolls like Felipe. That is a direct effect of his selfishness on the
-wider community. What has he brought to the community? Dissent, distraction and posturing.
-What has he taken away? The ability for all of us to engage with one of the developers
-of the software we all use. His presence on the list, and that of a few others,
-has been nothing short of corrosive.</p>
-
-<p>And as for the smoking gun, the config setting that no-one was smart enough to
-discover? Denis A. Altoé Falqueto went to the trouble to build another kernel
-and run a test and, contrary to Felipe who provided no such evidence,
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/030145.html" title="Denis' post">posted the results</a>.
-You can guess the outcome.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>See the <a href="http://www.urbandictionary.com/define.php?term=concern+troll">concern troll</a>.</li>
-<li>Read the whole thread to fully understand how obstinance can trump reason… See
-also his <a href="http://felipec.wordpress.com/2012/05/26/no-mercurial-branches-are-still-not-better-than-git-ones-response-to-jhws-more-on-mercurial-vs-git-with-graphs/">own blog</a>
-where he expresses incredulity that his comments on another blog have been deleted.</li>
-</ol>
-
-
-<p>Creative Commons image of the troll on Flickr by
-<a href="http://www.flickr.com/photos/56380734@N05/6937763971/">Comrade Foot</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[The Leap to systemd]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/08/04/systemd/"/>
-    <updated>2012-08-04T09:32:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/08/04/systemd</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/leap.jpg" title="Leap image on Flickr" >
-I posted a couple of weeks ago about the impact of some of the current
-<a href="http://jasonwryan.com/blog/2012/07/19/breakage/" title="Post on the glibc change">changes to Arch Linux</a>.
-There seems to be quite a bit of it about, because in conjunction with the move from
-<span class="file">/lib</span> to <span class="file">/usr/lib</span>—and motivated by the same
-overarching shifts in the other distributions—the other major change making its way through
-the Arch community is the move to
-<a href="http://freedesktop.org/wiki/Software/systemd" title="Project page">systemd</a>. This change, however, has
-been more controversial because it marks a shift away from Arch&#8217;s central configuration
-file, <a href="https://wiki.archlinux.org/index.php/Rc.conf" title="Arch wiki entry on rc.conf">/etc/rc.conf</a>;
-a move that has disconcerted a number of people.</p>
-
-<p>I&#8217;m not going to get into whether or not this move is consistent with
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="Wiki entry">The Arch Way</a>, because that has
-been thrashed over extensively on the
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023283.html" title="ML thread on rc.conf">mailing</a>
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023258.html" title="And another one…">lists</a>,
-but also—and more importantly—because Arch is a rolling release, which means change is <em>inevitable</em>.
-What is more, after watching all the back and forth on the <acronym title="Mailing lists">ML</acronym>
-and on the <a href="https://bbs.archlinux.org/viewtopic.php?id=96316&amp;p=1" title="Arch BBS thread on systemd">boards</a>, I am convinced that the
-<a href="http://www.archlinux.org/developers/#tomegun" title="Tom Gunderson">developer overseeing this shift</a>
-both knows what he is doing and is acting in the best interests of Arch.</p>
-
-<p>This view has been validated by my experience of shifting to systemd on my machines.</p>
-
-<p>When the new initscripts package was pushed to [testing] in the middle of last month,
-I stripped out all of the redundant options in <span class="file">/etc/rc.conf</span>
-and took the ten minutes or so to read about and then create the new files. I then spent some
-time reading up on systemd, principally
-<a href="http://0pointer.de/blog/projects/systemd-for-admins-1.html" title="One of TWELVE…">Lennart Poettering&#8217;s series of posts</a>,
-the <a href="https://wiki.archlinux.org/index.php/Systemd" title="Good, but needing some structure">Arch wiki entry</a>
-and the many and various
-<a href="http://0pointer.de/public/systemd-man/" title="One for everything">manual pages</a>.</p>
-
-<p>Over the last couple of days, I have migrated all of my machines over to systemd. I found it
-to be a very straightforward process. I went for a pure systemd approach, for reasons I will
-return to. Essentially, this is how I tackled it.</p>
-
-<p>First, for each machine, I established what daemons were running. I did this by using
-<a href="http://pikacode.com/jasonwryan/Veles/file/default/Scripts/daemons.sh" title="Pretty sure it is one of Xyne's">this shell script</a>
-and cross checking entries in my <span class="file">/etc/rc.conf</span>. Then
-it was just a matter of installing systemd:<sup>1</sup></p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S systemd systemd-sysvcompat systemd-arch-units
-</span></code></pre></div></figure>
-
-
-<p>The only outstanding file to be created was <span class="file">/etc/timezone</span>, the
-others—all documented in <code>man rc.conf</code>—I had created earlier in the month. Then, with the
-list of the services I would need running on each box, I enabled them. I think it is
-fair to say that the only thing that is clunky about systemd is the command syntax for
-managing units. Repeatedly typing <code>systemctl enable foo.service</code> is as tedious as it is
-error prone, so I hacked up a
-<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Scripts/sysd" title="sysd - *so* much easier">wrapper script</a>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sysd <span class="nb">enable </span>acpid
-</span><span class='line'>sysd <span class="nb">enable </span>lvm
-</span><span class='line'>etc…
-</span></code></pre></div></figure>
-
-
-<p>I also activated some additional gettys, as I like to log into a tmux session in TTY2 when
-I don&#8217;t need or want to start <code>X</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty2.service
-</span></code></pre></div></figure>
-
-
-<p>And I misguidedly wrote a couple of custom service files that turned out to be
-<a href="https://bbs.archlinux.org/viewtopic.php?id=146207" title="BBS post on said files">completely unnecessary</a>;
-and then I was done.</p>
-
-<p>On all three boxes I rebooted and that was it. The only issue I experienced was
-the final shutdown after removing initscripts and before booting up with
-systemd. After issuing <code>shutdown -r now</code> the process
-hung with a message about a missing <span class="file">inittab</span> file.
-In retrospect, I should have added <code>init=/bin/systemd</code> to my kernel parameters
-and not unistalled instiscripts until I had booted with systemd. This has
-now been added to the
-<a href="https://wiki.archlinux.org/index.php/Systemd" title="Archwiki systemd page">systemd wiki page</a>.</p>
-
-<p>Overall, though: no real drama, just a blur of text<sup>2</sup> and then the
-login prompt. While I haven&#8217;t seen a dramatic decrease in boot time,
-booting does <em>feel</em> a bit snappier and two of my three machines shutdown
-markedly more quickly. Consider me sold.</p>
-
-<p>That brings me back to the decision to opt for a pure systemd approach, rather than
-hanging on to a completely eviscerated <span class="file">/etc/rc.conf</span>. The
-Arch community has been told that the intention is to
-<a href="https://bbs.archlinux.org/viewtopic.php?pid=1133957#p1133957" title="BBS post by tomegun">support the rc.conf format forever</a>;
-I can&#8217;t help but think this is a mistake. In the same way that
-<a href="https://wiki.archlinux.org/index.php/Pacman#Partial_upgrades_are_unsupported" title="Pacman entry on Arch Wiki">partial upgrades are unsupported</a>,
-I think that systemd is Arch&#8217;s inevitable future and the community should be encouraged to accept that, <code>Syu</code> and
-move on…</p>
-
-<p>Having said that, I appreciate the consideration shown by the developers in wanting to assure
-people that their choice would continue to be catered for; and perhaps, over time, people still
-using initscripts will be regarded with the same sense of wry amusement as those who still show
-up from time to time with <code>hal</code> in their <code>DAEMONS</code> line.</p>
-
-<h3>Update 4/8/12</h3>
-
-<p>Tom Gunderson, the developer who looks after this part of Arch, has clarified the
-comment about the long term support for initscripts. As comments are hosted on
-a third-party paltform, I thought that it should be included in the body of the
-post.</p>
-
-<blockquote><p>Just a clarification: regarding the (probably very unwise) promise of &#8220;supporting <span="file">rc.conf</span> forever&#8221;, the intended meaning was that initscripts will support the syntax, not that initscripts themselves will always stay around (nor that systemd will gain support for the syntax in case initscripts is dropped).</p><p>At the moment systemd <strong>does</strong> support <span class="file">rc.conf</span> (when installed in conjunction with initscripts), but this is meant as a transitional measure only, and will likely go away eventually (though probably not soon).</p></blockquote>
-
-
-<h4>Notes</h4>
-
-<ol>
-<li>Note this approach will <em>remove</em> sysvinit and initscripts and <code>mv /etc/rc.conf{,.pacsave}</code>.</li>
-<li>Make sure you remove <code>quiet</code> from your kernel parameters for your first systemd
-boot so you can see that everything starts correctly…</li>
-</ol>
-
-
-<p>Creative commons image on Flickr by
-<a href="http://www.flickr.com/photos/sovietuk/486119799/" title="leap by rick harrison">Tricky</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Sharing Mercurial Patchsets]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/07/26/guards/"/>
-    <updated>2012-07-26T18:48:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/07/26/guards</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/guard.jpg" title="'On Guard image on Flickr'" >
-In my last post, on
-<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="You should read it…">Mercurial Queues</a>,
-I outlined how you might use MQ to manage a
-<a href="http://dwm.suckless.org/" title="Dynamic window manager">dwm</a> patchset.
-Mercurial makes this process ridiculously easy, and this functionality is more
-than enough to recommend it. However, where I think it really gets interesting
-is when you share that same patchset across multiple machines and are easily
-able to customize which patches in the queue are applied, based upon the
-particular machine you are building dwm on.</p>
-
-<p>For example, in my case I use dwm on all three of my machines: my desktop at home,
-my laptop at work and my EeePC. Given the nature of each of these three machines,
-though, I want a slightly different stack of patches applied. These differences
-might extend only to particular rules applied in <span class="file">config.def.h</span>
-based upon the number of tags I use, or the different applications that I run
-at home as opposed to at work.</p>
-
-<p>In any event, what I want to be able to do is maintain
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">a single patchset</a>
-in a mercurial repository, clone it to all my machines and then, using MQ,
-filter which specific patches are applied. This is all possible using a killer
-feature of MQ called
-<a href="http://hgbook.red-bean.com/read/advanced-uses-of-mercurial-queues.html%20'Advanced%20uses%20of%20MQ%20in%20the%20Mercurial%20book">guards</a>.
-Guards allow you to conditionally apply patches in a queue. Essentially, in
-a queue, you “tag” a patch with a guard and—depending on whether or not the
-guard is positive (to be applied), or negative (to be skipped)—when you
-<code>hg qpush -a</code> MQ takes care of applying the correct patches in the queue.</p>
-
-<p>So, in the case of my work laptop, I begin by cloning dwm and intializing
-a patch queue:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd </span>Build/
-</span><span class='line'>hg clone http://hg.suckless.org/dwm
-</span><span class='line'>hg qinit -c
-</span></code></pre></div></figure>
-
-
-<p>I setup my <span class="file">.hgrc</span> within the patches directory so that
-it points at the correct mercurial repository:</p>
-
-<figure class='code'><figcaption><span>.hg/patches/.hg/hgrc </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'> <span class="c"># Mercurial config file</span>
-</span><span class='line'><span class="o">[</span>ui<span class="o">]</span>
-</span><span class='line'><span class="nv">username</span> <span class="o">=</span> jasonwryan &lt;jasonwryan@gmail.com&gt;
-</span><span class='line'><span class="nv">ssh</span> <span class="o">=</span> ssh -i ~/.ssh/bb -C
-</span><span class='line'><span class="o">[</span>paths<span class="o">]</span>
-</span><span class='line'><span class="nv">default</span> <span class="o">=</span> ssh://hg@pikacode.com/jasonwryan/dwm-patchset
-</span></code></pre></div></figure>
-
-
-<p>Then I pull down my dwm patchset from the mercurial repository
-with <code>hg pull</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulling from ssh://hg@pikacode.com/jasonwryan/dwm-patchset
-</span><span class='line'>requesting all changes
-</span><span class='line'>adding changesets
-</span><span class='line'>adding manifests
-</span><span class='line'>adding file changes
-</span><span class='line'>added 6 changesets with 16 changes to 10 files
-</span><span class='line'><span class="o">(</span>run <span class="s1">&#39;hg update&#39;</span> to get a working copy<span class="o">)</span>
-</span></code></pre></div></figure>
-
-
-<p>After I update my local repo,<sup>1</sup> I can see the full patchset with
-<code>hg qseries</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setup.makefile
-</span><span class='line'>base.config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span><span class='line'>bstack
-</span><span class='line'>centurion.config
-</span></code></pre></div></figure>
-
-
-<p>Then, as I decribed in my previous post, I make the changes to
-<span class="file">config.def.h</span> that are specific to this
-machine:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew veles.config
-</span><span class='line'> <span class="c"># “hack, hack, hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qcommit -m <span class="s1">&#39;Adaptions for Veles&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>My patchset now has an additional patch in it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries
-</span><span class='line'>setup.makefile
-</span><span class='line'>base.config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span><span class='line'>bstack
-</span><span class='line'>centurion.config
-</span><span class='line'>veles.config
-</span></code></pre></div></figure>
-
-
-<p>This is where guards come in to play. If I wasn&#8217;t interested in sharing
-the patchset, it would just be a matter of deleting the patch for Centurion.
-However, what I want to do is direct MQ to ignore that specific patch
-when applying the queue. I do that by creating a negative guard and then
-activating it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qguard centurion.config -- -block
-</span><span class='line'>hg qselect block
-</span><span class='line'>number of unguarded, unapplied patches has changed from 8 to 7
-</span></code></pre></div></figure>
-
-
-<p>That&#8217;s it! Adding a verbose flag to <code>hg qseries</code><sup>2</sup> will print out the
-patchset and the accompanying guard status:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries -v
-</span><span class='line'>0 U setup.makefile
-</span><span class='line'>1 U base.config.customizations
-</span><span class='line'>2 U statuscolours
-</span><span class='line'>3 U cycle
-</span><span class='line'>4 U push
-</span><span class='line'>5 U bstack
-</span><span class='line'>6 G centurion.config
-</span><span class='line'>7 U veles.config
-</span></code></pre></div></figure>
-
-
-<p>The real test, of course, is pushing the patchset onto the fresh
-dwm code:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpush -a
-</span><span class='line'>applying setup.makefile
-</span><span class='line'>applying base.config.customizations
-</span><span class='line'>applying statuscolours
-</span><span class='line'>applying cycle
-</span><span class='line'>applying push
-</span><span class='line'>applying bstack
-</span><span class='line'>skipping centurion.config - guarded by <span class="s1">&#39;-block&#39;</span>
-</span><span class='line'>applying veles.config
-</span><span class='line'>now at: veles.config
-</span></code></pre></div></figure>
-
-
-<p>How cool is that? One central patchset, applied conditionally depending
-upon the machine you are using at the time.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>Any guards applied on other machines will be present in the newly
-pulled <span class="file">series</span> file: these conflicts will need
-to be manually merged…</li>
-<li>The options for all of the <code>hg</code> commands can be read with
-<code>hg -v help $command</code>. For those related to queues, just prepend
-a <code>q</code> to <code>$command</code>.</li>
-</ol>
-
-
-<p>Creative Commons image on Flickr by
-<a href="http://www.flickr.com/photos/alternatewords/4903560373/" title="On Guard on Flickr">Thorsten Becker</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Mercurial Queues]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/07/24/queues/"/>
-    <updated>2012-07-24T19:18:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/07/24/queues</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
-Over the last week or so, I have finally gotten around to digging into the whole concept of
-using
-<a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
-to manage patches against an upstream project; in my case
-<a href="http://dwm.suckless.org" title="The truly suckless window manager…">dwm</a>.<sup>1</sup>
-Essentially, this mercurial extension helps you manage a stack of patches on
-top of a directory tree. This gives you quite a lot of fine-grained control
-over your patchset and assists immeasurably with automating the application of
-patches when the underlying codebase changes.</p>
-
-<p>After having played around with queues for the last couple of days, I am quite
-impressed: both the concept and the execution are simple and powerful. The concept
-of Mercurial Queues is best described in the Mercurial book: the aptly titled,
-<em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
-
-<blockquote><p>MQ&#8217;s marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don&#8217;t like a patch, you can drop it. If a patch isn&#8217;t quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote>
-
-
-<p>I followed Filippo Negroni&#8217;s excellent
-<a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
-to setup my own
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">dwm patchset</a>
-based on
-<a href="http://hg.suckless.org/dwm" title="dwm hg repository">tip</a>, and the process was
-surprisingly straightforward; the only caveat being it is a good idea to plan
-quite carefully what changes you want in each particular patch. Once I had
-completed the setup, it got me thinking about the fact that the final install
-is done without <code>pacman</code>, just using <code>make install</code>. And, as a proof-of-concept
-more than anything else, I wondered whether this functionality could be used
-with <code>makepkg</code>.<sup>3</sup></p>
-
-<p>Turns out, as you might expect with Arch, it was not much of a job to set it
-up at all.</p>
-
-<p><strong>Note</strong>: this doesn&#8217;t mean I think it is a good idea; I was just interested
-to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
-like dwm, this is definitely a case of introducing a huge amount of complexity for
-no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
-
-<p>I have a
-<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD" title="If you must…">working PKGBUILD</a>
-that you can use if you want to follow along at home. Once you have downloaded
-it into <span class="file">dwm-hg/</span>, run <code>makepkg</code> to clone the dwm
-repository and build the binary.  Then you need to make sure that the mercurial
-queue extension is enabled, so your <span class="file">.hgrc</span> needs to
-contain:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
-</span><span class='line'>hgext.mq <span class="o">=</span>
-</span></code></pre></div></figure>
-
-
-<p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
-is <span class="file">dwm-hg/src/dwm</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
-</span></code></pre></div></figure>
-
-
-<p>The next step is to start applying the various patches that you want to comprise
-your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
-and three other patches:
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/statuscolours" title="Patch in mercurial queue">statuscolours</a>,
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/cycle" title="ditto">cycle</a>, and
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/push" title="etc…">push</a>.
-There are other patches in my repository, one of which patches the appropriate
-settings for an Arch build in the
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/setup.makefile" title="Arch settings for Makefiles">relevant makefiles</a>.
-This is taken care of by the PKGBUILD in this case.</p>
-
-<p>From here, it is very much as Filippo describes it in his tutorial: make
-some changes, add them to the queue and rinse and repeat:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
-</span><span class='line'> <span class="c"># “hack hack hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>After committing each of your changes as a discrete patch, you can review the queue
-with <code>hg qseries</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries
-</span><span class='line'>config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span></code></pre></div></figure>
-
-
-<p>And <code>hg qapplied</code> will tell you which of the patches is currently
-applied in the working repository; at this stage the list should look
-the same as that in <code>hg qseries</code>. The next step is to remove all of the
-patches from the queue so that we have a clean repository:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpop -a
-</span><span class='line'>popping push
-</span><span class='line'>popping cycle
-</span><span class='line'>popping statuscolours
-</span><span class='line'>popping config.customizations
-</span><span class='line'>patch queue now empty
-</span></code></pre></div></figure>
-
-
-<p>Should you need to edit a patch, it is simply a matter of popping
-to that spot in the stack (you can do so by name or by index
-number, beginning at 0):</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpop config.customizations
-</span><span class='line'>popping push
-</span><span class='line'>popping cycle
-</span><span class='line'>popping statuscolours
-</span><span class='line'>now at: config.customizations
-</span><span class='line'> <span class="c"># “hack hack hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qpush -a
-</span></code></pre></div></figure>
-
-
-<p>Once you are satisfied with the state of the stack, remove all of the
-patches to return to the original clean working directory and <code>cd</code> back
-to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> to
-rebuild the package and you should see the pushed patches as part of
-the output:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
-</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
-</span><span class='line'>applying config.customizations
-</span><span class='line'>applying statuscolours
-</span><span class='line'>applying cycle
-</span><span class='line'>applying push
-</span><span class='line'>now at: push
-</span><span class='line'>dwm build options:
-</span></code></pre></div></figure>
-
-
-<p>…and when you restart dwm, your customizations will be applied.
-When new changes are pushed to
-<a href="http://hg.suckless.org/dwm" title="dwm mercurial repo">the dwm repo</a>
-you can just <code>makepkg -fi</code>, and, if any of the patches fail due
-to changes in the underlying code, pop the stack to the failed
-patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
-
-<p>As I said at the beginning of this post, this isn&#8217;t a particularly smart way to
-use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
-better off just cloning dwm to your local repository, initializing a queue
-repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
-sudo make install</code>.</p>
-
-<p>If you have more than one machine, you can easily setup a repository for
-your patchset on
-<a href="https://bitbucket.org/" title="bitbucket free mercurial hosting">bitbucket</a>
-or <a href="http://pikacode.com/" title="Free Mercurial and Git hosting">Pikacode</a>
-and host it there: then just pull the patchset queue
-from your other boxes and <code>hg qpush -a</code>. If you require a slightly
-different patchset for each box, you can use MQ to manage this
-process as well. This is where MQ really excels;
-I&#8217;ll cover this in more detail in my next post.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
-<li>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
-example of thorough, accessible documentation.</li>
-<li>In the case of something like dwm, this is really irrelevant, as there
-is a single tiny binary and a <code>man</code> page, so keeping track of these files on
-your system is not an issue at all.</li>
-</ol>
-
-
-<p>Flickr Creative Commons image by
-<a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[The Myth of Breakage]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/07/19/breakage/"/>
-    <updated>2012-07-19T19:23:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/07/19/breakage</id>
-    <content type="html"><![CDATA[<p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/broken.jpg" title="Image of breakage on Flickr" >
-Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
-<a href="https://bbs.archlinux.org/" title="Arch Linux BBS">Arch boards</a> and in the various
-<a href="https://wiki.archlinux.org/index.php/IRC_Channels" title="Wiki page listing channels">IRC channels</a>.
-It doesn&#8217;t take newcomers long to realize that, whether something is actually broken or not,
-there is always
-<a href="http://allanmcrae.com/category/arch-linux/" title="Allan's Blog">someone they can blame</a>.<sup>1</sup></p>
-
-<p>My experience of Arch, over the last three and a bit years, is quite the opposite. I have yet to
-experience anything that would qualify as breakage. Sure, there have been bugs, mostly upstream,
-and the more frequent moments where I haven&#8217;t been as diligent as I should, but not once have I
-had a machine that was unbootable or otherwise unusable. Arch has, on both my home and work
-machines, been incredibly stable and reliable.</p>
-
-<p>For a number of Arch Linux users, however, that was not their experience over the last week when
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="News item on the move">/lib was moved to /usr/lib</a>.
-The volume of people on the boards and on IRC reporting unbootable or unusable systems was
-remarkable. Remarkable because, despite the fact that the
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Once more, just in case…">news item</a>, the
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Arch wiki page on the change">wiki page</a>,
-and the <a href="http://mailman.archlinux.org/pipermail/arch-announce/2012-July/000317.html" title="Mail archive">email to arch-announce</a>
-all <em>explicitly</em> warned people not to use the <code>--force</code> option,<sup>2</sup> so many did.</p>
-
-<p><span class='pullquote-right' data-pullquote='90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice. '>
-Sadly, these red-boxed warnings were apparently not enough.
-90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice.
-The remaining 10% were either in a hurry and didn&#8217;t pay close attention to how
-to deal with any leftover files in <span class="file">/lib</span> or <code>rm -rf</code>&#8216;ed
-in the wrong directory.
-<a href="http://www.gnu.org/fun/jokes/shit-happens.html" title="GNU Humour…">Accidents happen</a>.
-</span></p>
-
-<p>What I am interested in is the people who fell into the much larger category,
-and principally those that didn&#8217;t see any of the communications about this
-change in advance of updating and reasoned, based on a recent change that did
-<a href="http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required-1/" title="News item on filesystem upgrade">require the use of &#8211;force</a>,
-that this was the most expedient way to resolve <code>pacman</code> reporting conflicting
-files.</p>
-
-<p>Some context. The <code>glibc</code> update was released to the
-<a href="https://wiki.archlinux.org/index.php/Testing#.5Btesting.5D" title="Wiki entry on Testing">[testing] repository</a>
-in the first week of July: and there were a couple of long threads<sup>3</sup>
-about issues and fixes before it was pushed to [core]. By the time the
-package was released for general consumption, it had been tested and the
-developers had obviously planned how to make what is a fundamental system
-change with a minimal amount of user intervention.  I think that, given the
-magnitude of the challenge, they did a superb job.</p>
-
-<p>How then did it go so wrong for so many?<sup>4</sup> To answer that, you have
-to consider the nature of Arch. It&#8217;s <em>not</em> the sort of distribution where you
-install it and then just go on your merry way, installing
-<a href="http://oswatershed.org/" title="It's SCIENCE, Jim">the least obsolete packages</a>,
-revelling in the speed of the package manager and generally being
-a 1337 h@x0r…</p>
-
-<p>Successfully running a rolling release like Arch, irrespective of your level of
-competence, means staying in touch with what is happening—in
-<a href="http://kmkeen.com/pacmatic/" title="Pacman wrapper that pulls news updates">some form or other</a>.
-Subscribing to the arch-general <acronym title="Mailing list">ML</acronym>,
-visiting the forums, idling in IRC; somehow remaining connected to what is
-going on in the community so that you don&#8217;t blindly update one day and wonder
-why your system is broken.</p>
-
-<p>This strikes me as a real strength; by design Arch encourages its users to
-participate in the community. Even if you are only lurking, over time you will
-inevitably find yourself posting in a thread, responding to an email, editing
-the wiki,
-<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="Post on aurphan">adopting an orphaned package</a>—increasingly
-getting involved and contributing.</p>
-
-<p>This level of involvement is not for everyone. Some may find it onerous or
-a waste of their time. That&#8217;s fine. There are any number of other distros
-that do not ask for this level of commitment. The <em>quid pro quo</em> for
-running Arch, though, is that you are prepared, in whatever shape or form
-best works for you, to give something back; at the very least, that is your
-attention.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>This is, of course, a reference to said Arch meme: Allan is one
-of the developers who has contributed an enormous amount to Arch and the fact
-that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</li>
-<li>At the end of 2011, the short option <code>-f</code>
-<a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
-from <code>pacman</code> so “it at least makes people read the word &#8216;force&#8217; and maybe they
-will have some sense to step back and think about what they are doing first.”</li>
-<li><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
-<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></li>
-<li>Relatively speaking. In situations like this, the overwhelming amount of traffic
-is about what went wrong, not people posting to say they had no difficulties whatsoever…</li>
-</ol>
-
-
-<p>Creative Commons image on Flickr from
-<a href="http://www.flickr.com/photos/daviddoctorrose/431786001/" title="Broken keyboard on Flickr">djeucalyptus</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Replacing Grub With Syslinux]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/07/09/syslinux/"/>
-    <updated>2012-07-09T13:51:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/07/09/syslinux</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/grub.jpg" title="Image of grub on Flickr" >
-With the announcement late last month that
-<a href="http://lists.gnu.org/archive/html/grub-devel/2012-06/msg00093.html" title="Grub ML announcement">Grub 2.00 has been released</a>
-I thought that it was time to stop procrastinating and do something about moving away from
-<a href="http://www.gnu.org/software/grub/grub-legacy.html" title="Gnu Page for Grub Legacy">Grub Legacy</a>,
-which is no longer actively developed. Not that there is anything wrong with Grub Legacy&#8217;s
-functionality; it has always done whatever I asked of it (admittedly, not a lot) and done so
-without complaint.</p>
-
-<p>I have used Grub2 before, when I was running Ubuntu on my home desktop, and it is the bootloader
-on my Debian Squeeze server. I can&#8217;t, however, say that I have ever really understood—or
-appreciated—its mutliple file, “need to reconfigure after making any changes” type of
-complexity. So, I thought that I would give
-<a href="http://www.syslinux.org/wiki/index.php/The_Syslinux_Project" title="Syslinux Wiki">Syslinux</a>
-a shot.</p>
-
-<p>Syslinux isn&#8217;t a single bootloader, rather it is a collection of lightweight bootloaders,
-with <a href="http://www.syslinux.org/wiki/index.php/EXTLINUX" title="Extlinux page on Syslinux Wiki">Extlinux</a>
-responsible for booting ext2, ext3, ext4 and btrfs filesystems. As the
-<a href="https://wiki.archlinux.org/index.php/Syslinux" title="The FINE Wiki">Arch Wiki Syslinux page</a>
-notes, since Syslinux 4, Extlinux has been merged with Syslinux.</p>
-
-<p>Installing Syslinux is <em>ridiculously</em> easy. It is literally a five step process. First,
-install the package:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -S syslinux</span></code></pre></div></figure>
-
-
-<p>After installing <code>syslinux</code> pacman will helpfully tell you what to do next:</p>
-
-<blockquote><p>==> If you want to use syslinux as your bootloader<br/>==> edit /boot/syslinux/syslinux.cfg and run<br/>==>   # /usr/sbin/syslinux-install_update -i -a -m<br/>==> to install it.</p></blockquote>
-
-
-<p>Arch user <a href="http://pyther.net/" title="Matthew's website">Matthew Gyurgyik</a> has written an
-ingenious script, <code>syslinux-install_update</code> that automates the process of writing the
-<acronym title="Master Boot Record">MBR</acronym> and installing the relevant files to
-<span class="file">/boot/syslinux/</span>. The script also checks if, as is the case
-with my desktop, there is a RAID array present, and if so passes the install command the
-<code>--raid</code> flag:</p>
-
-<blockquote><p>RAID mode.  If boot fails, tell the BIOS to boot the next device in the boot sequence (usually the next  hard<br/>disk) instead of stopping with an error message.  This is useful for RAID-1 booting.</p></blockquote>
-
-
-<p>After running the script, you should receive a message advising you that Syslinux
-has been sucessfully installed on both drives:</p>
-
-<blockquote><p>Detected RAID on /boot - installing Syslinux with &#8211;raid<br/>Syslinux install successful<br/>Boot Flag Set - /dev/sda1<br/>Boot Flag Set - /dev/sdb1<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sda<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sdb</p></blockquote>
-
-
-<p>If you are moving from Grub Legacy, configuring Syslinux is similarly painless.
-There are two sections to a basic  <span class="file">/boot/syslinux/syslinux.cfg</span>,
-the defaults and the prompt entries.</p>
-
-<p>I set up my defaults to be essentially invisible:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'># General settings
-</span><span class='line'>DEFAULT Arch
-</span><span class='line'>PROMPT 0
-</span><span class='line'>TIMEOUT 0</span></code></pre></div></figure>
-
-
-<p>And then copy across the relevant lines from my <span class="file">/boot/grub/menu.lst</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>grep <span class="nv">root</span><span class="o">=</span> /boot/grub/menu.lst &gt;&gt; /boot/syslinux/syslinux.cfg
-</span></code></pre></div></figure>
-
-
-<p>Then it is just a matter of adding the relevant entries under LABEL:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>LABEL Arch
-</span><span class='line'>   MENU LABEL Arch Linux
-</span><span class='line'>   LINUX ../vmlinuz-linux
-</span><span class='line'>   APPEND root=/dev/mapper/vgroup-lvroot cryptdevice=/dev/md1:vgroup ro
-</span><span class='line'>   INITRD ../initramfs-linux.img</span></code></pre></div></figure>
-
-
-<p>You then add entries for Fallback, and any other images that you may wish to
-boot from.</p>
-
-<p>And that, in their entirety, is steps two and three. You then move to steps four and five:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -Rsn grub
-</span><span class='line'>shutdown -r now</span></code></pre></div></figure>
-
-
-<p>And you reboot with Syslinux. Done.</p>
-
-<p>The beauty of Syslinux, from my perspective, is that it is simple to install
-and configure, with just the one config file and the options all well documented
-and easy to understand. If you want a menu with a background
-image, you can have that. If, like me, you just want to get on and boot your default,
-it does that.</p>
-
-<p>Additionally, if you want or need to boot into Fallback, or want to dual boot,
-you can just hold down <kbd>Shift</kbd> at boot time and enter the desired
-Label at the prompt. Syslinux has Tab completion, so you only need enter a
-couple of letters, hit <kbd>Tab</kbd> and you will see all of the available
-Labels to boot. Brilliant.</p>
-
-<h4>Notes</h4>
-
-<p>Creative Commons Flickr image by
-<a href="http://www.flickr.com/photos/sgodt/5103674184/">custer_fluck</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Misunderstanding Arch]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/06/16/misunderstanding/"/>
-    <updated>2012-06-16T10:52:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/06/16/misunderstanding</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/hands.jpg" title="'mutt logo'" ></p>
-
-<p>I am frequently struck by how many people arrive on the
-<a href="https://bbs.archlinux.org/" title="Arch Linux Forums">Arch boards</a> without <em>any</em>
-understanding of how Arch is different from the other GNU/Linux communities
-they may have spent time with (if, indeed, they have spent any time in
-another community before trying Arch). For me, this is akin to arriving in a
-foreign country and not bothering to familiarize yourself at all with the local
-mores and customs; it lies on a spectrum somewhere between ignorance and
-outright arrogance.</p>
-
-<p>The result, inevitably, is that these people are shocked
-when their expectations of how they <em>should</em> be treated are at odds with the
-reception their behaviour invites…</p>
-
-<p>Before venturing any further, I should preface my remarks about this with
-something of a disclaimer. These are my own views and not those of the current,
-or past, forum staff.</p>
-
-<p>One of Arch&#8217;s significant acheivements is the quality of
-<a href="https://wiki.archlinux.org" title="THE best GNU/Linux Wiki">its documentation</a>.
-Not just the technical documentation describing how to install and configure
-Arch, but the cultural documentation that sets out
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="The Arch Way">Arch&#8217;s philosophy</a>
-and <a href="https://wiki.archlinux.org/index.php/Forum_Etiquette" title="Forum Etiquette">standards of behaviour</a>. Both these pages provide clear statements on what to expect when
-using Arch Linux and a clear indication of how to respectfully interact with the
-community when you are seeking help.</p>
-
-<p>The defining statement about Arch&#8217;s intended user base is quite direct and
-unambiguous:</p>
-
-<blockquote><p>Arch Linux targets and accommodates competent GNU/Linux users <br/>by giving them complete control and responsibility over the system.</p><footer><strong>The Arch Way</strong> <cite><a href='https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric'>wiki.archlinux.org/index.php/&hellip;</a></cite></footer></blockquote>
-
-
-<p>The expression “targets and accommodates” doesn&#8217;t exclude other users—for
-example, those that are not necessarily competent, but are wanting to learn
-more about the specifics of how their machines work—it does, however, signal
-quite explicitly what sort of community Arch is. And what it is not.</p>
-
-<p><a href="http://ubuntu.com" title="Ubuntu Linux">Ubuntu</a> is an excellent distribution. Like Arch,
-it has very specific aims and a clear concept of what the Ubuntu community is.
-Popularity is central to Ubuntu&#8217;s culture. People coming from Ubuntu, who
-haven&#8217;t bothered to familiarize themselves with Arch&#8217;s values, often struggle
-to appreciate the difference; leading to comments like this one:</p>
-
-<blockquote><p>Maybe if Arch is friendly and Arch forum is friendly, it might go some<br/>place, who knows…</p><footer><strong>Linux Journal commenter</strong> <cite><a href='http://www.linuxjournal.com/content/arch-way#comment-361974'>www.linuxjournal.com/content/&hellip;</a></cite></footer></blockquote>
-
-
-<p>This was posted in reply to a post on Arch in which the author noted how to
-seek help with Arch Linux:</p>
-
-<blockquote><p>You&#8217;ll find far less hand-holding on the Arch Forums than some of the other<br/>distro&#8217;s forums, and for good reason.  Arch has one of the most informative,<br/>user-friendly wiki&#8217;s out there. Do not, I repeat, DO NOT ask a question in the<br/>forums or on IRC without searching the wiki and the forums first.</p></blockquote>
-
-
-<p>Similarly, looking through the threads in
-<a href="https://bbs.archlinux.org/viewforum.php?id=23" title="Newbie board">Newbie Corner</a>
-will periodically turn up new posters who are indignant at being told to
-<acronym title="Read The Fscking Manual">RTFM</acronym> and see it as some
-sort of <em>personal</em> attack, when in fact it is just someone pointing out the
-obvious to them. The community hasn&#8217;t compiled all that documentation just
-so they can sit around and regurgitate answers for people who are either
-unwilling or incapable of making the minimum amount of  effort required to
-solve their own problems…</p>
-
-<p>If you want handholding, there are plenty of online communities that will
-cater for you. If you install Arch and think that you are automatically entitled
-to immediate support for issues that you encounter, then you are mistaken.
-If you think that Arch will suffer if you don&#8217;t get what you want, then
-your problems extend significantly beyond your choice of distro.</p>
-
-<p>The community has worked hard over the years to keep the signal-to-noise ratio
-on the boards high, that way, the forums remain a helpful resource for the community,
-not a breeding ground for
-<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on parasites…">help vampires</a>.</p>
-
-<h4>Notes</h4>
-
-<p>Flickr Creative Commons image by
-<a href="http://www.flickr.com/photos/angellic/47031159/">si_si_ay</a></p>
 ]]></content>
   </entry>
   

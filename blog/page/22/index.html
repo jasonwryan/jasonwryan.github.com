@@ -9,9 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I had posted a while back
-about my (failed) attempt to patch dwm
-with both pertag and some of the other layout patches. I had been able to get it to &hellip;">
+  <meta name="description" content="I use mutt and
+offlineimap
+to manage email on my Arch Linux machines. I like the simplicity and the
+power that this approach offers; that’s power in &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,7 +91,7 @@ with both pertag and some of the other layout patches. I had been able to get it
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/03/02/patching-dwm/">Patching dwm</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/01/08/mail-checking-script/">Mail Checking Script</a></h1>
     
     
       <p class="meta">
@@ -106,45 +107,75 @@ with both pertag and some of the other layout patches. I had been able to get it
   
 
 
-<time datetime="2010-03-02T20:16:00+13:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2010</time>
+<time datetime="2011-01-08T11:04:00+13:00" pubdate data-updated="true">Jan 8<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/patching-dwm.png" alt="image" /></p>
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/mailcheck.png" alt="image" /></p>
 
-<p>I had posted <a href="http://jasonwryan.com/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/" title="Patching dwm with pertag &amp; bstack">a while back</a>
-about my (failed) attempt to patch <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>
-with both pertag and some of the other layout patches. I had been able to get it to work with
-<a href="http://dwm.suckless.org/patches/bottom_stack" title="dwm wiki: bstack">bottomstack</a>,
-but adding another patch caused some of the chunks to fail. It seems
-pertag moves the code around to the point that – using
-<a href="http://dwm.suckless.org/patches/" title="patches: dwm wiki">the standard patching method</a> –
-any further patches won’t take.</p>
+<p>I use <a href="http://www.mutt.org/" title="Mutt homepage">mutt</a> and
+<a href="https://github.com/jgoerzen/offlineimap/wiki" title="Offlineimap on github">offlineimap</a>
+to manage email on my Arch Linux machines. I like the simplicity and the
+power that this approach offers; that’s power in the sense of
+extensibility and customization, by the way…</p>
 
-<p>Further investigation, and some trial and a tolerable amount of error,
-have however demonstrated to me that it is quite possible to patch dwm
-to your heart’s content; or at least to my meagre needs. Which in the
-case of <a href="http://dl.dropbox.com/u/261312/Configs/index.html" title="EeePC configs">my EeePC</a>
-is pertag, cycle and push, with the addition of bstack on
-<a href="https://bitbucket.org/jasonwryan/workstation/src/" title="Workstation configs">my workstation</a>.</p>
+<p>Using <a href="http://dwm.suckless.org/" title="dwm homepage">dwm</a> as my window
+manager, I had relied on
+<a href="http://jasonwryan.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/" title="My post on setting this up">conky and dzen2</a>
+to pipe system information into my status bar. Unfortunately, conky only
+supports one mail spool so if, like me, you use offlineimap to
+synchronize multiple mailboxes, conky would only show new mail in your
+primary box. I had asked in #conky about multiple mail spools, but it
+doesn’t seem to be supported.</p>
 
-<p>The solution, as I have found in almost every instance of my tinkering
-with dwm, is stunningly simple. Start with a new version of dwm and
-apply the
-<a href="http://dwm.suckless.org/patches/pertag" title="dwm wiki: pertag">pertag diff</a>. Then
-manually add all of the chunks of the subsequent patches.</p>
+<p>When I recently started using
+<a href="http://jasonwryan.com/blog/2010/12/26/wmfs-window-manager-from-scratch/" title="My post on Window Manager From Scratch">WMFS</a>
+I decided to move to a
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/wmfs-status" title="Script in mercurial repo">bash script for my status information</a>.
+So I approached the problem afresh and decided to write a script to poll
+the new mail directories and update my status bar when mail arrived.</p>
 
-<p>All of the changes are now in dwm.c and your config.h should only have
-the necessary keybindings to activate the functionality you have added
-to this amazing window manager.</p>
+<p>Offlineimap creates a directory structure like so:</p>
 
-<p>If you want to see what changes this makes, you can take a peek at
-<a href="https://bitbucket.org/jasonwryan/workstation/src/tip/dwm-5.7.2-2/" title="diff in mercurial repo">my .diff</a>
-(for bstack, cycle, pertag and push). You are equally welcome to apply
-it if that is the functionality that you are looking for in 5.7.2.</p>
+<pre><code>   Mail/ -------
+      |         |
+      |     Mail_Account_1
+      |         |
+      |         | --  INBOX 
+      |         |       | -- cur
+      |         |       | -- new
+      |         |       | -- temp
+      |         |
+      |         | -- INBOX.Drafts
+      |         |       | -- cur
+</code></pre>
+
+<p>As I was only interested in checking the <span class="file">INBOX/new</span>
+directory of each account, I had imagined that it would be necessary to set up some
+elaborate array to effectively check each of the requisite sub-directories…</p>
+
+<p>No, it was pretty simple. Just
+<a href="http://www.faqs.org/docs/abs/HTML/globbingref.html" title="ABS entry on globing">globbing</a>
+and
+<a href="http://linuxmanpages.com/man1/find.1.php" title="man page for find">find</a>,
+actually.</p>
+
+<figure class='code'><figcaption><span>mailcheck.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="c"># Set maildirs</span>
+</span><span class='line'><span class="nv">maildirs</span><span class="o">=</span><span class="s2">&quot;$HOME/Mail/*/INBOX/new/&quot;</span>
+</span><span class='line'>
+</span><span class='line'>find <span class="nv">$maildirs</span> -type f | wc -l
+</span><span class='line'><span class="nb">exit </span>0
+</span></code></pre></div></figure>
+
+
+<p>The glob (<code>*</code>) takes care of the different mail account names, and has
+the added bonus of being portable, and find returns any files (<code>-type f</code>)
+with <code>wc</code> counting the number of lines (the <code>-l</code> switch).</p>
 </div>
   
   
@@ -157,7 +188,7 @@ it if that is the functionality that you are looking for in 5.7.2.</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/02/27/using-uzbl/">Using Uzbl</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/12/26/wmfs-window-manager-from-scratch/">WMFS - Window Manager From Scratch</a></h1>
     
     
       <p class="meta">
@@ -173,73 +204,94 @@ it if that is the functionality that you are looking for in 5.7.2.</p>
   
 
 
-<time datetime="2010-02-27T10:19:00+13:00" pubdate data-updated="true">Feb 27<span>th</span>, 2010</time>
+<time datetime="2010-12-26T11:08:00+13:00" pubdate data-updated="true">Dec 26<span>th</span>, 2010</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/4352140405/" title="Arch &amp; uzbl by jasonwryan, on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/uzbl.jpg" alt="Arch &amp;
-uzbl" /></a></p>
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5289976238/lightbox/" title="Screenshot on Flickr"><img src="http://miromiro.com/Blog-images/wmfs.png" alt="image" /></a></p>
 
-<p>A couple of weeks ago, I switched my default browser from
-<a href="http://conkeror.org/" title="Conkeror homepage">Conkeror</a> to
-<a href="http://www.uzbl.org/" title="uzbl homepage">uzbl</a>. It wasn’t that I was
-dissatisfied with Conkeror <em>per se</em>; more that as I was almost
-exclusively using vim-like applications, it seemed almost perverse to be
-browsing with an application that used Emacs-style keybindings. Over
-time, the simplest operations seemed—in comparison to
-<a href="http://www.vim.org/" title="THE $EDITOR">Vim</a>— to demand ridiculously complex
-key strokes.</p>
+<p>I have been experimenting with a couple of new window managers over the
+last week or so. Not that I am in any way dissatisfied with
+<a href="http://dwm.suckless.org/" title="suckless page for dwm">dwm</a> — far from it; I
+do from time to time, however, like to see what else is on offer.</p>
 
-<p>So, I installed uzbl.</p>
+<p><a href="http://wmfs.info/projects/wmfs" title="WMFS homepage">WMFS</a> is a fairly new
+entrant in the window manager marketplace. The developers describe it
+as:</p>
 
-<blockquote><p>Uzbl follows the UNIX philosophy - “Write programs that do one thing
-and do it well. Write programs to work together. Write programs to
-handle text streams, because that is a universal interface.”
-<a href="http://www.uzbl.org/">uzbl homepage</a></p></blockquote>
+<blockquote><p>a lightweight and highly configurable tiling window manager for X… It
+supports Xft (Freetype) fonts and is compliant with the Extended
+Window Manager Hints (EWMH) specifications, Xinerama and Xrandr.</p></blockquote>
 
-<p>Consequently, the default uzbl version is designed to do little more
-than browse web pages. It doesn’t handle cookies, manage downloads,
-block ads, save bookmarks, or do any of the things that you would expect
-of its WebKit kin, <del>Firefox</del> Safari and Chrome.</p>
+<p>The <a href="http://aur.archlinux.org/packages.php?ID=26924" title="AUR page">git version is available</a> in
+AUR, and is straightforward to build and install. The fun, as always,
+comes with customization…</p>
 
-<p>This isn’t to say that it <em>can’t</em> do any of these things; like any
-well-designed
-<a href="http://en.wikipedia.org/wiki/UNIX" title="Wikipedia entry">UNIX</a> program, it
-is extensible and interoperable with programs through a range of
-scripts. The difference is that you get to choose which functionality
-matters to you, and implement it on an as-needs basis. This makes uzbl
-very light, very fast, and very powerful.</p>
+<p>As is says on the box, WMFS is highly configurable. The configuration is
+all done (initially) in one file, which you will need to copy to your
+<span class="file">~/.config/wmfs/directory</span>:</p>
 
-<p>The version I installed, uzbl-tabbed, ships with a number of default
-scripts that perform most of the functions that you will need. There is
-also a <a href="http://www.uzbl.org/wiki/scripts" title="uzbl wiki: scripts">scripts page</a>
-on the wiki that has a growing number of scripts contributed by users.</p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cp /etc/xdg/wmfs/wmfsrc ~/.config/wmfs/
+</span></code></pre></div></figure>
 
-<p>I installed a couple of <a href="http://pbrisbin.com:8080/pages/scripts.html" title="Pat's scripts page">Pat Brisbin’s scripts</a>;
-an ingenious bash script for bookmarking that creates an HTML page of
-your bookmarks that you can serve locally or remotely (I keep mine on
-<a href="http://www.dropbox.com" title="Dropbox home">Dropbox</a> so I can access it from
-my phone as well), and a tidy little download manager.</p>
 
-<p>Like Vim, uzbl is modal; you switch between command and insert mode. By
-configuring uzbl to use Vim key bindings, you can seamless integrate it
-into your desktop environment. Here you can see the status bar showing
-uzbl in command mode, on the Arch forums home page, which has completely
-loaded (the other figure is the X root window number).</p>
+<p>Even the default config is relatively fully featured. There are nine
+default layouts (about five more than I usually need, but it is always
+better to over cater). The <span class="file">wmfsrc</span> is quite well
+commented, so most of the options are self explanatory.</p>
 
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/uzbl-bar.png" alt="image" /></p>
+<p>One thing I did note about editing this file, which is probably more a
+reflection of my haste rather than the wm itself, is that it seemed
+<em>very</em> unforgiving of any errors. More than once I had to copy the
+default wmfsrc back across and start again. My advice is to make any
+changes cumulatively, and test by reloading before continuing.</p>
 
-<p>As an Arch Linux user, I’m keen to support a project that has been
-developed by the Arch community (if you want to see the history of the
-project, there is a <a href="http://bbs.archlinux.org/viewtopic.php?id=70700&amp;p=1" title="uzbl history">long thread</a>
-on the Arch boards); but ultimately this software appeals because it is
-so configurable: you can customize it to your heart’s content (see my
-config file on my <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/uzbl/" title="uzbl file on bitbucket">mercurial repo</a>).</p>
+<p>You can see my config file in my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/.config/wmfs/wmfsrc" title="Mercurial repository for EeePC">bitbucket repo</a>.
+Most of the changes have been made in setting up my preferred tags and
+keybindings – so they are consistent with my dwm and
+<a href="http://plhk.ru/" title="Echinus window manager home">echinus</a> setups.</p>
 
-<p>There are packages for most of the major distros: <a href="http://www.uzbl.org/get.php" title="Download and install details on the wiki">give it a go</a>.</p>
+<p>One of the great features of WMFS is the status bar. You can pipe all
+sorts of information into it with a bash script, and you can use colours
+and icons (if that is your thing). Simply sourcing the bash script from
+within wmfsrc will see it up and running:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">background_command</span> <span class="o">=</span> <span class="s2">&quot;$HOME/.config/wmfs/autostart.sh&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Or, if you prefer to use conky:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>conky | <span class="k">while </span><span class="nb">read</span> -r; <span class="k">do </span>wmfs -s -name <span class="s2">&quot;$REPLY&quot;</span>; <span class="k">done</span>
+</span></code></pre></div></figure>
+
+
+<p>I use the status bar to display some basic system information. You can
+see from
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/36ae3d14507b/Scripts/wmfs-status" title="Script in bitbucket repo">my status script</a>
+that most of it is simply piping commands through the awesomeness that
+is <a href="http://awk.info/" title="Awk Community Portal">awk</a>.</p>
+
+<p>I hadn’t thought that I would find a replacement for dwm, but WMFS is a
+serious contender. It has all of the functionality out-of-the-box,
+including:</p>
+
+<ul>
+<li>pre-set layout per tag</li>
+<li>rules to send applications to specific tags</li>
+<li>completely customizable keybinds, and – as a bonus,</li>
+<li><a href="http://en.wikipedia.org/wiki/Vi" title="Wikipedia page">Vi</a>-driven
+command interface</li>
+</ul>
+
+
+<p>Unlike dwm, it requires no patching for any of this. It has been
+completely stable while I have been using it and, while not as light as
+dwm, it is still in the minimalist camp in terms of size.</p>
 </div>
   
   
@@ -252,7 +304,7 @@ config file on my <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/uzbl/"
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/02/25/wikipedia-discriminates-against-foss/">Wikipedia Discriminates Against FOSS</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/10/21/console-fonts-in-ubuntu/">Console Fonts in Ubuntu</a></h1>
     
     
       <p class="meta">
@@ -268,48 +320,74 @@ config file on my <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/uzbl/"
   
 
 
-<time datetime="2010-02-25T06:59:00+13:00" pubdate data-updated="true">Feb 25<span>th</span>, 2010</time>
+<time datetime="2010-10-21T20:38:00+13:00" pubdate data-updated="true">Oct 21<span>st</span>, 2010</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>There is currently an interesting debate on Wikipedia about <a href="http://en.wikipedia.org/wiki/Wikipedia:Articles_for_deletion/Dwm" title="Wikipedia page">deleting the article on dwm.</a></p>
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/ubuntu-fonts.png" alt="image" /></p>
 
-<p>According to the Wikipedia <a href="http://en.wikipedia.org/wiki/Wikipedia:Notability" title="Wikipedia page">notability guidelines</a>,
-only</p>
+<p>Invariably, an <a href="http://www.ubuntu.com/" title="Ubuntu homepage">Ubuntu</a>
+upgrade only ever brings me pain in one area: the framebuffer. Granted,
+most Ubuntu users probably don’t care about the resolution of their
+framebuffer because they probably rarely venture there.</p>
 
-<blockquote><p>significant coverage in reliable sources that are independent of the
-subject</p></blockquote>
+<p>For me, however, having the correct resolution and a decent font is
+important. Not because I spend a huge amount of time there (I don’t),
+but because in the past I have been forced to — and quickly learned that
+if the resolution is off, it makes it <em>very</em> difficult to work with.</p>
 
-<p>constitutes notability.</p>
+<p>So the recent, otherwise completely successful, upgrade to Maverick
+Meerkat once again left me with an almost useless console. Fortunately,
+the hack for forcing a 1680x1050 resolution worked<sup>1</sup>, so it was just a
+matter of getting
+<a href="http://fractal.csie.org/~eric/wiki/Terminus_font" title="Terminus homepage">Terminus</a>
+to stick as the default console font.</p>
 
-<p>So 300 words by the likes of <a href="http://blogs.zdnet.com/BTL/?p=31024" title="ZDNet article exposing corrupt practice in Tech reporting">Randall Kennedy</a>
-counts for more in terms of “notability” than the hundreds of thousands
-of lines of code contributed to
-<a href="http://dwm.suckless.org/" title="dwm wiki">dwm</a> and its forks
-(<a href="http://awesome.naquadah.org/" title="awesome home page">awesome</a> and
-<a href="http://www.rootshell.be/~polachok/code/" title="echinus page">echinus</a>) and
-clones (<a href="http://www.xmonad.org/" title="xmonad homepage">xmonad</a>,
-<a href="http://aerosuidae.net/musca.html" title="musca homepage">musca</a>,
-<a href="http://www.peereboom.us/scrotwm/html/scrotwm.html">scrotwm</a> <em>et al</em>)?</p>
+<p>This was one instance where Google failed me. There doesn’t seem to be
+any authoritative guide to setting your console font permanently. I
+edited <span class="file">/etc/default/console-setup</span>
+and added Terminus as the font, like so:</p>
 
-<p>The notion that, in the free/libre and open source software world, a
-project’s notability is measured in terms of the <em>prose</em> that appears in
-journals, books etc is myopic and—in terms of Wikipedia’s status as a
-FOSS project—quite disappointing. The real measure of notability of
-projects like this is the <strong>code they generate</strong>.</p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">CODESET</span><span class="o">=</span><span class="s2">&quot;Lat15&quot;</span>
+</span><span class='line'><span class="nv">FONTFACE</span><span class="o">=</span><span class="s2">&quot;Terminus&quot;</span>
+</span><span class='line'><span class="nv">FONTSIZE</span><span class="o">=</span><span class="s2">&quot;16&quot;</span>
+</span></code></pre></div></figure>
 
-<p>Wikipedia’s criteria actively discriminates against free and open source
-projects where the measure of notability is not the column inches in
-trade magazines sponsored by advertising and advertorial, but by the
-passion and commitment of large communities of contributors who believe
-in the project enough to devote their code, time and money.</p>
 
-<p>Wikipedians need to review their criteria to reflect this reality;
-otherwise the “free encyclopedia” will continue to exclude exactly those
-free/libre projects…</p>
+<p>Issuing, from the console:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo setupcon -v
+</span></code></pre></div></figure>
+
+
+<p>would change the font to Terminus for that session but a reboot soon
+reverted it to the default fixed (which, given
+<a href="https://wiki.ubuntu.com/Ubuntu%20Font%20Family">Ubuntu have been working on their fonts</a>, is
+spectacularly ugly).</p>
+
+<p>I finally asked in #ubuntu and was pointed in the right direction:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo dpkg-reconfigure console-setup
+</span></code></pre></div></figure>
+
+
+<p>And <em>now</em> I have a workable framebuffer.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Hack to force higher framebuffer resolution in <span class="file">/etc/default/grub</span></li>
+</ol>
+
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">GRUB_GFXPAYLOAD_LINUX</span><span class="o">=</span>1680x1050
+</span></code></pre></div></figure>
+
+
+
 </div>
   
   
@@ -334,23 +412,23 @@ free/libre projects…</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -437,7 +515,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

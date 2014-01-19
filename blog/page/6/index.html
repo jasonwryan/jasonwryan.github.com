@@ -9,11 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="In my last post, on
-Mercurial Queues,
-I outlined how you might use MQ to manage a
-dwm patchset.
-Mercurial makes this process ridiculously easy, and &hellip;">
+  <meta name="description" content="I have posted about using dropbox quite
+a few times
+over the last couple of years; it is one of those utilities that quickly insinuates itself
+into &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -92,7 +91,7 @@ Mercurial makes this process ridiculously easy, and &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/03/16/sync/">BitTorrent Sync Alpha</a></h1>
     
     
       <p class="meta">
@@ -108,178 +107,121 @@ Mercurial makes this process ridiculously easy, and &hellip;">
   
 
 
-<time datetime="2012-07-26T18:48:00+12:00" pubdate data-updated="true">Jul 26<span>th</span>, 2012</time>
+<time datetime="2013-03-16T10:17:00+13:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/guard.jpg" title="'On Guard image on Flickr'" >
-In my last post, on
-<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="You should read it…">Mercurial Queues</a>,
-I outlined how you might use MQ to manage a
-<a href="http://dwm.suckless.org/" title="Dynamic window manager">dwm</a> patchset.
-Mercurial makes this process ridiculously easy, and this functionality is more
-than enough to recommend it. However, where I think it really gets interesting
-is when you share that same patchset across multiple machines and are easily
-able to customize which patches in the queue are applied, based upon the
-particular machine you are building dwm on.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/syncapp.png" title="'BitTorrent Sync logo'" >
+I have posted about using <a href="http://dropbox.com" title="dropbox homepage">dropbox</a> quite
+<a href="https://duckduckgo.com/?sites=jasonwryan.com&amp;q=dropbox" title="DDG search results">a few times</a>
+over the last couple of years; it is one of those utilities that quickly insinuates itself
+into an indispensable niche in your workflow and, consequently, can be <em>very</em> difficult to
+dislodge. Perhaps because it has started to glue together so much of the way I work, I have
+been wondering when I would find a replacement that would deliver all, or much, of the
+functionality, without the standard
+<a href="http://arstechnica.com/security/2012/07/dropbox-confirms-it-got-hacked-will-offer-two-factor-authentication/" title="Ars post on the dropbox hack">cloud security issues</a>,
+that seem to bedevil these services.<sup>1</sup></p>
 
-<p>For example, in my case I use dwm on all three of my machines: my desktop at home,
-my laptop at work and my EeePC. Given the nature of each of these three machines,
-though, I want a slightly different stack of patches applied. These differences
-might extend only to particular rules applied in <span class="file">config.def.h</span>
-based upon the number of tags I use, or the different applications that I run
-at home as opposed to at work.</p>
+<p>When I saw that BitTorrent had release a distributed synching app called—appropriately—
+<a href="http://blog.bittorrent.com/2013/01/24/test-bittorrent-sync-pre-alpha/" title="Blog post on sync release">Sync</a>,
+I <a href="http://labs.bittorrent.com/experiments/sync.html" title="Invitation form">signed up for the Alpha</a> and
+have been running it in lieu of dropbox for the past three weeks. My initial reaction is,
+that for a first release, it is very impressive.</p>
 
-<p>In any event, what I want to be able to do is maintain
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">a single patchset</a>
-in a mercurial repository, clone it to all my machines and then, using MQ,
-filter which specific patches are applied. This is all possible using a killer
-feature of MQ called
-<a href="http://hgbook.red-bean.com/read/advanced-uses-of-mercurial-queues.html%20'Advanced%20uses%20of%20MQ%20in%20the%20Mercurial%20book">guards</a>.
-Guards allow you to conditionally apply patches in a queue. Essentially, in
-a queue, you “tag” a patch with a guard and—depending on whether or not the
-guard is positive (to be applied), or negative (to be skipped)—when you
-<code>hg qpush -a</code> MQ takes care of applying the correct patches in the queue.</p>
+<p>Essentially, Sync uses the
+<a href="https://en.wikipedia.org/wiki/Bittorent" title="Wikipedia entry">bittorrent peer-to-peer protocol</a>
+and encryption
+(<a href="https://en.wikipedia.org/wiki/Aes_256" title="Wikipedia entry on the standard">AES 256</a>
+using a private key based on the secret generated for each shared folder)
+to sync files between your machines—or anyone with whom you share the secret
+for a particular directory. This has several advantages over dropbox, from my perspective.
+First and foremost, you are not relying on some third party for security<sup>2</sup>, storage
+and uptime. Secondly, all of the traffic between your devices is encrypted. And finally,
+it is free (sadly, only as in beer).</p>
 
-<p>So, in the case of my work laptop, I begin by cloning dwm and intializing
-a patch queue:</p>
+<h3>Positives</h3>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd </span>Build/
-</span><span class='line'>hg clone http://hg.suckless.org/dwm
-</span><span class='line'>hg qinit -c
+<p>So what does it do well? It is ridiculously easy to setup. You download the binary, start
+the app and then (on Linux) use the web interface to setup your first synching folder by
+generating a secret and then nominating a folder to share. On your next machine, enter the
+secret and select or create the shared folder and your files will be synched. Done.</p>
+
+<p>On a headless machine, there is a config file that you can create:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --dump-sample-config &gt; syncapp.conf
 </span></code></pre></div></figure>
 
 
-<p>I setup my <span class="file">.hgrc</span> within the patches directory so that
-it points at the correct mercurial repository:</p>
+<p>Edit it to suit your requirements, and then start <code>syncapp</code> with that configuration:</p>
 
-<figure class='code'><figcaption><span>.hg/patches/.hg/hgrc </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'> <span class="c"># Mercurial config file</span>
-</span><span class='line'><span class="o">[</span>ui<span class="o">]</span>
-</span><span class='line'><span class="nv">username</span> <span class="o">=</span> jasonwryan &lt;jasonwryan@gmail.com&gt;
-</span><span class='line'><span class="nv">ssh</span> <span class="o">=</span> ssh -i ~/.ssh/bb -C
-</span><span class='line'><span class="o">[</span>paths<span class="o">]</span>
-</span><span class='line'><span class="nv">default</span> <span class="o">=</span> ssh://hg@pikacode.com/jasonwryan/dwm-patchset
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --config /path/to/syncapp.conf
 </span></code></pre></div></figure>
 
 
-<p>Then I pull down my dwm patchset from the mercurial repository
-with <code>hg pull</code>:</p>
+<p>and you are away, happily synching.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulling from ssh://hg@pikacode.com/jasonwryan/dwm-patchset
-</span><span class='line'>requesting all changes
-</span><span class='line'>adding changesets
-</span><span class='line'>adding manifests
-</span><span class='line'>adding file changes
-</span><span class='line'>added 6 changesets with 16 changes to 10 files
-</span><span class='line'><span class="o">(</span>run <span class="s1">&#39;hg update&#39;</span> to get a working copy<span class="o">)</span>
-</span></code></pre></div></figure>
+<p>Like other applications that use the bittorrent protocol, it can take a minute or
+two for the synching to begin, but once it does I found it—over the Internet as well
+as my <acronym title="Local Area Network">LAN</acronym> to be much faster than
+dropbox. Another plus.</p>
 
+<h3>Areas for improvement</h3>
 
-<p>After I update my local repo,<sup>1</sup> I can see the full patchset with
-<code>hg qseries</code>:</p>
+<p>It is Alpha software so there are some areas where you can expect to see improvements
+with subsequent release. For me, that includes:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setup.makefile
-</span><span class='line'>base.config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span><span class='line'>bstack
-</span><span class='line'>centurion.config
-</span></code></pre></div></figure>
+<ul>
+<li>Better command line tools; the current limited set are servicable, but could do
+with more flexibility and options</li>
+<li>The ability to create your own secret, rather than rely on generated ones</li>
+<li>A less fragile config file; it is written in JSON and the simplest errors will
+break it</li>
+<li>More Linux love; the other platforms have a much more sophisticated <acronym title="User Interface">UI</acronym></li>
+</ul>
 
 
-<p>Then, as I decribed in my previous post, I make the changes to
-<span class="file">config.def.h</span> that are specific to this
-machine:</p>
+<p>A comparison with dropbox is not entirely fair; there are some things that dropbox
+does—like versioning—that Sync can/will not do. Dropbox also allows you to host
+public files and folders, meaning that you can
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on using dropbox to host dotfiles">setup a basic webpage</a>
+or <a href="https://www.dropbox.com/sh/t6ko1rbl9edy8p4/OkwVLtY5fO" title="My Top 10 Albums">share a photo album</a>.
+Sync clearly isn&#8217;t designed for this.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew veles.config
-</span><span class='line'> <span class="c"># “hack, hack, hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qcommit -m <span class="s1">&#39;Adaptions for Veles&#39;</span>
-</span></code></pre></div></figure>
+<p>However, in some other respects, like architectures
+for example, Sync is already a better choice. The ARMv6 port means that I am able
+to run it on my Raspberry Pi, and that I have been able to update my
+<a href="http://jasonwryan.com/blog/2011/11/07/irc-dzen/" title="Post on IRC highlights">IRC notification system</a>
+to use Sync rather than dropbox and it is working perfectly well.</p>
 
+<p>There is one area, though, where I wish the BitTorrent team would be a lot more
+forthcoming. There has been an unanswered question on the Sync forums for
+over three weeks now asking
+<a href="http://forum.bittorrent.com/topic/8816-will-syncapp-be-open-source/" title="Syncapp Forums">will Syncapp be open sourced?</a>
+Aside from the issue of whether or not the source will be made available (and I am guessing
+that given their reticence to answer the question on their boards the prognosis
+is not promising) people using the application now should know under what terms
+they are using it.</p>
 
-<p>My patchset now has an additional patch in it:</p>
+<p>In the absence of any definitive licensing, I can only assume that the application
+is covered by BitTorrent&#8217;s
+<a href="http://www.bittorrent.com/legal/eula" title="Licensing agreement on BitTorrent site">default EULA</a>.
+That ambiguity means that I am happy to participate in the
+trial and provide feedback, but I won&#8217;t be using the app for any remotely
+sensitive data and I am unlikely to do so until that issue is clarified.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries
-</span><span class='line'>setup.makefile
-</span><span class='line'>base.config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span><span class='line'>bstack
-</span><span class='line'>centurion.config
-</span><span class='line'>veles.config
-</span></code></pre></div></figure>
-
-
-<p>This is where guards come in to play. If I wasn&#8217;t interested in sharing
-the patchset, it would just be a matter of deleting the patch for Centurion.
-However, what I want to do is direct MQ to ignore that specific patch
-when applying the queue. I do that by creating a negative guard and then
-activating it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qguard centurion.config -- -block
-</span><span class='line'>hg qselect block
-</span><span class='line'>number of unguarded, unapplied patches has changed from 8 to 7
-</span></code></pre></div></figure>
-
-
-<p>That&#8217;s it! Adding a verbose flag to <code>hg qseries</code><sup>2</sup> will print out the
-patchset and the accompanying guard status:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries -v
-</span><span class='line'>0 U setup.makefile
-</span><span class='line'>1 U base.config.customizations
-</span><span class='line'>2 U statuscolours
-</span><span class='line'>3 U cycle
-</span><span class='line'>4 U push
-</span><span class='line'>5 U bstack
-</span><span class='line'>6 G centurion.config
-</span><span class='line'>7 U veles.config
-</span></code></pre></div></figure>
-
-
-<p>The real test, of course, is pushing the patchset onto the fresh
-dwm code:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpush -a
-</span><span class='line'>applying setup.makefile
-</span><span class='line'>applying base.config.customizations
-</span><span class='line'>applying statuscolours
-</span><span class='line'>applying cycle
-</span><span class='line'>applying push
-</span><span class='line'>applying bstack
-</span><span class='line'>skipping centurion.config - guarded by <span class="s1">&#39;-block&#39;</span>
-</span><span class='line'>applying veles.config
-</span><span class='line'>now at: veles.config
-</span></code></pre></div></figure>
-
-
-<p>How cool is that? One central patchset, applied conditionally depending
-upon the machine you are using at the time.</p>
+<p>I&#8217;ll install <a href="http://sparkleshare.org/" title="Sparkleshare site">Sparkleshare</a>
+and give that a shot instead…</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>Any guards applied on other machines will be present in the newly
-pulled <span class="file">series</span> file: these conflicts will need
-to be manually merged…</li>
-<li>The options for all of the <code>hg</code> commands can be read with
-<code>hg -v help $command</code>. For those related to queues, just prepend
-a <code>q</code> to <code>$command</code>.</li>
+<li>Naturally, there are more issues at play here than just their (in)security policies.</li>
+<li>Assuming, of course, you trust what BitTorrent pack into the binary…</li>
 </ol>
 
-
-<p>Creative Commons image on Flickr by
-<a href="http://www.flickr.com/photos/alternatewords/4903560373/" title="On Guard on Flickr">Thorsten Becker</a></p>
 </div>
   
   
@@ -292,7 +234,7 @@ a <code>q</code> to <code>$command</code>.</li>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/03/02/forking/">Forking Arch</a></h1>
     
     
       <p class="meta">
@@ -308,191 +250,105 @@ a <code>q</code> to <code>$command</code>.</li>
   
 
 
-<time datetime="2012-07-24T19:18:00+12:00" pubdate data-updated="true">Jul 24<span>th</span>, 2012</time>
+<time datetime="2013-03-02T10:04:00+13:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
-Over the last week or so, I have finally gotten around to digging into the whole concept of
-using
-<a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
-to manage patches against an upstream project; in my case
-<a href="http://dwm.suckless.org" title="The truly suckless window manager…">dwm</a>.<sup>1</sup>
-Essentially, this mercurial extension helps you manage a stack of patches on
-top of a directory tree. This gives you quite a lot of fine-grained control
-over your patchset and assists immeasurably with automating the application of
-patches when the underlying codebase changes.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/fork.jpg" title="'Fork on Flickr'" >
+Over the last couple of months there have been a number of discussions on the Arch boards
+about the
+<a href="https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY" title="Forum Etiquette">forum policy</a>
+of only providing support for Arch Linux, culminating in this
+<a href="https://bbs.archlinux.org/viewtopic.php?id=157361" title="Arch Forum thread">long thread about Archbang users</a>
+(login required) being denied support and having their threads summarily
+closed. As it emerged in the discussion, there seem to be two separate issues
+at play here; the question of Arch-derivatives using the Arch brand (logo,
+colours and even the forum style sheets), and how the wider community of
+GNU/Linux distributions are treated on our boards.</p>
 
-<p>After having played around with queues for the last couple of days, I am quite
-impressed: both the concept and the execution are simple and powerful. The concept
-of Mercurial Queues is best described in the Mercurial book: the aptly titled,
-<em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
+<p>The first issue is relatively simple to address. Allowing derivative
+distributions to use the Arch brand is, in my view, a mistake. It dilutes the
+value of the Arch “brand” and—as can be seen when people show up having
+installed a derivative and thinking they are running Arch—just confuses people.</p>
 
-<blockquote><p>MQ&#8217;s marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don&#8217;t like a patch, you can drop it. If a patch isn&#8217;t quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote>
+<p>For some of these derivatives, like Archbang, there is an argument to be made
+that once they have completed the installation process, they are in fact
+running Arch, albeit an off-the-shelf version. I find this argument to be
+specious. All of the derivatives that I have come across, in addition to
+“simplifying”<sup>1</sup> the installation process and including <code>X</code> and some
+sort of desktop or window manager by default, also make a number of other
+system changes that invalidate their claim to being Arch by another name.</p>
 
+<p>See this <a href="http://www.reddit.com/r/archlinux/comments/yj2v5/a_new_guibased_version_of_arch_has_gone_live/c5wc6yo" title="Reddit thread on Manjaro Linux">scathing review of Manjaro</a>
+or Allan&#8217;s <a href="http://allanmcrae.com/2012/12/battle-of-the-arch-spin-offs/" title="Allan McRae's blog">roundup of the Arch Spin-Offs</a>
+for the details on the decisions these developers make that mean it is not
+practicable to support them on the Arch boards, nor desirable to do so in
+future. As a distro, Arch is essentially vanilla packages, pacman and rolling
+release, and a base on which
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric" title="The Arch Way">you build your preferred system</a>.
+Changing two of those three means that you are not running Arch…</p>
 
-<p>I followed Filippo Negroni&#8217;s excellent
-<a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
-to setup my own
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/files/default" title="Patchset on Pikacode">dwm patchset</a>
-based on
-<a href="http://hg.suckless.org/dwm" title="dwm hg repository">tip</a>, and the process was
-surprisingly straightforward; the only caveat being it is a good idea to plan
-quite carefully what changes you want in each particular patch. Once I had
-completed the setup, it got me thinking about the fact that the final install
-is done without <code>pacman</code>, just using <code>make install</code>. And, as a proof-of-concept
-more than anything else, I wondered whether this functionality could be used
-with <code>makepkg</code>.<sup>3</sup></p>
+<p>That leads in to the second point, which is I&#8217;ll paraphrase as “well, we are
+all Linux users, so everyone should be welcome to ask for support from Arch
+users.” It is a fine sentiment, but one that is neither
+<a href="http://www.catb.org/esr/faqs/smart-questions.html#forum" title="ESR's seminal document">historically accurate</a>,
+nor in the long term interests of Arch. I have harped on in the past about
+<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="My post on the taxonomy of suckers…">help vampires</a>
+and last year I came across the perfect illustration of the unchecked effects
+of this phenomena:</p>
 
-<p>Turns out, as you might expect with Arch, it was not much of a job to set it
-up at all.</p>
-
-<p><strong>Note</strong>: this doesn&#8217;t mean I think it is a good idea; I was just interested
-to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
-like dwm, this is definitely a case of introducing a huge amount of complexity for
-no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
-
-<p>I have a
-<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD" title="If you must…">working PKGBUILD</a>
-that you can use if you want to follow along at home. Once you have downloaded
-it into <span class="file">dwm-hg/</span>, run <code>makepkg</code> to clone the dwm
-repository and build the binary.  Then you need to make sure that the mercurial
-queue extension is enabled, so your <span class="file">.hgrc</span> needs to
-contain:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
-</span><span class='line'>hgext.mq <span class="o">=</span>
-</span></code></pre></div></figure>
+<blockquote><p>Right now I&#8217;d say the bug queues are flooded with bugs that you can&#8217;t really act on… It&#8217;s a strain on the project that there are so many users that don&#8217;t really get it.</p><footer><strong>Alison Randall</strong> <cite>Ubuntu Technical Architect. Linux Format July 2012</cite></footer></blockquote>
 
 
-<p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
-is <span class="file">dwm-hg/src/dwm</span>:</p>
+<p>Your bugtracker becomes essentially unusable. Your forums end up the same way.
+No-one ends up getting much in the way of assistance at all, let alone anything
+approaching informed help. That may be an inevitable consequence of the
+collision between considerable but still finite resources and a philosophy of being
+the <acronym title="Operating System">OS</acronym> of the masses; Arch has
+nothing like that in terms of resources, and a very different
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="The Arch Way, again…">philosophy</a>.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
-</span></code></pre></div></figure>
+<p>That philosophy doesn&#8217;t include anything about shortcuts or commoditized images
+for a mass user base. It doesn&#8217;t mention making the installation and
+maintenance of your system completely idiot-proof so as to facilitate a
+relentless march to the very top of whatever spurious distro popularity ranking
+system you subscribe to. And it certainly doesn&#8217;t say anything about your
+entitlement to immediate and courteous support from the Arch community in the
+face of your own inability to reach a minimum level of understanding of what it
+is that you have installed on your hard drive.</p>
 
+<p>If you think that you can just skip the whole tiresome
+<a href="http://jasonwryan.com/blog/2013/02/08/documentation/" title="Post on documentation">RTFM thing</a>
+by downloading a derivative and installing that, how exactly do you expect to be able
+to run a rolling release distro that has, on average, a couple of
+<a href="https://www.archlinux.org/news/" title="Arch news">significant changes</a> every year?</p>
 
-<p>The next step is to start applying the various patches that you want to comprise
-your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
-and three other patches:
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/statuscolours" title="Patch in mercurial queue">statuscolours</a>,
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/cycle" title="ditto">cycle</a>, and
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/push" title="etc…">push</a>.
-There are other patches in my repository, one of which patches the appropriate
-settings for an Arch build in the
-<a href="http://pikacode.com/jasonwryan/dwm-patchset/file/default/setup.makefile" title="Arch settings for Makefiles">relevant makefiles</a>.
-This is taken care of by the PKGBUILD in this case.</p>
+<p>Sooner or later you are going to have to come to terms with <em>the responsibility</em>
+that is an integral part of this type of rolling release and, if you have
+installed it yourself, you will be much better placed to be able to build on
+that understanding and broaden and deepen your knowledge of your system.</p>
 
-<p>From here, it is very much as Filippo describes it in his tutorial: make
-some changes, add them to the queue and rinse and repeat:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
-</span><span class='line'> <span class="c"># “hack hack hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>After committing each of your changes as a discrete patch, you can review the queue
-with <code>hg qseries</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries
-</span><span class='line'>config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span></code></pre></div></figure>
-
-
-<p>And <code>hg qapplied</code> will tell you which of the patches is currently
-applied in the working repository; at this stage the list should look
-the same as that in <code>hg qseries</code>. The next step is to remove all of the
-patches from the queue so that we have a clean repository:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpop -a
-</span><span class='line'>popping push
-</span><span class='line'>popping cycle
-</span><span class='line'>popping statuscolours
-</span><span class='line'>popping config.customizations
-</span><span class='line'>patch queue now empty
-</span></code></pre></div></figure>
-
-
-<p>Should you need to edit a patch, it is simply a matter of popping
-to that spot in the stack (you can do so by name or by index
-number, beginning at 0):</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpop config.customizations
-</span><span class='line'>popping push
-</span><span class='line'>popping cycle
-</span><span class='line'>popping statuscolours
-</span><span class='line'>now at: config.customizations
-</span><span class='line'> <span class="c"># “hack hack hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qpush -a
-</span></code></pre></div></figure>
-
-
-<p>Once you are satisfied with the state of the stack, remove all of the
-patches to return to the original clean working directory and <code>cd</code> back
-to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> to
-rebuild the package and you should see the pushed patches as part of
-the output:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
-</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
-</span><span class='line'>applying config.customizations
-</span><span class='line'>applying statuscolours
-</span><span class='line'>applying cycle
-</span><span class='line'>applying push
-</span><span class='line'>now at: push
-</span><span class='line'>dwm build options:
-</span></code></pre></div></figure>
-
-
-<p>…and when you restart dwm, your customizations will be applied.
-When new changes are pushed to
-<a href="http://hg.suckless.org/dwm" title="dwm mercurial repo">the dwm repo</a>
-you can just <code>makepkg -fi</code>, and, if any of the patches fail due
-to changes in the underlying code, pop the stack to the failed
-patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
-
-<p>As I said at the beginning of this post, this isn&#8217;t a particularly smart way to
-use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
-better off just cloning dwm to your local repository, initializing a queue
-repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
-sudo make install</code>.</p>
-
-<p>If you have more than one machine, you can easily setup a repository for
-your patchset on
-<a href="https://bitbucket.org/" title="bitbucket free mercurial hosting">bitbucket</a>
-or <a href="http://pikacode.com/" title="Free Mercurial and Git hosting">Pikacode</a>
-and host it there: then just pull the patchset queue
-from your other boxes and <code>hg qpush -a</code>. If you require a slightly
-different patchset for each box, you can use MQ to manage this
-process as well. This is where MQ really excels;
-I&#8217;ll cover this in more detail in my next post.</p>
+<p>That is ultimately far more satisfying for you, and much more beneficial for
+the rest of the community as it means that you will be more able and likely to
+contribute back in whatever way that you can; reporting bugs to a functioning
+bug tracker, editing the <a href="https://wiki.archlinux.org" title="The finest, actually">fine Wiki</a>,
+maintaining packages in <a href="https://aur.archlinux.org" title="Arch User Repository">the AUR</a>,
+submitting patches, etc.  Doing all the things that will
+sustain Arch and continue to make it an attractive distribution for competent
+GNU/Linux users and those that are willing to invest the time to become so.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
-<li>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
-example of thorough, accessible documentation.</li>
-<li>In the case of something like dwm, this is really irrelevant, as there
-is a single tiny binary and a <code>man</code> page, so keeping track of these files on
-your system is not an issue at all.</li>
+<li>If you have used the Arch install scripts, you would appreciate that it is
+not really possible to provide a simpler installation process.</li>
 </ol>
 
 
-<p>Flickr Creative Commons image by
-<a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
+<p>Creative Commons licensed image on Flickr by <a href="http://www.flickr.com/photos/pietroizzo/3514191996/">pietroizzo</a></p>
 </div>
   
   
@@ -505,7 +361,7 @@ your system is not an issue at all.</li>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/02/08/documentation/">Read The Fine Manual</a></h1>
     
     
       <p class="meta">
@@ -521,109 +377,114 @@ your system is not an issue at all.</li>
   
 
 
-<time datetime="2012-07-19T19:23:00+12:00" pubdate data-updated="true">Jul 19<span>th</span>, 2012</time>
+<time datetime="2013-02-08T19:57:00+13:00" pubdate data-updated="true">Feb 8<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="https://dl.dropbox.com/u/261312/Blog-images/broken.jpg" title="Image of breakage on Flickr" >
-Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
-<a href="https://bbs.archlinux.org/" title="Arch Linux BBS">Arch boards</a> and in the various
-<a href="https://wiki.archlinux.org/index.php/IRC_Channels" title="Wiki page listing channels">IRC channels</a>.
-It doesn&#8217;t take newcomers long to realize that, whether something is actually broken or not,
-there is always
-<a href="http://allanmcrae.com/category/arch-linux/" title="Allan's Blog">someone they can blame</a>.<sup>1</sup></p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/documents.jpg" title="'Documents on Flickr'" >
+One of the canards about Free and Open Source Software that is peddled by the unscrupulous
+marketers of proprietary software is that their product is superior because, among other
+things, the scruffy, sandal-wearing Communists that write and distribute their software
+for free do not bother to adequately document that software; thereby placing in jeopardy
+the business processes in the enterprise that rely on said software to continue to
+profitably grease the wheels of the juggernaut of Capitalism.</p>
 
-<p>My experience of Arch, over the last three and a bit years, is quite the opposite. I have yet to
-experience anything that would qualify as breakage. Sure, there have been bugs, mostly upstream,
-and the more frequent moments where I haven&#8217;t been as diligent as I should, but not once have I
-had a machine that was unbootable or otherwise unusable. Arch has, on both my home and work
-machines, been incredibly stable and reliable.</p>
+<p>At heart, it really is an attempt to paint FOSS as a hobbyist&#8217;s pursuit, unworthy of
+consideration by Fortune 500 <acronym title="Chief Inhibiting Officers">CIOs</acronym>
+as it is not in the same league as “professional,” proprietary product. This
+<acronym title="Fear, Uncertainty & Doubt">FUD</acronym> is not restricted to
+the usual suspects; it has also been raised by other, presumably more
+<a href="http://www.osnews.com/story/5180" title="Editorial on OS News">objective commentators</a>:</p>
 
-<p>For a number of Arch Linux users, however, that was not their experience over the last week when
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="News item on the move">/lib was moved to /usr/lib</a>.
-The volume of people on the boards and on IRC reporting unbootable or unusable systems was
-remarkable. Remarkable because, despite the fact that the
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Once more, just in case…">news item</a>, the
-<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Arch wiki page on the change">wiki page</a>,
-and the <a href="http://mailman.archlinux.org/pipermail/arch-announce/2012-July/000317.html" title="Mail archive">email to arch-announce</a>
-all <em>explicitly</em> warned people not to use the <code>--force</code> option,<sup>2</sup> so many did.</p>
+<blockquote><p>Open Source documentation is terrible. There is no kinder way to put it. Even the commercially distributed software in the Open Source world has substandard documentation. (And believe me, as a technical writer coming from the Windows world, when I tell you that the commercial industrial standards are pretty low). Only a bare handful of Open Source software packages have any documentation at all. And out of the few that do, much of it is either unfinished, inaccurate, or outdated. What counts as explanatory text among geeks would bewilder a nuclear physicist, even a sober one.</p><footer><strong>OSNews Editorial, 2003</strong> <cite><a href='http://www.osnews.com/story/5180'>www.osnews.com/story/5180/&hellip;</a></cite></footer></blockquote>
 
-<p><span class='pullquote-right' data-pullquote='90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice. '>
-Sadly, these red-boxed warnings were apparently not enough.
-90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice.
-The remaining 10% were either in a hurry and didn&#8217;t pay close attention to how
-to deal with any leftover files in <span class="file">/lib</span> or <code>rm -rf</code>&#8216;ed
-in the wrong directory.
-<a href="http://www.gnu.org/fun/jokes/shit-happens.html" title="GNU Humour…">Accidents happen</a>.
-</span></p>
 
-<p>What I am interested in is the people who fell into the much larger category,
-and principally those that didn&#8217;t see any of the communications about this
-change in advance of updating and reasoned, based on a recent change that did
-<a href="http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required-1/" title="News item on filesystem upgrade">require the use of &#8211;force</a>,
-that this was the most expedient way to resolve <code>pacman</code> reporting conflicting
-files.</p>
+<p>A more recent survey, published in 2010, identifed the same issue for businesses,
+in slightly less histrionic language:</p>
 
-<p>Some context. The <code>glibc</code> update was released to the
-<a href="https://wiki.archlinux.org/index.php/Testing#.5Btesting.5D" title="Wiki entry on Testing">[testing] repository</a>
-in the first week of July: and there were a couple of long threads<sup>3</sup>
-about issues and fixes before it was pushed to [core]. By the time the
-package was released for general consumption, it had been tested and the
-developers had obviously planned how to make what is a fundamental system
-change with a minimal amount of user intervention.  I think that, given the
-magnitude of the challenge, they did a superb job.</p>
+<blockquote><p>The No. 1 reason for not choosing open-source solutions was lack of support followed by poor documentation.</p><footer><strong>Zenoss 2010 Survey</strong> <cite><a href='http://gigaom.com/2010/08/11/enterprise-yeah-were-cool-with-open-source/'>gigaom.com/2010/08/11/&hellip;</a></cite></footer></blockquote>
 
-<p>How then did it go so wrong for so many?<sup>4</sup> To answer that, you have
-to consider the nature of Arch. It&#8217;s <em>not</em> the sort of distribution where you
-install it and then just go on your merry way, installing
-<a href="http://oswatershed.org/" title="It's SCIENCE, Jim">the least obsolete packages</a>,
-revelling in the speed of the package manager and generally being
-a 1337 h@x0r…</p>
 
-<p>Successfully running a rolling release like Arch, irrespective of your level of
-competence, means staying in touch with what is happening—in
-<a href="http://kmkeen.com/pacmatic/" title="Pacman wrapper that pulls news updates">some form or other</a>.
-Subscribing to the arch-general <acronym title="Mailing list">ML</acronym>,
-visiting the forums, idling in IRC; somehow remaining connected to what is
-going on in the community so that you don&#8217;t blindly update one day and wonder
-why your system is broken.</p>
+<p>My experience of FOSS documentation, particularly over the last twelve months, has been just the
+opposite.</p>
 
-<p>This strikes me as a real strength; by design Arch encourages its users to
-participate in the community. Even if you are only lurking, over time you will
-inevitably find yourself posting in a thread, responding to an email, editing
-the wiki,
-<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="Post on aurphan">adopting an orphaned package</a>—increasingly
-getting involved and contributing.</p>
+<p>From the middle of 2012 on, I made a couple of significant changes in my computing
+environment; I moved from
+<a href="https://wiki.archlinux.org/index.php/SysVinit" title="Archwiki page…">SysVinit</a>
+to <a href="http://freedesktop.org/wiki/Software/systemd" title="Project web page">systemd</a>,
+garden variety to
+<a href="http://jasonwryan.com/blog/2013/01/25/uefi/" title="My post on UEFI booting">UEFI booting</a>
+and changed my shell from
+<a href="http://www.gnu.org/software/bash/" title="GNU Bash page">Bash</a> to
+<a href="http://www.zsh.org/" title="Zsh homepage, one of the ugliest on the Web">Zsh</a>.
+In each of these cases I found myself having to turn to the documentation the
+community has provided in order to understand the implications of the change,
+and to familiarise myself with the new tool or approach.</p>
 
-<p>This level of involvement is not for everyone. Some may find it onerous or
-a waste of their time. That&#8217;s fine. There are any number of other distros
-that do not ask for this level of commitment. The <em>quid pro quo</em> for
-running Arch, though, is that you are prepared, in whatever shape or form
-best works for you, to give something back; at the very least, that is your
-attention.</p>
+<p>I posted at the time about <a href="http://jasonwryan.com/blog/2012/08/04/systemd/" title="The Leap to systemd">moving to systemd</a>,
+and I don&#8217;t think—in retrospect—I credited Lennart Poettering enough for the series of posts
+he wrote detailing the design decisions and implementation of that system;
+those posts (at the time 12, now
+<a href="http://0pointer.de/blog/projects" title="Lennart Poettering's blog">grown to 20</a>)
+are an impressively thorough, and thoughtful, document of the new init system.</p>
+
+<p>Similarly, when I started reading about <acronym title="Universal Extensible Firmware Interface">UEFI</acronym>
+booting, I quickly found myself at <a href="http://www.rodsbooks.com/" title="The author of… Just go there!">Rod Smith&#8217;s site</a>.
+Rod has compiled an exhaustive and authoritative resource on <a href="http://www.rodsbooks.com/gdisk/" title="gdisk page">GPT</a>,
+EFI Stub loading and UEFI booting in general. Reading through his clear, approachable
+documentation made transitioning to UEFI a much simpler process than, given the
+inherent complexity in the ecosystem, I would have thought possible.</p>
+
+<p>Then there is Zsh.</p>
+
+<blockquote><p>Because zsh contains many features, the zsh manual has been split into a number of sections…</p><footer><strong>zsh manual</strong> <cite><a href='http://linux.die.net/man/1/zsh'>linux.die.net/man/1/zsh/&hellip;</a></cite></footer></blockquote>
+
+
+<p>And goes it on to list those <em>seventeen</em> sections. If you are not a fan of <code>man</code> pages<sup>1</sup>,
+there is the
+<a href="http://zsh.sourceforge.net/Doc/Release/zsh_toc.html" title="What it says on the tin…">Zsh Documentation</a>,
+the <a href="http://zsh.sourceforge.net/Guide/zshguide.html" title="User's Guide">User&#8217;s Guide</a> and
+<a href="http://zshwiki.org/home/" title="Zsh Wiki">wiki</a>. This amounts to a literally staggering
+amount of information—it is no wonder that preconfigured zsh systems like
+<a href="http://grml.org/zsh/" title="grml homepage">grml</a> are so popular; they provide
+relatively simple ingress to the byzantine ways of this powerful shell.</p>
+
+<p>Finally, also last year, I was privileged to chair the judging for the
+<a href="http://www.nzosa.org.nz/" title="NZOSA site">2012 New Zealand Open Source Awards</a>.
+This exposed me to the amazing contribution
+<a href="http://man7.orgi/mtk.index.html" title="Man pages Michael maintains">Michael Kerrisk</a>
+has made to GNU/Linux over the last decade. He is the author, or co-author, of
+<em>over 300</em> <code>man</code> pages; and these aren&#8217;t the glamorous, application pages read
+by the masses, but the system pages that document the kernel and <code>glibc</code>
+<acronym title="Application Program Interface">APIs</acronym>.</p>
+
+<p>All of this suggests to me that the state of documentation for FOSS is
+anything but parlous. At every turn over the last year, when I needed to
+be able to refer to documentation for a project, there was a surfeit of it.
+And I have only touched on what would normally constitute the primary
+sources; there is also all of the other community-driven documentation
+around projects, like the
+<a href="https://wiki.archlinux.org/" title="The BEST GNU/LINUX wiki on the web">Arch Wiki</a>
+or the <a href="http://unix.stackexchange.com/" title="Unix &amp; Linux SE">Stack Exchange sites</a>,
+the support available on forums, IRC, blog posts, etc.</p>
+
+<p>Compared to the sterile, mostly out-of-date (and expensive) documentation that
+accompanies proprietary software, FOSS is an Alexandrine utopia…</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>This is, of course, a reference to said Arch meme: Allan is one
-of the developers who has contributed an enormous amount to Arch and the fact
-that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</li>
-<li>At the end of 2011, the short option <code>-f</code>
-<a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
-from <code>pacman</code> so “it at least makes people read the word &#8216;force&#8217; and maybe they
-will have some sense to step back and think about what they are doing first.”</li>
-<li><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
-<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></li>
-<li>Relatively speaking. In situations like this, the overwhelming amount of traffic
-is about what went wrong, not people posting to say they had no difficulties whatsoever…</li>
+<li>And, god knows, <em>I am</em>; <code>man</code> pages are a constant source of knowledge
+and delight (and pretty much the only way I can contribute to projects that
+I am indebted to).</li>
 </ol>
 
 
-<p>Creative Commons image on Flickr from
-<a href="http://www.flickr.com/photos/daviddoctorrose/431786001/" title="Broken keyboard on Flickr">djeucalyptus</a></p>
+<p>Creative Commons image of documents by
+<a href="http://www.flickr.com/photos/mwichary/2322639175/">Marcin Wichary</a> on Flickr.</p>
 </div>
   
   
@@ -648,23 +509,23 @@ is about what went wrong, not people posting to say they had no difficulties wha
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -751,7 +612,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

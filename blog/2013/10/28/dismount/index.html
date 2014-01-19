@@ -1,0 +1,438 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Simple Unmounting - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="For those people that prefer to forego the full blown
+DE and—instead of all the
+“convenience” that this sort of setup offers—piece together their &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2013/10/28/dismount">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid.server" href="http://openid.claimid.com/server" />
+<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Simple Unmounting</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-28T15:29:00+13:00" pubdate data-updated="true">Oct 28<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/dismount.jpg" title="Creative Commons image" >
+For those people that prefer to forego the full blown
+<acronym title="Desktop Environment">DE</acronym> and—instead of all the
+“convenience” that this sort of setup offers—piece together their setup from a
+variety of different tools and knit it all together with some scripting,
+automounting external drives is, notwithstanding the inexplicable number of
+posts to the forums to the contrary, incredibly straightforward with
+<a href="https://wiki.archlinux.org/index.php/Udev#Udisks" title="Arch Wiki page on Udev">udisks</a>.
+My approach in this respect is to use
+<a href="https://wiki.archlinux.org/index.php/Udiskie" title="Wiki page">udiskie</a>; it is
+lightweight, unobtrusive, configurable and foolproof, as far as I can tell.</p>
+
+<p>Where I have found a small gap, or more a minor irritation really, is with
+unmounting devices. <code>udiskie-umount /media/MY_USB_DRIVE</code> works just fine, but
+I often have a variety of media mounted, and not just standard
+<acronym title="Universal Serial Bus">USB</acronym> drives. At work, for
+example, it is not uncommon for me to have mounted under
+<span class="file">/media</span> any or all of the following:</p>
+
+<ul>
+<li>A USB drive containing all of my music</li>
+<li>An encrypted volume mounted with
+<a href="http://jasonwryan.com/blog/2013/01/10/truecrypt/" title="My post on replacing TrueCrypt">tcplay</a>
+shared via <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Another postof mine…">Bittorrent Sync</a></li>
+<li>A <acronym title="Common Internet File System">CIFS</acronym> share</li>
+<li>An <acronym title="Network File System">NFS</acronym> share or an
+<acronym title="SSH Filesystem">SSHFS</acronym> mount.</li>
+</ul>
+
+
+<p>In a couple of these cases, I don&#8217;t want to—or can&#8217;t—just <code>umount</code> them with
+<code>udiskie</code>; they require a different approach. To facilitate this, I have adopted
+a simple approach: I use a standard naming convention for all external media
+or their mountpoints. When I first buy a USB drive, I give it a meaningful name,
+beginning with an uppercase letter, as this won&#8217;t clash with any of my internal
+drives and it happily accommodates drives from other operating systems. So:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo dosfslabel /dev/sdc1 EightBall
+</span></code></pre></div></figure>
+
+
+<p>sets up a new 8GB drive I found in the schwag bag at the conference I attended
+last week.</p>
+
+<p>Now that all external media are predictably named, it is just a matter of
+writing a script that checks how many are mounted, presents a menu if there is
+more than one, and unmounts the respective device correctly:</p>
+
+<figure class='code'><figcaption><span>dismount </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># unmount USB drives</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">target</span><span class="o">=(</span> <span class="k">$(</span>awk <span class="s1">&#39;/media\/[\^A-Z]/ {print $3}&#39;</span> &lt;<span class="o">(</span>mount<span class="k">)</span><span class="o">)</span> <span class="o">)</span>
+</span><span class='line'><span class="nv">shares</span><span class="o">=(</span>Scout Sentinel<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>checkbusy<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  grep <span class="s2">&quot;PID&quot;</span> &lt;<span class="o">(</span>lsof +d <span class="s2">&quot;$target&quot;</span> &amp;&gt;/dev/null<span class="o">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${target##*/} busy…&quot;</span>
+</span><span class='line'>    <span class="nb">exit </span>1
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>exstatus<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${target##*/} unmounted…&quot;</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Failed to unmount.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># check for multiple devices</span>
+</span><span class='line'><span class="k">if</span> <span class="o">((</span> <span class="s2">&quot;${#target[@]}&quot;</span> &gt; 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">PS3</span><span class="o">=</span><span class="s2">&quot;Select your device to unmount: &quot;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;There are ${#target[@]} devices mounted&quot;</span>
+</span><span class='line'>  <span class="k">select </span>dev in <span class="s2">&quot;${target[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="nv">target</span><span class="o">=</span><span class="s2">&quot;$dev&quot;</span>
+</span><span class='line'>    <span class="nb">break</span>
+</span><span class='line'><span class="nb">  </span><span class="k">done</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># check for share</span>
+</span><span class='line'><span class="k">for </span>drive in <span class="s2">&quot;${shares[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">  if</span> <span class="o">[[</span> <span class="s2">&quot;$drive&quot;</span> <span class="o">=</span>~ <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nv">share</span><span class="o">=</span><span class="s2">&quot;$drive&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># options per filesystem</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -n <span class="s2">&quot;$target&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  for </span>drive in <span class="s2">&quot;${shares[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">    if</span> <span class="o">[[</span> <span class="s2">&quot;$drive&quot;</span> <span class="o">=</span> <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">&amp;&amp;</span> <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">=</span> Safebox <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cmd</span><span class="o">=</span><span class="k">$(</span>sudo safebox close<span class="k">)</span>
+</span><span class='line'>    <span class="k">elif</span> <span class="o">[[</span> <span class="s2">&quot;$drive&quot;</span> <span class="o">=</span> <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cmd</span><span class="o">=</span><span class="k">$(</span>sudo umount <span class="s2">&quot;$target&quot;</span><span class="k">)</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cmd</span><span class="o">=</span><span class="k">$(</span>udiskie-umount -d <span class="s2">&quot;$target&quot;</span> &amp;&gt;/dev/null<span class="k">)</span>
+</span><span class='line'>    <span class="k">fi</span>
+</span><span class='line'><span class="k">  done</span>
+</span><span class='line'><span class="c"># do it</span>
+</span><span class='line'>checkbusy
+</span><span class='line'><span class="nv">$cmd</span>
+</span><span class='line'>exstatus
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;No drive mounted!&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># vim:set ts=2 sts=2 sw=2 et:</span>
+</span></code></pre></div></figure>
+
+
+<p>Now, no matter the number or type of devices I currently have mounted, I can
+unmount them by typing <code>dismount</code> and choosing the appropriate drive via the
+<code>select</code> menu. Simple, but satisfying. The script is in my
+<a href="https://bitbucket.org/jasonwryan/centurion/src/tip/Scripts/dismount%20'Grab%20it!">bitbucket repo</a></p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, Dismount, by
+<a href="http://www.flickr.com/photos/chrisinplymouth/3659964278/">Chris</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-28T15:29:00+13:00" pubdate data-updated="true">Oct 28<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/hack/'>hack</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/09/15/awking/" title="Previous Post: Managing modules with Awk">&laquo; Managing modules with Awk</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/11/14/api/" title="Next Post: BitTorrent Sync's API">BitTorrent Sync's API &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync's API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2013/10/28/dismount/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2013/10/28/dismount/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

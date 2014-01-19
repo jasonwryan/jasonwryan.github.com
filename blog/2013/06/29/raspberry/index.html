@@ -1,0 +1,413 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>RPi Headless Torrent Box - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="I was fortunate enough to be given a
+Raspberry Pi earlier this year
+and, naturally enough, have been running
+Arch ARM on it over the
+last several &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.github.com/blog/2013/06/29/raspberry">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid.server" href="http://openid.claimid.com/server" />
+<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">RPi Headless Torrent Box</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-29T09:40:00+12:00" pubdate data-updated="true">Jun 29<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/raspberry-pi-logo.png" title="Raspberry Pi logo" >
+I was fortunate enough to be given a
+<a href="http://www.raspberrypi.org/" title="Pi homepage">Raspberry Pi</a> earlier this year
+and, naturally enough, have been running
+<a href="http://archlinuxarm.org/" title="Arch Linux ARM site">Arch ARM</a> on it over the
+last several months. Initially, I was at somewhat of a loss as to what to do
+with it, so was just (under)using it<sup>1</sup> for a persistent IRC connection.
+I have now, with very little effort, set it up as a headless torrent box and it is
+working nicely.</p>
+
+<p>As is generally the case, this involved little more than stitching together a
+few lightweight tools to accomplish the task. In this case, it is a combination
+of
+<a href="http://libtorrent.rakshasa.no/" title="rotrrent homepage">rtorrent</a>
+(with the canvas-colour patch applied),
+<a href="http://jasonwryan.com/blog/categories/surfraw/" title="Posts on surfraw">surfraw</a>
+and
+<a href="http://w3m.sourceforge.net/" title="w3m homepage">w3m</a> for discovering
+torrents,<sup>2</sup>
+<a href="http://labs.bittorrent.com/experiments/sync.html" title="Peer to Peer synching">bittorrent sync</a>
+and, optionally, a <acronym title="Virtual Private Network">VPN</acronym>.</p>
+
+<p>I use a 16GB <acronym title="Universal Serial Bus">USB</acronym> drive to act as
+storage for the device, and mount it at <span class="file">~/Downloads</span>
+via <span class="file">/etc/fstab</span>; depending on the size of your
+<acronym title="Secure Digital">SD card</acronym>, this may be superfluous.</p>
+
+<p>First a note on building packages; building <em>anything</em> on the Pi—with only
+512MB <acronym title="Random Access Memory">RAM</acronym>—is a protracted
+and thankless task. So if you intend to do more of this, or do it regularly,
+set up
+<a href="http://archlinuxarm.org/developers/distcc-cross-compiling" title="Arch ARM instructions">cross-compiling</a>;
+you won&#8217;t regret the initial investment.</p>
+
+<p><code>rtorrent</code> is in the ARM repos, but I wanted to patch in colour, so I wrote
+<a href="https://gist.github.com/jasonwryan/5794623" title="Gist of the thing…">a PKGBUILD</a>,
+based on the package in [community] and
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="Arch User Repository">ashren&#8217;s AUR package</a>.
+Once you have rtorrent installed and working, the rest is straightforward.</p>
+
+<p>The default config for w3m is perfectly functional, but can be easily customized
+further. The key to this setup is being able to find a torrent and then easily
+add it to rtorrent&#8217;s queue.  To do this, I modified the hack that I wrote up
+<a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Post on yanking URLs in w3m">a couple years back</a>.
+Essentially, you use w3m&#8217;s external link function to trigger a script to grab
+the magnet link. Like so:</p>
+
+<figure class='code'><figcaption><span>~/.w3m/config </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>extbrowser /home/jason/Scripts/magnets %s
+</span></code></pre></div></figure>
+
+
+<p>and the script from the
+<a href="http://wiki.rtorrent.org/MagnetUri#Handling_.22magnet:.22_URIs_via_a_bash_script" title="Script for magnet links">rtorrent wiki</a>:</p>
+
+<figure class='code'><figcaption><span>~/Scripts/magnets </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nb">cd</span> <span class="nv">$HOME</span>/Downloads/Queue/watch/    <span class="c"># set your watch directory here</span>
+</span><span class='line'><span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span>~ <span class="nv">xt</span><span class="o">=</span>urn:btih:<span class="o">([</span>^&amp;/<span class="o">]</span>+<span class="o">)</span> <span class="o">]]</span> <span class="o">||</span> <span class="nb">exit</span>;
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;d10:magnet-uri${#1}:${1}e&quot;</span> &gt; <span class="s2">&quot;meta-${BASH_REMATCH[1]}.torrent&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Remapping the w3m key to trigger the script to make it more Vim-like:</p>
+
+<figure class='code'><figcaption><span>~/.w3m/keymap </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>keymap Y EXTERN_LINK
+</span></code></pre></div></figure>
+
+
+<p>And now hitting <kbd>Shift</kbd><kbd>y</kbd> over a magnet link adds it to your
+queue.</p>
+
+<p>The final piece was to ameliorate the step of transferring the completed files
+from the Pi, or for allowing me to add torrents remotely. To do this, I used
+a <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="My post on Sync">bittorrent sync</a>
+shared directory as <span class="file">~/Downloads</span>. All files are synched
+to my desktop as they are downloaded to the Pi. Simple.</p>
+
+<p><img src="http://miromiro.com/Blog-images/rtorrent-2.png" title="'Screenshot of rtorrent in action…'" ></p>
+
+<p>As I mentioned above, you could also use a VPN and, with a service
+file, have it connect on boot if you wished to further protect your privacy.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>This is not to say that I am now using it to it&#8217;s full potential; quite the
+opposite. Recommendations or suggestions gratefully received.</li>
+<li>Discovery is <em>your</em> business; what you choose to download and share may be the
+business of copyright holders…</li>
+</ol>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-29T09:40:00+12:00" pubdate data-updated="true">Jun 29<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/hack/'>hack</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/06/15/asking/" title="Previous Post: Asking for Help">&laquo; Asking for Help</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/07/20/gnupg/" title="Next Post: Encrypting Mutt">Encrypting Mutt &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync's API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.github.com/blog/2013/06/29/raspberry/';
+        var disqus_url = 'http://jasonwryan.github.com/blog/2013/06/29/raspberry/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

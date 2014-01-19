@@ -9,9 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="With the announcement late last month that
-Grub 2.00 has been released
-I thought that it was time to stop procrastinating and do something about &hellip;">
+  <meta name="description" content="Just before Christmas my
+EeePC 901 started
+to behave erratically. Rather than prolong the final throes, I decided to replace it and,
+after looking &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,7 +91,7 @@ I thought that it was time to stop procrastinating and do something about &helli
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/01/25/uefi/">Hi-UEFI Way</a></h1>
     
     
       <p class="meta">
@@ -106,337 +107,310 @@ I thought that it was time to stop procrastinating and do something about &helli
   
 
 
-<time datetime="2012-07-09T13:51:00+12:00" pubdate data-updated="true">Jul 9<span>th</span>, 2012</time>
+<time datetime="2013-01-25T19:35:00+13:00" pubdate data-updated="true">Jan 25<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/grub.jpg" title="Image of grub on Flickr" >
-With the announcement late last month that
-<a href="http://lists.gnu.org/archive/html/grub-devel/2012-06/msg00093.html" title="Grub ML announcement">Grub 2.00 has been released</a>
-I thought that it was time to stop procrastinating and do something about moving away from
-<a href="http://www.gnu.org/software/grub/grub-legacy.html" title="Gnu Page for Grub Legacy">Grub Legacy</a>,
-which is no longer actively developed. Not that there is anything wrong with Grub Legacy&#8217;s
-functionality; it has always done whatever I asked of it (admittedly, not a lot) and done so
-without complaint.</p>
-
-<p>I have used Grub2 before, when I was running Ubuntu on my home desktop, and it is the bootloader
-on my Debian Squeeze server. I can&#8217;t, however, say that I have ever really understood—or
-appreciated—its mutliple file, “need to reconfigure after making any changes” type of
-complexity. So, I thought that I would give
-<a href="http://www.syslinux.org/wiki/index.php/The_Syslinux_Project" title="Syslinux Wiki">Syslinux</a>
-a shot.</p>
-
-<p>Syslinux isn&#8217;t a single bootloader, rather it is a collection of lightweight bootloaders,
-with <a href="http://www.syslinux.org/wiki/index.php/EXTLINUX" title="Extlinux page on Syslinux Wiki">Extlinux</a>
-responsible for booting ext2, ext3, ext4 and btrfs filesystems. As the
-<a href="https://wiki.archlinux.org/index.php/Syslinux" title="The FINE Wiki">Arch Wiki Syslinux page</a>
-notes, since Syslinux 4, Extlinux has been merged with Syslinux.</p>
-
-<p>Installing Syslinux is <em>ridiculously</em> easy. It is literally a five step process. First,
-install the package:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -S syslinux</span></code></pre></div></figure>
-
-
-<p>After installing <code>syslinux</code> pacman will helpfully tell you what to do next:</p>
-
-<blockquote><p>==> If you want to use syslinux as your bootloader<br/>==> edit /boot/syslinux/syslinux.cfg and run<br/>==>   # /usr/sbin/syslinux-install_update -i -a -m<br/>==> to install it.</p></blockquote>
-
-
-<p>Arch user <a href="http://pyther.net/" title="Matthew's website">Matthew Gyurgyik</a> has written an
-ingenious script, <code>syslinux-install_update</code> that automates the process of writing the
-<acronym title="Master Boot Record">MBR</acronym> and installing the relevant files to
-<span class="file">/boot/syslinux/</span>. The script also checks if, as is the case
-with my desktop, there is a RAID array present, and if so passes the install command the
-<code>--raid</code> flag:</p>
-
-<blockquote><p>RAID mode.  If boot fails, tell the BIOS to boot the next device in the boot sequence (usually the next  hard<br/>disk) instead of stopping with an error message.  This is useful for RAID-1 booting.</p></blockquote>
-
-
-<p>After running the script, you should receive a message advising you that Syslinux
-has been sucessfully installed on both drives:</p>
-
-<blockquote><p>Detected RAID on /boot - installing Syslinux with &#8211;raid<br/>Syslinux install successful<br/>Boot Flag Set - /dev/sda1<br/>Boot Flag Set - /dev/sdb1<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sda<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sdb</p></blockquote>
-
-
-<p>If you are moving from Grub Legacy, configuring Syslinux is similarly painless.
-There are two sections to a basic  <span class="file">/boot/syslinux/syslinux.cfg</span>,
-the defaults and the prompt entries.</p>
-
-<p>I set up my defaults to be essentially invisible:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'># General settings
-</span><span class='line'>DEFAULT Arch
-</span><span class='line'>PROMPT 0
-</span><span class='line'>TIMEOUT 0</span></code></pre></div></figure>
-
-
-<p>And then copy across the relevant lines from my <span class="file">/boot/grub/menu.lst</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>grep <span class="nv">root</span><span class="o">=</span> /boot/grub/menu.lst &gt;&gt; /boot/syslinux/syslinux.cfg
-</span></code></pre></div></figure>
-
-
-<p>Then it is just a matter of adding the relevant entries under LABEL:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>LABEL Arch
-</span><span class='line'>   MENU LABEL Arch Linux
-</span><span class='line'>   LINUX ../vmlinuz-linux
-</span><span class='line'>   APPEND root=/dev/mapper/vgroup-lvroot cryptdevice=/dev/md1:vgroup ro
-</span><span class='line'>   INITRD ../initramfs-linux.img</span></code></pre></div></figure>
-
-
-<p>You then add entries for Fallback, and any other images that you may wish to
-boot from.</p>
-
-<p>And that, in their entirety, is steps two and three. You then move to steps four and five:</p>
-
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -Rsn grub
-</span><span class='line'>shutdown -r now</span></code></pre></div></figure>
-
-
-<p>And you reboot with Syslinux. Done.</p>
-
-<p>The beauty of Syslinux, from my perspective, is that it is simple to install
-and configure, with just the one config file and the options all well documented
-and easy to understand. If you want a menu with a background
-image, you can have that. If, like me, you just want to get on and boot your default,
-it does that.</p>
-
-<p>Additionally, if you want or need to boot into Fallback, or want to dual boot,
-you can just hold down <kbd>Shift</kbd> at boot time and enter the desired
-Label at the prompt. Syslinux has Tab completion, so you only need enter a
-couple of letters, hit <kbd>Tab</kbd> and you will see all of the available
-Labels to boot. Brilliant.</p>
-
-<h4>Notes</h4>
-
-<p>Creative Commons Flickr image by
-<a href="http://www.flickr.com/photos/sgodt/5103674184/">custer_fluck</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/16/misunderstanding/">Misunderstanding Arch</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-16T10:52:00+12:00" pubdate data-updated="true">Jun 16<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/hands.jpg" title="'mutt logo'" ></p>
-
-<p>I am frequently struck by how many people arrive on the
-<a href="https://bbs.archlinux.org/" title="Arch Linux Forums">Arch boards</a> without <em>any</em>
-understanding of how Arch is different from the other GNU/Linux communities
-they may have spent time with (if, indeed, they have spent any time in
-another community before trying Arch). For me, this is akin to arriving in a
-foreign country and not bothering to familiarize yourself at all with the local
-mores and customs; it lies on a spectrum somewhere between ignorance and
-outright arrogance.</p>
-
-<p>The result, inevitably, is that these people are shocked
-when their expectations of how they <em>should</em> be treated are at odds with the
-reception their behaviour invites…</p>
-
-<p>Before venturing any further, I should preface my remarks about this with
-something of a disclaimer. These are my own views and not those of the current,
-or past, forum staff.</p>
-
-<p>One of Arch&#8217;s significant acheivements is the quality of
-<a href="https://wiki.archlinux.org" title="THE best GNU/Linux Wiki">its documentation</a>.
-Not just the technical documentation describing how to install and configure
-Arch, but the cultural documentation that sets out
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="The Arch Way">Arch&#8217;s philosophy</a>
-and <a href="https://wiki.archlinux.org/index.php/Forum_Etiquette" title="Forum Etiquette">standards of behaviour</a>. Both these pages provide clear statements on what to expect when
-using Arch Linux and a clear indication of how to respectfully interact with the
-community when you are seeking help.</p>
-
-<p>The defining statement about Arch&#8217;s intended user base is quite direct and
-unambiguous:</p>
-
-<blockquote><p>Arch Linux targets and accommodates competent GNU/Linux users <br/>by giving them complete control and responsibility over the system.</p><footer><strong>The Arch Way</strong> <cite><a href='https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric'>wiki.archlinux.org/index.php/&hellip;</a></cite></footer></blockquote>
-
-
-<p>The expression “targets and accommodates” doesn&#8217;t exclude other users—for
-example, those that are not necessarily competent, but are wanting to learn
-more about the specifics of how their machines work—it does, however, signal
-quite explicitly what sort of community Arch is. And what it is not.</p>
-
-<p><a href="http://ubuntu.com" title="Ubuntu Linux">Ubuntu</a> is an excellent distribution. Like Arch,
-it has very specific aims and a clear concept of what the Ubuntu community is.
-Popularity is central to Ubuntu&#8217;s culture. People coming from Ubuntu, who
-haven&#8217;t bothered to familiarize themselves with Arch&#8217;s values, often struggle
-to appreciate the difference; leading to comments like this one:</p>
-
-<blockquote><p>Maybe if Arch is friendly and Arch forum is friendly, it might go some<br/>place, who knows…</p><footer><strong>Linux Journal commenter</strong> <cite><a href='http://www.linuxjournal.com/content/arch-way#comment-361974'>www.linuxjournal.com/content/&hellip;</a></cite></footer></blockquote>
-
-
-<p>This was posted in reply to a post on Arch in which the author noted how to
-seek help with Arch Linux:</p>
-
-<blockquote><p>You&#8217;ll find far less hand-holding on the Arch Forums than some of the other<br/>distro&#8217;s forums, and for good reason.  Arch has one of the most informative,<br/>user-friendly wiki&#8217;s out there. Do not, I repeat, DO NOT ask a question in the<br/>forums or on IRC without searching the wiki and the forums first.</p></blockquote>
-
-
-<p>Similarly, looking through the threads in
-<a href="https://bbs.archlinux.org/viewforum.php?id=23" title="Newbie board">Newbie Corner</a>
-will periodically turn up new posters who are indignant at being told to
-<acronym title="Read The Fscking Manual">RTFM</acronym> and see it as some
-sort of <em>personal</em> attack, when in fact it is just someone pointing out the
-obvious to them. The community hasn&#8217;t compiled all that documentation just
-so they can sit around and regurgitate answers for people who are either
-unwilling or incapable of making the minimum amount of  effort required to
-solve their own problems…</p>
-
-<p>If you want handholding, there are plenty of online communities that will
-cater for you. If you install Arch and think that you are automatically entitled
-to immediate support for issues that you encounter, then you are mistaken.
-If you think that Arch will suffer if you don&#8217;t get what you want, then
-your problems extend significantly beyond your choice of distro.</p>
-
-<p>The community has worked hard over the years to keep the signal-to-noise ratio
-on the boards high, that way, the forums remain a helpful resource for the community,
-not a breeding ground for
-<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on parasites…">help vampires</a>.</p>
-
-<h4>Notes</h4>
-
-<p>Flickr Creative Commons image by
-<a href="http://www.flickr.com/photos/angellic/47031159/">si_si_ay</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/23/notmuch/">Using Notmuch with mutt</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-23T19:37:00+12:00" pubdate data-updated="true">May 23<span>rd</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/magnifier.png" title="day 307 on Flickr" >
-Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
-<a href="http://www.mutt.org/" title="mutt homepage">mutt</a> posts<sup>1</sup> with what I am assuming is the
-final piece of the puzzle: searching <code>mutt's</code> maildirs. For a small to average size mailbox, <code>mutt's</code>
-searching works fine, but as your mail volume grows this simple search doesn&#8217;t really scale. That&#8217;s
-where the rather modestly named <a href="http://notmuchmail.org/" title="Notmuch website">Notmuch</a> comes into play.</p>
-
-<p>It can be run as a standalone mail client, but you can also use it with <code>mutt</code> to provide
-a ruthlessly efficient and fast search tool for your email. I had looked at it and
-<a href="http://sup.rubyforge.org/" title="A console client for people with lots of mail">Sup</a>
-a couple of years ago, but was spurred to do something about it this week when
-<a href="https://twitter.com/#!/chosig" title="Chosig on Twitter">Gunnar Lundström</a> pinged me on twitter and
-suggested I check it out. So I did.</p>
-
-<blockquote><p>&#8220;Not much mail&#8221; is what Notmuch thinks about your email collection. Even if you receive 12000 <br/>messages per month or have on the order of  millions of messages that you&#8217;ve been saving for decades. <br/>Regardless, Notmuch will be able to quickly search all of it. It&#8217;s just plain not much mail.</p><footer><strong>Notmuch website</strong> <cite><a href='http://notmuchmail.org'>notmuchmail.org/&hellip;</a></cite></footer></blockquote>
-
-
-<p>There was previously a
-<a href="http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/">mutt-notmuch script</a>
-for integrating the two, but the functionality was included upstream at the start of this year
-so it is quite straightforward to set it up. There is a
-<a href="http://aur.archlinux.org/packages.php?ID=36289" title="Arch User Repository package">package in the AUR</a>
-but it is intended as the full mail client, complete with, <em>shudder</em>, emacs support amongst
-other things. I have stripped out the uneeded bindings and included the relevant <code>perl</code> libraries in a
-<a href="https://bitbucket.org/jasonwryan/centurion/src/6ff0f252961f/Build/notmuch/PKGBUILD" title="…in my bitbucket repo">modified PKGBUILD</a>
-if you just want the basic search with <code>mutt</code>.</p>
-
-<p>Otherwise, you&#8217;ll need to step through it manually.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl perl-mailtools perl-mail-box perl-string-shellquote
-</span><span class='line'>cowerd notmuch perl-term-readline-gnu
-</span></code></pre></div></figure>
-
-
-<p>As you will see from the PKGBUILD, you will need to copy the <code>notmuch-mutt</code> script
-into your <code>$PATH</code>: you&#8217;ll find it in <span class="file">contrib/notmuch-mutt/</span>.</p>
-
-<p>There is a simple interative setup, which you can complete before running the index the first time:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>notmuch setup
-</span><span class='line'>notmuch new
-</span></code></pre></div></figure>
-
-
-<p>The final step is to copy across the <code>mutt</code> macros included with the script:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat src/notmuch-0.13/contrib/notmuch-mutt/notmuch-mutt.rc &gt;&gt; <span class="nv">$HOME</span>/.mutt/muttrc
-</span></code></pre></div></figure>
-
-
-<p>Now, from within <code>mutt</code>, <kbd>F8</kbd>, <kbd>F9</kbd> and <kbd>F6</kbd> will respectively
-search, create the relevant threads from search results, and tag mails with <code>notmuch</code>.</p>
-
-<p>As I use <code>offlineimap</code> to retrieve my mail, I simply added <code>notmuch new</code> to the script that
-runs as a <code>cron</code> job to synch my mail and <code>notmuch</code> reindexes all of my mail as soon as it arrives.</p>
-
-<h3>Updated 27/5/12</h3>
-
-<p>Two of the <code>mutt</code> macros that are shipped in <span class="file">contrib/notmuch-mutt/notmuch-mutt.rc</span>
-do not work. I have written a patch to fix this and
-<a href="http://notmuchmail.org/pipermail/notmuch/2012/011263.html" title="Patch on notmuch list">posted it to the ML</a>.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/uefi.jpg" title="'Samsung Series 9 Laptop'" >
+Just before Christmas my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src" title="Bitbucket repo for Archer">EeePC 901</a> started
+to behave erratically. Rather than prolong the final throes, I decided to replace it and,
+after looking around and having played with a colleague&#8217;s
+<a href="http://www.cnet.com.au/samsung-series-9-13-inch-2012-339341806.htm" title="CNet Review">Samsung Series 9</a>,
+I decided that I would swallow my pride, pay the Windows tax and opt for one of these sleek, fast
+little notebooks. Given my experience with it over the last six to eight weeks, I am confident that
+it was a decision that I am unlikely to regret.</p>
+
+<p>The machine came with
+<a href="https://en.wikipedia.org/wiki/Windows_8#Secure_boot" title="Wikipedia entry on Windows 8">Secure Boot</a>
+enabled and running Windows 8.<sup>1</sup> After sedulously ignoring the mounting number
+of posts on the Arch boards that had <acronym title="Unified Extensible Firmware Interface">UEFI</acronym>
+in the title, initially convinced that it had something to do with Apple hardware and therefore
+would be unlikely to impact on me at any point in the future, I now found myself in the position of
+having to understand all of the disparate elements involved in UEFI booting.</p>
+
+<p>This proved to be a non-trivial task. It is not that there is insufficient information
+available; quite the opposite. The Arch Wiki has a typically thorough
+<a href="https://wiki.archlinux.org/index.php/UEFI" title="Arch Wiki page">entry on UEFI</a>; the real
+challenge is revealed when you scroll to the bottom of that page to the
+<a href="https://wiki.archlinux.org/index.php/UEFI#See_also" title="See also section">reference links</a>
+where you begin to reach an appreciation that this isn&#8217;t a drop-in replacement for
+Grub in the way <a href="http://jasonwryan.com/blog/2012/07/09/syslinux/" title="My post on moving to Syslinux">Syslinux was</a>,
+for example. This is a whole new booting ecosystem.</p>
+
+<p>I wanted a LVM on LUKS setup and, after reading <em>a lot</em> more documentation on
+<a href="https://wiki.archlinux.org/index.php/UEFI_Bootloaders" title="Arch Wiki entry">UEFI bootloaders</a>,
+<a href="https://wiki.archlinux.org/index.php/GPT" title="Arch Wiki GPT page">GUID Partition Tables</a> and
+<a href="http://www.rodsbooks.com/efi-bootloaders/efistub.html" title="Rod Smith's excellent site">EFISTUB</a><sup>2</sup>
+than I had bargained on, I felt reasonably well equipped to proceed. And while this was an
+admittedly time consuming (and sometimes confusing) process, I believe it was worth it.</p>
+
+<p>Once I had a reasonable grasp of the conceptual model—and I am convinced this is the single
+biggest hurdle in this process—I chose the EFISTUB boot approach with
+<a href="http://freedesktop.org/wiki/Software/gummiboot" title="gummiboot homepage">gummiboot</a>,
+as the boot manager; mostly because it seemed the simplest approach (the name may also
+have been a factor).</p>
+
+<p>Armed with all this new knowledge, I embarked on the install process. It didn&#8217;t take long at
+all. Mostly because I couldn&#8217;t boot in UEFI mode from the USB drive.</p>
+
+<p>Turns out a couple of things were thwarting me; one I had disabled Secure Boot
+in the UEFI menu, but had neglected to disable the fast boot option. Secondly,
+and more worryingly, I kept encountering kernel panics once I had got the
+machine to boot. Seems that booting in UEFI mode triggers a nasty
+<a href="https://bugzilla.kernel.org/show_bug.cgi?id=47121" title="On the Kernel bugtracker">bug with the samsung_laptop module</a>.</p>
+
+<p>Once I could boot from the USB drive, I was able to successfully complete the install.
+Rather than include a blow-by-blow account of that process here, I
+have uploaded
+<a href="https://gist.github.com/4618490" title="Gist with installation details">a gist with the details</a>,
+for the morbidly curious or preternaturally bored.</p>
+
+<p>The whole process, for me, epitomised what Arch is really about. No matter how comfortable
+a point you reach with your understanding of the tools you use, the rolling release model
+constantly challenges you to adopt and adapt to new technologies. Sure, I could have just
+opted to boot in regular BIOS mode, but what would be the point of that? I wouldn&#8217;t have
+<em>learned</em> anything.</p>
+
+<p>The other thing that quickly became apparent is that, contrary to some commentary
+on the boards about the
+<a href="https://www.archlinux.org/news/install-media-20120715-released/" title="News item on new install method">removal of the AIF</a>,
+the new install scripts are quite superb; simple, direct and quite unambiguous, the whole
+install procedure now feels a lot more Arch-like. The developers have done a great
+job with these tools.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a> and
-<a href="http://jasonwryan.com/blog/2012/05/12/mutt/">mutt and HTML email</a></li>
+<li><p>Surely the worst operating system, at least in terms of the user interface, I have
+had the misfortune to encounter (and I include Vista and Ubuntu&#8217;s Unity in that
+cavalcade of fail)…</p></li>
+<li><p>I&#8217;ll post more on the voluminous documentation around this, and other aspects of
+GNU/Linux, in the coming weeks.</p></li>
 </ol>
 
+</div>
+  
+  
 
-<p>Creative Commons image by
-<a href="http://www.flickr.com/photos/mjtmail/3008566512/in/photostream/">mjtmail on Flickr</a></p>
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/01/10/truecrypt/">Replacing TrueCrypt</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-10T16:02:00+13:00" pubdate data-updated="true">Jan 10<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/lock.jpg" title="'Flickr image of lock'" >
+I have used <a href="http://truecrypt.org/" title="TrueCrypt homepage">TrueCrypt</a> since just before
+I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4.
+It is an incredibly handy utility, allowing you to create and manage encrypted volumes on
+the fly and—for the especially paranoid—to hide the existence of those volumes from
+inquisitive others.</p>
+
+<p>In the intervening years, with all aspects of my personal life
+increasingly mediated digitally, in order to properly safeguard my privacy,
+and that of my family, I have taken to using LUKS to
+<a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on LVM on LUKS">fully encrypt all of my machines</a>.
+And I have used TrueCrypt, both personally and for work, to encrypt some of my USB drives and as
+a container in <a href="http://dropbox.com/" title="Dropbox homepage">Dropbox</a>
+, for as long as
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on sharing dotfiles with Dropbox">I have used that service</a>.</p>
+
+<p>Early last year, however, I became aware of concerns that TrueCrypt was not truly open source; that almost
+all of the larger distros, including Arch, and the Open Source Initiative did not regard TrueCrypt as
+free (as in Freedom) software:</p>
+
+<blockquote><p>The TrueCrypt License has not been officially approved by the Open Source Initiative and is not considered &#8220;free&#8221; by several major Linux distributions (Arch Linux, Debian, Ubuntu, Fedora, openSUSE, Gentoo), mainly because of distribution and copyright-liability reasons.</p><footer><strong>Wikipedia entry on TrueCrypt</strong> <cite><a href='https://en.wikipedia.org/wiki/Truecrypt'>en.wikipedia.org/wiki/Truecrypt/&hellip;</a></cite></footer></blockquote>
+
+
+<p>When I initially accessed the page, in February 2012, there was also a paragraph—now removed—that
+highlighted further, more alarmist, concerns about the shadowy identity of the people behind
+TrueCrypt:</p>
+
+<blockquote><p>The anonymity of the developers and the abnormalities mentioned above have led users to raise suspicions about the provenance of the product and speculate about the possible existence of vulnerabilities or backdoors that might exist in the source code or executables. http://www.privacylover.com/encryption/analysis-is-there-a-backdoor-in-truecrypt-is-truecrypt-a-cia-honeypot/ However its open source and it can be check for funerabilities that way. [sic]</p><footer><strong>Wikipedia entry retrieved in February 2012</strong> <cite><a href='https://en.wikipedia.org/w/index.php?title=TrueCrypt&diff=478623780&oldid=478608477'>en.wikipedia.org/w/&hellip;</a></cite></footer></blockquote>
+
+
+<p>While I don&#8217;t subscribe to the theory that the CIA have planted a backdoor in the software (if they
+had, <a href="https://en.wikipedia.org/wiki/Truecrypt#Operation_Satyagraha" title="FBI operation foiled by TC">it clearly doesn&#8217;t work</a>),
+I was relieved to see at the end of last year that someone had written a simple utility that allows
+you to manage TrueCrypt containers from the command line; <a href="https://github.com/bwalex/tc-play" title="tcplay on Guthub">tcplay</a>
+is decribed as:</p>
+
+<blockquote><p>a free (BSD-licensed), pretty much fully featured (including multiple keyfiles, cipher cascades, etc) and stable TrueCrypt implementation.</p></blockquote>
+
+
+<p>With a <a href="https://github.com/bwalex/tc-play/blob/master/LICENSE" title="tcplay license">simple, two paragraph license</a>
+and a brief but comprehensive <code>man</code> page, I was sold. I uninstalled TrueCrypt late last year and haven&#8217;t missed it since. Quite
+the contrary. The only “issue” that I have had with tcplay is remembering the commands to map and mount a drive.
+Initially, I jotted down some notes, but opening them up several times a week to refer to them quickly seemed
+pointless so I eventually wised up and wrote a wrapper script to do the job for me…</p>
+
+<p>The script is quite simple, it finds the first available loop device, maps the encrypted volume to it and
+mounts it read-writeable for your user.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="c"># manage truecrypt containers using tcplay</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">user</span><span class="o">=</span>jason
+</span><span class='line'><span class="nv">cryptdev</span><span class="o">=</span>Safebox
+</span><span class='line'><span class="nv">cryptpath</span><span class="o">=</span>/home/jason/Dropbox/<span class="s2">&quot;$cryptdev&quot;</span>
+</span><span class='line'><span class="nv">loopdev</span><span class="o">=</span><span class="k">$(</span>losetup -f<span class="k">)</span>
+</span><span class='line'><span class="nv">mountpt</span><span class="o">=</span>/media/<span class="s2">&quot;$cryptdev&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># must be run as root</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$EUID</span> !<span class="o">=</span> 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;You must be root to run this.&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># unecrypt and mount container</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span>losetup <span class="s2">&quot;$loopdev&quot;</span> <span class="s2">&quot;$cryptpath&quot;</span>
+</span><span class='line'>  tcplay --map<span class="o">=</span><span class="s2">&quot;$cryptdev&quot;</span> --device<span class="o">=</span><span class="s2">&quot;$loopdev&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># read passphrase</span>
+</span><span class='line'>  <span class="nb">read</span> -r -s passphrase <span class="s">&lt;&lt;EOF</span>
+</span><span class='line'><span class="s">  &quot;$passphrase&quot;</span>
+</span><span class='line'><span class="s">EOF</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># mount container</span>
+</span><span class='line'>  <span class="o">[[</span> -d <span class="s2">&quot;$mountpt&quot;</span> <span class="o">]]</span> <span class="o">||</span> mkdir <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># mount options</span>
+</span><span class='line'>  <span class="nv">userid</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="s2">&quot;[=(]&quot;</span> <span class="s1">&#39;{print $2,$4}&#39;</span> &lt;<span class="o">(</span>id <span class="s2">&quot;$user&quot;</span><span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  mount -o nosuid,uid<span class="o">=</span><span class="s2">&quot;${userid% *}&quot;</span>,gid<span class="o">=</span><span class="s2">&quot;${userid#* }&quot;</span> /dev/mapper/<span class="s2">&quot;$cryptdev&quot;</span> <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># close and clean up…</span>
+</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;close&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">device</span><span class="o">=</span><span class="k">$(</span>awk -v <span class="nv">dev</span><span class="o">=</span><span class="nv">$cryptdev</span> -F<span class="s2">&quot;:&quot;</span> <span class="s1">&#39;/dev/ {print $1}&#39;</span> &lt;<span class="o">(</span>losetup -a<span class="k">)</span><span class="o">)</span>
+</span><span class='line'>  umount <span class="s2">&quot;$mountpt&quot;</span>
+</span><span class='line'>  dmsetup remove <span class="s2">&quot;$cryptdev&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;demapping failed&quot;</span>
+</span><span class='line'>  losetup -d <span class="s2">&quot;$device&quot;</span> <span class="o">||</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;deleting $loopdev failed&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Options are open or close.&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>Once you are done, the script will unmount your volume and clean up. Undoubtedly, the
+script could be improved; patches are welcome.</p>
+
+<p>There is a
+<a href="https://aur.archlinux.org/packages/tcplay-git/" title="Arch User Repository">PKGBUILD in the AUR</a>.
+Uninstall TrueCrypt and give tcplay a go, it is a simple, powerful application; and it <em>is</em>
+free software…</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/20/vimprobable/">A Vimprobable Walkthrough</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-20T18:58:00+13:00" pubdate data-updated="true">Nov 20<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/vimprobable-logo.png" title="'Vimprobable logo'" >
+I have written about <a href="http://vimprobable.org" title="Vimprobable homepage">Vimprobable</a>
+a couple of times over the last two years<sup>1</sup>,
+it is one of those projects that, for a variety of reasons, I have picked up
+and stuck with.  Like <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>,
+<a href="http://vim.org" title="Vim homepage">Vim</a> and
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>,
+it is an essential part of my working environment and is installed on all of my
+machines, where it is my default browser. It&#8217;s simplicity, power and
+configurability are why, despite looking at a few other similar projects, I
+have stuck with Vimprobable since first installing it.</p>
+
+<p>After my last post, a <a href="http://jasonwryan.com/blog/2012/09/28/screencast/" title="An intro to dwm">dwm screencast</a>,
+I wanted to have another crack at making a decent screencast. Sadly,
+this is not it.  I can say that making a <em>good</em> screencast is not a simple
+accomplishment; there are so many elements that require significant attention. I
+spent a good many hours this time around playing with custom Xorg modelines,
+<code>ffmpeg</code>&#8217;s arcane encoding options and, to be frank, the final product is just not worth
+all that effort.</p>
+
+<p>I&#8217;m going to stick with plain text from now on. It requires little more from me
+than a passing acquaintance with the subject matter, some loosely held and
+<a href="http://jasonwryan.com/blog/2012/08/18/trolls/" title="Trolling Arch Linux">firmly expressed opinions</a>
+and my unbridled confidence in the fact that anyone who
+has read this far down the page is so bereft of other, more pressing things to
+think about that they may inadvertently find a scintilla of amusement in here…</p>
+
+<p>With that explanation out of the way, I give you my final screencast:</p>
+
+<iframe src="http://player.vimeo.com/video/53829053?byline=0&amp;portrait=0&amp;badge=0&amp;color=ffffff" 
+width="350" height="197" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+
+
+<p></p>
+
+<p><a href="http://vimeo.com/53829053">An Introduction to Vimprobable</a> on 
+<a href="http://vimeo.com">Vimeo</a>.</p>
+
+
+<h4>Notes</h4>
+
+<ol>
+<li>First back in <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/">October, 2010</a> and then,
+more recently, in <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/">June, 2011</a>.</li>
+</ol>
+
 </div>
   
   
@@ -461,23 +435,23 @@ do not work. I have written a patch to fix this and
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -564,7 +538,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

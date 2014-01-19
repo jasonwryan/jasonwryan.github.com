@@ -9,7 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar. Here is how I sorted it. First, I &hellip;">
+  <meta name="description" content="This morning I received a heap of brochures inviting me to attend
+professional development courses, training seminars and conferences. One
+in &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -88,7 +90,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/">dzen2 and conky-cli in dwm</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/04/03/vapourware/">Vapourware</a></h1>
     
     
       <p class="meta">
@@ -104,71 +106,47 @@
   
 
 
-<time datetime="2009-11-21T12:07:00+13:00" pubdate data-updated="true">Nov 21<span>st</span>, 2009</time>
+<time datetime="2010-04-03T13:18:00+13:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2010</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar.</p>
+  <div class="entry-content"><p>This morning I received a heap of brochures inviting me to attend
+professional development courses, training seminars and conferences. One
+in particular stood out for reasons I’d like to share with you.</p>
 
-<p>Here is how I sorted it.</p>
+<p>By way of context; it’s a 2 day programme (workshops on the first,
+plenary sessions on the second) of social media for internal
+communicators. As I have a keen interest in internal communications, I
+studied their offering.</p>
 
-<p>First, I installed <code>conky-cli</code> and <code>dzen2</code>. Conky-cli is in AUR, and dzen2 is in Community:</p>
+<p>One presentation, from an “international guest speaker,” is so striking
+I’ll reprint it in its entirety, removing the name of the company to
+prevent them any (further) embarassment, (all emphasis mine):</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S dzen2 <span class="o">&amp;&amp;</span> yaourt conky-cli
-</span></code></pre></div></figure>
+<blockquote><p>[Multi-national company] is rolling out Sharepoint this year. It
+<strong>will</strong> provide the organization with an enhanced way of
+communicating, collaborating and managing content - a dynamic platform
+on which to evolve and further improve [company’s] way or working.
+From an internal communications perspective, the Microsoft Office
+product provides an <strong>updated way</strong> to engage colleagues, in order to
+drive winning culture and business performance. This session captures
+the opportunities, benefits, <strong>and realities</strong> of implementing and
+living with Sharepoint.</p>
 
+<p>[Employee name], Internal Communications Director, [company].</p></blockquote>
 
-<p>Then it was a matter of setting up the relevant files.</p>
+<p>Did I read that correctly? The company haven’t actually implemented the
+technology yet, but they are still fronting someone to sell it’s future
+virtues.</p>
 
-<figure class='code'><figcaption><span>.xinitrc.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># ~/.xinitrc</span>
-</span><span class='line'>setxkbmap -option terminate:ctrl_alt_bksp &amp;amp;
-</span><span class='line'><span class="nb">eval</span> <span class="sb">`</span>cat ~/.fehbg<span class="sb">`</span> &amp;amp;
-</span><span class='line'>numlockx &amp;amp;
-</span><span class='line'>xscreensaver -no-splash &amp;amp;
-</span><span class='line'><span class="c"># Dzen &amp;amp; conky</span>
-</span><span class='line'><span class="o">(</span>sleep 15s &amp;amp;&amp;amp; conky | dzen2 -x <span class="s1">&#39;500&#39;</span> -e <span class="s1">&#39;&#39;</span> -fg <span class="s1">&#39;#dcdcdc&#39;</span> -bg <span class="s1">&#39;#3f3f3f&#39;</span> <span class="se">\</span>
-</span><span class='line'>-w <span class="s1">&#39;650&#39;</span> -ta r -fn <span class="s1">&#39;-*-terminus-*-r-normal-*-*-120-*-*-*-*-iso8859-*&#39;</span> -p <span class="o">)</span> &amp;amp;
-</span><span class='line'><span class="c"># Start dwm</span>
-</span><span class='line'><span class="nb">exec </span>ck-launch-session ~/Scripts/dwm-start
-</span></code></pre></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>.conkyrc .sh </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>background no
-</span><span class='line'>out_to_console yes
-</span><span class='line'>update_interval 2
-</span><span class='line'>total_run_times 0
-</span><span class='line'>use_spacer none
-</span><span class='line'>double_buffer yes
-</span><span class='line'>TEXT
-</span><span class='line'>${if_existing /sys/class/power_supply/BAT0/present}^i(/home/jason/Build/dwm/dzen/bat.xbm)…</span></code></pre></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>dwm-start .sh </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>while true; do 
-</span><span class='line'>    dwm >/dev/null
-</span><span class='line'>done</span></code></pre></div></figure>
-
-
-<p>The key is —and it took me a while to work it out— to delay the loading of conky until <em>after</em> dwm has painted it&#8217;s
-status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
-
-<p>Now, the “before” shot:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/conky-dzen.png"></p>
-
-<p>…and the finished product:</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4121324068/" title="Conky-cli to dzen2 in dwm on Arch by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2666/4121324068_6ec29262d7.jpg" width="500" height="293" alt="Conky-cli to dzen2 in dwm on Arch"/></a></p>
+<p>Whether or not the technology is able to deliver these benefits (and I
+<a href="http://twitter.com/jasonwryan/status/839079414">doubt it</a> <a href="http://twitter.com/jasonwryan/status/839079197">very
+much</a>), shouldn’t the
+corporate communicator at least be talking about, oh let’s say for a
+whim, something <em>grounded in evidence?</em></p>
 </div>
   
   
@@ -181,7 +159,7 @@ status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2009/11/07/changing-karmics-login-screen/">Changing Karmic&#8217;s Login Screen</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/03/02/patching-dwm/">Patching dwm</a></h1>
     
     
       <p class="meta">
@@ -197,66 +175,45 @@ status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
   
 
 
-<time datetime="2009-11-07T18:46:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2009</time>
+<time datetime="2010-03-02T20:16:00+13:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2010</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>With Ubuntu 9.10, Karmic Koala, they have dispensed with the GDM in order to
-accelerate boot time. This has made for a faster boot, but a side effect has
-been that there is no longer a straightforward way to theme your login - and
-the default isn’t just ugly, it’s fugly…</p>
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/patching-dwm.png" alt="image" /></p>
 
-<p>Fear not. It can be fixed.</p>
+<p>I had posted <a href="http://jasonwryan.com/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/" title="Patching dwm with pertag &amp; bstack">a while back</a>
+about my (failed) attempt to patch <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>
+with both pertag and some of the other layout patches. I had been able to get it to work with
+<a href="http://dwm.suckless.org/patches/bottom_stack" title="dwm wiki: bstack">bottomstack</a>,
+but adding another patch caused some of the chunks to fail. It seems
+pertag moves the code around to the point that – using
+<a href="http://dwm.suckless.org/patches/" title="patches: dwm wiki">the standard patching method</a> –
+any further patches won’t take.</p>
 
-<p>The first thing you want to do is replace the background image. You can find it
-at <code>/usr/share/images/xsplash</code>.</p>
+<p>Further investigation, and some trial and a tolerable amount of error,
+have however demonstrated to me that it is quite possible to patch dwm
+to your heart’s content; or at least to my meagre needs. Which in the
+case of <a href="http://miromiro.com/Configs/index.html" title="EeePC configs">my EeePC</a>
+is pertag, cycle and push, with the addition of bstack on
+<a href="https://bitbucket.org/jasonwryan/workstation/src/" title="Workstation configs">my workstation</a>.</p>
 
-<p>Before doing anything rash, make a copy of the directory:</p>
+<p>The solution, as I have found in almost every instance of my tinkering
+with dwm, is stunningly simple. Start with a new version of dwm and
+apply the
+<a href="http://dwm.suckless.org/patches/pertag" title="dwm wiki: pertag">pertag diff</a>. Then
+manually add all of the chunks of the subsequent patches.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
-</span></code></pre></div></figure>
+<p>All of the changes are now in dwm.c and your config.h should only have
+the necessary keybindings to activate the functionality you have added
+to this amazing window manager.</p>
 
-
-<p>Then delete all of the images that begin with <code>bg_</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo rm /usr/share/images/xsplash/bg_*
-</span></code></pre></div></figure>
-
-
-<p>Use the gimp to create a background image for your desktop and save it into
-this directory, and name it <code>bg_2560x1600.jpg</code> …irrespective of the resolution
-of your screen. Leave the other images as they are: the logo and the
-marvellously named throbber will sit over your new background as you boot up…</p>
-
-<p>Next you can change the colours of the login box to complement your new
-background. This is all controlled in
-<code>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc</code>.</p>
-
-<p>Again, make a copy:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc <span class="se">\</span>
-</span><span class='line'>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc-backup
-</span></code></pre></div></figure>
-
-
-<p>Then open the file and edit the relevant lines of code at the beginning of the
-file:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
-</span></code></pre></div></figure>
-
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/karmic-text.png" title="'Screenshot of editing text'" ></p>
-
-<p>As you can see, the colour scheme I have chosen uses dark grey to match my
-desktop. Feel free to experiment, you can’t really break anything…</p>
-
-<p><a href="http://www.flickr.com/photos/jasonwryan/4081800113/" title="Customized Karmic Login Screen by jasonwryan, on Flickr"><img src="http://farm3.staticflickr.com/2536/4081800113_d4b98a9b3c.jpg" width="500" height="313" alt="Customized Karmic Login Screen"></a></p>
-
-<p>Simple, really.</p>
+<p>If you want to see what changes this makes, you can take a peek at
+<a href="https://bitbucket.org/jasonwryan/workstation/src/tip/dwm-5.7.2-2/" title="diff in mercurial repo">my .diff</a>
+(for bstack, cycle, pertag and push). You are equally welcome to apply
+it if that is the functionality that you are looking for in 5.7.2.</p>
 </div>
   
   
@@ -269,7 +226,7 @@ desktop. Feel free to experiment, you can’t really break anything…</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2009/03/17/install-otf-fonts-in-openoffice/">Install .otf Fonts in OpenOffice</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/02/27/using-uzbl/">Using Uzbl</a></h1>
     
     
       <p class="meta">
@@ -285,58 +242,73 @@ desktop. Feel free to experiment, you can’t really break anything…</p>
   
 
 
-<time datetime="2009-03-17T19:51:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2009</time>
+<time datetime="2010-02-27T10:19:00+13:00" pubdate data-updated="true">Feb 27<span>th</span>, 2010</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>OpenOffice won’t recognize TrueType fonts with the extension <code>.otf</code>, so you need to convert them to <code>.ttf</code>
-in order to use them in that suite.</p>
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/4352140405/" title="Arch &amp; uzbl by jasonwryan, on Flickr"><img src="http://miromiro.com/Blog-images/uzbl.jpg" alt="Arch &amp;
+uzbl" /></a></p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install fontforge
-</span></code></pre></div></figure>
+<p>A couple of weeks ago, I switched my default browser from
+<a href="http://conkeror.org/" title="Conkeror homepage">Conkeror</a> to
+<a href="http://www.uzbl.org/" title="uzbl homepage">uzbl</a>. It wasn’t that I was
+dissatisfied with Conkeror <em>per se</em>; more that as I was almost
+exclusively using vim-like applications, it seemed almost perverse to be
+browsing with an application that used Emacs-style keybindings. Over
+time, the simplest operations seemed—in comparison to
+<a href="http://www.vim.org/" title="THE $EDITOR">Vim</a>— to demand ridiculously complex
+key strokes.</p>
 
+<p>So, I installed uzbl.</p>
 
-<p>If all the <code>.otf</code> files are in the same folder, then you are good to go.</p>
+<blockquote><p>Uzbl follows the UNIX philosophy - “Write programs that do one thing
+and do it well. Write programs to work together. Write programs to
+handle text streams, because that is a universal interface.”
+<a href="http://www.uzbl.org/">uzbl homepage</a></p></blockquote>
 
-<p>First, you need the conversion script, which I found in <a href="url=http://www.stuermer.ch/blog/convert-otf-to-ttf-font-on-ubuntu.html]this%20post[/url">this post</a>:</p>
+<p>Consequently, the default uzbl version is designed to do little more
+than browse web pages. It doesn’t handle cookies, manage downloads,
+block ads, save bookmarks, or do any of the things that you would expect
+of its WebKit kin, <del>Firefox</del> Safari and Chrome.</p>
 
-<figure class='code'><figcaption><span>otf2ttf.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/local/bin/fontforge</span>
-</span><span class='line'><span class="c"># Quick and dirty hack: converts a font to truetype (.ttf)</span>
-</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Opening &quot;</span>+<span class="nv">$1</span><span class="o">)</span>;
-</span><span class='line'>Open<span class="o">(</span><span class="nv">$1</span><span class="o">)</span>;
-</span><span class='line'>Print<span class="o">(</span><span class="s2">&quot;Saving &quot;</span>+<span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
-</span><span class='line'>Generate<span class="o">(</span><span class="nv">$1</span>:r+<span class="s2">&quot;.ttf&quot;</span><span class="o">)</span>;
-</span><span class='line'>Quit<span class="o">(</span>0<span class="o">)</span>;
-</span></code></pre></div></figure>
+<p>This isn’t to say that it <em>can’t</em> do any of these things; like any
+well-designed
+<a href="http://en.wikipedia.org/wiki/UNIX" title="Wikipedia entry">UNIX</a> program, it
+is extensible and interoperable with programs through a range of
+scripts. The difference is that you get to choose which functionality
+matters to you, and implement it on an as-needs basis. This makes uzbl
+very light, very fast, and very powerful.</p>
 
+<p>The version I installed, uzbl-tabbed, ships with a number of default
+scripts that perform most of the functions that you will need. There is
+also a <a href="http://www.uzbl.org/wiki/scripts" title="uzbl wiki: scripts">scripts page</a>
+on the wiki that has a growing number of scripts contributed by users.</p>
 
-<p>Save it as <code>otf2ttf.sh</code> into the folder with the <code>.otf</code> files.</p>
+<p>I installed a couple of <a href="http://pbrisbin.com:8080/pages/scripts.html" title="Pat's scripts page">Pat Brisbin’s scripts</a>;
+an ingenious bash script for bookmarking that creates an HTML page of
+your bookmarks that you can serve locally or remotely (I keep mine on
+<a href="http://www.dropbox.com" title="Dropbox home">Dropbox</a> so I can access it from
+my phone as well), and a tidy little download manager.</p>
 
-<p>Then run:</p>
+<p>Like Vim, uzbl is modal; you switch between command and insert mode. By
+configuring uzbl to use Vim key bindings, you can seamless integrate it
+into your desktop environment. Here you can see the status bar showing
+uzbl in command mode, on the Arch forums home page, which has completely
+loaded (the other figure is the X root window number).</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">for </span>i in *.otf; <span class="k">do </span>fontforge -script otf2ttf.sh <span class="nv">$i</span>; <span class="k">done</span>
-</span></code></pre></div></figure>
+<p><img src="http://miromiro.com/Blog-images/uzbl-bar.png" alt="image" /></p>
 
+<p>As an Arch Linux user, I’m keen to support a project that has been
+developed by the Arch community (if you want to see the history of the
+project, there is a <a href="http://bbs.archlinux.org/viewtopic.php?id=70700&amp;p=1" title="uzbl history">long thread</a>
+on the Arch boards); but ultimately this software appeals because it is
+so configurable: you can customize it to your heart’s content (see my
+config file on my <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/uzbl/" title="uzbl file on bitbucket">mercurial repo</a>).</p>
 
-<p>Move all the converted fonts to your your shared directory:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo mv *ttf /usr/share/fonts/truetype/myfonts/
-</span></code></pre></div></figure>
-
-
-<p>And then change the permissions and reload the cache:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/
-</span><span class='line'>sudo chmod go+rx /usr/share/fonts/truetype/myfonts/*.ttf
-</span><span class='line'>sudo <span class="nb">fc</span>-cache -f -v
-</span></code></pre></div></figure>
-
-
-<p>And the fonts will now appear in OpenOffice. Easy.</p>
+<p>There are packages for most of the major distros: <a href="http://www.uzbl.org/get.php" title="Download and install details on the wiki">give it a go</a>.</p>
 </div>
   
   
@@ -345,6 +317,8 @@ in order to use them in that suite.</p>
     </article>
   
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/26/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -359,23 +333,23 @@ in order to use them in that suite.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -462,7 +436,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Over the last week I have been moving my blog over to Octopress,
-a lightweight blogging framework for Jekyll,
-the static site generator powering &hellip;">
+  <meta name="description" content="I posted a couple of weeks ago about the impact of some of the current
+changes to Arch Linux.
+There seems to be quite a bit of it about, because in &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,7 +90,7 @@ the static site generator powering &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/03/30/octopress/">Moving to Octopress</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/08/04/systemd/">The Leap to systemd</a></h1>
     
     
       <p class="meta">
@@ -106,110 +106,134 @@ the static site generator powering &hellip;">
   
 
 
-<time datetime="2012-03-30T12:30:00+13:00" pubdate data-updated="true">Mar 30<span>th</span>, 2012</time>
+<time datetime="2012-08-04T09:32:00+12:00" pubdate data-updated="true">Aug 4<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/octopress_logo.png" width="240" height="240" title="Octopress Logo" ></p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/leap.jpg" title="Leap image on Flickr" >
+I posted a couple of weeks ago about the impact of some of the current
+<a href="http://jasonwryan.com/blog/2012/07/19/breakage/" title="Post on the glibc change">changes to Arch Linux</a>.
+There seems to be quite a bit of it about, because in conjunction with the move from
+<span class="file">/lib</span> to <span class="file">/usr/lib</span>—and motivated by the same
+overarching shifts in the other distributions—the other major change making its way through
+the Arch community is the move to
+<a href="http://freedesktop.org/wiki/Software/systemd" title="Project page">systemd</a>. This change, however, has
+been more controversial because it marks a shift away from Arch&#8217;s central configuration
+file, <a href="https://wiki.archlinux.org/index.php/Rc.conf" title="Arch wiki entry on rc.conf">/etc/rc.conf</a>;
+a move that has disconcerted a number of people.</p>
 
-<p>Over the last week I have been moving my blog over to <a href="http://octopress.org/">Octopress</a>,
-a lightweight blogging framework for <a href="https://github.com/mojombo/jekyll">Jekyll</a>,
-the static site generator powering <a href="http://pages.github.com/">Github Pages</a>. I had previously
-been posting to a <a href="https://www.tumblr.com/">tumblr</a> page and, over the nearly four years that
-I had been doing that I had somehow racked up just over 4000 posts. I was <em>not</em>
-looking forward to migrating across.</p>
+<p>I&#8217;m not going to get into whether or not this move is consistent with
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="Wiki entry">The Arch Way</a>, because that has
+been thrashed over extensively on the
+<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023283.html" title="ML thread on rc.conf">mailing</a>
+<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023258.html" title="And another one…">lists</a>,
+but also—and more importantly—because Arch is a rolling release, which means change is <em>inevitable</em>.
+What is more, after watching all the back and forth on the <acronym title="Mailing lists">ML</acronym>
+and on the <a href="https://bbs.archlinux.org/viewtopic.php?id=96316&amp;p=1" title="Arch BBS thread on systemd">boards</a>, I am convinced that the
+<a href="http://www.archlinux.org/developers/#tomegun" title="Tom Gunderson">developer overseeing this shift</a>
+both knows what he is doing and is acting in the best interests of Arch.</p>
 
-<p>However, the fact that the Jekyll project has a number of scripts for
-<a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">migrating from other platforms</a>
-assuaged my concerns about the difficulty of this task. That sense of relief was shortlived.
-Neither of the two tumblr migration scripts were of any assistance: both would die during their
-initial runs, probably due to some funky characters in the post titles, or perhaps the posts themselves.</p>
+<p>This view has been validated by my experience of shifting to systemd on my machines.</p>
 
-<p>I certainly had no intention of trying to wade through the entire back catalogue identifying the
-rogue posts. Rather that admit defeat, and probably more due to a sense of misguided optimism about the
-“straightforward” nature of the task, I saw this setback as an opportunity to cull all of the
-cruft<sup>1</sup> from the blog and decided to manually import the fifty posts that I thought were of
-some interest.</p>
+<p>When the new initscripts package was pushed to [testing] in the middle of last month,
+I stripped out all of the redundant options in <span class="file">/etc/rc.conf</span>
+and took the ten minutes or so to read about and then create the new files. I then spent some
+time reading up on systemd, principally
+<a href="http://0pointer.de/blog/projects/systemd-for-admins-1.html" title="One of TWELVE…">Lennart Poettering&#8217;s series of posts</a>,
+the <a href="https://wiki.archlinux.org/index.php/Systemd" title="Good, but needing some structure">Arch wiki entry</a>
+and the many and various
+<a href="http://0pointer.de/public/systemd-man/" title="One for everything">manual pages</a>.</p>
 
-<p>Being an assiduous record keeper, all of the posts were helpfully bookmarked on
-<a href="https://pinboard.in/u:jasonwryan/t:jwr/">Pinboard under one tag</a>, and therefore it was
-simple enough to create a list of the required <acronym title="Unique Resource Locator">URLs</acronym>.
-Armed with this list, it was just a matter of cobbling together a script to do the bulk of
-the work for me.</p>
+<p>Over the last couple of days, I have migrated all of my machines over to systemd. I found it
+to be a very straightforward process. I went for a pure systemd approach, for reasons I will
+return to. Essentially, this is how I tackled it.</p>
 
-<p>The first task was to retrieve the posts from the list:</p>
+<p>First, for each machine, I established what daemons were running. I did this by using
+<a href="http://pikacode.com/jasonwryan/Veles/file/default/Scripts/daemons.sh" title="Pretty sure it is one of Xyne's">this shell script</a>
+and cross checking entries in my <span class="file">/etc/rc.conf</span>. Then
+it was just a matter of installing systemd:<sup>1</sup></p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grab files</span>
-</span><span class='line'><span class="k">while </span><span class="nb">read </span>url; <span class="k">do </span>
-</span><span class='line'><span class="k">    </span>wget --adjust-extension <span class="s2">&quot;${url}&quot;</span>
-</span><span class='line'><span class="k">done</span> &lt; /home/jason/Scripts/list
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S systemd systemd-sysvcompat systemd-arch-units
 </span></code></pre></div></figure>
 
 
-<p>Then I needed to remove all of the <acronym title="HyperText Markup Language">HTML</acronym>
-surrounding the actual posts: an <code>awk</code> one-liner took care of that.</p>
+<p>The only outstanding file to be created was <span class="file">/etc/timezone</span>, the
+others—all documented in <code>man rc.conf</code>—I had created earlier in the month. Then, with the
+list of the services I would need running on each box, I enabled them. I think it is
+fair to say that the only thing that is clunky about systemd is the command syntax for
+managing units. Repeatedly typing <code>systemctl enable foo.service</code> is as tedious as it is
+error prone, so I hacked up a
+<a href="https://bitbucket.org/jasonwryan/centurion/src/default/Scripts/sysd" title="sysd - *so* much easier">wrapper script</a>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># strip HTML cruft</span>
-</span><span class='line'><span class="k">for </span>file in *.html; <span class="k">do</span>
-</span><span class='line'><span class="k">  </span>awk <span class="s1">&#39;/&lt;h3&gt;/ {flag=1;next} /&lt;\/div&gt;/{flag=0} flag {print}&#39;</span> <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;${file%%.*}&quot;</span>
-</span><span class='line'><span class="k">done</span>
-</span><span class='line'>mkdir html <span class="o">&amp;&amp;</span> mv *.html html/
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sysd <span class="nb">enable </span>acpid
+</span><span class='line'>sysd <span class="nb">enable </span>lvm
+</span><span class='line'>etc…
 </span></code></pre></div></figure>
 
 
-<p>The final task of this part of the migration was to convert the HTML into
-<a href="http://daringfireball.net/projects/markdown/">markdown</a>,
-the format that Octopress uses. <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>
-the &#8220;universal document converter&#8221; handled that job:</p>
+<p>I also activated some additional gettys, as I like to log into a tmux session in TTY2 when
+I don&#8217;t need or want to start <code>X</code>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># convert to markdown format</span>
-</span><span class='line'><span class="k">for </span>file in *; <span class="k">do </span>
-</span><span class='line'><span class="k">    </span>pandoc -f html -t markdown <span class="s2">&quot;$file&quot;</span> &gt; <span class="s2">&quot;$file&quot;</span>.md
-</span><span class='line'><span class="k">done</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty2.service
 </span></code></pre></div></figure>
 
 
-<p>The final result was fifty markdown files holding all of my posts, almost ready to
-be committed to github. I say “almost” because the files still required what turned out to
-be a reasonable amount of cleaning up. Pandoc did a great job, for example, but would
-inexpicably break <a href="http://www.notareallink.com">multi word
-hyperlinks</a> over two lines. Similarly all of the internal
-links to my other posts pointed to the (meaningless) tumblr URLs<sup>2</sup>.</p>
+<p>And I misguidedly wrote a couple of custom service files that turned out to be
+<a href="https://bbs.archlinux.org/viewtopic.php?id=146207" title="BBS post on said files">completely unnecessary</a>;
+and then I was done.</p>
 
-<p>Setting up Octopress was extremely simple and quick by comparison: the
-<a href="http://octopress.org/docs/">documentation is very helpful</a>. There was one slight
-hitch, a <a href="https://github.com/tmm1/pygments.rb/issues/10">known issue on Arch x86_64</a>,
-which was simple enough to deal with.</p>
+<p>On all three boxes I rebooted and that was it. The only issue I experienced was
+the final shutdown after removing initscripts and before booting up with
+systemd. After issuing <code>shutdown -r now</code> the process
+hung with a message about a missing <span class="file">inittab</span> file.
+In retrospect, I should have added <code>init=/bin/systemd</code> to my kernel parameters
+and not unistalled instiscripts until I had booted with systemd. This has
+now been added to the
+<a href="https://wiki.archlinux.org/index.php/Systemd" title="Archwiki systemd page">systemd wiki page</a>.</p>
 
-<p>While the migration was not entirely pain-free, I am pleased that I have done it. Tumblr&#8217;s service
-increasingly <a href="https://twitter.com/#!/jasonwryan/statuses/176543962276954112">left a lot to be desired</a>
-but as it was a free service, I couldn&#8217;t complain too much. Or, more accurately, when I did complain,
-no-one actually listened…</p>
+<p>Overall, though: no real drama, just a blur of text<sup>2</sup> and then the
+login prompt. While I haven&#8217;t seen a dramatic decrease in boot time,
+booting does <em>feel</em> a bit snappier and two of my three machines shutdown
+markedly more quickly. Consider me sold.</p>
 
-<p>Indeed, moving to a paid service like Github
-(yes, it&#8217;s free at first, but once you have enough data there you need to pay a small amount
-every month) <a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/">makes a lot of sense</a>.
-The paid services I do use, like <a href="http://pinboard.in/">Pinboard</a> and
-<a href="http://www.tarsnap.com/">Tarsnap</a> are both inexpensive and much more
-reliable than their free counterparts<sup>3</sup>; and you get to invest in great
-software that is a pleasure to use.</p>
+<p>That brings me back to the decision to opt for a pure systemd approach, rather than
+hanging on to a completely eviscerated <span class="file">/etc/rc.conf</span>. The
+Arch community has been told that the intention is to
+<a href="https://bbs.archlinux.org/viewtopic.php?pid=1133957#p1133957" title="BBS post by tomegun">support the rc.conf format forever</a>;
+I can&#8217;t help but think this is a mistake. In the same way that
+<a href="https://wiki.archlinux.org/index.php/Pacman#Partial_upgrades_are_unsupported" title="Pacman entry on Arch Wiki">partial upgrades are unsupported</a>,
+I think that systemd is Arch&#8217;s inevitable future and the community should be encouraged to accept that, <code>Syu</code> and
+move on…</p>
 
-<h5>Notes</h5>
+<p>Having said that, I appreciate the consideration shown by the developers in wanting to assure
+people that their choice would continue to be catered for; and perhaps, over time, people still
+using initscripts will be regarded with the same sense of wry amusement as those who still show
+up from time to time with <code>hal</code> in their <code>DAEMONS</code> line.</p>
+
+<h3>Update 4/8/12</h3>
+
+<p>Tom Gunderson, the developer who looks after this part of Arch, has clarified the
+comment about the long term support for initscripts. As comments are hosted on
+a third-party paltform, I thought that it should be included in the body of the
+post.</p>
+
+<blockquote><p>Just a clarification: regarding the (probably very unwise) promise of &#8220;supporting <span="file">rc.conf</span> forever&#8221;, the intended meaning was that initscripts will support the syntax, not that initscripts themselves will always stay around (nor that systemd will gain support for the syntax in case initscripts is dropped).</p><p>At the moment systemd <strong>does</strong> support <span class="file">rc.conf</span> (when installed in conjunction with initscripts), but this is meant as a transitional measure only, and will likely go away eventually (though probably not soon).</p></blockquote>
+
+
+<h4>Notes</h4>
 
 <ol>
-<li>Initially, I had set up the site as a simple holding page and dumped a whole lot
-of feeds into it: twitter, bookmarks, scrobbled music, etc. Those 4000 posts were
-mostly just that sort of internet detritus…</li>
-<li>For creating redirections (Github pages do <em>not</em> support <span class="file">.htaccess</span>)
-I can&#8217;t recommend enough the
-<a href="https://github.com/rawsyntax/jekyll_alias_generator/blob/master/_plugins/alias_generator.rb">Jekyll Alias Generator</a>.
-Just. Brilliant.</li>
-<li>And <strong>much</strong> more scrupulous about how they use your personal data.</li>
+<li>Note this approach will <em>remove</em> sysvinit and initscripts and <code>mv /etc/rc.conf{,.pacsave}</code>.</li>
+<li>Make sure you remove <code>quiet</code> from your kernel parameters for your first systemd
+boot so you can see that everything starts correctly…</li>
 </ol>
 
+
+<p>Creative commons image on Flickr by
+<a href="http://www.flickr.com/photos/sovietuk/486119799/" title="leap by rick harrison">Tricky</a></p>
 </div>
   
   
@@ -222,7 +246,7 @@ Just. Brilliant.</li>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/03/23/key/">Signing Your Own Key</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a></h1>
     
     
       <p class="meta">
@@ -238,108 +262,178 @@ Just. Brilliant.</li>
   
 
 
-<time datetime="2012-03-23T11:36:00+13:00" pubdate data-updated="true">Mar 23<span>rd</span>, 2012</time>
+<time datetime="2012-07-26T18:48:00+12:00" pubdate data-updated="true">Jul 26<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/key.jpg" alt="image" /></p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/guard.jpg" title="'On Guard image on Flickr'" >
+In my last post, on
+<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="You should read it…">Mercurial Queues</a>,
+I outlined how you might use MQ to manage a
+<a href="http://dwm.suckless.org/" title="Dynamic window manager">dwm</a> patchset.
+Mercurial makes this process ridiculously easy, and this functionality is more
+than enough to recommend it. However, where I think it really gets interesting
+is when you share that same patchset across multiple machines and are easily
+able to customize which patches in the queue are applied, based upon the
+particular machine you are building dwm on.</p>
 
-<p>Some time in the last couple of days, the last of the packages in the
-Community repository were signed and, thanks to the tremendous work of
-the Arch developers and Trusted Users, you can fully implement package
-signing in your <span class="file">/etc/pacman.conf</span>.</p>
+<p>For example, in my case I use dwm on all three of my machines: my desktop at home,
+my laptop at work and my EeePC. Given the nature of each of these three machines,
+though, I want a slightly different stack of patches applied. These differences
+might extend only to particular rules applied in <span class="file">config.def.h</span>
+based upon the number of tags I use, or the different applications that I run
+at home as opposed to at work.</p>
 
-<p>You can check the state of the signed packages with this <code>expac</code>
-one-liner; it will return a list of any <em>unsigned</em> packages:</p>
+<p>In any event, what I want to be able to do is maintain
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/" title="Patchset in Bitbucket">a single patchset</a>
+in a mercurial repository, clone it to all my machines and then, using MQ,
+filter which specific patches are applied. This is all possible using a killer
+feature of MQ called
+<a href="http://hgbook.red-bean.com/read/advanced-uses-of-mercurial-queues.html%20'Advanced%20uses%20of%20MQ%20in%20the%20Mercurial%20book">guards</a>.
+Guards allow you to conditionally apply patches in a queue. Essentially, in
+a queue, you “tag” a patch with a guard and—depending on whether or not the
+guard is positive (to be applied), or negative (to be skipped)—when you
+<code>hg qpush -a</code> MQ takes care of applying the correct patches in the queue.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>expac -S <span class="s1">&#39;%r %n %g&#39;</span> | awk <span class="s1">&#39;$3==&quot;(null)&quot; {print $1 &quot;/&quot; $2}&#39;</span>
+<p>So, in the case of my work laptop, I begin by cloning dwm and intializing
+a patch queue:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd </span>Build/
+</span><span class='line'>hg clone http://hg.suckless.org/dwm
+</span><span class='line'>hg qinit -c
 </span></code></pre></div></figure>
 
 
-<p>Now that the packages are all signed, I updated my <span class="file">/etc/pacman.conf</span> to
-take advantage of this. My overall <code>SigLevel</code> setting requires signed
-packages, and—as of yesterday—I was able to move the last repository
-entry over to do the same:</p>
+<p>I setup my <span class="file">.hgrc</span> within the patches directory so that
+it points at the correct mercurial repository:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> Required DatabaseOptional TrustedOnly
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>core<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>extra<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>community<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>multilib<span class="o">]</span>
-</span><span class='line'><span class="nv">SigLevel</span> <span class="o">=</span> PackageRequired
-</span><span class='line'><span class="nv">Include</span> <span class="o">=</span> /etc/pacman.d/mirrorlist
+<figure class='code'><figcaption><span>.hg/patches/.hg/hgrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'> <span class="c"># Mercurial config file</span>
+</span><span class='line'><span class="o">[</span>ui<span class="o">]</span>
+</span><span class='line'><span class="nv">username</span> <span class="o">=</span> jasonwryan &lt;jasonwryan@gmail.com&gt;
+</span><span class='line'><span class="nv">ssh</span> <span class="o">=</span> ssh -i ~/.ssh/bb -C
+</span><span class='line'><span class="o">[</span>paths<span class="o">]</span>
+</span><span class='line'><span class="nv">default</span> <span class="o">=</span> ssh://hg@bitbucket.com/jasonwryan/dwm-patchset
 </span></code></pre></div></figure>
 
 
-<p>The next step was to add my key to pacman’s keychain so that I could
-sign the packages that I build using ABS or from the
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>. Allan has an
-<a href="http://allanmcrae.com/2011/08/pacman-package-signing-1-makepkg-and-repo-add/" title="The first in a series of four posts on signing: read them all">excellent post on setting this up</a>.</p>
+<p>Then I pull down my dwm patchset from the mercurial repository
+with <code>hg pull</code>:</p>
 
-<p>First, import your key into pacman’s keyring:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key -r 0xB1BD4E40
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulling from ssh://hg@bitbucket.com/jasonwryan/dwm-patchset
+</span><span class='line'>requesting all changes
+</span><span class='line'>adding changesets
+</span><span class='line'>adding manifests
+</span><span class='line'>adding file changes
+</span><span class='line'>added 6 changesets with 16 changes to 10 files
+</span><span class='line'><span class="o">(</span>run <span class="s1">&#39;hg update&#39;</span> to get a working copy<span class="o">)</span>
 </span></code></pre></div></figure>
 
 
-<p>Then follow the prompts as you edit the key to sign, set a trust level
-and save your key:</p>
+<p>After I update my local repo,<sup>1</sup> I can see the full patchset with
+<code>hg qseries</code>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman-key --edit-key 0xB1BD4E40
-</span><span class='line'>gpg&gt; lsign
-</span><span class='line'>...
-</span><span class='line'>gpg&gt; trust
-</span><span class='line'>...
-</span><span class='line'>gpg&gt; save
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setup.makefile
+</span><span class='line'>base.config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span><span class='line'>bstack
+</span><span class='line'>centurion.config
 </span></code></pre></div></figure>
 
 
-<p>Then it is just a matter of changing the <code>BUILDENV</code> option in your
-<span class="file">/etc/makepkg.conf</span>, which is set to <code>!sign</code>
-by default. Remove the bang and include the details of the key you wish to use:</p>
+<p>Then, as I decribed in my previous post, I make the changes to
+<span class="file">config.def.h</span> that are specific to this
+machine:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#-- Packager: name/email of the person or organization building packages</span>
-</span><span class='line'><span class="nv">PACKAGER</span><span class="o">=</span><span class="s2">&quot;Jason Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
-</span><span class='line'><span class="c">#-- Specify a key to use for package signing</span>
-</span><span class='line'><span class="nv">GPGKEY</span><span class="o">=</span><span class="s2">&quot;B1BD4E40&quot;</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew veles.config
+</span><span class='line'> <span class="c"># “hack, hack, hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Adaptions for Veles&#39;</span>
 </span></code></pre></div></figure>
 
 
-<p>Now, when you build a package, you will be prompted for your key’s
-passphrase:</p>
+<p>My patchset now has an additional patch in it:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Signing package...
-</span><span class='line'>
-</span><span class='line'>You need a passphrase to unlock the secret key <span class="k">for</span>
-</span><span class='line'>user: <span class="s2">&quot;Jason W Ryan &lt;jasonwryan@gmail.com&gt;&quot;</span>
-</span><span class='line'>2048-bit RSA key, ID B1BD4E40, created 2010-08-21
-</span><span class='line'>
-</span><span class='line'>Enter passphrase:
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>setup.makefile
+</span><span class='line'>base.config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span><span class='line'>bstack
+</span><span class='line'>centurion.config
+</span><span class='line'>veles.config
 </span></code></pre></div></figure>
 
 
-<p>Enter the correct passphrase and your package is built and signed:</p>
+<p>This is where guards come in to play. If I wasn&#8217;t interested in sharing
+the patchset, it would just be a matter of deleting the patch for Centurion.
+However, what I want to do is direct MQ to ignore that specific patch
+when applying the queue. I do that by creating a negative guard and then
+activating it:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>-&gt; Created signature file /home/jason/Build/<span class="o">{</span>pkg<span class="o">}</span>.pkg.tar.xz.sig.
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qguard centurion.config -- -block
+</span><span class='line'>hg qselect block
+</span><span class='line'>number of unguarded, unapplied patches has changed from 8 to 7
 </span></code></pre></div></figure>
 
 
-<p>Creative Commons image by
-<a href="http://www.flickr.com/photos/donovan_beeson/3185668524/" title="Coraline key on Flickr">donovanbeeson</a>
-on Flickr.</p>
+<p>That&#8217;s it! Adding a verbose flag to <code>hg qseries</code><sup>2</sup> will print out the
+patchset and the accompanying guard status:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries -v
+</span><span class='line'>0 U setup.makefile
+</span><span class='line'>1 U base.config.customizations
+</span><span class='line'>2 U statuscolours
+</span><span class='line'>3 U cycle
+</span><span class='line'>4 U push
+</span><span class='line'>5 U bstack
+</span><span class='line'>6 G centurion.config
+</span><span class='line'>7 U veles.config
+</span></code></pre></div></figure>
+
+
+<p>The real test, of course, is pushing the patchset onto the fresh
+dwm code:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpush -a
+</span><span class='line'>applying setup.makefile
+</span><span class='line'>applying base.config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>applying bstack
+</span><span class='line'>skipping centurion.config - guarded by <span class="s1">&#39;-block&#39;</span>
+</span><span class='line'>applying veles.config
+</span><span class='line'>now at: veles.config
+</span></code></pre></div></figure>
+
+
+<p>How cool is that? One central patchset, applied conditionally depending
+upon the machine you are using at the time.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Any guards applied on other machines will be present in the newly
+pulled <span class="file">series</span> file: these conflicts will need
+to be manually merged…</li>
+<li>The options for all of the <code>hg</code> commands can be read with
+<code>hg -v help $command</code>. For those related to queues, just prepend
+a <code>q</code> to <code>$command</code>.</li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by
+<a href="http://www.flickr.com/photos/alternatewords/4903560373/" title="On Guard on Flickr">Thorsten Becker</a></p>
 </div>
   
   
@@ -352,7 +446,7 @@ on Flickr.</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/03/17/vampires/">A Taxonomy of Help Vampires</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a></h1>
     
     
       <p class="meta">
@@ -368,105 +462,190 @@ on Flickr.</p>
   
 
 
-<time datetime="2012-03-17T16:25:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2012</time>
+<time datetime="2012-07-24T19:18:00+12:00" pubdate data-updated="true">Jul 24<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/vampire1.jpg" alt="image" /></p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
+Over the last week or so, I have finally gotten around to digging into the whole concept of
+using
+<a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
+to manage patches against an upstream project; in my case
+<a href="http://dwm.suckless.org" title="The truly suckless window manager…">dwm</a>.<sup>1</sup>
+Essentially, this mercurial extension helps you manage a stack of patches on
+top of a directory tree. This gives you quite a lot of fine-grained control
+over your patchset and assists immeasurably with automating the application of
+patches when the underlying codebase changes.</p>
 
-<p>If you have spent any time at all amongst online (or, for that matter,
-off-line) communities, you will be familiar with the help vampire. If,
-by some combination of fortune and ignorance, you haven’t come across
-this term before, read Amy Hoy’s original—and definitive—
-<a href="http://slash7.com/2006/12/22/vampires/" title="Amy's blog on help vampires">post on this scourge</a>,
-<em>now</em>.</p>
+<p>After having played around with queues for the last couple of days, I am quite
+impressed: both the concept and the execution are simple and powerful. The concept
+of Mercurial Queues is best described in the Mercurial book: the aptly titled,
+<em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
 
-<p>Amy has some excellent tips on identifying help vampires, however, since
-she originally shed some sunlight on this odious species, they have
-become even more cunning and have adapted; to the point where there are
-now several varieties that you should be wary of if you are determined
-to prevent your online community from becoming overrun with them.</p>
+<blockquote><p>MQ&#8217;s marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don&#8217;t like a patch, you can drop it. If a patch isn&#8217;t quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote>
 
-<p><strong>The Infant</strong> The easiest to spot because, due to their nascent form,
-they have not developed sophisticated anti-detection strategies as yet.
-Also, encouragingly, these are the most likely to respond to the
-corrective measures Amy outlines in her post.</p>
 
-<p>The infant has probably learned their dependant ways in some other
-online community with a higher tolerance for their spoonfeeding needs.
-Corrective measures, vigorously and repeatedly applied <em>can</em> turn them
-around; but even small amounts of reinforcement of this behaviour can
-quickly see them morph into one of the more sinister types…</p>
+<p>I followed Filippo Negroni&#8217;s excellent
+<a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
+to setup my own
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src" title="Patchset in Bitbucket repo">dwm patchset</a>
+based on
+<a href="http://hg.suckless.org/dwm" title="dwm hg repository">tip</a>, and the process was
+surprisingly straightforward; the only caveat being it is a good idea to plan
+quite carefully what changes you want in each particular patch. Once I had
+completed the setup, it got me thinking about the fact that the final install
+is done without <code>pacman</code>, just using <code>make install</code>. And, as a proof-of-concept
+more than anything else, I wondered whether this functionality could be used
+with <code>makepkg</code>.<sup>3</sup></p>
 
-<p><img src="http://media.tumblr.com/tumblr_m10ce18Jda1qz8s9s.jpg" alt="image" /></p>
+<p>Turns out, as you might expect with Arch, it was not much of a job to set it
+up at all.</p>
 
-<p><strong>The Leech</strong> This reprehensible lifeform just sucks and sucks and
-<em>sucks</em> until there is nothing left. Some of their forum threads may
-even appear reasonable, but looking at their profile in totality tells a
-shocking story. All of their posts are in their own threads, they are
-not interested in helping anyone else with a problem. They will move
-remorselessly from issue to issue, expecting the community to provide
-answers for them at a hemorrhagic rate.</p>
+<p><strong>Note</strong>: this doesn&#8217;t mean I think it is a good idea; I was just interested
+to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
+like dwm, this is definitely a case of introducing a huge amount of complexity for
+no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
 
-<p>They won’t have made any edits to
-<a href="https://wiki.archlinux.org" title="The BEST godamn GNU/Linux wiki on the web">the Wiki</a>,
-no matter how trivial. They won’t
-<a href="https://aur.archlinux.org" title="Arch User repository">maintain any packages</a> or donate
-any time or
-<a href="http://www.archlinux.org/donate/" title="Donate now and recieve a FREE package update!">money</a>
-to your community. But they will be there night after night, posting
-their problems and waiting for the hapless to expend their time and
-energy on them. Like all parasites, they will adapt over time so remain
-vigilant.</p>
+<p>I have a
+<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD" title="If you must…">working PKGBUILD</a>
+that you can use if you want to follow along at home. Once you have downloaded
+it into <span class="file">dwm-hg/</span>, run <code>makepkg</code> to clone the dwm
+repository and build the binary.  Then you need to make sure that the mercurial
+queue extension is enabled, so your <span class="file">.hgrc</span> needs to
+contain:</p>
 
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/vampire3.jpg" alt="image" /></p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
+</span><span class='line'>hgext.mq <span class="o">=</span>
+</span></code></pre></div></figure>
 
-<p><strong>The Fanger</strong> The out-and-out help vampire, unabashed and unashamed of
-their <em>needs</em>. Their sense of entitlement will be telegraphed by needy
-and demanding thread titles, often featuring exhortations like “HELP”
-and “URGENT” and almost always embellished with a liberal—and, at times
-of “real crises,” exclusive—use of all caps and exclamation marks.</p>
 
-<p>The Fanger will also occasionally table (sadly, almost inevitably empty)
-threats about leaving your community and going off to use some other
-software; as if the dependency relationship is somehow reversed and it
-is you, the community, that will suffer if they leave.</p>
+<p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
+is <span class="file">dwm-hg/src/dwm</span>:</p>
 
-<p>The other classic trait of the hardcore vampire is that, like their
-fictional avatars, they see nothing when a mirror is held up to them.
-You can call their behaviour as much as you like, it will have no
-effect. Your only solution here is technology:
-<a href="http://www.codinghorror.com/blog/2011/06/suspension-ban-or-hellban.html" title="Coding Horror on the Hell Ban">the hell ban</a>.</p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
+</span></code></pre></div></figure>
 
-<hr />
 
-<p>The Arch Linux community has grown considerably since it emerged
-<a href="http://www.archlinux.org/news/arch-linux-turns-10/" title="w00t!">ten years ago this month</a>. Over
-the last couple of years, the forums in particular have seen a lot of
-new users signing up to participate. This is unquestionably a good
-thing™</p>
+<p>The next step is to start applying the various patches that you want to comprise
+your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
+and three other patches:
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/statuscolours" title="Patch in mercurial queue">statuscolours</a>,
+<a href="http://https://bitbucket.org/jasonwryan/dwm-patchset/src/default/cycle" title="ditto">cycle</a>, and
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/push" title="etc…">push</a>.
+There are other patches in my repository, one of which patches the appropriate
+settings for an Arch build in the
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/setup.makefile" title="Arch settings for Makefiles">relevant makefiles</a>.
+This is taken care of by the PKGBUILD in this case.</p>
 
-<p>However, Arch is clearly labelled as being for
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric" title="The Arch Way: user-centric">competent users</a>
-(and here competent can equally mean accomplished – or prepared to
-invest in themselves and the community to become competent) and that
-means not enabling these sorts of vampiric behaviours, in whatever form
-they manifest.</p>
+<p>From here, it is very much as Filippo describes it in his tutorial: make
+some changes, add them to the queue and rinse and repeat:</p>
 
-<h5>Notes</h5>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
+</span><span class='line'> <span class="c"># “hack hack hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
+</span></code></pre></div></figure>
 
-<p>Photography is all Creative Commons licensed on Flickr by, in order of
-appearance:</p>
 
-<ul>
-<li><a href="http://www.flickr.com/photos/randaldroher/2161723492/" title="The Count, by Randall Drohrer on Flickr">Randall Drohrer</a></li>
-<li><a href="http://www.flickr.com/photos/phatcontroller/2620032517" title="Leech, by phatcontroler on Flickr">phatcontroller</a></li>
-<li><a href="http://www.flickr.com/photos/sandrafalkevik/4465039571" title="Vampire, by Sandra Falkevik on Flickr">Sandra Falkevik</a></li>
-</ul>
+<p>After committing each of your changes as a discrete patch, you can review the queue
+with <code>hg qseries</code>:</p>
 
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span></code></pre></div></figure>
+
+
+<p>And <code>hg qapplied</code> will tell you which of the patches is currently
+applied in the working repository; at this stage the list should look
+the same as that in <code>hg qseries</code>. The next step is to remove all of the
+patches from the queue so that we have a clean repository:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop -a
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>popping config.customizations
+</span><span class='line'>patch queue now empty
+</span></code></pre></div></figure>
+
+
+<p>Should you need to edit a patch, it is simply a matter of popping
+to that spot in the stack (you can do so by name or by index
+number, beginning at 0):</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop config.customizations
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>now at: config.customizations
+</span><span class='line'> <span class="c"># “hack hack hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qpush -a
+</span></code></pre></div></figure>
+
+
+<p>Once you are satisfied with the state of the stack, remove all of the
+patches to return to the original clean working directory and <code>cd</code> back
+to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> to
+rebuild the package and you should see the pushed patches as part of
+the output:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
+</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
+</span><span class='line'>applying config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>now at: push
+</span><span class='line'>dwm build options:
+</span></code></pre></div></figure>
+
+
+<p>…and when you restart dwm, your customizations will be applied.
+When new changes are pushed to
+<a href="http://hg.suckless.org/dwm" title="dwm mercurial repo">the dwm repo</a>
+you can just <code>makepkg -fi</code>, and, if any of the patches fail due
+to changes in the underlying code, pop the stack to the failed
+patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
+
+<p>As I said at the beginning of this post, this isn&#8217;t a particularly smart way to
+use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
+better off just cloning dwm to your local repository, initializing a queue
+repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
+sudo make install</code>.</p>
+
+<p>If you have more than one machine, you can easily setup a repository for
+your patchset on
+<a href="https://bitbucket.org/" title="bitbucket free mercurial hosting">bitbucket</a>
+and host it there: then just pull the patchset queue
+from your other boxes and <code>hg qpush -a</code>. If you require a slightly
+different patchset for each box, you can use MQ to manage this
+process as well. This is where MQ really excels;
+I&#8217;ll cover this in more detail in my next post.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
+<li>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
+example of thorough, accessible documentation.</li>
+<li>In the case of something like dwm, this is really irrelevant, as there
+is a single tiny binary and a <code>man</code> page, so keeping track of these files on
+your system is not an issue at all.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image by
+<a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
 </div>
   
   
@@ -491,23 +670,23 @@ appearance:</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -594,7 +773,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

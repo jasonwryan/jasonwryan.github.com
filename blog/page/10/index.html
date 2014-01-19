@@ -9,10 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="If you are an Arch Linux user and you are not using
-aurphan,
-you can take a moment to hang your head in shame before you click on to
-whatever the &hellip;">
+  <meta name="description" content="Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
+Arch boards and in the various
+IRC channels.
+It doesn&# &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -91,7 +91,7 @@ whatever the &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a></h1>
     
     
       <p class="meta">
@@ -107,68 +107,109 @@ whatever the &hellip;">
   
 
 
-<time datetime="2012-03-09T16:52:00+13:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+<time datetime="2012-07-19T19:23:00+12:00" pubdate data-updated="true">Jul 19<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/aurphan.png" alt="image" /></p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/broken.jpg" title="Image of breakage on Flickr" >
+Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
+<a href="https://bbs.archlinux.org/" title="Arch Linux BBS">Arch boards</a> and in the various
+<a href="https://wiki.archlinux.org/index.php/IRC_Channels" title="Wiki page listing channels">IRC channels</a>.
+It doesn&#8217;t take newcomers long to realize that, whether something is actually broken or not,
+there is always
+<a href="http://allanmcrae.com/category/arch-linux/" title="Allan's Blog">someone they can blame</a>.<sup>1</sup></p>
 
-<p>If you are an Arch Linux user and you are not using
-<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
-you can take a moment to hang your head in shame before you click on to
-whatever the next thing is. The package description sums up perfectly
-what aurphan does:</p>
+<p>My experience of Arch, over the last three and a bit years, is quite the opposite. I have yet to
+experience anything that would qualify as breakage. Sure, there have been bugs, mostly upstream,
+and the more frequent moments where I haven&#8217;t been as diligent as I should, but not once have I
+had a machine that was unbootable or otherwise unusable. Arch has, on both my home and work
+machines, been incredibly stable and reliable.</p>
 
-<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
-today!</p></blockquote>
+<p>For a number of Arch Linux users, however, that was not their experience over the last week when
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="News item on the move">/lib was moved to /usr/lib</a>.
+The volume of people on the boards and on IRC reporting unbootable or unusable systems was
+remarkable. Remarkable because, despite the fact that the
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Once more, just in case…">news item</a>, the
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Arch wiki page on the change">wiki page</a>,
+and the <a href="http://mailman.archlinux.org/pipermail/arch-announce/2012-July/000317.html" title="Mail archive">email to arch-announce</a>
+all <em>explicitly</em> warned people not to use the <code>--force</code> option,<sup>2</sup> so many did.</p>
 
-<p>Running <code>aurphan -a</code>, for example, will identify any
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
-database that are not currently maintained; allowing you to log in to
-the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
-fulfilled.<sup>1</sup></p>
+<p><span class='pullquote-right' data-pullquote='90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice. '>
+Sadly, these red-boxed warnings were apparently not enough.
+90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice.
+The remaining 10% were either in a hurry and didn&#8217;t pay close attention to how
+to deal with any leftover files in <span class="file">/lib</span> or <code>rm -rf</code>&#8216;ed
+in the wrong directory.
+<a href="http://www.gnu.org/fun/jokes/shit-happens.html" title="GNU Humour…">Accidents happen</a>.
+</span></p>
 
-<p>If, like most Archers, you have a compulsive desire to automate
-<em>everything</em> then clearly typing (or even remembering to type) <code>aurphan
--a</code> into a terminal periodically is as ludicrous as it is onerous. The
-obvious answer is some shell script and a cron job.</p>
+<p>What I am interested in is the people who fell into the much larger category,
+and principally those that didn&#8217;t see any of the communications about this
+change in advance of updating and reasoned, based on a recent change that did
+<a href="http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required-1/" title="News item on filesystem upgrade">require the use of &#8211;force</a>,
+that this was the most expedient way to resolve <code>pacman</code> reporting conflicting
+files.</p>
 
-<p>First, the <code>cron</code> job:</p>
+<p>Some context. The <code>glibc</code> update was released to the
+<a href="https://wiki.archlinux.org/index.php/Testing#.5Btesting.5D" title="Wiki entry on Testing">[testing] repository</a>
+in the first week of July: and there were a couple of long threads<sup>3</sup>
+about issues and fixes before it was pushed to [core]. By the time the
+package was released for general consumption, it had been tested and the
+developers had obviously planned how to make what is a fundamental system
+change with a minimal amount of user intervention.  I think that, given the
+magnitude of the challenge, they did a superb job.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
-</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
-</span></code></pre></div></figure>
+<p>How then did it go so wrong for so many?<sup>4</sup> To answer that, you have
+to consider the nature of Arch. It&#8217;s <em>not</em> the sort of distribution where you
+install it and then just go on your merry way, installing
+<a href="http://oswatershed.org/" title="It's SCIENCE, Jim">the least obsolete packages</a>,
+revelling in the speed of the package manager and generally being
+a 1337 h@x0r…</p>
 
+<p>Successfully running a rolling release like Arch, irrespective of your level of
+competence, means staying in touch with what is happening—in
+<a href="http://kmkeen.com/pacmatic/" title="Pacman wrapper that pulls news updates">some form or other</a>.
+Subscribing to the arch-general <acronym title="Mailing list">ML</acronym>,
+visiting the forums, idling in IRC; somehow remaining connected to what is
+going on in the community so that you don&#8217;t blindly update one day and wonder
+why your system is broken.</p>
 
-<p>Then, as part of my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="Script in mercurial repo">dwm-status script</a>,
-a function to check that there are no new additions to the file and, if
-there are, flash a highlight:</p>
+<p>This strikes me as a real strength; by design Arch encourages its users to
+participate in the community. Even if you are only lurking, over time you will
+inevitably find yourself posting in a thread, responding to an email, editing
+the wiki,
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="Post on aurphan">adopting an orphaned package</a>—increasingly
+getting involved and contributing.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>
-</span><span class='line'>    <span class="nv">aurphans</span><span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">        </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
-</span><span class='line'>    <span class="k">fi</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></div></figure>
+<p>This level of involvement is not for everyone. Some may find it onerous or
+a waste of their time. That&#8217;s fine. There are any number of other distros
+that do not ask for this level of commitment. The <em>quid pro quo</em> for
+running Arch, though, is that you are prepared, in whatever shape or form
+best works for you, to give something back; at the very least, that is your
+attention.</p>
 
-
-<p>The awk filter excludes a null return, which is “No aurphans found.”
-Now, if any of the packages that I use from the AUR are disowned, I’ll
-be the first to know about it.</p>
-
-<h5>Notes</h5>
+<h4>Notes</h4>
 
 <ol>
-<li>Actual feeling may differ depending on the package you have adopted
-and the amount of prescription painkillers that you are currently
-ingesting…</li>
+<li>This is, of course, a reference to said Arch meme: Allan is one
+of the developers who has contributed an enormous amount to Arch and the fact
+that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</li>
+<li>At the end of 2011, the short option <code>-f</code>
+<a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
+from <code>pacman</code> so “it at least makes people read the word &#8216;force&#8217; and maybe they
+will have some sense to step back and think about what they are doing first.”</li>
+<li><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
+<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></li>
+<li>Relatively speaking. In situations like this, the overwhelming amount of traffic
+is about what went wrong, not people posting to say they had no difficulties whatsoever…</li>
 </ol>
 
+
+<p>Creative Commons image on Flickr from
+<a href="http://www.flickr.com/photos/daviddoctorrose/431786001/" title="Broken keyboard on Flickr">djeucalyptus</a></p>
 </div>
   
   
@@ -181,7 +222,7 @@ ingesting…</li>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/02/13/chroot/">Chroot in LVM on LUKS on Raid: Arch Linux</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a></h1>
     
     
       <p class="meta">
@@ -197,127 +238,116 @@ ingesting…</li>
   
 
 
-<time datetime="2012-02-13T10:25:00+13:00" pubdate data-updated="true">Feb 13<span>th</span>, 2012</time>
+<time datetime="2012-07-09T13:51:00+12:00" pubdate data-updated="true">Jul 9<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/chroot-lvm.jpg" alt="image" /></p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/grub.jpg" title="Image of grub on Flickr" >
+With the announcement late last month that
+<a href="http://lists.gnu.org/archive/html/grub-devel/2012-06/msg00093.html" title="Grub ML announcement">Grub 2.00 has been released</a>
+I thought that it was time to stop procrastinating and do something about moving away from
+<a href="http://www.gnu.org/software/grub/grub-legacy.html" title="Gnu Page for Grub Legacy">Grub Legacy</a>,
+which is no longer actively developed. Not that there is anything wrong with Grub Legacy&#8217;s
+functionality; it has always done whatever I asked of it (admittedly, not a lot) and done so
+without complaint.</p>
 
-<p>In <a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on setting this system up">my previous post describing this setup</a>
-I made the point that grub won’t be installed and that it is necessary
-to <code>chroot</code> in to install grub on both drives. This is the procedure I use
-to do that—and to perform any other maintenance that requires working
-from a live environment.</p>
+<p>I have used Grub2 before, when I was running Ubuntu on my home desktop, and it is the bootloader
+on my Debian Squeeze server. I can&#8217;t, however, say that I have ever really understood—or
+appreciated—its mutliple file, “need to reconfigure after making any changes” type of
+complexity. So, I thought that I would give
+<a href="http://www.syslinux.org/wiki/index.php/The_Syslinux_Project" title="Syslinux Wiki">Syslinux</a>
+a shot.</p>
 
-<p>Again, most of this information is on the
-<a href="https://wiki.archlinux.org/index.php/Chroot" title="Arch wiki page">Arch Wiki chroot page</a>, I
-am just going to fill in the detail around this setup: LVM on LUKS on
-Raid1.</p>
+<p>Syslinux isn&#8217;t a single bootloader, rather it is a collection of lightweight bootloaders,
+with <a href="http://www.syslinux.org/wiki/index.php/EXTLINUX" title="Extlinux page on Syslinux Wiki">Extlinux</a>
+responsible for booting ext2, ext3, ext4 and btrfs filesystems. As the
+<a href="https://wiki.archlinux.org/index.php/Syslinux" title="The FINE Wiki">Arch Wiki Syslinux page</a>
+notes, since Syslinux 4, Extlinux has been merged with Syslinux.</p>
 
-<p>Once you have booted into your live environment, load the modules that
-are required; in this case: <code>raid1</code>, <code>dm-mod</code> and <code>dm-crypt</code>.</p>
+<p>Installing Syslinux is <em>ridiculously</em> easy. It is literally a five step process. First,
+install the package:</p>
 
-<p>Check that udev hasn’t helpfully read the superblock of your Raid drives
-and assembled phantom arrays:</p>
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -S syslinux</span></code></pre></div></figure>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/mdstat
+
+<p>After installing <code>syslinux</code> pacman will helpfully tell you what to do next:</p>
+
+<blockquote><p>==> If you want to use syslinux as your bootloader<br/>==> edit /boot/syslinux/syslinux.cfg and run<br/>==>   # /usr/sbin/syslinux-install_update -i -a -m<br/>==> to install it.</p></blockquote>
+
+
+<p>Arch user <a href="http://pyther.net/" title="Matthew's website">Matthew Gyurgyik</a> has written an
+ingenious script, <code>syslinux-install_update</code> that automates the process of writing the
+<acronym title="Master Boot Record">MBR</acronym> and installing the relevant files to
+<span class="file">/boot/syslinux/</span>. The script also checks if, as is the case
+with my desktop, there is a RAID array present, and if so passes the install command the
+<code>--raid</code> flag:</p>
+
+<blockquote><p>RAID mode.  If boot fails, tell the BIOS to boot the next device in the boot sequence (usually the next  hard<br/>disk) instead of stopping with an error message.  This is useful for RAID-1 booting.</p></blockquote>
+
+
+<p>After running the script, you should receive a message advising you that Syslinux
+has been sucessfully installed on both drives:</p>
+
+<blockquote><p>Detected RAID on /boot - installing Syslinux with &#8211;raid<br/>Syslinux install successful<br/>Boot Flag Set - /dev/sda1<br/>Boot Flag Set - /dev/sdb1<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sda<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sdb</p></blockquote>
+
+
+<p>If you are moving from Grub Legacy, configuring Syslinux is similarly painless.
+There are two sections to a basic  <span class="file">/boot/syslinux/syslinux.cfg</span>,
+the defaults and the prompt entries.</p>
+
+<p>I set up my defaults to be essentially invisible:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'># General settings
+</span><span class='line'>DEFAULT Arch
+</span><span class='line'>PROMPT 0
+</span><span class='line'>TIMEOUT 0</span></code></pre></div></figure>
+
+
+<p>And then copy across the relevant lines from my <span class="file">/boot/grub/menu.lst</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>grep <span class="nv">root</span><span class="o">=</span> /boot/grub/menu.lst &gt;&gt; /boot/syslinux/syslinux.cfg
 </span></code></pre></div></figure>
 
 
-<p>I find that there are a couple there generally assigned the names
-<span class="file">/dev/md126</span> and <span class="file">/dev/md127</span>.
-These need to be stopped before assembling the correct arrays:</p>
+<p>Then it is just a matter of adding the relevant entries under LABEL:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
-</span><span class='line'>mdadm --assemble /dev/md0 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
-</span><span class='line'>mdadm --assemble /dev/md1 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
-</span></code></pre></div></figure>
-
-
-<p>You should now have both your arrays up and running. The next step is to
-unlock your encrypted device:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>LABEL Arch
+</span><span class='line'>   MENU LABEL Arch Linux
+</span><span class='line'>   LINUX ../vmlinuz-linux
+</span><span class='line'>   APPEND root=/dev/mapper/vgroup-lvroot cryptdevice=/dev/md1:vgroup ro
+</span><span class='line'>   INITRD ../initramfs-linux.img</span></code></pre></div></figure>
 
 
-<p>After entering your passphrase, your device will be unlocked. Next, make
-the logical volumes available, and then check they are correct:</p>
+<p>You then add entries for Fallback, and any other images that you may wish to
+boot from.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vgchange --available y vgroup
-</span><span class='line'>lvscan
-</span></code></pre></div></figure>
+<p>And that, in their entirety, is steps two and three. You then move to steps four and five:</p>
 
-
-<p>At this point, you are ready to mount the devices and <code>chroot</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir /mnt/arch
-</span><span class='line'>mount /dev/mapper/vgroup-lvroot /mnt/arch
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -Rsn grub
+</span><span class='line'>shutdown -r now</span></code></pre></div></figure>
 
 
-<p>The next steps are straight from the wiki:</p>
+<p>And you reboot with Syslinux. Done.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
-</span><span class='line'>mount -t proc proc proc/
-</span><span class='line'>mount -t sysfs sys sys/
-</span><span class='line'>mount -o <span class="nb">bind</span> /dev dev/
-</span></code></pre></div></figure>
+<p>The beauty of Syslinux, from my perspective, is that it is simple to install
+and configure, with just the one config file and the options all well documented
+and easy to understand. If you want a menu with a background
+image, you can have that. If, like me, you just want to get on and boot your default,
+it does that.</p>
 
+<p>Additionally, if you want or need to boot into Fallback, or want to dual boot,
+you can just hold down <kbd>Shift</kbd> at boot time and enter the desired
+Label at the prompt. Syslinux has Tab completion, so you only need enter a
+couple of letters, hit <kbd>Tab</kbd> and you will see all of the available
+Labels to boot. Brilliant.</p>
 
-<p>Mount the other parts of the system that you need to use in your
-recovery – in this case, I need my <span class="file">/boot</span> partition:</p>
+<h4>Notes</h4>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
-</span></code></pre></div></figure>
-
-
-<p>Now <code>chroot</code> to the device and define your shell:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>chroot . /bin/bash
-</span></code></pre></div></figure>
-
-
-<p>The wiki has some good advice about customizing your prompt to reinforce
-the fact that you are in a chroot:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>With everything mounted, it is just a matter of performing your
-maintenance. To reinstall <code>grub</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grub</span>
-</span><span class='line'>grub&gt; find /grub/stage1
-</span><span class='line'>grub&gt; device <span class="o">(</span>hd0<span class="o">)</span> /dev/sda
-</span><span class='line'>grub&gt; root <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>grub&gt; setup <span class="o">(</span>hd0<span class="o">)</span>
-</span><span class='line'>grub&gt; quit
-</span></code></pre></div></figure>
-
-
-<p>Repeat for <span class="file">/dev/sdb</span> and both your drives will be bootable in the event
-that one fails.</p>
-
-<p>With the maintenance accomplished, all that remains is to exit the
-<code>chroot</code> and unmount the devices cleanly:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">exit</span>
-</span><span class='line'>umount <span class="o">{</span>proc,sys,dev,boot...<span class="o">}</span>
-</span><span class='line'><span class="nb">cd</span> ..
-</span><span class='line'>umount arch/
-</span><span class='line'>reboot
-</span></code></pre></div></figure>
-
-
-<p>Simple.</p>
-
-<p>Creative Commons image by
-<a href="http://www.flickr.com/photos/mpd01605/4152508668/" title="Rescue Engine 6 on Flickr">MPD01605</a></p>
+<p>Creative Commons Flickr image by
+<a href="http://www.flickr.com/photos/sgodt/5103674184/">custer_fluck</a></p>
 </div>
   
   
@@ -330,7 +360,7 @@ that one fails.</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/02/11/lvm/">LVM on LUKS on RAID1 on Arch Linux</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/06/16/misunderstanding/">Misunderstanding Arch</a></h1>
     
     
       <p class="meta">
@@ -346,231 +376,92 @@ that one fails.</p>
   
 
 
-<time datetime="2012-02-11T15:58:00+13:00" pubdate data-updated="true">Feb 11<span>th</span>, 2012</time>
+<time datetime="2012-06-16T10:52:00+12:00" pubdate data-updated="true">Jun 16<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/lvm-luks-raid.png" alt="image" /></p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/hands.jpg" title="'mutt logo'" ></p>
 
-<p>After much procrastination, I finally got around to moving the last of
-my machines to Arch Linux:
-<a href="http://jasonwryan.com/blog/2010/10/04/the-setup/" title="The Setup post">my home desktop</a>,
-which has been running Ubuntu since the end of 2007. I’d like to share a
-few thoughts about why I finally walked away from Ubuntu, but I’ll save
-that for another long post.</p>
+<p>I am frequently struck by how many people arrive on the
+<a href="https://bbs.archlinux.org/" title="Arch Linux Forums">Arch boards</a> without <em>any</em>
+understanding of how Arch is different from the other GNU/Linux communities
+they may have spent time with (if, indeed, they have spent any time in
+another community before trying Arch). For me, this is akin to arriving in a
+foreign country and not bothering to familiarize yourself at all with the local
+mores and customs; it lies on a spectrum somewhere between ignorance and
+outright arrogance.</p>
 
-<p>Anyway, the setup I decided on was reasonably straightforward: two 1TB
-drives comprising two Raid1 devices, one for a small (150Mb)
-<span class="file">/boot</span> and the other holding three logical volumes
-in a LUKS crypt. This way, I have the flexibility to grow the volumes as
-needed, and only require thesingle passphrase at boot to unlock the
-enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
-and <span class="file">/home</span>.</p>
+<p>The result, inevitably, is that these people are shocked
+when their expectations of how they <em>should</em> be treated are at odds with the
+reception their behaviour invites…</p>
 
-<p>Almost all of the information here has been gleaned gratefully from
-other sources; principally the Arch Wiki entries on
-<a href="https://wiki.archlinux.org/index.php/LUKS" title="Arch wiki entry">LUKS</a> and
-<a href="https://wiki.archlinux.org/index.php/Lvm" title="Arch LVM article">LVM</a> and
-this <a href="http://www.pindarsign.de/webblog/?p=767" title="Blog post on LUKS and LVM">helpful blog post</a>.
-This post (and the next) are notes to remind me how I got here and, in
-the follow-up, what I need to do to restore this build…</p>
+<p>Before venturing any further, I should preface my remarks about this with
+something of a disclaimer. These are my own views and not those of the current,
+or past, forum staff.</p>
 
-<p>First up, prepare the two hard drives. This took roughly ~90 hours for
-the 1TB drives, so allow some time:</p>
+<p>One of Arch&#8217;s significant acheivements is the quality of
+<a href="https://wiki.archlinux.org" title="THE best GNU/Linux Wiki">its documentation</a>.
+Not just the technical documentation describing how to install and configure
+Arch, but the cultural documentation that sets out
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="The Arch Way">Arch&#8217;s philosophy</a>
+and <a href="https://wiki.archlinux.org/index.php/Forum_Etiquette" title="Forum Etiquette">standards of behaviour</a>. Both these pages provide clear statements on what to expect when
+using Arch Linux and a clear indication of how to respectfully interact with the
+community when you are seeking help.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
-</span></code></pre></div></figure>
+<p>The defining statement about Arch&#8217;s intended user base is quite direct and
+unambiguous:</p>
 
-
-<p>Once the drives are scrubbed (read the Arch Wiki on why that is
-necessary), you can move to the actual installation business. I used a
-256Mb thumb drive with the most recent x86_64 netinstall image burned
-to it. Boot into the live environment and set up the initial partitions
-using <code>cfdisk</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cfdisk /dev/sda
-</span></code></pre></div></figure>
+<blockquote><p>Arch Linux targets and accommodates competent GNU/Linux users <br/>by giving them complete control and responsibility over the system.</p><footer><strong>The Arch Way</strong> <cite><a href='https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric'>wiki.archlinux.org/index.php/&hellip;</a></cite></footer></blockquote>
 
 
-<p>I created a 150Mb partition for <span class="file">/boot</span> - marked
-with the boot flag, and then partitoned the rest of the drive. Both partitons
-should be primary and be <code>FSType linux_raid</code> (the FD option). Write the
-partition tabel toa file and then import it to the second drive so both are exactly the
-same:</p>
+<p>The expression “targets and accommodates” doesn&#8217;t exclude other users—for
+example, those that are not necessarily competent, but are wanting to learn
+more about the specifics of how their machines work—it does, however, signal
+quite explicitly what sort of community Arch is. And what it is not.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
-</span><span class='line'>sfdisk /dev/sdb &lt; part-table
-</span></code></pre></div></figure>
+<p><a href="http://ubuntu.com" title="Ubuntu Linux">Ubuntu</a> is an excellent distribution. Like Arch,
+it has very specific aims and a clear concept of what the Ubuntu community is.
+Popularity is central to Ubuntu&#8217;s culture. People coming from Ubuntu, who
+haven&#8217;t bothered to familiarize themselves with Arch&#8217;s values, often struggle
+to appreciate the difference; leading to comments like this one:</p>
 
-
-<p>Now, set up the Raid arrays. Start by loading the required modules and
-then create the two arrays. The metadata flag is important: if you are
-using legacy grub, as I did, you must use the 0.90 type or your MBR will
-get overwritten:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>modprobe raid1 <span class="o">&amp;&amp;</span> modprobe dm-mod
-</span><span class='line'>mdadm --create /dev/md0 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 <span class="se">\</span>
-</span><span class='line'>    --metadata<span class="o">=</span>0.90 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
-</span><span class='line'>mdadm --create /dev/md1 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
-</span></code></pre></div></figure>
+<blockquote><p>Maybe if Arch is friendly and Arch forum is friendly, it might go some<br/>place, who knows…</p><footer><strong>Linux Journal commenter</strong> <cite><a href='http://www.linuxjournal.com/content/arch-way#comment-361974'>www.linuxjournal.com/content/&hellip;</a></cite></footer></blockquote>
 
 
-<p><sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup></p>
+<p>This was posted in reply to a post on Arch in which the author noted how to
+seek help with Arch Linux:</p>
 
-<p>At this point, you can switch to another TTY to watch the disks
-sync—again, this could take some time, depending on the size of the
-drives.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
-</span></code></pre></div></figure>
+<blockquote><p>You&#8217;ll find far less hand-holding on the Arch Forums than some of the other<br/>distro&#8217;s forums, and for good reason.  Arch has one of the most informative,<br/>user-friendly wiki&#8217;s out there. Do not, I repeat, DO NOT ask a question in the<br/>forums or on IRC without searching the wiki and the forums first.</p></blockquote>
 
 
-<p>Check that it all went to plan…</p>
+<p>Similarly, looking through the threads in
+<a href="https://bbs.archlinux.org/viewforum.php?id=23" title="Newbie board">Newbie Corner</a>
+will periodically turn up new posters who are indignant at being told to
+<acronym title="Read The Fscking Manual">RTFM</acronym> and see it as some
+sort of <em>personal</em> attack, when in fact it is just someone pointing out the
+obvious to them. The community hasn&#8217;t compiled all that documentation just
+so they can sit around and regurgitate answers for people who are either
+unwilling or incapable of making the minimum amount of  effort required to
+solve their own problems…</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
-</span></code></pre></div></figure>
+<p>If you want handholding, there are plenty of online communities that will
+cater for you. If you install Arch and think that you are automatically entitled
+to immediate support for issues that you encounter, then you are mistaken.
+If you think that Arch will suffer if you don&#8217;t get what you want, then
+your problems extend significantly beyond your choice of distro.</p>
 
+<p>The community has worked hard over the years to keep the signal-to-noise ratio
+on the boards high, that way, the forums remain a helpful resource for the community,
+not a breeding ground for
+<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on parasites…">help vampires</a>.</p>
 
-<p>Once the drives are synched and pronounced clean, it it time to encrypt
-the second Raid device, <span class="file">dev/md1</span>. You can’t encrypt
-the array that contains <span class="file">/boot</span>,
-but having it duplicated in a Raid array means that, ifone drive goes down,
-you can still boot the other.</p>
+<h4>Notes</h4>
 
-<p>Load the module for encryption, and then set it up:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>modprobe dm-crypt
-</span><span class='line'>cryptsetup --cipher<span class="o">=</span>aes-xts-plain --verify-passphrase <span class="se">\</span>
-</span><span class='line'>    --key-size<span class="o">=</span>512 luksFormat /dev/md1
-</span></code></pre></div></figure>
-
-
-<p>Now, open the encrypted device to create the logical volumes:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
-</span></code></pre></div></figure>
-
-
-<p>The three next steps create, in this order, the physical volume (the
-container, if you will), the group and then the individual volumes
-contained in the group. Choose simple, memorable names and do not
-hypenate them. The {pv,vg,lv}display commands print out the details of
-the devices once created.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk
-</span><span class='line'>pvdisplay
-</span><span class='line'>
-</span><span class='line'>vgcreate vgroup /dev/mapper/cryptdisk
-</span><span class='line'>vgdisplay
-</span><span class='line'>
-</span><span class='line'>lvcreate --size 20G --name lvroot vgroup
-</span><span class='line'>lvcreate --contiguous y --size 2G --name lvswap vgroup
-</span><span class='line'>lvcreate --extents +100%FREE --name lvdata vgroup
-</span><span class='line'>lvdisplay
-</span></code></pre></div></figure>
-
-
-<p>It should be pointed out that the
-<a href="https://github.com/Dieterbe/aif" title="AIF on Github">Arch Installer Framework</a> supports
-LUKS and LVM, so you can accomplish these last two steps from within the
-installer. I tried both and I found that I had a little more control
-doing it manually, but YMMV.</p>
-
-<p>At this point, you are ready to enter the installer and complete the
-install. Run /arch/setup and move through the early setup until you
-reach the &#8216;Prepare Hard Drives&#8217; section. Select option 3, &#8216;Configure block
-devices, mountpoints and filesystems&#8217;. Make sure that the only “raw”
-device that you configure is <span class="file">/dev/md0</span>, your
-<span class="file">/boot</span> partition. Otherwise,
-you are configuring the logical volumes, <em>not</em> the devices they are
-built on.</p>
-
-<p>After succesfully setting up the drives, install the base packages and
-then, once that is complete, switch TTYs and update your Raid
-configuration <em>prior to configuring your system</em>. This means that when
-your <code>initrd</code> is regenerated, it will inlcude the correct Raid
-information:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
-</span></code></pre></div></figure>
-
-
-<p>When you are done, move to configure your system and make sure to add
-the relevant details to both your <span class="file">/etc/rc.conf</span> and your
-<span class="file">/etc/mkinitcpio.conf</span>. In the former:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
-</span><span class='line'><span class="nv">USEDMRAID</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>and in /etc/mkinitcpio.conf:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
-</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm_udev encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
-</span></code></pre></div></figure>
-
-
-<p>That is the straightforward part of the install over. The final step is
-a little more tricky: installing a bootloader. My experience, and I
-tried a number of times using different approaches, is that this <em>won’t
-work</em>. The installer doesn’t seem to like the Raid setup, so it
-complains about it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>It’s not all bad, as this is the final hurdle and it is not a
-particularly high one.</p>
-
-<p>The important step is to ensure that your <span class="file">/boot/grub/menu.lst</span> is setup
-correctly. Given the names I chose above for my devices, mine looks like
-this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># (0) Arch</span>
-</span><span class='line'>title  Arch Linux
-</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
-</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
-</span><span class='line'>initrd /kernel26.img
-</span><span class='line'>
-</span><span class='line'><span class="c"># (1) Arch Fallback</span>
-</span><span class='line'>title  Arch Linux Fallback
-</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
-</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
-</span><span class='line'>initrd /kernel26-fallback.img
-</span></code></pre></div></figure>
-
-
-<p>Once it is all setup, simply exit the installer. At this point, you have
-a perfectly secure, redundant, new Arch Linux install that you can’t
-boot into. You have two choices; chroot in and manually install grub
-now, or reboot and do it then. I opted for the latter as it would be
-more like a recovery mission—and I wanted to make sure that I was
-capable enough to manage that before committing all of my backed-up data
-to the machine.</p>
-
-<p>I’ll post the details of the relatively straightforward steps required
-to chroot into the system and install grub on both hard drives in a
-couple of days.</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>The name <code>cryptdisk</code> is arbitrary - just make it memorable and use it
-consistently…</p></li>
-<li><p>I am not sure how necessary it is to have the Raid modules included
-here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
-warranted. <strong>UPDATED 12/4/12</strong> as per the <a href="https://wiki.archlinux.org/index.php/Mkinitcpio#HOOKS">mkinitcpio article on the Wiki</a>
-the <code>mdadm_udev</code> hook is preferred over the plain <code>mdadm</code> hook in your
-<span class="file">/etc/mkinitcpio.conf</span>.</p></li>
-</ol>
-
+<p>Flickr Creative Commons image by
+<a href="http://www.flickr.com/photos/angellic/47031159/">si_si_ay</a></p>
 </div>
   
   
@@ -595,23 +486,23 @@ the <code>mdadm_udev</code> hook is preferred over the plain <code>mdadm</code> 
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -698,7 +589,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

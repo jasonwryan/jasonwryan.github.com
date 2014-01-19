@@ -9,9 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Nearly two years ago, I posted about my adaption of a simple
-command line note utility.
-I have used this setup on all of my machines on a daily &hellip;">
+  <meta name="description" content="I posted a couple of weeks ago about
+Building Vim and how,
+using ABS
+and makepkg it is possible to customize packages in the repositories to suit &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,7 +91,7 @@ I have used this setup on all of my machines on a daily &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/09/01/notes-updated/">Improved Notes Utility</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a></h1>
     
     
       <p class="meta">
@@ -106,134 +107,187 @@ I have used this setup on all of my machines on a daily &hellip;">
   
 
 
-<time datetime="2012-09-01T10:09:00+12:00" pubdate data-updated="true">Sep 1<span>st</span>, 2012</time>
+<time datetime="2013-05-18T10:10:00+12:00" pubdate data-updated="true">May 18<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/notes.jpg" title="'Notepad image on Flickr'" >
-Nearly two years ago, I posted about my adaption of a simple
-<a href="http://jasonwryan.com/blog/2010/09/28/command-line-notes/" title="My post in 2010">command line note utility</a>.
-I have used this setup on all of my machines on a daily basis since and it has worked
-marvellously. Symlinking to a folder in
-<a href="https://www.dropbox.com/home" title="Dropbox home">Dropbox</a> means that the notes are accessible
-from all my machines, including my phone. There has only really been one aspect of this setup
-that has been sub-optimal.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/woodcutting.jpg" title="'Cutting wood'" >
+I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on Vim">Building Vim</a> and how,
+using <a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Build System on the Wiki">ABS</a>
+and <code>makepkg</code> it is possible to customize packages in the repositories to suit your
+individual requirements, in that case with a specific feature set.</p>
 
-<p>As an inveterate note-taker (this is one of the “benefits” of ageing; the speed with
-which you forget information outpaces the acquisition of newer material) I have—in
-those intervening years—built up quite a store of notes. Consequently, in order to
-maintain a semblance of order, I have arranged them in a series of directories. There
-is a minor flaw with this approach: retreiving a note depended on two factors, a) excellent
-recall<sup>1</sup> and, b) accurately typing out the full path. Neither of these are things that I
-am inherently good at or inclined to master.</p>
+<p>One of Arch&#8217;s real strengths is in the flexibility that <code>makepkg</code> and PKGBUILDs provide
+the community; the ability to adapt official packages—or unofficial ones in the
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>—as you see fit. As PKGBUILDs
+are just shell scripts, the entry level to start playing around with them is quite
+low<sup>1</sup>.</p>
 
-<p>This had been irritating me for some time before I came across this
-<a href="http://unix.stackexchange.com/questions/11906/how-to-change-the-target-directory-for-tab-completion" title="Tab completion for notes function">question on Unix &amp; Linux StackExchange</a>.
-This provided me with a partial solution to the issue but, as I note in my answer, I was not
-able to solve it for nested directories, which was my particular use case. Once I had
-muddled my way through the solution on U&amp;L I pushed it to the back of my mind and
-tried to ignore it.</p>
+<p>A fairly standard, and simple, example of the type of customization that I might make
+is with <a href="http://tools.suckless.org/dmenu/" title="dmenu page">dmenu</a>, the suckless dynamic
+menu, where the
+<a href="https://www.archlinux.org/packages/community/x86_64/dmenu/" title="Arch package">standard package</a>
+in the Arch repositories is not patched for Xft support. There is a patch for this on the
+<a href="http://tools.suckless.org/dmenu/patches/xft" title="Xft patch on suckless.org">suckless wiki</a>, so it
+is just a case of making the requisite changes in the PKGBUILD from ABS and building it.</p>
 
-<p>Recently, though, the accumulation of notes and the frustration of trying to access them
-without <kbd>Tab</kbd> completion drove me to do something about it.</p>
+<p>As you can see from the <code>diff</code> below, there is not a lot involved in this exercize; essentially,
+adding <code>libxft</code> as a dependency, sourcing the patch from the suckless site (and including the
+hash for it), and then in the <code>build</code> function ensuring that the patch is applied and the
+Makefile updated with the new library:</p>
 
-<p>The documentation on
-<a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html" title="Bash Manual">programmable completion</a>
-is typically terse and searching the web returns very little in the way of instructions
-as to how to accomplish this.<sup>2</sup> Undeterred, I decided to hack up a completion
-function that worked for nested directories.</p>
-
-<p>What I arrived at was this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">shopt</span> -s globstar
-</span><span class='line'><span class="nb">shopt</span> -s progcomp
+<figure class='code'> <div class="highlight"><pre><code class='diff'><span class='line'><span class="gd">--- PKGBUILD   2013-05-18 09:33:07.156328812 +1200</span>
+</span><span class='line'><span class="gi">+++ PKGBUILD   2012-11-14 09:25:15.915335588 +1300</span>
+</span><span class='line'><span class="gu">@@ -11,16 +6,22 @@</span>
+</span><span class='line'> pkgdesc=&quot;A generic menu for X&quot;
+</span><span class='line'> url=&quot;http://tools.suckless.org/dmenu/&quot;
+</span><span class='line'> arch=(&#39;i686&#39; &#39;x86_64&#39;)
+</span><span class='line'><span class="gi">+groups=(&#39;modified&#39;)</span>
+</span><span class='line'> license=(&#39;MIT&#39;)
+</span><span class='line'><span class="gd">-depends=(&#39;sh&#39; &#39;libxinerama&#39;)</span>
+</span><span class='line'><span class="gd">-source=(http://dl.suckless.org/tools/$pkgname-$pkgver.tar.gz)</span>
+</span><span class='line'><span class="gd">-md5sums=(&#39;9c46169ed703732ec52ed946c27d84b4&#39;)</span>
+</span><span class='line'><span class="gi">+depends=(&#39;sh&#39; &#39;libxinerama&#39; &#39;libxft&#39;)</span>
+</span><span class='line'><span class="gi">+source=(http://dl.suckless.org/tools/$pkgname-$pkgver.tar.gz</span>
+</span><span class='line'><span class="gi">+http://tools.suckless.org/dmenu/patches/$pkgname-$pkgver-xft.diff)</span>
+</span><span class='line'><span class="gi">+md5sums=(&#39;9c46169ed703732ec52ed946c27d84b4&#39;</span>
+</span><span class='line'><span class="gi">+         &#39;d448ec9120718b0aedbdb338f4fa69ba&#39;)</span>
 </span><span class='line'>
-</span><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> <span class="nv">$HOME</span>/.notes/<span class="s2">&quot;$*&quot;</span>.txt ;<span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'> <span class="c"># completion for notes</span>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>cur
-</span><span class='line'>    <span class="nv">cur</span><span class="o">=</span><span class="k">${</span><span class="nv">COMP_WORDS</span><span class="p">[COMP_CWORD]</span><span class="k">}</span>
-</span><span class='line'>    <span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**<span class="o">)</span>
-</span><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;${files[@]##*/}&quot;</span>
-</span><span class='line'>    <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="k">$(</span> <span class="nb">compgen</span> -f <span class="s2">&quot;${file[@]}&quot;</span> -- <span class="k">${</span><span class="nv">cur</span><span class="k">}</span> <span class="k">)</span> <span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span><span class='line'> build(){
+</span><span class='line'>   cd $srcdir/$pkgname-$pkgver
+</span><span class='line'><span class="gi">+  patch -p1 &lt; ../$pkgname-$pkgver-xft.diff</span>
+</span><span class='line'><span class="gi">+  sed -i &#39;s:-I/usr/local/include/freetype2:-I/usr/include/freetype2:&#39; config.mk</span>
+</span><span class='line'><span class="gi">+</span>
+</span><span class='line'>   make \
 </span></code></pre></div></figure>
 
 
-<p>The best that can be said about it is that it <em>nearly</em> works…<sup>3</sup></p>
+<p>Running <code>makepkg -i</code> will build and install dmenu with Xft support. This is the most
+straightforward approach. I also, primarily by way of experimentation and in an effort
+to try an understand how this actually works, have slightly more convoluted examples.
+<a href="https://www.archlinux.org/packages/extra/x86_64/msmtp/" title="Arch package">msmtp</a>, the
+<acronym title="Simple Mail Transfer Protocol">SMTP</acronym> client has a couple
+of makedepends in
+<a href="https://www.archlinux.org/packages/extra/x86_64/libgnome-keyring/" title="Arch package">libgnome-keyring</a>
+and <a href="https://www.archlinux.org/packages/extra/any/texlive-core/" title="Arch package">texlive-core</a>; the former
+I have zero use for and the latter is only installed on my desktop, so I have no wish to install it on
+my laptop just to be able to send emails…</p>
 
-<p>Realising that I was completely out of my depth, I turned to #bash for help, and
-I was indeed fortunate that
-<a href="https://github.com/geirha" title="geirha's Gitgub">geihra</a> offered some much needed
-assistance. geirha&#8217;s solution is an elegant one:</p>
+<p>In this case, I modified the PKGBUILD to completely remove the <code>libgnome-keyring</code> dependency
+and to only build the <code>msmtp</code> documentation in <code>.pdf</code> and <code>.html</code> if <code>texlive-core</code> was
+already installed on the machine. Unfortunately, I wasn&#8217;t able to test for the presence of
+<code>texlive-core</code> with the standard utilities like <code>type</code> or <code>which</code>, so—as it is installed
+on all my boxes—I went with <code>expac</code> (<code>pacman -Q</code> would also work):</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
-</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
-</span><span class='line'><span class="o">}</span>
+<figure class='code'> <div class="highlight"><pre><code class='diff'><span class='line'><span class="gd">--- PKGBUILD    2013-05-18 09:32:07.393095131 +1200</span>
+</span><span class='line'><span class="gi">+++ PKGBUILD    2013-05-18 09:31:55.449986364 +1200</span>
+</span><span class='line'><span class="gu">@@ -1,7 +1,8 @@</span>
+</span><span class='line'> arch=(&#39;i686&#39; &#39;x86_64&#39;)
+</span><span class='line'><span class="gi">+groups=(&#39;modified&#39;)</span>
+</span><span class='line'> license=(&#39;GPL3&#39;)
+</span><span class='line'> url=&quot;http://msmtp.sourceforge.net&quot;
+</span><span class='line'><span class="gd">-makedepends=(&#39;texlive-core&#39; &#39;gsasl&#39; &#39;libgnome-keyring&#39;)</span>
+</span><span class='line'><span class="gi">+makedepends=(&#39;gsasl&#39;)</span>
+</span><span class='line'> source=(http://download.sourceforge.net/sourceforge/msmtp/${pkgbase}-${pkgver}.tar.bz2)
+</span><span class='line'> sha1sums=(&#39;c0edce1e1951968853f15209c8509699ff9e9ab5&#39;)
 </span><span class='line'>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**/<span class="s2">&quot;$2&quot;</span>*<span class="o">)</span>
-</span><span class='line'>    <span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+</span><span class='line'><span class="gu">@@ -12,19 +13,24 @@</span>
+</span><span class='line'>
+</span><span class='line'> build() {
+</span><span class='line'>   cd ${pkgbase}-${pkgver}
+</span><span class='line'><span class="gd">-  ./configure --prefix=/usr --sysconfdir=/etc --with-ssl=gnutls</span>
+</span><span class='line'><span class="gi">+  ./configure --prefix=/usr --sysconfdir=/etc --with-ssl=gnutls --without-gnome-keyring</span>
+</span><span class='line'>   make
+</span><span class='line'><span class="gd">-  make -C doc html pdf</span>
+</span><span class='line'><span class="gi">+  if [[ -n $(expac -Q &#39;%n&#39; texlive-core) ]]; then</span>
+</span><span class='line'><span class="gi">+      make -C doc html pdf</span>
+</span><span class='line'><span class="gi">+  fi</span>
+</span><span class='line'> }
+</span><span class='line'>
+</span><span class='line'> package_msmtp() {
+</span><span class='line'>   pkgdesc=&quot;A mini smtp client&quot;
+</span><span class='line'><span class="gd">-  depends=(&#39;gsasl&#39; &#39;libgnome-keyring&#39;)</span>
+</span><span class='line'><span class="gi">+  depends=(&#39;gsasl&#39;)</span>
+</span><span class='line'>   install=msmtp.install
+</span><span class='line'>
+</span><span class='line'>   cd ${pkgbase}-${pkgver}
+</span><span class='line'>   make DESTDIR=&quot;${pkgdir}&quot; install
+</span><span class='line'><span class="gi">+</span>
+</span><span class='line'><span class="gi">+  if [[ -n $(expac -Q &#39;%n&#39; texlive-core) ]]; then</span>
+</span><span class='line'>   make DESTDIR=&quot;${pkgdir}&quot; -C doc install-html install-pdf
+</span><span class='line'><span class="gi">+  fi</span>
+</span><span class='line'>
+</span><span class='line'> # Installing example configs and scripts to /usr/share/doc/msmtp
 </span></code></pre></div></figure>
 
 
-<p>In addition to working exactly as I hoped, it had the benefit of introducing me
-to a couple more bash concepts that I hadn&#8217;t encountered;
-<a href="http://mywiki.wooledge.org/BashGuide/Arrays" title="Bash Guide on Greg's Wiki">adding elements to an array</a>
-with <code>+=()</code> being one. For posterity, the full script is:</p>
+<p>It isn&#8217;t necessarily an attractive solution, but it works for me…
+On the subject of unattractive solutions, as of pacman 4.1, released
+last month, the packaging standards for
+<a href="https://wiki.archlinux.org/index.php/VCS_PKGBUILD_Guidelines" title="Arch Wiki page">VCS PKGBUILDs</a>
+have been changed, principally around how sources and versioning is handled. For
+the couple of VCS packages I maintain in the <acronym title="Arch User
+Repository">AUR</acronym><sup>2</sup>, I have been
+experimenting with how to capture the <code>pkgver</code> in a way that conforms to the
+standards and provides people with a meaningful version number.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span>arg <span class="nv">files</span><span class="o">=()</span>; <span class="k">for </span>arg; <span class="k">do </span>files+<span class="o">=(</span> ~/<span class="s2">&quot;.notes/$arg&quot;</span> <span class="o">)</span>; <span class="k">done</span>
-</span><span class='line'><span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> <span class="s2">&quot;${files[@]}&quot;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>nls<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>tree -CR --noreport <span class="nv">$HOME</span>/.notes | awk <span class="s1">&#39;{ </span>
-</span><span class='line'><span class="s1">    if (NF==1) print $1; </span>
-</span><span class='line'><span class="s1">    else if (NF==2) print $2; </span>
-</span><span class='line'><span class="s1">    else if (NF==3) printf &quot;  %s\n&quot;, $3 </span>
-</span><span class='line'><span class="s1">    }&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'> <span class="c"># TAB completion for notes</span>
-</span><span class='line'>_notes<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'><span class="nb">local </span><span class="nv">files</span><span class="o">=(</span><span class="nv">$HOME</span>/.notes/**/<span class="s2">&quot;$2&quot;</span>*<span class="o">)</span>
-</span><span class='line'>    <span class="o">[[</span> -e <span class="k">${</span><span class="nv">files</span><span class="p">[0]</span><span class="k">}</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nv">COMPREPLY</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##~/.notes/}&quot;</span> <span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="nb">complete</span> -o default -F _notes n
+<p>By default, the version number for these projects from their git repos
+is not that helpful:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git describe --always
+</span><span class='line'>4861046
 </span></code></pre></div></figure>
 
+
+<p>After looking through the git logs, and playing around with <code>awk</code> to filter
+the results, I came up with this:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pkgver<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nb">cd</span> <span class="s2">&quot;$_gitname&quot;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;$(awk &#39;/^ / {print $2}&#39; &lt;(git log --grep=version -1))_\</span>
+</span><span class='line'><span class="s2">  $(git describe --always)&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>This prints a more, for me anyway, intelligble package version: <code>vimprobable2-git
+1.2.1_c5936cc-1</code> that relates back to the last stable release and appends the
+current commit. I&#8217;m sure that this could be improved upon; suggestions are
+welcome.</p>
+
+<p>The other change to note in all of these PKGBUILDs is the inclusion of the
+<code>groups</code> variable. By adding all of the modified packages from the official
+repositories to the—imaginatively titled—<code>modified</code> group, I can then add a line
+to <code>/etc/pacman.conf</code> that prevents those packages from being overwritten on
+upgrade<sup>3</sup>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">IgnoreGroup</span> <span class="o">=</span> modified
+</span></code></pre></div></figure>
+
+
+<p>Issuing <code>pacman -Syu</code>, or running <code>checkupdates</code> from a <code>cron</code> job, will
+notify you that the packages have had a version bump and that they need
+to be rebuilt. The PKGBUILDs for all of these packages can be found in
+<a href="https://bitbucket.org/jasonwryan/centurion/src/ff3b3c9d805e197f35aa28dbeb6a9a6555ee7b63/Build?at=default" title="Files in bitbucket">my bitbucket repo</a>.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>The alternative to remembering the full path name is to list all of the notes before
-each operation with the <code>nls</code> function; this is not ideal either…</li>
-<li>Which means that it is either so straightforward that few have bothered to write up their
-experiences (most likely), or so arcane that not many have bothered (how it
-feels to me). However, there are a couple of pages that I referenced in addition
-to the official documentation:
-
-<ul>
-<li><a href="http://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html">Adam Backstrong&#8217;s post</a></li>
-<li><a href="http://fahdshariff.blogspot.co.nz/2011/04/writing-your-own-bash-completion.html">Fahd Shariff&#8217;s post</a></li>
-<li><a href="http://devmanual.gentoo.org/tasks-reference/completion/index.html">Gentoo Development Guide</a></li>
-</ul>
-</li>
-<li>It fails, as geirha pointed out, because it breaks the filenames on whitespace.</li>
+<li>As my experiments attest…</li>
+<li><a href="https://aur.archlinux.org/packages/vimprobable2-git/">Vimprobable2-git</a>,
+<a href="https://aur.archlinux.org/packages/surfraw-git/">Surfraw-git</a> and
+<a href="https://aur.archlinux.org/packages/ruby-build-git/">ruby-build-git</a>.</li>
+<li>All credit to ataraxia <a href="https://bbs.archlinux.org/viewtopic.php?pid=623841#p623841">for this idea</a>.</li>
 </ol>
 
 
 <p>Creative Commons image on Flickr by
-<a href="http://www.flickr.com/photos/nicholasjon/4101203095/" title="Field Notes etc on Flickr">nicholasjon</a>.</p>
+<a href="http://www.flickr.com/photos/wellspwilson/6481217091/" title="Wood
+Cutting Wood">Wells P. Wilson</a></p>
 </div>
   
   
@@ -246,7 +300,7 @@ to the official documentation:
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/08/18/trolls/">Trolling Arch Linux</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/04/09/helpers/">AUR Helpers</a></h1>
     
     
       <p class="meta">
@@ -262,115 +316,117 @@ to the official documentation:
   
 
 
-<time datetime="2012-08-18T10:47:00+12:00" pubdate data-updated="true">Aug 18<span>th</span>, 2012</time>
+<time datetime="2013-04-09T19:07:00+12:00" pubdate data-updated="true">Apr 9<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/troll.jpg" title="'Troll on Flickr'" >
-I posted recently about
-<a href="http://jasonwryan.com/blog/2012/08/04/systemd/" title="Some thoughts on moving across…">my experiences shifting to systemd</a>
-and how I found it, for all three of my Arch machines, to be a relatively simple and
-straightforward process which, in the intervening weeks, has borne out the views of
-the developers and other members of the community who have been using it for a longer
-period—it works, and works well. At the start of this week, Stéphane Gaudreault
-announced on Arch-dev-public the intention to
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-August/023389.html" title="ML post seeking developer views">replace the original initscripts with systemd</a>.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/crutches.jpg" title="'Crutches on Flickr'" ></p>
 
-<p>The reaction by some to this announcement was, to me, quite disappointing. My view of
-open source communities is that by participating you are entering into a social contract.
-That contract is that, as you are reliant on the goodwill of the wider community it is
-incumbent on you to ensure that your overall contribution—in whatever form—brings
-more to the community than it takes away. At the very least, you can strive to ensure
-that it is a value neutral exchange.</p>
+<h3>Or, &#8220;Why you should uninstall Yaourt and embrace <em>makepkg</em>…&#8221;</h3>
 
-<p>Sadly, for some of the trolls on the <acronym title="Mailing lists">MLs</acronym>, that
-is patently not the case. I want to take a closer look at just one of those threads, for two
-reasons. First, it is a textbook case of a particularly pernicious troll. And second, in
-conjunction with some other factors, it had an especially damaging effect on the wider
-community.</p>
+<p>The <a href="https://bbs.archlinux.org/viewtopic.php?id=160655" title="Announcement on the Arch boards">release of Pacman 4.1</a>
+saw the same flurry of posts on the boards, in IRC and the mailing lists about
+people being “unable” to upgrade or, worse, claiming that pacman was “broken”
+because their upgrade was failing due to unsatisfied dependencies, that pretty
+much every pacman upgrade ocassions. How is it possible that so many people can
+run an operating system designed for competent users without having even a
+basic understanding of how the package manager—one of the single most critical
+components of the distribution—works?</p>
 
-<p>The thread in question is on Arch-general, the largest of the mailing lists. It has
-the suitably alarmist title
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029856.html" title="A trolling we will go…">Think twice before moving to systemd</a>.
-The troll, who has had only minimal involvement with the Arch community up until this
-unfortunate moment starts by framing his “concern”<sup>1</sup>:</p>
+<p>Even a cursory perusal of the resulting threads on the boards will quickly
+identify the common denominator in these cases:</p>
 
-<blockquote><p>I just became aware that Arch Linux plans to switch to systemd, and this worries me for several reasons.</p></blockquote>
+<blockquote><p>resolving dependencies&#8230;<br/>looking for inter-conflicts&#8230;<br/>error: failed to prepare transaction (could not satisfy dependencies)<br/>:: package-query: requires pacman<4.1</p></blockquote>
 
 
-<p>Felipe is worried. Ergo, <em>we</em> should be worried. Why should we be worried? Because,
-despite the fact that systemd has been discussed and used by Archers since the
-<a href="https://bbs.archlinux.org/viewtopic.php?id=96316" title="57 page thread on the Arch BBS">middle of 2010</a>,
-it has just come to his attention and now, with the formidable powers of his intellect,
-he has detected a disturbance in the force.</p>
+<p><a href="https://aur.archlinux.org/packages/package-query/" title="AUR page">package-query</a>
+is required by <a href="https://aur.archlinux.org/packages/yaourt/" title="yaourt on AUR">yaourt</a>;
+so these upgrades have been stymied by a package that is in the (unsupported)
+<acronym title="Arch User Repository">AUR</acronym>? There are a
+<a href="https://wiki.archlinux.org/index.php/AUR_Helpers" title="Arch Wiki entry">multitude of AUR helpers</a>,
+but <code>yaourt</code> is most commonly used by people who are new to Arch<sup>1</sup>
+for two reasons.  First, it is one of the most “featureful” and secondly, and
+more to the point of my argument, it can be installed by simply adding an
+unsupported repo to <code>pacman.conf</code>; thereby effectively bypassing the need for
+the hapless user ever having to use or understand <code>makepkg</code>.</p>
 
-<blockquote><p>I tried systemd a while ago in a brand new machine with Arch Linux and the boot was *much slower*. After some exchanges with Lennart Poettering and other people in Google+[1], it became clear I was on my own. Eventually I found the culprit: Fedora uses CONFIG_HZ_1000, and Arch Linux uses CONFIG_HZ_300. It became clear to me that systemd was not ready for prime time, it wasn&#8217;t thoroughly tested in a lot of machines, and if you have problems Lennart Poettering will blame you (PulseAudio sounds familiar?).</p></blockquote>
+<p>Consequently, over time, people who are habitually using <code>yaourt -Syu --aur</code> to
+update both the packages in the supported repositories and those they have
+installed from the AUR lose the conceptual distinction between the two.
+<code>yaourt</code> obscures this from them and—if they are completely reliant upon it, as
+these threads attest they are—they have abnegated responsibility for managing
+those unsupported packages and in doing so have found themselves incapable of
+understanding the bind they are in.</p>
+
+<p>This sort of obscuring of fundamental operating principles in the pursuit of
+“convenience” is anathema to Arch and is precisely the reason I moved away from
+using <code>yaourt</code> (and indeed from using Ubuntu when I jumped from that sinking
+ship). Any convenience is purely illusory, in reality it just fosters
+<a href="http://en.wikipedia.org/wiki/Learned_helplessness" title="Wikipedia entry">learned helplessness</a>.</p>
+
+<p>I understand that the <code>yaourt</code> developer(s) was scratching their own itch, and
+this post is not about maligning the project; but there are significant
+unintended consequences of giving people a tool that abstracts such a
+fundamental element of the distribution away from the user, especially for a
+distribution where you are expected to have
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric" title="The Arch Way">complete control <em>and responsbility</em> over your system</a>.</p>
+
+<p>To be clear, I don&#8217;t have a complaint with the <em>concept</em> of AUR helpers. I used
+<code>yaourt</code> initially before switching to
+<a href="http://pbrisbin.com/posts/aurget" title="Patrick Brisbin's AUR helper">aurget</a> and then
+alighting on
+<a href="https://github.com/falconindy/cower" title="Cower on github">cower</a>, or more particularly,
+a partial wrapper for <code>cower</code>:</p>
+
+<figure class='code'><figcaption><span>cowerd </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># install AUR packages with cower</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">cd</span> <span class="nv">$HOME</span>/Build <span class="o">&amp;&amp;</span> cower -d <span class="s2">&quot;$1&quot;</span>
+</span><span class='line'><span class="nv">builddir</span><span class="o">=</span><span class="s2">&quot;$_&quot;</span>
+</span><span class='line'><span class="nb">cd</span> <span class="s2">&quot;$builddir&quot;</span> <span class="o">&amp;&amp;</span> <span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> PKGBUILD
+</span><span class='line'>
+</span><span class='line'>makepkg -si <span class="o">&amp;&amp;</span> <span class="nb">cd</span> - &amp;&gt;/dev/null
+</span><span class='line'>
+</span><span class='line'><span class="nb">read</span> -p <span class="s2">&quot;Remove Build directory? [Y/n]? &quot;</span> yn
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$yn&quot;</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;Removing build directory...&quot;</span>
+</span><span class='line'>    rm -rf <span class="s2">&quot;$builddir&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Build completed.&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
 
 
-<p>The salient phrases here are “it became clear I was on my own” and the even more telling,
-“it became clear to me that systemd was not ready for prime time.” Once I had managed to
-wipe away the tears of gratitude that were coursing down my cheeks, I realized that Arch
-finally had finally found what it had been missing for all these years: a saviour. We
-were going to be OK after all.</p>
+<p>This provides me the minimum level of automation I require—essentially only
+around downloading and installing a package. It doesn&#8217;t automatically handle
+dependencies, nor manage updating the packages; that remains, rightly in my
+view, <em>my</em> responsibility.</p>
 
-<p>Felipe has “found the culprit.” Despite the best efforts of the Arch developers, upstream,
-the other distros that have been using it for considerably longer, and the experience of the
-<a href="https://bbs.archlinux.org/viewtopic.php?pid=1147676" title="Thread on systemd - one of many">Arch users reported on our boards</a>,
-no-one had the heroic ability to see through to the heart of this conundrum and expose
-systemd for the fraud that it is.</p>
+<p>If I were to look to a more fully featured wrapper, I would undoubtedly choose
+<a href="https://github.com/e36freak/meat" title="meat on Github">meat</a>, however as on my
+desktop machine, I only have ~30 AUR packages installed, I don&#8217;t really need
+anything more sophisticated.</p>
 
-<p>But our gratitude should be tempered with some shame for we, the Arch community, have let
-Felipe down. We haven&#8217;t lived up to the standards he expects of us. As he gently admonishes us:
-“I was expecting more from the Arch Linux community.” Yes, Felipe, and you were right to.
-We let you down; can you forgive us?</p>
-
-<p>The thread goes on to generate more than 50 replies. All of them wasted.
-His trolling is not interested in facts, in reason or logic; his method of argumentation is
-not rational, and he is not interested in working toward an understanding
-of the truth; he just wants to be right. At whatever cost to the wider community. These posts,
-and trolls in other fora
-<a href="https://lkml.org/lkml/2012/4/12/434" title="LKML exchange with Linus Torvalds">like this one</a>,<sup>2</sup>
-are really about gratifying Felipe&#8217;s own voracious appetite for self-aggrandisement. In reality,
-of course, it is a stunning illustration of the
-<a href="https://secure.wikimedia.org/wikipedia/en/wiki/Dunning%E2%80%93Kruger_effect" title="Wikipedia entry">Dunning-Kruger effect</a>.
-It would be pathetic if it were a victimless pursuit; but it is not.</p>
-
-<p>Further down in the thread we see the inevitable frustration of the developer who leads
-this work for Arch,
-<a href="https://www.archlinux.org/developers/#tomegun" title="Tom's developer profile">Tom Gunderson</a>,
-finally <a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029933.html" title="Tom's reply quoting Linus">boil over</a>.
-This precipitates another thread where Tom announces that he will
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/029960.html" title="Tom's mail to the list">no longer participate in this list</a>.
-This is from the developer that has patiently and constructively engaged with Arch users on the
-list around this issue for the past several months. On his own time.</p>
-
-<p>That is the impact of trolls like Felipe. That is a direct effect of his selfishness on the
-wider community. What has he brought to the community? Dissent, distraction and posturing.
-What has he taken away? The ability for all of us to engage with one of the developers
-of the software we all use. His presence on the list, and that of a few others,
-has been nothing short of corrosive.</p>
-
-<p>And as for the smoking gun, the config setting that no-one was smart enough to
-discover? Denis A. Altoé Falqueto went to the trouble to build another kernel
-and run a test and, contrary to Felipe who provided no such evidence,
-<a href="http://mailman.archlinux.org/pipermail/arch-general/2012-August/030145.html" title="Denis' post">posted the results</a>.
-You can guess the outcome.</p>
+<p>So by all means, use an AUR helper. But recognize that it is intended to help
+you, not preclude you from being able to accomplish the most simple and
+critical task of system maintenance, updating your package manager. Uninstall
+<code>yaourt</code> if you are using it and familiarize yourself with <code>makepkg</code>; once you
+do understand the relationship between the official repositories and the AUR,
+download <code>cower</code> or <code>meat</code>, they are both <em>much</em> better solutions.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>See the <a href="http://www.urbandictionary.com/define.php?term=concern+troll">concern troll</a>.</li>
-<li>Read the whole thread to fully understand how obstinance can trump reason… See
-also his <a href="http://felipec.wordpress.com/2012/05/26/no-mercurial-branches-are-still-not-better-than-git-ones-response-to-jhws-more-on-mercurial-vs-git-with-graphs/">own blog</a>
-where he expresses incredulity that his comments on another blog have been deleted.</li>
+<li><a href="http://jasonwryan.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/" title="Post from 2009">Myself included</a>…</li>
 </ol>
 
 
-<p>Creative Commons image of the troll on Flickr by
-<a href="http://www.flickr.com/photos/56380734@N05/6937763971/">Comrade Foot</a>.</p>
+<p>Creative Commons image of crutches by
+<a href="http://www.flickr.com/photos/wheatfields/118700600/" title="Flickr CC image">net_efekt on Flickr</a>.</p>
 </div>
   
   
@@ -383,7 +439,7 @@ where he expresses incredulity that his comments on another blog have been delet
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/08/04/systemd/">The Leap to systemd</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/03/29/vim/">Building Vim</a></h1>
     
     
       <p class="meta">
@@ -399,134 +455,96 @@ where he expresses incredulity that his comments on another blog have been delet
   
 
 
-<time datetime="2012-08-04T09:32:00+12:00" pubdate data-updated="true">Aug 4<span>th</span>, 2012</time>
+<time datetime="2013-03-29T10:17:00+13:00" pubdate data-updated="true">Mar 29<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://dl.dropbox.com/u/261312/Blog-images/leap.jpg" title="Leap image on Flickr" >
-I posted a couple of weeks ago about the impact of some of the current
-<a href="http://jasonwryan.com/blog/2012/07/19/breakage/" title="Post on the glibc change">changes to Arch Linux</a>.
-There seems to be quite a bit of it about, because in conjunction with the move from
-<span class="file">/lib</span> to <span class="file">/usr/lib</span>—and motivated by the same
-overarching shifts in the other distributions—the other major change making its way through
-the Arch community is the move to
-<a href="http://freedesktop.org/wiki/Software/systemd" title="Project page">systemd</a>. This change, however, has
-been more controversial because it marks a shift away from Arch&#8217;s central configuration
-file, <a href="https://wiki.archlinux.org/index.php/Rc.conf" title="Arch wiki entry on rc.conf">/etc/rc.conf</a>;
-a move that has disconcerted a number of people.</p>
+  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/vim-logo.png" title="'Vim logo'" >
+Apart from a brief, but nevertheless instructive, flirtation with
+<a href="http://www.gnu.org/software/emacs/" title="Emacs homepage">Emacs</a><sup>1</sup> I have
+been a consistent <a href="http://www.vim.org/" title="Vim home">Vim</a> user over the last three
+or four years. Like most Vim users, I have made some progress over that time
+in spite of Vim&#8217;s
+<a href="http://stackoverflow.com/a/1815372/712613" title="SO answer on Vim">notorious learning curve</a>
+and have now reached the point where, belatedly, I think I understand it just enough
+to really grasp how little I actually know. It&#8217;s a milestone that speaks more to
+necessity than gratification, granted.</p>
 
-<p>I&#8217;m not going to get into whether or not this move is consistent with
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="Wiki entry">The Arch Way</a>, because that has
-been thrashed over extensively on the
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023283.html" title="ML thread on rc.conf">mailing</a>
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023258.html" title="And another one…">lists</a>,
-but also—and more importantly—because Arch is a rolling release, which means change is <em>inevitable</em>.
-What is more, after watching all the back and forth on the <acronym title="Mailing lists">ML</acronym>
-and on the <a href="https://bbs.archlinux.org/viewtopic.php?id=96316&amp;p=1" title="Arch BBS thread on systemd">boards</a>, I am convinced that the
-<a href="http://www.archlinux.org/developers/#tomegun" title="Tom Gunderson">developer overseeing this shift</a>
-both knows what he is doing and is acting in the best interests of Arch.</p>
+<p>In any event, as part of confronting my Vim shortcomings (no
+<a href="http://www.vimgolf.com/" title="Vim golf…">golfing</a> for me), I have been able
+to land on the features of Vim that I require to be enabled so that I am moderately
+productive (in my own, admittedly cloistered, working environment). That, you will
+probably not be surprised to read, does not include needing support for Arabic or
+Farsi to be built into Vim.</p>
 
-<p>This view has been validated by my experience of shifting to systemd on my machines.</p>
+<p>Part of the beauty of Vim is that, unlike it&#8217;s
+<a href="http://en.wikipedia.org/wiki/Editor_war#Humor" title="…lacking a decent editor">operating system counterpart Emacs</a>,
+you can choose how much functionality you wish to enable at compile-time. You do want
+support for Farsi? Then the <code>--with-features=big</code> option is what you are looking for.
+If, on the other hand, you just want the barest of bones, editor-wise, you could opt
+for the austere minimalism that is <code>--with-features=tiny</code> and find yourself happily
+transported back in time to
+<a href="https://en.wikipedia.org/wiki/Vi" title="Wikipedia page on Vi">Bill Joy&#8217;s lab in 1976</a>.</p>
 
-<p>When the new initscripts package was pushed to [testing] in the middle of last month,
-I stripped out all of the redundant options in <span class="file">/etc/rc.conf</span>
-and took the ten minutes or so to read about and then create the new files. I then spent some
-time reading up on systemd, principally
-<a href="http://0pointer.de/blog/projects/systemd-for-admins-1.html" title="One of TWELVE…">Lennart Poettering&#8217;s series of posts</a>,
-the <a href="https://wiki.archlinux.org/index.php/Systemd" title="Good, but needing some structure">Arch wiki entry</a>
-and the many and various
-<a href="http://0pointer.de/public/systemd-man/" title="One for everything">manual pages</a>.</p>
+<p>You can peruse all of the various features available to Vim using the <code>:help version</code>
+command.<sup>2</sup> There is also
+<a href="http://www.drchip.org/astronaut/vim/vimfeat.html" title="Vim's versions and features">this table</a>
+where the various features are listed against the respective feature flags (tiny, small,
+normal, big &amp; huge).</p>
 
-<p>Over the last couple of days, I have migrated all of my machines over to systemd. I found it
-to be a very straightforward process. I went for a pure systemd approach, for reasons I will
-return to. Essentially, this is how I tackled it.</p>
+<p>After this
+<a href="https://bugs.archlinux.org/task/33019" title="Add +profile to gvim on Flyspray">bug report</a>
+late last year, the default Arch PKGBUILD ships with <code>huge</code> as the feature set. Make
+what you will of that, but for my purposes it is overkill. With all the magic of
+<a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Wiki page on ABS">ABS</a> and
+<code>makepkg</code>, however, it is simple enough to build a Vim package that is tailored
+to exactly your requirements. For me, that means this set of simplified <code>configure</code>
+options:</p>
 
-<p>First, for each machine, I established what daemons were running. I did this by using
-<a href="http://pikacode.com/jasonwryan/Veles/file/default/Scripts/daemons.sh" title="Pretty sure it is one of Xyne's">this shell script</a>
-and cross checking entries in my <span class="file">/etc/rc.conf</span>. Then
-it was just a matter of installing systemd:<sup>1</sup></p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S systemd systemd-sysvcompat systemd-arch-units
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>  ./configure <span class="se">\</span>
+</span><span class='line'>    --prefix<span class="o">=</span>/usr <span class="se">\</span>
+</span><span class='line'>    --localstatedir<span class="o">=</span>/var/lib/vim <span class="se">\</span>
+</span><span class='line'>    --with-features<span class="o">=</span>normal <span class="se">\</span>
+</span><span class='line'>    --with-compiledby<span class="o">=</span>Arch:jwr <span class="se">\</span>
+</span><span class='line'>    --with-x<span class="o">=</span>yes <span class="se">\</span>
+</span><span class='line'>    --enable-acl <span class="se">\</span>
+</span><span class='line'>    --disable-gui <span class="se">\</span>
+</span><span class='line'>    --disable-signs <span class="se">\</span>
+</span><span class='line'>    --disable-netbeans <span class="se">\</span>
+</span><span class='line'>    --enable-multibyte
 </span></code></pre></div></figure>
 
 
-<p>The only outstanding file to be created was <span class="file">/etc/timezone</span>, the
-others—all documented in <code>man rc.conf</code>—I had created earlier in the month. Then, with the
-list of the services I would need running on each box, I enabled them. I think it is
-fair to say that the only thing that is clunky about systemd is the command syntax for
-managing units. Repeatedly typing <code>systemctl enable foo.service</code> is as tedious as it is
-error prone, so I hacked up a
-<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Scripts/sysd" title="sysd - *so* much easier">wrapper script</a>:</p>
+<p>With these options, I have the minimum amount of functionality I comfortably
+require (including the ability to access the system clipboard, <code>--with-x=yes</code>)
+but without the other bloat.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sysd <span class="nb">enable </span>acpid
-</span><span class='line'>sysd <span class="nb">enable </span>lvm
-</span><span class='line'>etc…
-</span></code></pre></div></figure>
+<p>In addition to these changes to the config options, I also strip out all of the
+<code>gvim</code>-related stuff from the PKGBUILD as I do not require it. Even though it
+is a split package, just building <code>vim</code> still includes options superfluous to
+my needs.  As a result, I get Vim with just the features I need, without the
+dependencies of <code>ruby</code> and <code>lua</code> and god knows what else.</p>
 
-
-<p>I also activated some additional gettys, as I like to log into a tmux session in TTY2 when
-I don&#8217;t need or want to start <code>X</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty2.service
-</span></code></pre></div></figure>
-
-
-<p>And I misguidedly wrote a couple of custom service files that turned out to be
-<a href="https://bbs.archlinux.org/viewtopic.php?id=146207" title="BBS post on said files">completely unnecessary</a>;
-and then I was done.</p>
-
-<p>On all three boxes I rebooted and that was it. The only issue I experienced was
-the final shutdown after removing initscripts and before booting up with
-systemd. After issuing <code>shutdown -r now</code> the process
-hung with a message about a missing <span class="file">inittab</span> file.
-In retrospect, I should have added <code>init=/bin/systemd</code> to my kernel parameters
-and not unistalled instiscripts until I had booted with systemd. This has
-now been added to the
-<a href="https://wiki.archlinux.org/index.php/Systemd" title="Archwiki systemd page">systemd wiki page</a>.</p>
-
-<p>Overall, though: no real drama, just a blur of text<sup>2</sup> and then the
-login prompt. While I haven&#8217;t seen a dramatic decrease in boot time,
-booting does <em>feel</em> a bit snappier and two of my three machines shutdown
-markedly more quickly. Consider me sold.</p>
-
-<p>That brings me back to the decision to opt for a pure systemd approach, rather than
-hanging on to a completely eviscerated <span class="file">/etc/rc.conf</span>. The
-Arch community has been told that the intention is to
-<a href="https://bbs.archlinux.org/viewtopic.php?pid=1133957#p1133957" title="BBS post by tomegun">support the rc.conf format forever</a>;
-I can&#8217;t help but think this is a mistake. In the same way that
-<a href="https://wiki.archlinux.org/index.php/Pacman#Partial_upgrades_are_unsupported" title="Pacman entry on Arch Wiki">partial upgrades are unsupported</a>,
-I think that systemd is Arch&#8217;s inevitable future and the community should be encouraged to accept that, <code>Syu</code> and
-move on…</p>
-
-<p>Having said that, I appreciate the consideration shown by the developers in wanting to assure
-people that their choice would continue to be catered for; and perhaps, over time, people still
-using initscripts will be regarded with the same sense of wry amusement as those who still show
-up from time to time with <code>hal</code> in their <code>DAEMONS</code> line.</p>
-
-<h3>Update 4/8/12</h3>
-
-<p>Tom Gunderson, the developer who looks after this part of Arch, has clarified the
-comment about the long term support for initscripts. As comments are hosted on
-a third-party paltform, I thought that it should be included in the body of the
-post.</p>
-
-<blockquote><p>Just a clarification: regarding the (probably very unwise) promise of &#8220;supporting <span="file">rc.conf</span> forever&#8221;, the intended meaning was that initscripts will support the syntax, not that initscripts themselves will always stay around (nor that systemd will gain support for the syntax in case initscripts is dropped).</p><p>At the moment systemd <strong>does</strong> support <span class="file">rc.conf</span> (when installed in conjunction with initscripts), but this is meant as a transitional measure only, and will likely go away eventually (though probably not soon).</p></blockquote>
-
+<p>I&#8217;m not operating under any illusions about the fact that this is
+really saving a huge amount of space or, for that matter, drastically reducing the
+number of dependencies I have installed. It is partly about understanding how Vim
+works at another level while also catering for the obsessive-compulsive drive to
+micro-control what is and isn&#8217;t installed on my systems. If you want to scratch either
+of the same itches, you can see the full
+<a href="https://bitbucket.org/jasonwryan/shiv/src/e6ccbe61780dfe24a5f7edda0d4b082dbb572e4a/Build/vim/PKGBUILD?at=default" title="Eviscerated Vim PKGBUILD">PKGBUILD in Bitbucket</a>.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>Note this approach will <em>remove</em> sysvinit and initscripts and <code>mv /etc/rc.conf{,.pacsave}</code>.</li>
-<li>Make sure you remove <code>quiet</code> from your kernel parameters for your first systemd
-boot so you can see that everything starts correctly…</li>
+<li>Still visible in some of my early Arch screenshots
+<a href="http://www.flickr.com/photos/jasonwryan/3748882572/in/photostream" title="Emacs in Openbox">on Flickr</a>…</li>
+<li>The official documentation for the features is also
+<a href="http://vimdoc.sourceforge.net/htmldoc/various.html#+feature-list" title="Vim Feature list">online</a>.</li>
 </ol>
 
-
-<p>Creative commons image on Flickr by
-<a href="http://www.flickr.com/photos/sovietuk/486119799/" title="leap by rick harrison">Tricky</a></p>
 </div>
   
   
@@ -551,23 +569,23 @@ boot so you can see that everything starts correctly…</li>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -654,7 +672,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

@@ -9,10 +9,11 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have been experiencing problems with my wifi LAN when playing music
-through
-mpd
-or watching movies. My upload speeds would climb to around 120- &hellip;">
+  <meta name="description" content="I recently picked up a
+HP Microserver;
+a small, silent server to use primarily to back up
+my other boxes.
+I went for the 2GB version without any &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -91,7 +92,7 @@ or watching movies. My upload speeds would climb to around 120- &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/06/06/network-flooding-on-ubuntu/">Network Flooding on Ubuntu</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/11/18/microserver/">Microserver</a></h1>
     
     
       <p class="meta">
@@ -107,201 +108,88 @@ or watching movies. My upload speeds would climb to around 120- &hellip;">
   
 
 
-<time datetime="2011-06-06T13:40:00+12:00" pubdate data-updated="true">Jun 6<span>th</span>, 2011</time>
+<time datetime="2011-11-18T17:13:00+13:00" pubdate data-updated="true">Nov 18<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/ubuntu-logo.png" alt="image" /></p>
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/microserver.png" alt="image" /></p>
 
-<p>I have been experiencing problems with my wifi LAN when playing music
-through
-<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
-or watching movies. My upload speeds would climb to around 120-130Kb/s
-and my wifi would just go down.</p>
+<p>I recently picked up a
+<a href="http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html" title="HP specs page">HP Microserver</a>;
+a small, silent server to use primarily to back up
+<a href="http://jasonwryan.com/blog/2010/10/04/the-setup" title="Slightly out-of-date setup post">my other boxes</a>.
+I went for the 2GB version without any preinstalled operating system.</p>
 
-<p>Apart from being frustrating, this was inconvenient as it meant that if
-I was doing either of those things, my stereo in the living room
-couldn’t stream music from my
-<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
-other members of the family (or guests) couldn’t connect to the access
-point to get online.</p>
+<p>As I want this machine to just sit quietly in my garage for the next 5
+or 6 years, I opted for
+<a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
+base system. After installing two 1TB drives, I set them up as an
+<a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
+RAID 1 array, in a
+<a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
 
-<p>After asking on
-<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
-(which, like many of the Ubuntu-related fora is populated with people
-who are more well-intentioned than they are knowledgeable - which seems
-to me one of the fundamental problems the distro has; but I’ll save that
-rant for another day), one helpful user suggested I use
-<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
-the network traffic.</p>
+<p><strong>Pro tip</strong> when you get to the part of the partitioning where you
+configure the volume for encryption, make sure you select <em>No</em> for
+<em>erase data</em>. It took close to 90 hours to scrub both the hard drives.
+And, as I am not really expecting
+<a href="http://www.extremetech.com/computing/105931-full-disk-encryption-is-too-good-says-us-intelligence-agency" title="FDE defeats the NSA">a visit from the spooks</a>,
+that seems a little like overkill…</p>
 
-<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
-immediately instructive. Wireshark quickly identified that, as soon as I
-started mpd, one of my ports was being flooded: 46560</p>
+<p>Once the base install was complete, I set up my SSH keys,
+<a href="http://tmux.sourceforge.net/" title="tmux page">tmux</a>, configured the
+firewall and forwarded the necessary ports, set up
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia page: network file system">NFS</a>,
+and that was it. The box is deathly quite, can be mounted locally for
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync entry">rsync backups</a> and
+accessed remotely (for a tmux session running
+<a href="http://irssi.org/" title="Irssi homepage">irssi</a>), and all for less than
+NZD700.</p>
 
-<p><code>lsof</code> showed that pulse audio was the culprit:</p>
+<p>I knocked together a quick script<sup>1</sup> to manage the backing up; currently
+I run it manually, but once I have the excludes file tweaked properly,
+I’ll set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
+automate the task.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
+<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># Backup to remote server over NFS</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
+</span><span class='line'>     <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then </span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
+</span><span class='line'>     mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
+</span><span class='line'> <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># sync directories</span>
+</span><span class='line'> <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>
+</span><span class='line'>
+</span><span class='line'> rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\</span>
+</span><span class='line'>     --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
+</span><span class='line'>     /home/jason /etc /media/Sentinel/Backups/Centurion
+</span><span class='line'>
+</span><span class='line'> <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
+</span><span class='line'>     umount /media/Sentinel
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
+</span><span class='line'> <span class="k">fi</span>
 </span></code></pre></div></figure>
 
-
-<p>Quelle surprise… When software engineers want a case study of opacity
-and abstraction from the user, this should be their first port of call.</p>
-
-<p>Worse, it is a known bug.
-<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
-And apparently insufficiently serious to warrant any attention. Fair
-enough, I suppose, given the fix is easy enough <em>if you know what you
-are trying to fix…</em></p>
-
-<p>Install the Pulse audio preferences tool:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install papref
-</span></code></pre></div></figure>
-
-
-<p>…and disable Multicast/RTP.</p>
-
-<p>Another example for me of Ubuntu’s fast waning utility as a distribution
-for people that want to be able to exercize some control over their
-system. It is only still installed on this machine because there isn’t
-an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
-here and, with my international traffic capped to 30Kb/s until last
-month, I wasn’t prepared to try and run a distro on that sort of
-bandwidth. Now that has changed, I suspect that Ubuntu’s days are
-numbered on this box.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/05/28/quoras-quandary/">Quora&#8217;s Quandary</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-05-28T10:05:00+12:00" pubdate data-updated="true">May 28<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora1.png" alt="image" /></p>
-
-<p>I joined <a href="http://www.quora.com/" title="Quora: Q&amp;A site">Quora</a> early in the
-new year and, while
-<a href="http://techcrunch.com/2011/01/23/why-i-don%E2%80%99t-buy-the-quora-hype/" title="TC article on the hype">the hype has in no way abated</a>,
-I have found that increasingly over the months that I have been
-visiting, there is less and less reason for me to return on any regular
-basis. And this puzzles me as I think the concept is, for me, an
-attractive one.</p>
-
-<p>In the five-odd months I have been visiting the site, I have managed to
-<a href="http://www.quora.com/Jason-Ryan" title="My Quora profile">contribute 58 answers</a>
-and over one hundred edits (more on that below); this strikes me as a reasonable
-commitment on my part and one that should return some dividend to me –
-at least in terms of satisfaction with the site. Alas, no.</p>
-
-<p>And why not? For several reasons. And reasons that have only really
-become apparent over the last month as I started to spend time on the
-<a href="http://unix.stackexchange.com/" title="Unix and Linux Stack Exchange">Unix &amp; Linux Stack Exchange site</a>.
-The contrast between the <em>experience</em> of the two sites, that are in
-essence very similar, couldn’t be more striking.</p>
-
-<p>The primary difference between the two is that Unix.SE isn’t a social
-site: you don’t follow anyone. Which, when you think about Q&amp;A sites,
-makes a lot more sense than Quora’s model. I still don’t understand the
-point of following people on Quora. Perhaps I am not following enough
-people, or the wrong ones, but I have yet to see <em>any benefit</em> in
-following on the site.</p>
-
-<p>One other area of seeming similarity between the sites is the ability to
-vote up (or down) questions and answers. On Unix.SE, this is implemented
-as a real strength as these votes determine contributor’s reputation,
-described thus:</p>
-
-<blockquote><p>Reputation is a rough measurement of how much the community trusts
-you. Reputation is never given, it is earned by convincing fellow
-users that you know what you’re talking about.</p></blockquote>
-
-<p>This has a twofold effect: it motivates contributors to provide quality
-answers (and
-<a href="http://unix.stackexchange.com/badges" title="StackExchange badges">rewards</a>
-them when they do), and more importantly, gives you a heuristic for how
-credible an answer may be. Quora doesn’t have this concept and, for me,
-is much the poorer for it.</p>
-
-<p>Reputation has consequences on Unix.SE: the more you accrue, the more
-privileges on the site you are granted. Again, this builds the
-community’s capability while encouraging individual contributors.</p>
-
-<p>Some of the other areas where Quora is really left wanting in comparison
-to Unix.SE are around the design of the site. The text box where you
-enter your answers or edits is a case in point:</p>
-
-<p><img src="http://dl.dropbox.com/u/261312/Blog-images/quora2.png" alt="image" /></p>
-
-<p>On Quora, it is like trying to change a car battery through a letterbox.
-The single, overriding impression is that entering information into the
-site is neither a priority nor pleasurable which, for a site aspiring to
-be a knowledge repository is incredibly perverse.</p>
-
-<p>This is compounded by the fact that the tools for presenting the
-information that you want to add to the site can charitably be described
-as rudimentary (one of the reasons that I have 100-odd edits is that it
-takes at least two to three attempts to present information in a
-semi-acceptable fashion). Searching for
-“<a href="http://www.quora.com/Quora-product/Are-there-any-markup-tags-when-writing-a-question?q=quora+markup+tools" title="Recursion alert">quora markup tools</a>”
-is as disappointing as it is frustrating.</p>
-
-<p>Being able to present information appropriately is critical. The
-StackExchange sites
-<a href="http://unix.stackexchange.com/editing-help" title="Unix.SE editing guidleines">allow all sorts</a>
-of HTML tags and
-<a href="http://daringfireball.net/projects/markdown/syntax" title="markdown syntax">markdown</a>,
-without apparently any additional
-<a href="http://en.wikipedia.org/wiki/Cross-site_scripting" title="Wikipedia page on Cross site scripting">XSS risk</a><sup>1</sup>.
-The result is questions and answers that are formatted in a way that
-enhances their legibility, rather than detracting from it.</p>
-
-<p>There are some other areas where Quora is not measuring up for me:
-opaque editorial and moderation policies and practices and an
-unwillingness to more actively curate the questions – and no, those two
-statements are not contradictory.</p>
-
-<p>The overall impression I am left with is that while both sites have
-similar aims (albeit Unix.SE’s is much more specific in terms of the
-subject matter), Quora seems to me to be really failing at building a
-community around it. Unless, of course, you count social media experts…</p>
 
 <h5>Notes</h5>
 
 <ol>
-<li>God knows if that is actually the reason they refuse to allow
-potential contributors the ability to adequately format their
-information, but it seems plausible enough.</li>
+<li>Any faults aside, it should be reasonably portable…</li>
 </ol>
 
 </div>
@@ -316,7 +204,7 @@ information, but it seems plausible enough.</li>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/05/24/tyrs-ncurses-twitter-client/">Tyrs: ncurses Twitter Client</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/11/07/irc-dzen/">IRC Notifications with dzen2</a></h1>
     
     
       <p class="meta">
@@ -332,69 +220,149 @@ information, but it seems plausible enough.</li>
   
 
 
-<time datetime="2011-05-24T20:17:00+12:00" pubdate data-updated="true">May 24<span>th</span>, 2011</time>
+<time datetime="2011-11-07T19:48:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5754227102/in/photostream" title="Tyrs photo on Flickr"><img src="http://dl.dropbox.com/u/261312/Blog-images/tyrs.png" alt="image" /></a></p>
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/irc-dzen.png" alt="image" /></p>
 
-<p>I have been a solid user of
-<a href="http://www.floodgap.com/software/ttytter/" title="TTYtter homepage">TTYtter</a>
-for a couple of years now, much preferring the speed and power of a
-command line Twitter client. And, after having tried–at one time or
-another–most of the Linux or cross-platform Twitter clients, I can
-safely say that for me TTYtter is easily the best.</p>
+<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective of whether I
+was connected to the session, or that particular machine at the time.</p>
 
-<p>There is, however, a new
-<a href="http://www.gnu.org/software/ncurses/" title="ncurses page">ncurses</a> client
-that is showing a lot of promise:
-<a href="http://tyrs.nicosphere.net/index.html" title="Tyrs homepage">Tyrs</a>. Only at
-the 0.2.1.1 stage, and with a fraction of the functionality that TTYtter
-has, it is nevertheless a very nice client.</p>
+<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
+and there is a script called
+<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
+that will print any mentions in a channel to a file. I then configured
+the fnotify script to write to a folder in Dropbox. Now, whenever I am
+mentioned in freenode, the file is updated across all my machines.</p>
 
-<p>Requiring little in the way of dependencies, only python-twitter and
-python-oauth2, both available in the
-<a href="http://aur.archlinux.org/" title="Arch Linux User Repository">AUR</a> or in the
-debian/Ubuntu repos (if you are using debian/Ubuntu, you will need the
-newer python-twitter-0.8.2 for it to run).</p>
+<p>The next challenge was to translate the updating of the fnotify file
+into a notification on my current machine. As I don’t use
+<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
+on my Arch machines, I wanted to make it work with
+<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
+Enter a simple shell script:</p>
 
-<p>Tyrs is easy to configure, with good documentation and a simple
-configuration file, located by default at
-$XDG_CONFIG_HOME/tyrs/tyrs.cfg. The default keybinds are
-<a href="http://www.vim.org/" title="THE editor">Vim-centric</a>, naturally…</p>
-
-<p>My config is pretty straightforward at this point:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'>[keys]
-</span><span class='line'>retweet           <span class="p">=</span> <span class="k">p</span>
-</span><span class='line'>retweet_and_edit  <span class="p">=</span> <span class="k">P</span>
-</span><span class='line'>mentions          <span class="p">=</span> <span class="k">a</span>
-</span><span class='line'>reply             <span class="p">=</span> <span class="k">r</span>
+<figure class='code'><figcaption><span>highlights.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>
 </span><span class='line'>
-</span><span class='line'>[<span class="k">colors</span>]
-</span><span class='line'><span class="nb">highlight</span>         <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>header            <span class="p">=</span> <span class="m">6</span>
-</span><span class='line'>hashtag           <span class="p">=</span> <span class="m">4</span>
-</span><span class='line'>attag             <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'>text              <span class="p">=</span> <span class="m">7</span>
-</span><span class='line'>warning_msg       <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>info_msg          <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'>
-</span><span class='line'>[params]
-</span><span class='line'>refresh           <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>tweet_border      <span class="p">=</span> <span class="m">0</span>
+</span><span class='line'><span class="k">while </span>inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
+</span><span class='line'><span class="k">done</span>
 </span></code></pre></div></figure>
 
 
-<p>Written in Python, the code is well commented and relatively easy to
-find your way around if your are keen on hacking.</p>
+<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
+so that it runs in the background after login. Whenever the metadata
+(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
+written to my
+<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
+with the message.</p>
 
-<p>The developer, Nicolas Paris, is both approachable and helpful and is
-actively developing Tyrs. With some more functionality in the pipeline,
-it looks to be a very nice application.</p>
+<p>Simple; but does what I need…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Dropbox’s API won’t work with dzen2—or with other lightweight
+notifications like
+<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
+<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
+(that was closed without any progress)—hence my having to resort to a
+home-cooked solution…</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/10/01/pinboard-elvis/">Pinboard Elvis</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-10-01T10:29:00+13:00" pubdate data-updated="true">Oct 1<span>st</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/pinboard-elvis.png" alt="image" /></p>
+
+<p>After recovering from
+<a href="http://jasonwryan.com/blog/2011/09/28/delicious/" title="My post on the delicious fiasco">the shock of the botched delicious relaunch</a>,
+I have switched to
+<a href="http://pinboard.in/u:jasonwryan/" title="My bookmarks on Pinboard">Pinboard</a>
+for my bookmarking. Previously, I was just synching my bookmarks from
+delicious, but now I have abandoned that trainwreck completely.</p>
+
+<p>Two things made the transition painless. The first was the
+<a href="http://www.appbrain.com/app/me.mitnworb.save.to.pinboard/" title="Save to Pinboard page">Pinboard Android app</a>
+so I could access and manage bookmarks from my phone; the second was a
+little trickier.</p>
+
+<p>As I have previously mentioned, I use bookmarking not just to retrieve
+my own saved pages, but as a search repository for material that other
+people have decided is interesting or valuable enough to want to save.
+And there is no better tool for this sort of searching than
+<a href="http://surfraw.alioth.debian.org/" title="Surfraw - Shell Users' Revolutionary Front Rage Against the Web">Surfraw</a><sup>1</sup></p>
+
+<p>I had written an elvis to search delicious bookmarks, so to complete the
+transition to Pinboard, I needed to do the same. It was a little
+trickier than I had anticipated, as some of the URLs (particularly when
+searching across multiple tags) were reasonably complex given my modest
+scripting skills. But
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.config/surfraw/elvi/pin" title="Pinboard elvis in mercurial repo">I got there in the end…</a></p>
+
+<p>Now searching for web pages that I or anyone else has saved to Pinboard
+is as simple as typing:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pin -t<span class="o">=</span>unix+linux+vim
+</span></code></pre></div></figure>
+
+
+<p>Which will return all saved pages that share those three tags. I can
+also refine my search to a particular user with the <code>-u</code>{ser} switch, or
+just browse recent or popular tags. Simple, but ruthlessly efficient…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Previous posts on Surfraw:
+
+<ul>
+<li> <a href="http://jasonwryan.com/blog/2011/04/13/archwiki-elvis-for-surfraw/" title="My post on the Arch Wiki elvis">Arch Wiki elvis for Surfraw</a></li>
+<li> <a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Yanking links in w3m">w3m, Surfraw and yanking  URLs</a></li>
+</ul>
+</li>
+</ol>
+
 </div>
   
   
@@ -419,23 +387,23 @@ it looks to be a very nice application.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/15/asking/">Asking for Help</a>
+        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/25/greader/">Replacing Google Reader</a>
+        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a>
+        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/04/09/helpers/">AUR Helpers</a>
+        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/03/29/vim/">Building Vim</a>
+        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
       </li>
     
   </ul>
@@ -522,7 +490,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2013 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
