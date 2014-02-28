@@ -79,7 +79,7 @@ relatively simple ingress to the byzantine ways of this powerful shell.
 Finally, also last year, I was privileged to chair the judging for the 
 [2012 New Zealand Open Source Awards](http://www.nzosa.org.nz/ 'NZOSA site').
 This exposed me to the amazing contribution 
-[Michael Kerrisk](http://man7.orgi/mtk.index.html 'Man pages Michael maintains')
+[Michael Kerrisk](http://man7.org/mtk/index.html 'Man pages Michael maintains')
 has made to GNU/Linux over the last decade. He is the author, or co-author, of
 *over 300* `man` pages; and these aren't the glamorous, application pages read
 by the masses, but the system pages that document the kernel and `glibc`
