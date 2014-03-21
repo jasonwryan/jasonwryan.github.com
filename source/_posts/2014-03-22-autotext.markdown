@@ -1,0 +1,98 @@
+---
+layout: post
+title: "Autotext Function"
+date: 2014-03-22 09:20
+comments: true
+categories: [archlinux, bash, hack] 
+---
+{%img left http://miromiro.com/Blog-images/cans.jpg Flickr CC image %}
+
+Once you have your environment set up; your 
+[window manager](http://dwm.suckless.org 'dwm site')
+patched 
+[*exactly* the way you want](http://jasonwryan.com/blog/2012/07/24/queues/ 'Post on mercurial queues'),
+same for 
+[your editor](http://jasonwryan.com/blog/2013/03/29/vim/ 'Post on building Vim') 
+and even
+[your kernel builds automated](http://jasonwryan.com/blog/2013/08/24/automating-kernels/ 'Yet another post…'),
+then you either start from scratch and learn a whole lot more, or you start to
+focus on the really small details. The endless polishing that is bred of a
+mania for automation and customisation and the liberating freedom of using
+software that allows, and even encourages, this approach.
+
+Since I started using a couple of basic functions for managing my
+[note taking](http://jasonwryan.com/blog/2012/09/01/notes-updated/ 'Post on the updated functions'),
+I have been conscious of the way I can use this tool to make my workflow a
+little less onerous.
+
+One of the things I find myself doing *a lot* is reusing the same snippets of
+text; either prose in work documents, or links to relevant articles on the
+Arch Wiki and Forums. It is simple enough to add this material to my 
+<span class="file">~/.notes</span>, but retrieval has always been&mdash;for the
+text I reuse frequently&mdash;unwieldy.
+
+How many times do you really want to open the file, search for the relevant
+excerpt, highlight it and then copy it to the system clipboard before closing
+the file and pasting it into your email or a web form? I must have logged
+several thousand before I finally decided to do something about it.
+
+I now have a couple of different files in <span class="file">~/.notes/</span>
+depending upon the context; the example I'll use is the one for the Arch Forums
+kept, naturally enough, at
+<span class="file">$HOME/Sync/notes/arch</span> (I symlink to 
+<span class="file">~/.notes</span> so that the directory is synched using
+[BitTorrent Sync](http://jasonwryan.com/blog/2013/03/16/sync/ 'Post on using Sync')).
+
+This is just a simple text file with all of the links, guidance and wisdom that 
+I generously share with those people, mostly new to the community, who have yet
+to embrace the opportunity to commit the 
+[Forum Etiquette](https://wiki.archlinux.org/index.php/Forum_Etiquette 'On the Wiki')
+to memory. The format of each file is the same and is pretty basic:
+
+{% blockquote %}
+# rules sticky
+https://bbs.archlinux.org/viewtopic.php?id=130309
+
+# smart questions
+[url=http://www.catb.org/esr/faqs/smart-questions.html]How To Ask Questions The Smart Way[/url]
+
+# arch only
+https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY
+{% endblockquote %}
+
+I use the commented title to identify the desired piece of text and then just
+copy it to the clipboard, ready to pasted into a post that will undoubtedly
+be gratefully received by the infractor:
+
+{% codeblock lang:sh $HOME/.bashrc %}
+# board snippets
+bbs() {
+  file="$HOME/.notes/arch"
+  if (( $# == 1 )); then
+    local opt="$1"
+    awk -v line="$opt" 'index($0, line) { getline; print }' "$file" | xsel -b
+  else
+    awk '/^# /' "$file"
+  fi
+}
+{% endcodeblock %}
+
+So, on the rare occasion that I need to remind someone that on the Arch boards
+we only support Arch Linux (I know, quite the revelation…), I just open
+[a scratchpad](https://bitbucket.org/jasonwryan/dwm-patchset/src/tip/base.config.customizations#cl-76 'Config in Bitbucket')
+and enter <code>bbs only</code> and then <kbd>Shift</kbd>+<kbd>Insert</kbd> the
+text into the post and I am done. Not passing an argument just prints the
+commented titles in the file in the event that I forget what the damn thing
+is called.
+
+I have a similar setup for work, with a couple of files that feature longer 
+pieces of text that I find myself reusing for proposals, email responses
+and other administrivia. It's a simple enough approach, but it works well and
+does lend a certain satisfaction to the otherwise tedious business of writing
+boilerplate.
+
+#### Notes
+Flickr Creative Commons image 
+[how many cans](http://www.flickr.com/photos/shrapnel1/134674051/) by shrapnel1
+
+
