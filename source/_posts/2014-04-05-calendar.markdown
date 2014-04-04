@@ -1,0 +1,121 @@
+---
+layout: post
+title: "Mutt and iCal"
+date: 2014-04-05 09:48
+comments: true
+categories: [archlinux, mutt]
+---
+{% img left http://miromiro.com/Blog-images/calendar.jpg Creative Commons Calendar image %}
+I have posted a few times now about how I use 
+[Mutt](http://www.mutt.org/ 'Mutt homepage')<sup>1</sup>, that most superlative
+of email clients. Using a variety of different tools, I have
+settled on an effective and satisfying workflow for managing both my personal
+and professional email, with one glaring exception: calendaring. This, I should
+stress, is not for want of trying. It is not necessarily a nagging concern in
+terms of my personal use of email, but professionally it is a daily frustration.
+
+Day after day, I receive a *lot* of meeting invitations and, when these show up
+in my inbox they are, for all intents and purposes, unintelligble. Yes, with
+careful scrutiny you can decypher the 
+[iCalendar files](http://en.wikipedia.org/wiki/ICalendar 'Wikipedia entry'), but
+doing so is more likely to induce a seizure than a punctual appearance at an
+important meeting. To get around this, I had been using a basic Awk script that
+would parse the most important parts of the message and print them out. This was
+working well enough until I started to receive invitations from people using
+OSX. For some god-unknown reason, Apple's “interpretation” of the
+standard<sup>2</sup> is different enough to those sent from Evolution and
+Thunderbird that my script wouldn't successfully print some of the data (just
+the start and end times of the meeting, nothing too important).
+
+I started to try and expand the capability of the script and then realized that
+I would be much better off seeing if someone else had solved this problem;
+satisfactorily, that is. 
+[And they had](https://github.com/terabyte/mutt-filters 'Github fork of the repo').
+In a further delightful coincidence, the original author of the script, 
+[Martyn Smith](https://github.com/martynsmith 'Martyn's Github repo') is an 
+ex-colleague who, in 2004, first got me interested in Linux (thank you, Martyn).
+Armed with this script and entries in <span class="file">$HOME/.mutt/{mailcap,muttrc}</span> 
+now, whenever I open a calendar invitation, the pertinent details are printed
+out perfectly legibly. It's a small step, but an important one.
+
+Next I started playing around with 
+[khal](http://lostpackets.de/khal/ 'khal homepage'), a command line calendaring
+application that uses 
+[CalDav](http://en.wikipedia.org/wiki/CalDAV 'Wikipedia page') to sync to
+calendar servers. It is described as being in “the early stages of development”
+and that certainly is the case. Nonetheless, it is incredibly promising as—even
+in this rudimentary form—it performs well and offers most of the basics that I
+require. khal is simple to setup, does not have too many (python2) dependencies
+and handles multiple calendars<sup>3</sup>. Yes, there are bugs, but nothing
+grievous and the developer, 
+[Christian Geier](http://lostpackets.de/blog/ 'Christian's blog'), is very 
+responsive and helpful<sup>4</sup>.
+
+The [khal documentation](http://lostpackets.de/khal/pages/usage.html 'Usage page')
+gives you a pretty good idea of the current feature set. Set up your 
+<span class="file">khal.conf</span> with the calendars you want synched and then
+you have two modes of interaction: directly via the command line or an
+interactive mode invoked with `ikhal`. Both modes allow you to perform the basic
+functions of adding, editing or deleting events.
+
+{% img center http://miromiro.com/Blog-images/khal.png Simple screenshot of khal %}
+
+While the interactive mode is very simple and straightforward, what I am most
+excited about is the ability to add events from the command line, as per the
+example in the documentation:
+
+{% codeblock lang:sh %}
+khal --new 25.10. 16:00 18:00 Another Event :: with Alice and Bob
+{% endcodeblock %}
+
+
+I just needed to figure out a way to extract the relevant fields from the iCal
+file and pass them to khal. My first attempt is unashamedly ugly, both in
+conception and execution. However, I don't know Perl (and at this stage of my
+life 
+[I have run out of time to learn it](https://twitter.com/jasonwryan/status/204660063669989376 'Sad, but true…')),
+and it actually works. I
+[modified](https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/ical_filter.pl 'In my bitbucket repo') 
+Martyn's script to write to a temp file and then, for iCal events I want to
+import to khal, I bound a key sequence in Mutt to a simple Awk
+script<sup>5</sup>:
+
+{% codeblock lang:awk %}
+#!/usr/bin/awk -f
+# read from ical_filter.pl and then send ical invitation details 
+# in mutt to khal
+
+/^Summary/   { for (i=1; i<=NF-2; i++) $i = $(i+2); NF-=2; summ = $0 }
+/^Location/  { for (i=1; i<=NF-2; i++) $i = $(i+2); NF-=2; meet = $0 }
+/^Dtstart/   { date_st = $3; time_st = $4 } 
+/^Dtend/     { time_nd = $4 }
+
+END          { print  date_st" "time_st" "time_nd" "summ }
+{% endcodeblock %}
+
+In <span class="file">$HOME/.mutt/muttrc</span>, I have
+<kbd>Ctrl</kbd><kbd>k</kbd> in pager view trigger the script like so:
+
+{% codeblock lang:sh %}
+# save iCal to khal
+macro pager \Ck  "!/usr/bin/khal --new $(~/Scripts/mutt2khal ~/.mutt/temp/caldata)" "Saving Calendar event" 
+{% endcodeblock %}
+
+Neither elegant nor imaginative, I know; but for a first attempt, it gets the
+job done. If I did know any Perl, I am sure I would be able to avoid the
+additional temp file and the need to reread the information before handing it
+off to khal, but you work with the skills (or lack thereof) that you have.
+Needless to say, patches are welcomed.
+
+#### Notes
+1. See all my mutt posts:
+    * [Using Mutt, LDAP and SSL](http://jasonwryan.com/blog/2012/04/21/lbdb/)
+    * [Mutt and HTML Email](http://jasonwryan.com/blog/2012/05/12/mutt/)
+    * [Using Notmuch with Mutt](http://jasonwryan.com/blog/2012/05/23/notmuch/)
+    * [Encrypting Mutt](http://jasonwryan.com/blog/2013/07/20/gnupg/)
+2. Yes, I understand how special Apple is but this is particularly annoying…
+3. There is a [package in AUR](https://aur.archlinux.org/packages/khal-git/).
+4. I [logged a bug](https://github.com/geier/khal/issues/36) and it was fixed in a matter of hours.
+5. The script is [in my bitbucket repo](https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/mutt2khal).
+
+Creative Commons image, [Calendar](https://flic.kr/p/4h1oE5) by Angela Mabray.
