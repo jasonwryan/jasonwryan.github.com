@@ -1,0 +1,76 @@
+---
+layout: post
+title: "Syncing with khal"
+date: 2014-04-18 10:32
+comments: true
+categories: [archlinux, mutt]
+---
+{% img left  http://miromiro.com/Blog-images/arrows.png Creative Commons image %}
+Following up on my post from last week, about using
+[khal and mutt](http://jasonwryan.com/blog/2014/04/05/calendar/ 'Check it out…'),
+where I covered off a couple of simple hacks to integrate command line
+calendaring with [Mutt](http://www.mutt.org/ 'Mutt hompeage'), I had been using
+the main development branch of
+[khal](https://github.com/geier/khal 'Master branch on github') which includes
+syncing capability. However, as I was conversing with the developer, Christian,
+around
+[a bug report](https://github.com/geier/khal/issues/47 'Issue on khal github repo'),
+he indicated that this functionality would be superseded by development in a 
+separate branch that uses 
+[vdirsyncer](https://github.com/untitaker/vdirsyncer 'Github repo') to
+synchronise calendars.
+
+As Christian intimated that this change would happen in the
+[very near future](https://github.com/geier/khal/issues/47#issuecomment-40175915 'Relevant comment'),
+and “js” had commented on my last post to the effect that it was working well, I 
+thought I should take a look for myself.
+
+There are packages in the AUR for 
+[vdirsyncer-git](https://aur.archlinux.org/packages/python2-vdirsyncer/ 'Grab it') and
+[python2-argvard](https://aur.archlinux.org/packages/python2-argvard/ 'Same deal…')
+so you will just need to grab the khal branch that uses `vdirsyncer` as it's
+syncing engine. I have thrown up a 
+[PKGBUILD gist](https://gist.github.com/jasonwryan/10949540 'Nothing too flash…'),
+or—as we are only talking about a couple of simple scripts—you could install the
+complete set using 
+[pip](http://www.pip-installer.org/en/latest/ 'Official documentation'), the
+Python package manager; in which case it would be a straightforward:
+
+{% codeblock lang:sh %}
+sudo pacman -S python2-pip
+pip2 install --user git+https://github.com/geier/khal.git@vdir
+pip2 install --user vdirsyncer
+{% endcodeblock %}
+
+…and then remember to make sure that <span class="file">$HOME/.local/bin</span>
+is included in your `$PATH`.
+
+I wanted to have vdirsyncer manage two of my calendars, my 
+[CalDav](http://en.wikipedia.org/wiki/CalDAV 'Wikipedia page') work calendar and
+a simple [iCalendar](http://en.wikipedia.org/wiki/ICalendar 'Wikipedia, again…')
+with all of the New Zealand public holidays. Configuring vdirsyncer to
+successfully do this took me a *lot* longer than I would like to admit: a
+combination of my ineptitude, a bug and a broken schema in the original 
+<span class="file">holidays.ics</span> that I wanted to use.
+
+The `collections` variable in the config file merits a mention in this regard.
+If you choose to use it, be aware that your <acronym title="Unique Resource Locator">URL</acronym>
+will have this value appended to it, which may throw 
+[a 404](http://en.wikipedia.org/wiki/HTTP_404 'Wikipedia entry'). Using the
+`DEBUG` verbosity level will identify this issue if you are struck by it.
+
+Eventually, with the help of both Christian and Markus, the vdirsyncer
+developer, I got it set up and running smoothly. I then just had to create
+a `cron` job to sync my work calendar every two hours and it was done.
+
+As you would expect with such a simple tool, there is not a lot to say, or do,
+with vdirsycner. It runs on a similar model to 
+[OfflineIMAP](http://offlineimap.org/ 'Home page'), in that it synchronises a
+remote and local repository. There are a couple of nice touches: it will read
+tour credentials from <span class="file">$HOME/.netrc</span> so you don't have
+to worry about sensitive information in plain text in yet another file, and there
+is a `VDIRSYNCER_CONFIG` variable, so you can place the config file wherever it
+suits.
+
+#### Notes
+[Elevator](https://flic.kr/p/Re9Sb), a Creative Commons image on Flickr by Mykl Roventine.
