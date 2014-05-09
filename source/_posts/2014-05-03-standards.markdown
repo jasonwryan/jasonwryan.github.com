@@ -7,8 +7,7 @@ categories: [archlinux, community]
 ---
 {% img left http://miromiro.com/Blog-images/crowd.jpg Creative Commons crowd image %}
 Late last month there was a post on 
-[Meta Stack
-Overflow](http://meta.stackoverflow.com/questions/251758/why-is-stack-overflow-so-negative-of-late 'All the hate…') wondering why SO is “so negative of late.” Reading through the
+[Meta Stack Overflow](http://meta.stackoverflow.com/questions/251758/why-is-stack-overflow-so-negative-of-late 'All the hate…') wondering why SO is “so negative of late.” Reading through the
 extensive list of answers, and all the comments that quickly adhered to them
 like barnacles on a becalmed schooner, it was hard not to extrapolate to the
 experiences of online communities elsewhere, especially in the free and open
