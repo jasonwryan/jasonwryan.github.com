@@ -110,7 +110,9 @@ more
 and features rolled out.
 
 #### Notes
-1. Naturally enough, someone is [on the case](https://github.com/calmh/syncthing/issues/177)…
+1. Naturally enough, someone is [on the case](https://github.com/calmh/syncthing/issues/177)… 
+**Update: 17/5/14** App is available on
+[Google Play](https://play.google.com/store/apps/details?id=com.nutomic.syncthingandroid) and it works pretty well.
 1. I added a debian daemon script to a thread on 
 [the Syncthing boards](http://discourse.syncthing.net/t/keeping-syncthing-running/30/2) 
 as there is no built in daemon functionality (yet).
