@@ -67,13 +67,13 @@ loopdev=$(losetup -f)
 mountpt=/media/"$cryptdev"
 
 # must be run as root
-if [[ $EUID != 0 ]]; then
+if (( $EUID != 0 )); then
   printf "%s\n" "You must be root to run this."
   exit 1
 fi
 
 # unecrypt and mount container
-if [[ "$1" == "open" ]]; then
+if [[ $1 == open ]]; then
   losetup "$loopdev" "$cryptpath"
   tcplay --map="$cryptdev" --device="$loopdev"
     
@@ -83,14 +83,14 @@ if [[ "$1" == "open" ]]; then
 EOF
 
   # mount container
-  [[ -d "$mountpt" ]] || mkdir "$mountpt"
+  [[ -d $mountpt ]] || mkdir "$mountpt"
 
   # mount options
   userid=$(awk -F"[=(]" '{print $2,$4}' <(id "$user"))
   mount -o nosuid,uid="${userid% *}",gid="${userid#* }" /dev/mapper/"$cryptdev" "$mountpt"
 
 # close and clean up…
-elif [[ "$1" == "close" ]]; then
+elif [[ $1 == close ]]; then
   device=$(awk -v dev=$cryptdev -F":" '/dev/ {print $1}' <(losetup -a))
   umount "$mountpt"
   dmsetup remove "$cryptdev" || printf "%s\n" "demapping failed"
