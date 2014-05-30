@@ -1,0 +1,101 @@
+---
+layout: post
+title: "Browser tunnels"
+date: 2014-05-30 09:32
+comments: true
+categories: [archlinux, bash, browser, hack] 
+---
+{% img left http://miromiro.com/Blog-images/tunnel.jpg Creative Commons image %}
+Using a 
+[Socks proxy](http://en.wikipedia.org/wiki/SOCKS 'Wikipedia article') over an 
+[SSH tunnel](http://en.wikipedia.org/wiki/Tunneling_protocol#Secure_shell_tunneling 'Wikipedia entry') 
+is a well documented and simple if much less flexible stand in for a full-blown
+[VPN](http://en.wikipedia.org/wiki/Virtual_private_network 'VPN on Wikipedia). It
+can provide a degree of comfort when accessing private or sensitive information
+over a public Internet connection, or you might use it to get around the
+terminally Canutian<sup>1</sup> construct that is known as geo-blocking; that
+asinine practice of pretending that the Internet observes political boundaries…
+
+By way of a digression, it occurred to me at some point while I was wrestling
+with setting this up that, over the last seven or so years, much of the
+“entertainment” provided by corporate content distributors has been in the form
+of encouraging me to spend hundreds? thousands? of hours researching and
+implementing ways to circumvent their litany of failed and defective 
+technological restrictions: region codes, 
+[DRM](http://www.defectivebydesign.org/what_is_drm_digital_restrictions_management 'Defective by Design')
+and the like. It is worth noting that, in the vast majority of cases, I was
+just seeking access to content that I already owned (in another format), or was
+prepared to pay for.
+
+My move to GNU/Linux in 2007 was in large part motivated by the awful
+realisation that the music I had bought in iTunes was stuck in there. The
+combined intellectual effort globally expended trying to legitimately route
+around broken copyright law would have comfortably powered another golden age
+of the sciences; it's not entirely implausible to think that the only reason we
+still have to deal with cancer is the malignant legacy of
+[Sonny Bono](https://en.wikipedia.org/wiki/Sonny_Bono_Copyright_Term_Extension_Act 'Sonny's gift…')<sup>2</sup>.
+
+Now, back to our regular programming… One of my approaches to get around this
+sort of economic and policy rigor mortis has been to use a basic script to
+create a proxy tunnel to my home server. It assumes that you have 
+[public key](http://en.wikipedia.org/wiki/Public-key_cryptography 'Wikipedia, again') 
+authentication set up and your passphrase loaded in 
+[keychain](https://wiki.archlinux.org/index.php/SSH_Keys#Keychain 'Arch wiki, for a change'), 
+or something similar. 
+
+{% codeblock lang:sh %}
+#!/usr/bin/env bash
+
+SSH_HOST="jason@XXX.XXX.XXX.XXX -p XXX -i $HOME/.ssh/box1"
+
+up(){
+    ssh -f -N -D 8080 -M -S /tmp/ssh_tunnel_%h.sock -o ExitOnForwardFailure=yes $SSH_HOST && \
+    printf '%s\n' "ssh tunnel started successfully" || \
+    printf '%s\n' "ssh tunnel failed to start"
+}
+
+down(){
+    ssh -S /tmp/ssh_tunnel_%h.sock -O exit $SSH_HOST
+}
+
+if [[ $1 = up ]]; then
+    up && chromium --proxy-server="socks://127.0.0.1:8080" &
+elif [[ $1 = down ]]; then
+    down
+else
+    printf '%s\n' "Fail…"
+    exit 1
+fi
+{% endcodeblock %}
+
+Over the last couple of weeks, though, while I have been setting up and 
+[playing with Syncthing](http://jasonwryan.com/blog/2014/05/10/syncthing/ 'Post on Syncthing'),
+I found this script wanting. With six nodes and, depending if I was on the 
+<acronym title="Local Area Network">LAN</acronym> or not, as many as four of those
+hosts only accessible via SSH, then having the ability to quickly and painlessly
+open a browser on any one of the nodes *without having to edit the script*
+suddenly seemed like quite a good idea.
+
+Accordingly I went to work on the script, including a test to determine if I
+was on my home network and passing the name of the desired host as an 
+argument. With this approach, I simply type `tunnel $host` and chromium
+opens tunneled to that host, where I can the happily open 
+<strike>Hulu</strike> the Syncthing GUI.
+
+The updated script is posted as 
+[a gist](https://gist.github.com/jasonwryan/715a4f3fcb55e995de0d 'On Github'), 
+and as you can see, still needs some work to make it a little more generic.
+You will need, for example, to hand edit in the hosts and ports in 
+`get_host()`. It is also the first time I have played with 
+[named pipes](http://mywiki.wooledge.org/BashGuide/InputAndOutput#Pipes 'Wooledge wiki')
+and I am not convinced that my use of `mkfifo` here is either the correct
+approach or implementation; but it works. Comments enlightening me would
+be gratefully received.
+
+#### Notes
+1. The good king was, appropriately enough, actually called Cnut the Great…
+2. And, no, I am not referring to his musical corpus, which is as carcinogenic as his 
+political career was a Myrmidon for Big Content.
+
+Flickr Creative Commmons image, [The Tunnel](https://www.flickr.com/photos/lawrence_evil/113733779/),
+by Lawrence Whitmore.
