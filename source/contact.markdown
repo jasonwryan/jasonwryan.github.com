@@ -15,8 +15,6 @@ If you'd like to send me encrypted mail, you can use:
 * [my personal GPG Key](http://dl.dropbox.com/u/261312/jwr_public.key)
 * or [my work key](http://dl.dropbox.com/u/261312/catalyst.asc) for <jason@catalyst.net.nz>
 
-or find me on IRC in #freenode
-
 ## Other venues ##
 You will find me in a couple of other places around the web:
 
@@ -25,6 +23,8 @@ You will find me in a couple of other places around the web:
 * [My Github projects](http://github.com/jasonwryan)
 * [Bitbucket repositories](http://bitbucket.jasonwryan.com/)
 * [Unix &amp; Linux StackExchange](http://unix.stackexchange.com/users/6761/jasonwryan)
+
+or find me on IRC in #freenode
 
 ### Media ###
 * [My Photos](http://flickr.jasonwryan.com/) on Flickr
