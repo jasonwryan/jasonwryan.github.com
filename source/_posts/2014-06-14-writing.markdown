@@ -1,0 +1,101 @@
+---
+layout: post
+title: "Writing with Vim"
+date: 2014-06-14 09:30
+comments: true
+categories: [archlinux, vim]
+---
+{% img left http://miromiro.com/Blog-images/vimbot.jpg Practical Vim cover image %}
+[Vim](http://www.vim.org/ 'Vim homepage') is not just an editor (and not in the way that
+[Emacs](http://www.gnu.org/software/emacs/ 'GNU Emacs page') is more than 
+[just an editor](http://uncyclopedia.wikia.com/wiki/Emacs 'Uncyclopedia entry'));
+it is for all intents and purposes a universal design pattern. The concept of using 
+Vim's modes and keybinds extends from 
+[the shell](http://jasonwryan.com/blog/2011/12/01/readline/ 'Post on readline')
+through to [file managers](http://jasonwryan.com/blog/2009/12/28/changing-keybinds-in-vifm/ 'Post on Vifm')
+and [browsers](http://jasonwryan.com/blog/2012/11/20/vimprobable/ 'Vimprobable screencast').
+If you so choose (and I *do*), then a significant amount of your interactions with your
+operating system are mediated by Vim's design principles. This is undeniably a 
+good thing™ as it goes some way to standardising your command interface (whether at the
+command line or in a <acronym title="Graphic User Interface">GUI</acronym>).
+
+To that end, I have been spending more time working with Vim and trying to
+improve both my understanding of it's capabilities, the environment in which I
+use it and how I can optimise both of those conditions to not necessarily just
+be more productive, but to minimise friction in my work flows. 
+
+A large part of my job involves writing and, happily, so does a good deal of
+what constitutes my leisure activity. Whether it is emails written in 
+[Mutt](http://jasonwryan.com/blog/categories/mutt/ 'Mutt category'), these blog posts,
+longer documents written in [LaTeX](http://www.latex-project.org/ 'LaTeX website'),
+or just [roboposting to forums](http://jasonwryan.com/blog/2014/03/22/autotext/ 'Autotext function');
+it is Vim all the way down. So I have spent some effort setting up Vim to make
+that experience as comfortable as possible.
+
+[{% img right http://miromiro.com/Blog-images/distract.png Click for full-size %}](http://miromiro.com/Blog-images/distract-full.png)
+The first step, and one I took several years ago now, was to write custom 
+[colour schemes](https://bitbucket.org/jasonwryan/shiv/src/tip/.vim/colors/ 'In Bitbucket repo'),
+depending on whether I am in the console or X. Several weeks ago, I came across a Vim plugin
+called [DistractFree](https://github.com/chrisbra/DistractFree 'Github repo'), which
+is described as “enabling a distraction free writing mode.” I had always been slightly
+(well, perhaps *scathingly* would be more accurate) cynical when reading about these sorts
+of things when they first started to appear, but—after playing with two or three of them—this
+one has really grown on me (see the screenshot on the right).
+
+I [adapted my colour scheme](https://bitbucket.org/jasonwryan/shiv/src/tip/.vim/colors/mirowriter.vim 'Bitbucket repo') for it, added a line to my <span class="file">~/.vimrc</span>
+to enable it for specific document types, and have not looked back.
+
+{% codeblock lang:vim %}
+autocmd BufRead *.markdown,*tex call DistractFree#DistractFreeToggle() | wincmd w
+{% endcodeblock %}
+
+The final piece was to set up spell checking  to work properly. As well as
+using English, I wanted to share my personal whitelist of words between all of
+my machines, so I define a location in <span class="file">~/.vimrc</span> 
+as well:
+
+{% codeblock lang:vim %}
+set spelllang=en_gb                               " real English spelling
+set dictionary+=/usr/share/dict/words             " use standard dictionary
+set spellfile=$HOME/Sync/vim/spell/en.utf-8.add   " my whitelist
+{% endcodeblock %}
+
+Then it is just a matter of ensuring that misspelled or other flagged words (like those
+that should be capitalised) are highlighted correctly. This required a couple of lines in
+my colour schemes:
+
+{% codeblock lang:vim %}
+" Spell checking  --- 
+if version >= 700
+  hi clear SpellBad
+  hi clear SpellCap
+  hi clear SpellRare
+  hi clear SpellLocal
+  hi SpellBad    ctermfg=9
+  hi SpellCap    ctermfg=3    cterm=underline
+  hi SpellRare   ctermfg=13   cterm=underline
+  hi SpellLocal  cterm=None
+endif
+{% endcodeblock %}
+
+The most significant change, however, was that I recently purchased a hard 
+copy of Drew Neill's excellent
+[Practical Vim](http://pragprog.com/book/dnvim/practical-vim 'Just buy it, now…'). I
+have long been a fan of Drew's excellent podcast, [Vimcasts](http://vimcasts.org/ 'Drew's site'),
+and the book is every bit as impressive as the collection of those episodes,
+and more.  Reading it on my commute over the last week, I have been constantly
+amazed at the power and flexibility of this editor and Drew's ability to clearly
+articulate how to work economically and efficiently with it.  I'm convinced
+this is an invaluable resource for anyone that currently uses Vim or wants to
+learn.
+
+I expect that, over time, as I become more proficient with Vim, that I will adapt
+some of these settings, but for the time being they feel very comfortable and allow
+me to focus on hacking words together (and to do the occasional bit of 
+[scripting on the side](https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/ 'Scripts in Bitbucket'))…
+
+
+#### Notes
+Image is from the cover of Drew Neill's 
+[Practical Vim](http://pragprog.com/book/dnvim/practical-vim), by 
+[Ben Cormack](http://en.wikipedia.org/wiki/Ben_Cormack).
