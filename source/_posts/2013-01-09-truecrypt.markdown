@@ -108,6 +108,11 @@ There is a
 Uninstall TrueCrypt and give tcplay a go, it is a simple, powerful application; and it *is*
 free software…
 
+### Update
+As cr notes in the comments, the `uid` and `gid` values are because when I created this container I
+needed to ocassionally mount it from windows, so it is a FAT32 filesystem. For ext3 or ext4, you would use
+`bindfs -u $user -g $group "$mountpt" "$backuppath"`.
+
 #### Notes
 Creative Commons image on Flickr by [xserv](http://www.flickr.com/photos/xserve/368758286/ 'Licensed CC by xserv').
 
