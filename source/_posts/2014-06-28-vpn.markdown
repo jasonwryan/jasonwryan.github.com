@@ -1,0 +1,89 @@
+---
+layout: post
+title: "OpenVPN and Time on the Raspberry Pi"
+date: 2014-06-28 09:57
+comments: true
+categories: [archlinux, arm]
+---
+{% img left http://miromiro.com/Blog-images/raspberry-pi-logo.png Pi logo %}
+After relieving my Pi of
+[seedbox duties](http://jasonwryan.com/blog/2013/06/29/raspberry/ 'Post on Torrent Pi'),
+I was looking around for some other use for it. I decided, after looking over
+the Arch wiki article on [OpenVPN](https://wiki.archlinux.org/index.php/Openvpn 'Simple, really…'), 
+that the Pi would be a terrific <acronym title="virtual private network">VPN</acronym> 
+server; when I am out and about I can access a secure connection to my home
+network, thereby significantly reducing the risk of my privacy being
+compromised while using connectivity to the Internet provided by the
+notoriously security conscious sysadmins that run networks in hotels and
+other public places.
+
+Setting it up was straightforward enough, the wiki is typically clear and thorough; the only
+bottleneck in the process was waiting for the Pi's tiny chip to chug through the creation of
+[public keys](https://wiki.archlinux.org/index.php/Create_a_Public_Key_Infrastructure_Using_the_easy-rsa_Scripts 'Wiki page on the easy-rsa scripts'). Once it was done, and I had tested that it was
+indeed working as intended, a more vexing issue presented itself. The service wouldn't come
+up after rebooting. Not a deal breaker, I could always just <acronym title="Secure Shell">SSH</acronym>
+in and manually bring the server up, but that sort of defeats the purpose of being able to
+have the thing running reliably.
+
+The reason that it fails on boot is that, without a hardware clock, the Pi
+resets its time to 
+[UNIX time](https://en.wikipedia.org/wiki/Unix_time 'Wikipedia article')
+until the
+[NTP](https://wiki.archlinux.org/index.php/Ntp 'Arch wiki page') daemon can
+start, which in turn depends upon the network being up. So, after rebooting,
+the journal would show the VPN server as having failed as the date was nearly
+half a century ago. 
+
+There are a variety of fixes floating around, the most amusing being
+[a wrapper for init](http://archlinuxarm.org/forum/viewtopic.php?f=31&t=6037#p34228 'Yes, really…').
+Suffice to say, this wasn't an option for me. Looking at the problem logically, it occurred to me
+that the issue was actually a trivial one: the correct sequencing of different services
+post boot. Isn't this, I asked myself, one of the issues 
+[systemd](http://www.freedesktop.org/wiki/Software/systemd/ 'At freedesktop.org') was supposed
+to address?
+
+I just had to ensure that the network came up as quickly as possible after boot, that the time
+was reset correctly once there was a viable connection, and that the `openvpn.service` waited for
+those things to happen before launching. 
+
+I have fitted the Pi with a wireless dongle, so the first step was to ditch
+[netctl](https://wiki.archlinux.org/index.php/Netctl 'Arch wiki page') (the
+default network manager on the ARM image) and replace it with 
+[systemd-networkd](https://wiki.archlinux.org/index.php/Systemd-networkd 'More wiki pages for you…').
+This is the point at which all the wingnuts that think that systemd is some
+sort of conspiracy to overthrow the old UNIX gods and replace them with false
+idols in *chapeau rouge* start foaming at their retrognathic mouths about
+“viral takeovers” and—seriously what fucking planet do these imbeciles hail
+from?—“an abhorrent and violent slap in the face to the Unix
+philosophy.”<sup>1</sup>
+
+For those of us that accept the theory of evolution, this technology is both
+effective and non-threatening; in fact, it is quite an improvement over its by
+now ageing predecessor. So, a few minutes later, 
+<span class="file">/etc/systemd/network/wlan0.network</span> and 
+<span class="file">/etc/wpa_supplicant/wpa_supplicant-wlan0.conf</span> had pretty much
+written themselves and then it was just a matter of enabling the eponymous services
+as well as `systemd-resolved.service`. Reboot and the network is up seemingly
+*instantly*.
+
+Compounding my heresy, I then switched out NTP for 
+[systemd-timesyncd](http://man7.org/linux/man-pages/man8/systemd-timesyncd.8.html 'Man page') 
+and the Pi's clock was now reset with the same alacrity. The final piece, ensuring 
+that the openvpn service waited for this to happen, was to add two lines to the 
+service file:
+
+{% codeblock lang:sh %} 
+After=network-online.target
+Wants=network-online.target
+{% endcodeblock %}
+
+That is all there is to it. Reboot and the network comes up, the clock is reset and then
+the OpenVPN server starts. Like magic. The sort of heathen magic that threatens to
+sap and impurify all of our
+[precious bodily fluids](http://www.youtube.com/watch?v=rKR32ImWYzw 'it's like that…').
+
+#### Notes
+1. No, Virginia, I did [not make that up](http://boycottsystemd.org/)…
+And I don't really understand how you can slap a philosophy in the face, but then
+rationality is anathema to zealots; irrespective of which chimæra they
+prostrate before.

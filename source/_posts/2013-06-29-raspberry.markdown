@@ -3,7 +3,7 @@ layout: post
 title: "RPi Headless Torrent Box"
 date: 2013-06-29 09:40
 comments: true
-categories: [archlinux, hack]
+categories: [archlinux, arm, hack]
 ---
 {% img left http://miromiro.com/Blog-images/raspberry-pi-logo.png Raspberry Pi logo %}
 I was fortunate enough to be given a 
