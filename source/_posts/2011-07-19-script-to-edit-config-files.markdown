@@ -5,7 +5,7 @@ date: 2011-07-19 19:34
 comments: true
 categories: [linux, bash, hack]
 ---
-![image](http://miromiro.com/Blog-images/xdg-script.png)
+![image](/images/post_images/xdg-script.png)
 
 Even with bash completion, endlessly typing and tabbing through the
 directory tree to make a simple change to a config file quickly becomes

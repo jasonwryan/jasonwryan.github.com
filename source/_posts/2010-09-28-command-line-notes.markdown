@@ -5,7 +5,7 @@ date: 2010-09-28 17:56
 comments: true
 categories: [linux, hack, bash]
 ---
-![image](http://miromiro.com/Blog-images/cli-notes-1.png)
+![image](/images/post_images/cli-notes-1.png)
 
 A couple of weeks ago, I came across these 
 [simple bash functions](http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool)
@@ -69,4 +69,4 @@ symlink to it from <span class="file">~/.notes</span>.
       
 2. Obligatory “after” screenshot:
       
-{% img http://miromiro.com/Blog-images/cli-notes-2.png 'Screenshot of editing text' %}
+{% img /images/post_images/cli-notes-2.png 'Screenshot of editing text' %}

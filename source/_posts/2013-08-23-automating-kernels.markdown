@@ -5,7 +5,7 @@ date: 2013-08-24 10:30
 comments: true
 categories: [archlinux, bash, hack]
 ---
-{% img left http://miromiro.com/Blog-images/robot.jpg I Robot %}
+{% img left /images/post_images/robot.jpg I Robot %}
 I posted a couple of weeks ago about 
 [compiling a custom kernel](http://jasonwryan.com/blog/2013/08/03/kernels/ 'Check it if you haven't...')
 using [modprobed_db](https://github.com/graysky2/modprobed_db 'graysky's github repo')

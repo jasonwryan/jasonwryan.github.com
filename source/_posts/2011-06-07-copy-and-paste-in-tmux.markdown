@@ -5,7 +5,7 @@ date: 2011-06-07 19:54
 comments: true
 categories: [tmux, linux]
 ---
-![image](http://miromiro.com/Blog-images/tmux-copy.png)
+![image](/images/post_images/tmux-copy.png)
 
 I’ve posted a couple of times<sup>1</sup> about
 [tmux](http://tmux.sourceforge.net/ "tmux homepage"), the brilliant

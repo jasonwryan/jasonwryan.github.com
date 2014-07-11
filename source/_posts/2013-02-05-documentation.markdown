@@ -5,7 +5,7 @@ date: 2013-02-08 19:57
 comments: true
 categories: [archlinux, community]
 ---
-{% img left http://miromiro.com/Blog-images/documents.jpg 'Documents on Flickr' %}
+{% img left /images/post_images/documents.jpg 'Documents on Flickr' %}
 One of the canards about Free and Open Source Software that is peddled by the unscrupulous
 marketers of proprietary software is that their product is superior because, among other
 things, the scruffy, sandal-wearing Communists that write and distribute their software

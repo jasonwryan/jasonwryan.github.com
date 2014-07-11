@@ -5,7 +5,7 @@ date: 2011-05-24 20:17
 comments: true
 categories: [linux]
 ---
-[![image](http://miromiro.com/Blog-images/tyrs.png)](http://www.flickr.com/photos/jasonwryan/5754227102/in/photostream "Tyrs photo on Flickr")
+[![image](/images/post_images/tyrs.png)](http://www.flickr.com/photos/jasonwryan/5754227102/in/photostream "Tyrs photo on Flickr")
 
 I have been a solid user of
 [TTYtter](http://www.floodgap.com/software/ttytter/ "TTYtter homepage")

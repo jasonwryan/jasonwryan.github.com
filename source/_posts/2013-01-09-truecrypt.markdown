@@ -5,7 +5,7 @@ date: 2013-01-10 16:02
 comments: true
 categories: [archlinux, bash, hack]
 ---
-{% img left http://miromiro.com/Blog-images/lock.jpg 'Flickr image of lock' %} 
+{% img left /images/post_images/lock.jpg 'Flickr image of lock' %} 
 I have used [TrueCrypt](http://truecrypt.org/ 'TrueCrypt homepage') since just before 
 I migrated to Linux, so somwehere around six or seven years, dating back to version 3 or 4. 
 It is an incredibly handy utility, allowing you to create and manage encrypted volumes on 

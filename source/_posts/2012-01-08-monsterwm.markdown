@@ -5,7 +5,7 @@ date: 2012-01-18 10:03
 comments: true
 categories: [archlinux]
 ---
-![image](http://miromiro.com/Blog-images/monster.jpg)
+![image](/images/post_images/monster.jpg)
 
 If you have visited here at all over the last couple of weeks, you would
 have seen some screenshots from 

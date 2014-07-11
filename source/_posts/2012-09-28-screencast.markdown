@@ -5,7 +5,7 @@ date: 2012-09-28 09:18
 comments: true
 categories: [archlinux, dwm, screencast]
 ---
-{% img left http://miromiro.com/Blog-images/dwm-logo.png 'dwm logo' %}
+{% img left /images/post_images/dwm-logo.png 'dwm logo' %}
 Over the last week as I have been at home convalescing I have, quite unaccountably,
 found myself watching videos of tiling window managers. In all, I have probably watched
 between twenty and thirty of these videos so I feel, quite confidently, that I have a
@@ -27,7 +27,7 @@ Rather that simply bask in the sense of superiority that these observations have
 afforded me, I thought that I would make my own, more lasting, contribution to the
 canon. I can only describe this process as instructive.
 
-[{% img center http://miromiro.com/Blog-images/tower.jpg dwm screencast %}](http://www.youtube.com/watch?v=GQ5s6T25jCc)
+[{% img center /images/post_images/tower.jpg dwm screencast %}](http://www.youtube.com/watch?v=GQ5s6T25jCc)
 
 The best that can be said of this video is that, while it sucks just as hard as the others
 that I have reviewed over the past week, it has the distinguishing feature of at least

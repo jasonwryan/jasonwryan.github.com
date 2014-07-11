@@ -6,7 +6,7 @@ comments: true
 categories: [archlinux, community]
 ---
 
-{% img left http://miromiro.com/Blog-images/hands.jpg 'mutt logo' %}
+{% img left /images/post_images/hands.jpg 'mutt logo' %}
 
 I am frequently struck by how many people arrive on the 
 [Arch boards](https://bbs.archlinux.org/ 'Arch Linux Forums') without *any* 

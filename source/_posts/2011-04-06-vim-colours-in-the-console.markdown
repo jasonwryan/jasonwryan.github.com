@@ -5,7 +5,7 @@ date: 2011-04-06 21:19
 comments: true
 categories: [vim, linux, tmux]
 ---
-![image](http://miromiro.com/Blog-images/vim-colours1.png)
+![image](/images/post_images/vim-colours1.png)
 
 I have spent the last couple of days trying to understand why I couldn’t
 get [Vim](http://www.vim.org/ "Vim: the _only_ editor") to display the
@@ -36,7 +36,7 @@ linux
 
 Which, under my current configuration of Vim, rendered colours like so:
 
-![image](http://miromiro.com/Blog-images/vim-colours2.png)
+![image](/images/post_images/vim-colours2.png)
 
 Hardly satisfactory.
 
@@ -74,7 +74,7 @@ but I was intent on keeping things compartmentalized until I had it working…
 
 Running Vim in the console was now starting to look promising:
 
-![image](http://miromiro.com/Blog-images/vim-colours3.png)
+![image](/images/post_images/vim-colours3.png)
 
 The final piece of the puzzle was to pass my 
 [X colours](https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.colours/dark  "jwr dark colours: mercurial repo")

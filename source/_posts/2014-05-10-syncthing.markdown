@@ -5,7 +5,7 @@ date: 2014-05-10 09:30
 comments: true
 categories: [archlinux, backup] 
 ---
-{% img left http://miromiro.com/Blog-images/syncthing.png Syncthing logo %}
+{% img left /images/post_images/syncthing.png Syncthing logo %}
 Just over a year ago, I was invited to participate in an exciting Alpha, for
 [BitTorrent Sync](http://www.bittorrent.com/sync 'Sync website), an application
 that allows you to sync selected directories across devices using a 

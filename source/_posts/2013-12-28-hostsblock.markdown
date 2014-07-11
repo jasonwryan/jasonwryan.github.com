@@ -5,7 +5,7 @@ date: 2013-12-28 10:09
 comments: true
 categories: [archlinux, bash]
 ---
-{%img left http://miromiro.com/Blog-images/ad_free.png Flickr CC Image %}
+{%img left /images/post_images/ad_free.png Flickr CC Image %}
 The relentless commercialization of traditional holidays, not just the December
 variety but all of them now, means that what was ostensibly an occasion for
 celebrating your particular flavour of $deity, pagan ritual or just an
@@ -48,7 +48,7 @@ after a week or so or using it haven't seen the need to revisit that decision.
 Suffice to say, it is working brilliantly. Where once web pages were festooned
 with garish advertisements promising me ripped abdominals, tropical holidays and the
 lasting serenity that only Apple products can really truly deliver, I now have
-[glorious whitespace](http://miromiro.com/Blog-images/herald.png 'Screenshot of the local rag…')
+[glorious whitespace](/images/post_images/herald.png 'Screenshot of the local rag…')
 
 There are a couple of other factors to consider with Hostsblock. There is a very
 simple command line interface for managing black and white listing of websites,

@@ -5,7 +5,7 @@ date: 2013-05-18 10:10
 comments: true
 categories: [archlinux, bash, hack]
 ---
-{% img left http://miromiro.com/Blog-images/woodcutting.jpg 'Cutting wood' %}
+{% img left /images/post_images/woodcutting.jpg 'Cutting wood' %}
 I posted a couple of weeks ago about 
 [Building Vim](http://jasonwryan.com/blog/2013/03/29/vim/ 'Post on Vim') and how, 
 using [ABS](https://wiki.archlinux.org/index.php/Abs 'Arch Build System on the Wiki')

@@ -5,7 +5,7 @@ date: 2012-11-20 18:58
 comments: true
 categories: [archlinux, browser, screencast]
 ---
-{% img left http://miromiro.com/Blog-images/vimprobable-logo.png 'Vimprobable logo' %} 
+{% img left /images/post_images/vimprobable-logo.png 'Vimprobable logo' %} 
 I have written about [Vimprobable](http://vimprobable.org 'Vimprobable homepage') 
 a couple of times over the last two years<sup>1</sup>,
 it is one of those projects that, for a variety of reasons, I have picked up

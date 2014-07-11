@@ -5,7 +5,7 @@ date: 2010-03-02 20:16
 comments: true
 categories: [dwm, archlinux]
 ---
-![image](http://miromiro.com/Blog-images/patching-dwm.png)
+![image](/images/post_images/patching-dwm.png)
 
 I had posted [a while back](http://jasonwryan.com/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/ "Patching dwm with pertag & bstack")
 about my (failed) attempt to patch [dwm](http://dwm.suckless.org "dwm homepage") 

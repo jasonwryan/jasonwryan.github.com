@@ -5,7 +5,7 @@ date: 2010-10-07 16:23
 comments: true
 categories: [browser, archlinux]
 ---
-[![image](http://miromiro.com/Blog-images/vimprobable.png "Hacked Vimprobable2")](http://www.flickr.com/photos/jasonwryan/5055695051/ "Vimprobable on Flickr")
+[![image](/images/post_images/vimprobable.png "Hacked Vimprobable2")](http://www.flickr.com/photos/jasonwryan/5055695051/ "Vimprobable on Flickr")
 
 After just posting details of [my setup](http://jasonwryan.com/blog/2010/10/04/the-setup/), 
 I have made a reasonably significant (and it goes almost without saying, unplanned)

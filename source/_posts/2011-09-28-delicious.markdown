@@ -5,7 +5,7 @@ date: 2011-09-28 09:27
 comments: true
 categories: [media] 
 ---
-![image](http://miromiro.com/Blog-images/delicious1.png)
+![image](/images/post_images/delicious1.png)
 
 I have used
 [delicious](http://delicious.com "Once great social bookmarking site..."),
@@ -49,7 +49,7 @@ have also decided that I don’t need to see all of my tags, so I can now
 only view 50 of them. **Fifty out of seven hundred and fifty**.
 Presumably I am expected to guess all the rest…
 
-![image](http://miromiro.com/Blog-images/delicious2.png)
+![image](/images/post_images/delicious2.png)
 
 <sup>The new tag display on the left and the old, as a cloud, on the right.</sup>
 

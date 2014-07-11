@@ -5,7 +5,7 @@ date: 2011-05-28 10:05
 comments: true
 categories: [media, community]
 ---
-![image](http://miromiro.com/Blog-images/quora1.png)
+![image](/images/post_images/quora1.png)
 
 I joined [Quora](http://www.quora.com/ "Quora: Q&A site") early in the
 new year and, while 
@@ -58,7 +58,7 @@ Some of the other areas where Quora is really left wanting in comparison
 to Unix.SE are around the design of the site. The text box where you
 enter your answers or edits is a case in point:
 
-![image](http://miromiro.com/Blog-images/quora2.png)
+![image](/images/post_images/quora2.png)
 
 On Quora, it is like trying to change a car battery through a letterbox.
 The single, overriding impression is that entering information into the

@@ -50,7 +50,7 @@ file:
 sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
 {% endcodeblock %}
 
-{% img http://miromiro.com/Blog-images/karmic-text.png 'Screenshot of editing text' %}
+{% img /images/post_images/karmic-text.png 'Screenshot of editing text' %}
 
 As you can see, the colour scheme I have chosen uses dark grey to match my
 desktop. Feel free to experiment, you can’t really break anything…
