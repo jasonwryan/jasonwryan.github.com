@@ -1,0 +1,68 @@
+---
+layout: post
+title: "CLI Password Manager"
+date: 2014-07-25 09:36
+comments: true
+categories: [archlinux]
+---
+{% img left /images/post_images/lock.jpg Creative Commons Lock image %}
+Managing passwords is a necessary evil. You can choose a number of different strategies
+for keeping track of all of your login credentials; from using the same password for every
+site which prioritises convenience over <strike>sanity</strike>security, through to
+creating heinously complex unique passwords for every service and then balancing the relief
+of knowing your risks of being hacked have been minimised with the very real fear you will
+only remember any of them for a short period—if at all—and will shortly be locked out of
+everything.
+
+Fortunately, this is a solved problem. There are a number of password managers available,
+both as desktop clients and cloud services. Personally, I find the idea of storing my
+passwords in the cloud has all the fascination of bungee jumping; it's apparently
+[mostly safe](http://en.wikipedia.org/wiki/Bungee_jumping#Safety_and_possible_injury 'Wikipedia page'),
+but that can be cold comfort… The first application that I used, and used happily for 
+quite a long time, was
+[KeePassX](http://www.keepassx.org/ 'Homepage for KeePassX').
+
+Around the end of 2012, I started experimenting with 
+[KeePassC](http://raymontag.github.io/keepassc/ 'Homepage'), a curses-based password manager
+that is completely compatible with KeePassX and has very little in the way of dependencies.
+I have been using it solidly on my home and work laptops ever since and, after recently
+uninstalling Skype on my desktop, have switched over to it completely<sup>1</sup>.
+I'm still not entirely clear why I haven't written about it previously.
+
+Written in [Python 3](https://www.python.org/download/releases/3.0/ 'The New Python'),
+KeePassC is entirely keyboard driven (naturally enough, you can use Vim keybinds) and
+integrates seamlessly with your browser and clipboard. My experience of the
+software over the last eighteen-odd months is that it has been incredibly stable and
+the developer, Karsten-Kai, has been exceptionally responsive and helpful in the 
+[forum thread](https://bbs.archlinux.org/viewtopic.php?id=148004 'Arch BBS thread').
+
+Like most good software, there is not a lot to it. You pull up the login page, switch 
+to a terminal and run `keepassc`, enter your passphrase (I use a 
+[Yubikey](http://www.yubico.com/products/yubikey-hardware/yubikey/ 'Yubico site')
+for this and it works wonderfully) and then search for your desired entry with
+<kbd>/</kbd> and then hit <kbd>c</kbd> to copy the password to your clipboard before
+switching back to the browser and you are in. 
+
+KeePassC also has a set of simple command line options, run `keepassc -h` to see them.
+Additionally, you can set up KeePassC as 
+[a server](http://raymontag.github.io/keepassc/server.html 'Server documentation'), I haven't 
+experimented with this as I sync my database. The only functionality that the X application
+offers in addition, as far as I can tell, is the auto-filling of your username and password
+fields bound to a keybind; undoubtedly, this is a very handy feature, but I haven't
+really missed it at all.
+
+As I said, I store the database in a directory synced between all my machines<sup>2</sup> (using
+[Syncthing](http://jasonwryan.com/blog/2014/05/10/syncthing/ 'Post on the same')),
+so I have access to an up-to-date versions of my credentials everywhere. Well, almost
+everywhere. I don't use the Android client because the mobile web is just such a
+fundamentally [insecure environment](http://en.wikipedia.org/wiki/Mobile_security 'Wikipedi page')
+and I see it as just being sensible, rather than any sort of inconvenience.
+
+#### Notes
+1. Skype and KeePassX were the only two applications I used that required 
+[Qt](http://qt-project.org/), so once Skype was gone there was no reason to keep
+KeePassX installed.
+2. And, after a nasty scare very early on with a corrupt database, I back that file up
+daily.
+
+Creative Commons image on Flickr by [xserv](http://www.flickr.com/photos/xserve/368758286/ 'Licensed CC by xserv').
