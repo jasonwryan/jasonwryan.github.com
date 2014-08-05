@@ -34,8 +34,7 @@ or find me on IRC in #freenode
 
 
 ## Bitcoin ##
-If you enjoy these posts and would like to express your gratitude with a modest
-donation, you are welcome to do so using 
+If you enjoy these posts and would like to spring for a coffee, you are welcome to do so using 
 [bitcoin](http://bitcoin.org/en/ 'Open source P2P money'):
 [13VFRYdzMJX33H8kiqVkB56MhkKsvFKX5a](bitcoin:13VFRYdzMJX33H8kiqVkB56MhkKsvFKX5a)
 
