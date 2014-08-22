@@ -1,0 +1,67 @@
+---
+layout: post
+title: "Building from Source"
+date: 2014-08-23 09:41
+comments: true
+categories: [archlinux, hack, vcs]
+---
+{% img left /images/post_images/lego.jpg Creative Commons image %}
+One of the real strengths of Arch is its ability to be customised. Not just in
+terms of the packages that you choose to install, but how those packages
+themselves can be patched, altered or otherwise configured to suit your
+workflow and setup. I have posted previously about, 
+for example, [building Vim](http://jasonwryan.com/blog/2013/03/29/vim/ 'Post on Vim configuration')
+or [hacking PKGBUILDS](http://jasonwryan.com/blog/2013/05/18/pkgbuilds/ 'More general observations').
+What makes all this possible is the wonderful 
+[ABS](https://wiki.archlinux.org/index.php/Arch_Build_System 'Arch Wiki page'),
+the Arch Build System.
+
+Essentially a tree of all of the PKGBUILDs (and other necessary files) for the
+packages in the official repositories, the ABS is the means by which you can
+easily acquire, compile and install any of the packages on your system:
+
+{% blockquote Arch Wiki, ABS %}
+ABS is made up of a directory tree (the ABS tree) residing under <span class="file">/var/abs</span>. This tree contains many subdirectories, each within a category and each named by their respective package. This tree represents (but does not contain) all <em>official Arch software</em>, retrievable through the SVN system.
+{% endblockquote %}
+
+I have been using ABS since I started running Arch and it has worked well. I
+wrote a 
+[simple script](https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/abpkg 'In my bitbucket repo')
+to check for and download updates when required to help simplify the process
+and have been generally content with that approach. That isn't to say that
+elements of this process couldn't be improved. One of the small niggles is that
+the ABS only syncs once a day so there is almost always—for me down here in
+.nz, anyway—at least a full day's wait between the package hitting the local
+mirror and the updated ABS version arriving. The other issue is that you
+download and sync the entire tree…
+
+That all changed when, at the start of this month, one of the Arch developers, 
+[Dave Reisner](http://blog.falconindy.com/ 'Dave's blog'), opened a
+[thread on the Arch boards](https://bbs.archlinux.org/viewtopic.php?id=185075 'asp thread')
+announcing [asp](https://github.com/falconindy/asp 'Github repo'), the Arch 
+Source Package management tool, a git-based alternative for `abs`<sup>1</sup>.
+
+Basically a 200-line bash script, `asp` is an improvement over `abs` insofar as
+you get the updated PKGBUILDs immediately; you can choose between just pulling
+the necessary source files (as *per* `abs`), or checking out the package branch
+so that you can create your own development branch and, for example, keep your
+patch set in git as well.
+
+You can elect to locate the local git repository in a directory of your
+choosing by exporting `ASPROOT`, there are <kbd>Tab</kbd> completion scripts
+for bash and zsh and a succinct `man` page. Overall, for a utility that is only
+three weeks old, `asp` is already fulfilling the function of a drop-in
+replacement; a faster, more flexible tool for building Arch packages from
+source.
+
+{% blockquote Antony and Cleopatra, V.ii %}
+With thy sharp teeth this knot intrinsicate
+Of life at once untie…
+{% endblockquote %}
+
+#### Notes
+1. The [package](https://www.archlinux.org/packages/?name=abs), 
+not the entire build system…
+
+Creative Commons image, Red Lego Brick by [Brian Dill](https://www.flickr.com/photos/dillpixel/8506365952/)
+on Flickr.
