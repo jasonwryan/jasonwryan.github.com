@@ -1,0 +1,80 @@
+---
+layout: post
+title: "Simple Reminders"
+date: 2014-09-06 10:59
+comments: true
+categories: [archlinux, hack]
+---
+{% img left /images/post_images/alarm_clock.jpg Creative Commons image %}
+Due to a rather embarrassing episode in #archlinux a couple of weeks ago,
+where I naively shared one of the first bash scripts I had written without
+first looking back over it<sup>1</sup>, and had to subsequently endure what
+felt like the ritual
+[code mocking](http://www.dilbert.com/strips/comic/2013-02-24/ 'Classic Dilbert strip'),
+but was in fact some helpful pointers as to how I could make the script suck
+less (a *lot* less) I have been going through those older scripts and applying
+the little knowledge that I have picked up in the interim; reappraising the
+usefulness of the scripts as I go.
+
+One that has proved to be of some utility for many years now is a simple
+wrapper script I wrote to help manage my finances. Like many useful scripts, it
+was written quickly and has been in constant use ever since; becoming almost
+transparent it is so ingrained in my workflow.
+
+The script allows me to manage the lag between when a company emails me an
+invoice and when the payment is actually due. I find that companies will
+typically email their invoices to me some weeks in advance, whereupon I will
+make a mental note and then, unsurprisingly, promptly forget all about it,
+thereby opening myself up for penalties for late payment.  It didn't take me
+long (well, in my defence, a lot less time than it took for invoices to become
+digital) to realise that there was a better way™ - a script.
+
+The [at command](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html 'POSIX spec')
+is purpose built for running aperiodic commands at a later time (whereas
+[cron](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html 'POSIX spec')
+is for periodic tasks). So, using at(1), once I receive an invoice, I can set a
+reminder closer to the final payment window, thereby avoiding both the late
+payment penalty—and the loss of interest were I to pay it on receipt. I just
+needed a script to make it painless to achieve.
+
+The main function of the script is pretty self-explanatory:
+
+{% codeblock lang:sh todo %}
+aread() {
+  read -p "Time of message? [HH:MM] " attime
+  read -p "Date of message? [DD.MM.YY] " atdate
+  read -p "Message body? " message
+
+  timexp='^[0-9]{2}:[0-9]{2}'
+  datexp='^[0-9]{2}.[0-9]{2}.[0-9]{2}'
+
+  if [[ $attime =~ $timexp && $atdate =~ $datexp ]]; then
+     at "$attime" "$atdate" << EOF
+     printf '%s\n' "$message" | mutt -s "REMINDER" jasonwryan@gmail.com
+EOF
+  else
+     printf '%s\n' "Incorrectly formatted values, bailing..." && exit 1
+  fi  
+}
+{% endcodeblock %}
+
+Now, an invoice arrives, I open it and fire up 
+[a scratchpad](https://github.com/jasonwryan/dwm/blob/patches/patchset/Base_config_changes.patch#L85
+'patch on github'), and follow the prompts. A couple of weeks later, the
+reminder email arrives and I login to my bank account and dispatch payment.
+You could, of course, have the script trigger some other form of notification,
+but an email works well for me.
+
+The rest of the script is similarly basic; just some options for listing and
+reading any queued jobs and some more rudimentary checking. The full script is
+in my
+[bitbucket repo](https://bitbucket.org/jasonwryan/centurion/src/tip/Scripts/todo 'todo script')<sup>2</sup>.
+
+
+#### Notes
+1. In the interests of full disclosure, the most egregious line was `myterm=$(echo $TERM)` which
+I would hope I copied blindly from somewhere else, but accept full responsibility for nonetheless.
+2. Don't poke around too much in there, I still have quite a lot of cleaning up to do…
+
+Creative Commons image by [Adelle and Justin](https://www.flickr.com/photos/h_is_for_home/3494382794/) 
+on Flickr.
