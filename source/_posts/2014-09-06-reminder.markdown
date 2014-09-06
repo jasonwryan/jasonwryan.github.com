@@ -70,10 +70,23 @@ reading any queued jobs and some more rudimentary checking. The full script is
 in my
 [bitbucket repo](https://bitbucket.org/jasonwryan/centurion/src/tip/Scripts/todo 'todo script')<sup>2</sup>.
 
+### Update 7/09/14
+Not more than a couple of hours after posting this,
+[Florian Pritz](http://bluewind.at/) pinged me in #archlinux with some great suggestions
+for improving the script. I particularly liked relying on date(1) handling the input format
+for the time and date values. He also suggested a 
+[readline](http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html 'GNU readline page')
+wrapper called (appropriately enough)
+[rlwrap](https://github.com/hanslub42/rlwrap 'Github repo') and a `tmpfile` to better manage
+input validation. You can see his
+[full diff](https://gist.github.com/jasonwryan/54fead5ad2b0c3b82621 'Gist on github') of
+changes. In the end, I adopted the `date` suggestion but passed on `rlwrap`. Thanks for the
+great pointers, Florian.
 
 #### Notes
-1. In the interests of full disclosure, the most egregious line was `myterm=$(echo $TERM)` which
-I would hope I copied blindly from somewhere else, but accept full responsibility for nonetheless.
+1. In the interests of full disclosure, the most egregious line was
+   `myterm=$(echo $TERM)` which I would hope I copied blindly from somewhere
+else, but accept full responsibility for nonetheless.
 2. Don't poke around too much in there, I still have quite a lot of cleaning up to do…
 
 Creative Commons image by [Adelle and Justin](https://www.flickr.com/photos/h_is_for_home/3494382794/) 
