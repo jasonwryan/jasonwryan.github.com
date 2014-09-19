@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Multiarch Packages in AUR"
+title: "Multi-arch Packages in AUR"
 date: 2014-09-20 09:16
 comments: true
 categories: [archlinux, arm, hack]
@@ -24,7 +24,7 @@ digression to note that
 [Arch Linux ARM](http://archlinuxarm.org/ 'AL ARM home page') is an entirely 
 *separate* distribution and, while they share features with Arch, support for
 each is restricted to their respective communities. It is with this
-consideration in mind that I had begun to think about multiarch support in
+consideration in mind that I had begun to think about multi-arch support in
 PKGBUILDs, particularly in the packages that I maintain in the AUR. 
 
 I have
