@@ -9,10 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have been a solid user of
-TTYtter
-for a couple of years now, much preferring the speed and power of a
-command line Twitter client. And, after &hellip;">
+  <meta name="description" content="I recently threw caution to the wind and
+changed my shell over to vi mode.
+I wanted to take advantage of the superior command editing ability that &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +20,7 @@ command line Twitter client. And, after &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/20">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/20">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -29,8 +28,8 @@ command line Twitter client. And, after &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -68,7 +67,7 @@ command line Twitter client. And, after &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -91,7 +90,7 @@ command line Twitter client. And, after &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/05/24/tyrs-ncurses-twitter-client/">Tyrs: ncurses Twitter Client</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/12/01/readline/">Readline Bindings in Vi Mode</a></h1>
     
     
       <p class="meta">
@@ -107,69 +106,72 @@ command line Twitter client. And, after &hellip;">
   
 
 
-<time datetime="2011-05-24T20:17:00+12:00" pubdate data-updated="true">May 24<span>th</span>, 2011</time>
+<time datetime="2011-12-01T18:43:00+13:00" pubdate data-updated="true">Dec 1<span>st</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5754227102/in/photostream" title="Tyrs photo on Flickr"><img src="http://miromiro.com/Blog-images/tyrs.png" alt="image" /></a></p>
+  <div class="entry-content"><p><img src="/images/post_images/readline.png" alt="image" /></p>
 
-<p>I have been a solid user of
-<a href="http://www.floodgap.com/software/ttytter/" title="TTYtter homepage">TTYtter</a>
-for a couple of years now, much preferring the speed and power of a
-command line Twitter client. And, after having tried–at one time or
-another–most of the Linux or cross-platform Twitter clients, I can
-safely say that for me TTYtter is easily the best.</p>
+<p>I recently threw caution to the wind and
+<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
+I wanted to take advantage of the superior command editing ability that
+this mode offered, and also to continue to bake vi[m] methods into every
+aspect of my working environment.</p>
 
-<p>There is, however, a new
-<a href="http://www.gnu.org/software/ncurses/" title="ncurses page">ncurses</a> client
-that is showing a lot of promise:
-<a href="http://tyrs.nicosphere.net/index.html" title="Tyrs homepage">Tyrs</a>. Only at
-the 0.2.1.1 stage, and with a fraction of the functionality that TTYtter
-has, it is nevertheless a very nice client.</p>
+<p>The change has been relatively straightforward; the only issues I have
+experienced are really just around a couple of keybinds that I had
+become accustomed to in normal/Emacs mode:</p>
 
-<p>Requiring little in the way of dependencies, only python-twitter and
-python-oauth2, both available in the
-<a href="http://aur.archlinux.org/" title="Arch Linux User Repository">AUR</a> or in the
-debian/Ubuntu repos (if you are using debian/Ubuntu, you will need the
-newer python-twitter-0.8.2 for it to run).</p>
+<ul>
+<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
+<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
+</ul>
 
-<p>Tyrs is easy to configure, with good documentation and a simple
-configuration file, located by default at
-$XDG_CONFIG_HOME/tyrs/tyrs.cfg. The default keybinds are
-<a href="http://www.vim.org/" title="THE editor">Vim-centric</a>, naturally…</p>
 
-<p>My config is pretty straightforward at this point:</p>
+<p>The first, the ability to recall the final arguments of previous
+commands was a showstopper for me: I really struggled without this.
+Being able to recall a long file path and append it to a new command is
+invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
+exactly this. Why it is not bound by default in vi mode is beyond me…</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'>[keys]
-</span><span class='line'>retweet           <span class="p">=</span> <span class="k">p</span>
-</span><span class='line'>retweet_and_edit  <span class="p">=</span> <span class="k">P</span>
-</span><span class='line'>mentions          <span class="p">=</span> <span class="k">a</span>
-</span><span class='line'>reply             <span class="p">=</span> <span class="k">r</span>
+<p>The other was purely cosmetic, really. I am an inveterate clearer of the
+screen—unless I am referring to something printed to stdout, I always
+prefer to work at the top of the console.</p>
+
+<p>In any event, with the
+<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
+it was a trivial exercize to restore this functionality to my bash shell
+in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
+
+<figure class='code'><figcaption><span>~/inputrc </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc
 </span><span class='line'>
-</span><span class='line'>[<span class="k">colors</span>]
-</span><span class='line'><span class="nb">highlight</span>         <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>header            <span class="p">=</span> <span class="m">6</span>
-</span><span class='line'>hashtag           <span class="p">=</span> <span class="m">4</span>
-</span><span class='line'>attag             <span class="p">=</span> <span class="m">2</span>
-</span><span class='line'>text              <span class="p">=</span> <span class="m">7</span>
-</span><span class='line'>warning_msg       <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>info_msg          <span class="p">=</span> <span class="m">2</span>
+</span><span class='line'># for vi mode
+</span><span class='line'>set editing-mode vi
+</span><span class='line'>$if mode=vi
 </span><span class='line'>
-</span><span class='line'>[params]
-</span><span class='line'>refresh           <span class="p">=</span> <span class="m">1</span>
-</span><span class='line'>tweet_border      <span class="p">=</span> <span class="m">0</span>
-</span></code></pre></div></figure>
+</span><span class='line'>set keymap vi-command
+</span><span class='line'># these are for vi-command mode
+</span><span class='line'>"\e[A": history-search-backward            # arrow up
+</span><span class='line'>"\e[B": history-search-forward             # arrow down
+</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>
+</span><span class='line'>set keymap vi-insert
+</span><span class='line'># these are for vi-insert mode
+</span><span class='line'>"\e[A": history-search-backward
+</span><span class='line'>"\e[B": history-search-forward
+</span><span class='line'>"\ep": yank-last-arg
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>$endif</span></code></pre></div></figure>
 
 
-<p>Written in Python, the code is well commented and relatively easy to
-find your way around if your are keen on hacking.</p>
-
-<p>The developer, Nicolas Paris, is both approachable and helpful and is
-actively developing Tyrs. With some more functionality in the pipeline,
-it looks to be a very nice application.</p>
+<p>There is an extensive list of
+<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
+with which you can customize your shell environment.</p>
 </div>
   
   
@@ -182,7 +184,7 @@ it looks to be a very nice application.</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/05/05/w3m/">w3m, Surfraw and Yanking URLs</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/11/29/rtorrent/">Building rtorrent on Debian Squeeze</a></h1>
     
     
       <p class="meta">
@@ -198,94 +200,76 @@ it looks to be a very nice application.</p>
   
 
 
-<time datetime="2011-05-05T19:57:00+12:00" pubdate data-updated="true">May 5<span>th</span>, 2011</time>
+<time datetime="2011-11-29T21:21:00+13:00" pubdate data-updated="true">Nov 29<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/w3m.png" alt="image" /></p>
+  <div class="entry-content"><p><img src="/images/post_images/rtorrent.png" alt="image" /></p>
 
-<p>I posted a couple of weeks ago about
-<a href="http://jasonwryan.com/blog/2011/04/13/archwiki-elvis-for-surfraw/" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
-to the point of writing a couple of my own <em>elvi</em>. As part of the
-ongoing tweaking of my Surfraw experience, I have been experimenting
-with different
-<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
-to see which one best fits my workflow.</p>
+<p>After <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Post on the HP microserver">setting up my server</a>,
+I wanted to use it as a torrent box. The version of
+<a href="http://libtorrent.rakshasa.no/" title="rtorrent &amp; libtorrent homepage">rtorrent</a>
+in the Debian stable repositories is 0.8.6, which is unfortunate as
+support for <a href="http://en.wikipedia.org/wiki/Magnet_URI_scheme" title="Wikipedia page on magnet URIs">magnet links</a>
+was introduced in 0.8.7.</p>
 
-<p>I have previously been using both
-<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
-and it’s homophone,
-<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
-these have been perfectly acceptable, they weren’t quite providing the
-level of functionality —and integration with my vim-oriented workflow—
-that I was looking for. Enter
-<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
+<p>To remedy this, I decided to build the current stable version of
+rtorrent, 0.8.9. At the same time—seeing as I was getting my hands dirty
+anyway—I thought I’d patch in colour support.</p>
 
-<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
-`less’. With w3m you can browse web pages through a terminal emulator
-window (xterm, rxvt or something like that). Moreover, w3m can be used
-as a text formatting tool which typesets HTML into plain text.</p></blockquote>
+<p>This is a straightforward two-step process. First, build the current
+version of libtorrent, 0.12.9:</p>
 
-<p>w3m is a step up from the other two for a variety of reasons. It
-supports tables, frames, SSL connections, color and inline images. It
-also renders pages in a form as true to their original layout as
-possible. The killer features on top of that are, for me, the above
-mentioned rendering of HTML as text (meaning you can save content
-easily), and the customizable keybinds.</p>
-
-<p>There was however, one significant sticking point. After countless hours
-fruitlessly searching, I was unable to find a way to yank URLs to the
-clipboard. As I have been spending a little time of late on
-<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
-I thought I would ask the good folk there…</p>
-
-<p>Less than fourty hours later, I had an answer so simple and elegant,
-that I was literally grinning when I read it. It deserves quoting in
-full. It is that ingenious.</p>
-
-<blockquote><p>Set the “External Browser” option to
-<code>sh -c 'echo "$0" | xsel'</code></p>
-
-<p>You can use xsel -b to use the clipboard instead of the primary
-selection. An alternative to
-<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
-is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
-(xclip for the primary selection, xclip -selection CLIPBOARD for the
-clipboard).</p>
-
-<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
-Then press M to copy (yank) the URL of the current page, or ESCM to
-copy the URL of the link under the cursor.</p>
-
-<p>You can use the second or third external browser for that instead;
-then the key combination is 2M or 3M or 2ESCM or 3ESCM.
-<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
-
-<p>This simple hack means that it is now trivial to yank either the URL of
-the current page, or of the link under the cursor to primary selection.
-It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
-and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
-<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN
-</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
+</span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
+</span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
+</span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
+</span><span class='line'>sudo checkinstall
 </span></code></pre></div></figure>
 
 
-<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
+<p>Once libtorrent is successfully built and installed, you can begin the
+rtorrent build:</p>
 
-<h4>Updated 8/5/11</h4>
-
-<p>Gilles has edited and updated his answer with a slight change:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
+</span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
+</span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
 </span></code></pre></div></figure>
 
 
-<p>This prevents a new line being appended.</p>
+<p>Then, if you want colour support, you need the patch. I used the version
+in the
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
+but you can also grab a copy from a paste site:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
+</span><span class='line'>mv canvas_colour.patch src/
+</span><span class='line'>patch -uNp1 -i canvas_colour.patch
+</span></code></pre></div></figure>
+
+
+<p>The patch should apply cleanly. Then specify where libtorrent is
+installed to ensure that it is linked during the rtorrent build:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
+</span><span class='line'>make
+</span><span class='line'>sudo checkinstall
+</span></code></pre></div></figure>
+
+
+<p>Once again, this should compile cleanly and you will now have rtorrent
+with colour and magnet link support installed in
+<span class="file">/usr/local/bin/rtorrent</span>.</p>
+
+<h5>Notes</h5>
+
+<p>I prefer to use
+<a href="http://asic-linux.com.mx/~izto/checkinstall/" title="checkinstall homepage">checkinstall</a>
+so that self-installed applications are tracked by
+<a href="http://wiki.debian.org/Apt" title="Debian wiki entry">Apt</a>.</p>
 </div>
   
   
@@ -298,7 +282,7 @@ and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/04/13/archwiki-elvis-for-surfraw/">Archwiki elvis for Surfraw</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/11/28/rsync/">rsync + SSH Backups</a></h1>
     
     
       <p class="meta">
@@ -314,66 +298,90 @@ and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
   
 
 
-<time datetime="2011-04-13T19:29:00+12:00" pubdate data-updated="true">Apr 13<span>th</span>, 2011</time>
+<time datetime="2011-11-28T12:23:00+13:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/arch-elvis.png" alt="image" /></p>
+  <div class="entry-content"><p><img src="/images/post_images/rsync-ssh.png" alt="image" /></p>
 
-<p>I have been using
-<a href="http://surfraw.alioth.debian.org/" title="Surfraw manifesto">Surfraw</a> for the
-better part of eighteen months, and I think that it is a perfect Unix
-tool: it does <em>one</em> thing, extremely well… If you haven’t come across
-it, Surfraw is a command-line interface to a couple of dozen
-repositories of knowledge. It is described thus:</p>
+<p>I <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
+and included a
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
+script for backing up my files to the server. At the time, I was running
+it manually, but since have sorted out the excludes list and have now
+automated it.</p>
 
-<blockquote><p>It reclaims google, altavista, babelfish, dejanews, freshmeat,
-research index, slashdot and many others from the false-prophet,
-pox-infested heathen lands of html-forms, placing these wonders where
-they belong, deep in unix heartland, as god loving extensions to the
-shell.<sup>1</sup></p></blockquote>
+<p>My original scheme was to set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
+mount an
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
+before rsync’ing the directories across. In the end, I went with SSH and
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
+as debugging all of the various permissions issues with the NFS share
+did not seem worth the effort.</p>
 
-<p>The shell scripts that power the searches of the repositories are called
-<em>elvi</em>, the singular being <em>elvis</em>. Currently, in
-<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=summary" title="Debian Git Repo: Surfraw">the git repo</a>,
-there are
-<a href="http://git.debian.org/?p=surfraw/surfraw.git;a=tree;f=elvi;hb=HEAD" title="elvi in the git repo">over 100 elvi</a>,
-ranging from Wikipedia through to the CIA website (yes, the project was
-founded by <a href="http://en.wikipedia.org/wiki/Julian_Assange" title="Julian's Wikipedia page">Julian Assange</a>),
-Slashdot and The Wayback Machine.</p>
+<p>First, on my local desktop, I created the keypair called, inventively,
+rsync:</p>
 
-<p>As comprehensive as the list of elvi is, there was one glaring hole.
-Arch Linux is represented in terms of elvi to search the
-<a href="http://aur.archlinux.org/" title="Arch User Repository">AUR</a> and the
-<a href="http://www.archlinux.org/packages/" title="Arch Package Database">official package repositories</a>,
-but nothing for the
-<a href="https://wiki.archlinux.org/index.php/Main_Page" title="Definitive Arch Linux documentation">Arch Wiki</a>,
-perhaps the best GNU/Linux reference wiki on the web.</p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
+</span><span class='line'>mv rsync ~/.ssh <span class="o">&amp;&amp;</span> chmod 600 ~/.ssh/rsync
+</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
+</span></code></pre></div></figure>
 
-<p>So I thought I would rectify that.</p>
 
-<p>You can grab the archwiki elvis from my
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.config/surfraw/elvi/archwiki" title="mercurial repo">mercurial repo</a>,
-copy it into your local directory at <span class="file">$XDG_CONFIG_HOME/surfraw/elvi/</span> or
-in the system folder at <span class="file">$XDG_CONFIG_DIRS/surfraw/</span> and you can surf the
-Arch Wiki, or any one of the nine other language wikis, from the command
-line.</p>
+<p>This keypair was created <em>without a passphrase</em> so that the script could
+be successfully called from <code>cron</code>. To slightly increase the security
+around a key without a passphrase, I used the from option in
+authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
+machine(s), like so:</p>
 
-<blockquote><p>Surfrawize the soul of your favourite internet wonder. Join the
-<strong>S</strong>hell <strong>U</strong>sers’ <strong>R</strong>evolutionary <strong>F</strong>ront <strong>A</strong>gainst the
-WW<strong>W</strong> by submitting code. Reclaim heathen lands. Bear witness to the
-truth. Its love will set you free.</p></blockquote>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
+</span></code></pre></div></figure>
+
+
+<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
+</span></code></pre></div></figure>
+
+
+<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
+the SSH command:</p>
+
+<figure class='code'><figcaption><span>.ssh/config </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>Host backups
+</span><span class='line'>   Hostname 192.168.1.200
+</span><span class='line'>   Port 0000
+</span><span class='line'>   User jason
+</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></div></figure>
+
+
+<p>And I was done. Everynight at 10pm, all of my data will be backed up to
+the server. The rsync command in the script:</p>
+
+<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># Backup to remote server over SSH</span>
+</span><span class='line'>
+</span><span class='line'>rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\</span>
+</span><span class='line'>    --log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
+</span><span class='line'>    -e ssh /home/jason /etc backups:Backups/Centurion
+</span></code></pre></div></figure>
+
 
 <h5>Notes</h5>
 
 <ol>
-<li>A bonus: all of the documentation is written like Unix
-<a href="http://en.wikipedia.org/wiki/Agitprop" title="Wikipedia entry">agitprop</a>…</li>
+<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
 </ol>
 
+
+<p>Creative Commons image from
+<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
 </div>
   
   
@@ -398,23 +406,23 @@ truth. Its love will set you free.</p></blockquote>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -492,7 +500,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -501,7 +509,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

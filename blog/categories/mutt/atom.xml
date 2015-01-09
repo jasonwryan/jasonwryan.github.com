@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: mutt | jasonwryan.com]]></title>
-  <link href="http://jasonwryan.github.com/blog/categories/mutt/atom.xml" rel="self"/>
-  <link href="http://jasonwryan.github.com/"/>
-  <updated>2014-01-20T12:56:27+13:00</updated>
-  <id>http://jasonwryan.github.com/</id>
+  <link href="http://jasonwryan.com/blog/categories/mutt/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-09T23:18:03+13:00</updated>
+  <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
     
@@ -14,11 +14,221 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Syncing with khal]]></title>
+    <link href="http://jasonwryan.com/blog/2014/04/18/vdir/"/>
+    <updated>2014-04-18T10:32:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/04/18/vdir</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/arrows.png" title="Creative Commons image" >
+Following up on my post from last week, about using
+<a href="http://jasonwryan.com/blog/2014/04/05/calendar/" title="Check it out…">khal and mutt</a>,
+where I covered off a couple of simple hacks to integrate command line
+calendaring with <a href="http://www.mutt.org/" title="Mutt hompeage">Mutt</a>, I had been using
+the main development branch of
+<a href="https://github.com/geier/khal" title="Master branch on github">khal</a> which includes
+syncing capability. However, as I was conversing with the developer, Christian,
+around
+<a href="https://github.com/geier/khal/issues/47" title="Issue on khal github repo">a bug report</a>,
+he indicated that this functionality would be superseded by development in a
+separate branch that uses
+<a href="https://github.com/untitaker/vdirsyncer" title="Github repo">vdirsyncer</a> to
+synchronise calendars.</p>
+
+<p>As Christian intimated that this change would happen in the
+<a href="https://github.com/geier/khal/issues/47#issuecomment-40175915" title="Relevant comment">very near future</a>,
+and “js” had commented on my last post to the effect that it was working well, I
+thought I should take a look for myself.</p>
+
+<p>There are packages in the AUR for
+<a href="https://aur.archlinux.org/packages/python2-vdirsyncer/" title="Grab it">vdirsyncer-git</a> and
+<a href="https://aur.archlinux.org/packages/python2-argvard/" title="Same deal…">python2-argvard</a>
+so you will just need to grab the khal branch that uses <code>vdirsyncer</code> as it's
+syncing engine. I have thrown up a
+<a href="https://gist.github.com/jasonwryan/10949540" title="Nothing too flash…">PKGBUILD gist</a>,
+or—as we are only talking about a couple of simple scripts—you could install the
+complete set using
+<a href="http://www.pip-installer.org/en/latest/" title="Official documentation">pip</a>, the
+Python package manager; in which case it would be a straightforward:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S python2-pip
+</span><span class='line'>pip2 install --user git+https://github.com/geier/khal.git@vdir
+</span><span class='line'>pip2 install --user vdirsyncer
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>…and then remember to make sure that <span class="file">$HOME/.local/bin</span>
+is included in your <code>$PATH</code>.</p>
+
+<p>I wanted to have vdirsyncer manage two of my calendars, my
+<a href="http://en.wikipedia.org/wiki/CalDAV" title="Wikipedia page">CalDav</a> work calendar and
+a simple <a href="http://en.wikipedia.org/wiki/ICalendar" title="Wikipedia, again…">iCalendar</a>
+with all of the New Zealand public holidays. Configuring vdirsyncer to
+successfully do this took me a <em>lot</em> longer than I would like to admit: a
+combination of my ineptitude, a bug and a broken schema in the original
+<span class="file">holidays.ics</span> that I wanted to use.</p>
+
+<p>The <code>collections</code> variable in the config file merits a mention in this regard.
+If you choose to use it, be aware that your <acronym title="Unique Resource Locator">URL</acronym>
+will have this value appended to it, which may throw
+<a href="http://en.wikipedia.org/wiki/HTTP_404" title="Wikipedia entry">a 404</a>. Using the
+<code>DEBUG</code> verbosity level will identify this issue if you are struck by it.</p>
+
+<p>Eventually, with the help of both Christian and Markus, the vdirsyncer
+developer, I got it set up and running smoothly. I then just had to create
+a <code>cron</code> job to sync my work calendar every two hours and it was done.</p>
+
+<p>As you would expect with such a simple tool, there is not a lot to say, or do,
+with vdirsycner. It runs on a similar model to
+<a href="http://offlineimap.org/" title="Home page">OfflineIMAP</a>, in that it synchronises a
+remote and local repository. There are a couple of nice touches: it will read
+your credentials from <span class="file">$HOME/.netrc</span> so you don't have
+to worry about sensitive information in plain text in yet another file, and there
+is a <code>VDIRSYNCER_CONFIG</code> variable, so you can place the config file wherever it
+suits.</p>
+
+<h4>Notes</h4>
+
+<p><a href="https://flic.kr/p/Re9Sb">Elevator</a>, a Creative Commons image on Flickr by Mykl Roventine.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mutt and iCal]]></title>
+    <link href="http://jasonwryan.com/blog/2014/04/05/calendar/"/>
+    <updated>2014-04-05T09:48:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2014/04/05/calendar</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/calendar.jpg" title="Creative Commons Calendar image" >
+I have posted a few times now about how I use
+<a href="http://www.mutt.org/" title="Mutt homepage">Mutt</a><sup>1</sup>, that most superlative
+of email clients. Using a variety of different tools, I have
+settled on an effective and satisfying workflow for managing both my personal
+and professional email, with one glaring exception: calendaring. This, I should
+stress, is not for want of trying. It is not necessarily a nagging concern in
+terms of my personal use of email, but professionally it is a daily frustration.</p>
+
+<p>Day after day, I receive a <em>lot</em> of meeting invitations and, when these show up
+in my inbox they are, for all intents and purposes, unintelligble. Yes, with
+careful scrutiny you can decypher the
+<a href="http://en.wikipedia.org/wiki/ICalendar" title="Wikipedia entry">iCalendar files</a>, but
+doing so is more likely to induce a seizure than a punctual appearance at an
+important meeting. To get around this, I had been using a basic Awk script that
+would parse the most important parts of the message and print them out. This was
+working well enough until I started to receive invitations from people using
+OSX. For some god-unknown reason, Apple's “interpretation” of the
+standard<sup>2</sup> is different enough to those sent from Evolution and
+Thunderbird that my script wouldn't successfully print some of the data (just
+the start and end times of the meeting, nothing too important).</p>
+
+<p>I started to try and expand the capability of the script and then realized that
+I would be much better off seeing if someone else had solved this problem;
+satisfactorily, that is.
+<a href="https://github.com/terabyte/mutt-filters" title="Github fork of the repo">And they had</a>.
+In a further delightful coincidence, the original author of the script,
+<a href="https://github.com/martynsmith" title="Martyn's Github repo">Martyn Smith</a> is an
+ex-colleague who, in 2004, first got me interested in Linux (thank you, Martyn).
+Armed with this script and entries in <span class="file">$HOME/.mutt/{mailcap,muttrc}</span>
+now, whenever I open a calendar invitation, the pertinent details are printed
+out perfectly legibly. It's a small step, but an important one.</p>
+
+<p>Next I started playing around with
+<a href="http://lostpackets.de/khal/" title="khal homepage">khal</a>, a command line calendaring
+application that uses
+<a href="http://en.wikipedia.org/wiki/CalDAV" title="Wikipedia page">CalDav</a> to sync to
+calendar servers. It is described as being in “the early stages of development”
+and that certainly is the case. Nonetheless, it is incredibly promising as—even
+in this rudimentary form—it performs well and offers most of the basics that I
+require. khal is simple to setup, does not have too many (python2) dependencies
+and handles multiple calendars<sup>3</sup>. Yes, there are bugs, but nothing
+grievous and the developer,
+<a href="http://lostpackets.de/blog/" title="Christian's blog">Christian Geier</a>, is very
+responsive and helpful<sup>4</sup>.</p>
+
+<p>The <a href="http://lostpackets.de/khal/pages/usage.html" title="Usage page">khal documentation</a>
+gives you a pretty good idea of the current feature set. Set up your
+<span class="file">khal.conf</span> with the calendars you want synched and then
+you have two modes of interaction: directly via the command line or an
+interactive mode invoked with <code>ikhal</code>. Both modes allow you to perform the basic
+functions of adding, editing or deleting events.</p>
+
+<p><img class="center" src="/images/post_images/khal.png" title="Simple screenshot of khal" ></p>
+
+<p>While the interactive mode is very simple and straightforward, what I am most
+excited about is the ability to add events from the command line, as per the
+example in the documentation:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>khal --new 25.10. 16:00 18:00 Another Event :: with Alice and Bob
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>I just needed to figure out a way to extract the relevant fields from the iCal
+file and pass them to khal. My first attempt is unashamedly ugly, both in
+conception and execution. However, I don't know Perl (and at this stage of my
+life
+<a href="https://twitter.com/jasonwryan/status/204660063669989376" title="Sad, but true…">I have run out of time to learn it</a>),
+and it actually works. I
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/ical_filter.pl" title="In my bitbucket repo">modified</a>
+Martyn's script to write to a temp file and then, for iCal events I want to
+import to khal, I bound a key sequence in Mutt to a simple Awk
+script<sup>5</sup>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;!</span><span class="err">/usr/bin/awk -f&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">read</span> <span class="nx">from</span> <span class="nx">ical_filter</span><span class="p">.</span><span class="nx">pl</span> <span class="nx">and</span> <span class="nx">then</span> <span class="nx">send</span> <span class="nx">ical</span> <span class="o">in</span><span class="nx">vitation</span> <span class="nx">details</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;in</span> <span class="nx">mutt</span> <span class="nx">to</span> <span class="nx">khal</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="sr">/&lt;sup&gt;Summary/</span><span class="o">&lt;</span><span class="err">/sup&gt;   { for (i=1; i&amp;lt;=NF-2; i++) $i = $(i+2); NF-=2; summ = $0 }</span>
+</span><span class='line'><span class="sr">/&lt;sup&gt;Location/</span><span class="o">&lt;</span><span class="err">/sup&gt;  { for (i=1; i&amp;lt;=NF-2; i++) $i = $(i+2); NF-=2; meet = $0 }</span>
+</span><span class='line'><span class="sr">/&lt;sup&gt;Dtstart/</span><span class="o">&lt;</span><span class="err">/sup&gt;   { date_st = $3; time_st = $4 }</span>
+</span><span class='line'><span class="sr">/&lt;sup&gt;Dtend/</span><span class="o">&lt;</span><span class="err">/sup&gt;     { time_nd = $4 }&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">END</span>          <span class="p">{</span> <span class="kr">print</span>  <span class="nx">date_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_nd</span><span class="s2">&quot; &quot;</span><span class="nx">summ</span> <span class="p">}</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>In <span class="file">$HOME/.mutt/muttrc</span>, I have
+<kbd>Ctrl</kbd><kbd>k</kbd> in pager view trigger the script like so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;save iCal to khal&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;macro pager <span class="se">\C</span>k  <span class="s2">&quot;!/usr/bin/khal --new $(~/Scripts/mutt2khal ~/.mutt/temp/caldata)&quot;</span> <span class="s2">&quot;Saving Calendar event&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Neither elegant nor imaginative, I know; but for a first attempt, it gets the
+job done. If I did know any Perl, I am sure I would be able to avoid the
+additional temp file and the need to reread the information before handing it
+off to khal, but you work with the skills (or lack thereof) that you have.
+Needless to say, patches are welcomed.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See all my mutt posts:
+
+<ul>
+<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using Mutt, LDAP and SSL</a></li>
+<li><a href="http://jasonwryan.com/blog/2012/05/12/mutt/">Mutt and HTML Email</a></li>
+<li><a href="http://jasonwryan.com/blog/2012/05/23/notmuch/">Using Notmuch with Mutt</a></li>
+<li><a href="http://jasonwryan.com/blog/2013/07/20/gnupg/">Encrypting Mutt</a></li>
+</ul>
+</li>
+<li>Yes, I understand how special Apple is but this is particularly annoying…</li>
+<li>There is a <a href="https://aur.archlinux.org/packages/khal-git/">package in AUR</a>.</li>
+<li>I <a href="https://github.com/geier/khal/issues/36">logged a bug</a> and it was fixed in a matter of hours.</li>
+<li>The script is <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/mutt2khal">in my bitbucket repo</a>.</li>
+</ol>
+
+
+<p>Creative Commons image, <a href="https://flic.kr/p/4h1oE5">Calendar</a> by Angela Mabray.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Encrypting Mutt]]></title>
-    <link href="http://jasonwryan.github.com/blog/2013/07/20/gnupg/"/>
+    <link href="http://jasonwryan.com/blog/2013/07/20/gnupg/"/>
     <updated>2013-07-20T09:36:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2013/07/20/gnupg</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/key-board.jpg" title="Encrypted mail" >
+    <id>http://jasonwryan.com/blog/2013/07/20/gnupg</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/key-board.jpg" title="Encrypted mail" >
 With the torrent of recent revelations about the enthusiasm with which
 the governments of most of the first world have been systematically and
 unlawfully violating the privacy of their citizens by intercepting their digital
@@ -108,13 +318,13 @@ willing and able to decrypt it…</li>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Using Notmuch with mutt]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/05/23/notmuch/"/>
+    <title type="html"><![CDATA[Using Notmuch with Mutt]]></title>
+    <link href="http://jasonwryan.com/blog/2012/05/23/notmuch/"/>
     <updated>2012-05-23T19:37:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/05/23/notmuch</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/magnifier.png" title="day 307 on Flickr" >
+    <id>http://jasonwryan.com/blog/2012/05/23/notmuch</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/magnifier.png" title="day 307 on Flickr" >
 Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
-<a href="http://www.mutt.org/" title="mutt homepage">mutt</a> posts<sup>1</sup> with what I am assuming is the
+<a href="http://www.mutt.org/" title="Mutt homepage">Mutt</a> posts<sup>1</sup> with what I am assuming is the
 final piece of the puzzle: searching <code>mutt's</code> maildirs. For a small to average size mailbox, <code>mutt's</code>
 searching works fine, but as your mail volume grows this simple search doesn't really scale. That's
 where the rather modestly named <a href="http://notmuchmail.org/" title="Notmuch website">Notmuch</a> comes into play.</p>
@@ -173,8 +383,8 @@ do not work. I have written a patch to fix this and
 <h4>Notes</h4>
 
 <ol>
-<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a> and
-<a href="http://jasonwryan.com/blog/2012/05/12/mutt/">mutt and HTML email</a></li>
+<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using Mutt, LDAP and SSL</a> and
+<a href="http://jasonwryan.com/blog/2012/05/12/mutt/">Mutt and HTML email</a></li>
 </ol>
 
 
@@ -184,13 +394,13 @@ do not work. I have written a patch to fix this and
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[mutt and HTML email]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/05/12/mutt/"/>
+    <title type="html"><![CDATA[Mutt and HTML email]]></title>
+    <link href="http://jasonwryan.com/blog/2012/05/12/mutt/"/>
     <updated>2012-05-12T15:49:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/05/12/mutt</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/mutt-1.png" title="'mutt logo'" ></p>
+    <id>http://jasonwryan.com/blog/2012/05/12/mutt</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/mutt-1.png" title="'mutt logo'" ></p>
 
-<p>Following on from my <a href="http://jasonwryan.com/blog/2012/04/21/lbdb/" title="Using mutt, LDAP and SSL">last post about mutt</a>,
+<p>Following on from my <a href="http://jasonwryan.com/blog/2012/04/21/lbdb/" title="Using Mutt, LDAP and SSL">last post about Mutt</a>,
 I have been tinkering more with the most suckless of mail clients to
 get it to deal with—of all things—<acronym title="HyperText Markup Language">HTML</acronym>
 emails. I will preface this post with a remark or two that amounts to a warning about
@@ -204,7 +414,7 @@ and provides the same level of social good as syphilis and fistulas. Suffice to 
 
 <p>Sadly, it is a blight that I have to deal with. Up until now, I had done that by using the
 excellent <a href="http://w3m.sourceforge.net/" title="w3m homepage on sourceforge">w3m</a> to render
-HTML as text in mutt itself. That is accomplished easily enough with an entry in
+HTML as text in Mutt itself. That is accomplished easily enough with an entry in
 <span class="file">muttrc</span> and another in a <span class="file">mailcap</span> file.</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/.mutt/muttrc </span></figcaption>
@@ -222,16 +432,16 @@ view in w3m is enough to tell me that, due to the outstanding incompetence of th
 generated the email, there <em>is</em> actually some information that is contained in the email that I need
 to access <strong>but it is not viewable in a text browser.</strong></p>
 
-<p><img class="left" src="http://miromiro.com/Blog-images/mutt-2.png" title="'An example…'" ></p>
+<p><img class="left" src="/images/post_images/mutt-2.png" title="'An example…'" ></p>
 
 <p>For this special level of retardation, I need to be able to open the email in a graphical browser.
 As I use vimprobable, that means sending the file to
 <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/" title="My post on Using vimprobable">vimprobable running in tabbed</a>. Fortunately, as you would expect with superior software,
-<code>mutt</code> has a way of handling this gracefully. In mutt's extensive documentation, there is a
-<a href="http://www.mutt.org/doc/manual/manual-5.html" title="Go and read it…">page on mutt's MIME support</a>
+<code>mutt</code> has a way of handling this gracefully. In Mutt's extensive documentation, there is a
+<a href="http://www.mutt.org/doc/manual/manual-5.html" title="Go and read it…">page on Mutt's MIME support</a>
 that details how to set up a graduated response to this pernicious issue:</p>
 
-<p><blockquote><p>In addition, you can use this with Autoview to denote two commands for viewing<br/>an attachment, one to be viewed automatically, the other to be viewed<br/>interactively from the attachment menu.</p><footer><strong>mutt manual</strong> <cite><a href='http://www.mutt.org/doc/manual/manual-5.html'>www.mutt.org/doc/manual/&hellip;</a></cite></footer></blockquote></p>
+<p><blockquote><p>In addition, you can use this with Autoview to denote two commands for viewing<br/>an attachment, one to be viewed automatically, the other to be viewed<br/>interactively from the attachment menu.</p><footer><strong>Mutt manual</strong> <cite><a href='http://www.mutt.org/doc/manual/manual-5.html'>www.mutt.org/doc/manual/&hellip;</a></cite></footer></blockquote></p>
 
 <p>So, you can have <code>mutt</code> render the HTML abomination in <code>w3m</code> in most cases, and when those
 instances of particularly cretinous behaviour make it to your inbox, you can choose to
@@ -249,133 +459,6 @@ For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">bind </span>attach &lt;<span class="k">return</span>&gt;    view-mailcap
 </span></code></pre></div></figure></notextile></div></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using mutt, LDAP and SSL]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/04/21/lbdb/"/>
-    <updated>2012-04-21T11:23:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/04/21/lbdb</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/addressbook.png" title="'Address Book Icon by bertop on Flickr'" ></p>
-
-<p>One of the great things about starting a new job at
-<a href="http://jasonwryan.com/blog/2012/04/05/catalyst/" title="My post on joining Catalyst IT">an open source company</a>
-is having the freedom to use the tools that suit your workflow, rather than
-having to suffer the indignity of whatever the IT department consider to be the
-lowest comon denominator. Suffice to say, I have had a lot of fun this week
-setting up my working environment—and the ocassional hiccough as I was forced to learn
-something new…</p>
-
-<p>One of those “learning opportunities” consisted of trying to get my mail client,
-<a href="http://www.mutt.org/" title="All mail clients suck. This one just sucks less.">mutt</a>
-to talk to the <acronym title="Lightweight Directory Acces Protocol">LDAP</acronym>
-directory over <acronym title="Secure Sockets Layer">SSL</acronym> so that I could
-query the shared address book. There are a number of helpful blog posts that describe
-using <a href="http://www.spinnaker.de/lbdb/" title="The Little Brother Database homepage">lbdb</a>
-with <code>mutt</code><sup>1</sup>. Unfortunately, after a lot of searching, I was unable to find
-any documentation on achieving this integration over a secure connection.
-I kept seeing this error:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>Error: Search failed. LDAP server returned an error : 13, description: TLS
-</span><span class='line'>confidentiality required at /usr/lib/mutt_ldap_query line 198, &lt;DATA&gt; line 558.
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Several hours later, and with some
-help from <a href="https://twitter.com/#!/ibeardslee" title="Ian on Twitter: follow him…">@ibeardslee</a>,
-I managed to set it up, and it was definitely worth the effort.</p>
-
-<p>You will need to install <code>lbdb</code> from
-<a href="http://aur.archlinux.org/packages.php?ID=10225" title="AUR package">the AUR</a>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cowerd lbdb     <span class="c"># 2</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>…and a couple of packages from the repos to make it all work:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl-ldap perl-io-socket-ssl netkit-bsd-finger
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Then it is a matter of configuring <code>lbdb</code> to both
-query the LDAP directory and be able to be called from <code>mutt</code>.
-First, copy the config files into your <span class="file">$HOME</span>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir .lbdb
-</span><span class='line'>cp /etc/lbdb.rc .lbdb/lbdbrc
-</span><span class='line'>cp /etc/lbdb_ldap.rc .lbdb/ldap.rc
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>And then modify the two configuration files to suit your setup:
-The first, <span class="file">$HOME/.lbdb/lbdbrc</span>, is well commented and
-self-explanatory; add <code>ldap</code> to the methods and the
-nickname of your server:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">METHODS</span><span class="o">=</span><span class="s2">&quot;m_abook m_ldap&quot;</span>
-</span><span class='line'><span class="nv">LDAP_NICKS</span><span class="o">=</span><span class="s2">&quot;catalyst&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The second config file, <span class="file">$HOME/.lbdb/ldap.rc</span>
-is written in Perl and is a bit of a shocker:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='perl'><span class='line'><span class="nv">%ldap_server_db</span> <span class="o">=</span> <span class="p">(</span><span class="sr">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;</span><span class="s">&#39;catalyst&#39;</span> <span class="o">=&amp;</span><span class="ow">gt</span><span class="p">;</span> <span class="p">[</span><span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s">&#39;${mail}&#39;</span><span class="p">,</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">]</span>
-</span><span class='line'><span class="sr">&lt;/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;</span><span class="p">);</span><span class="sr">&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;h1&gt;</span><span class="n">hostname</span> <span class="n">of</span> <span class="n">your</span> <span class="n">ldap</span> <span class="n">server</span><span class="sr">&lt;/h1&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;</span><span class="nv">$ldap_server</span> <span class="o">=</span> <span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$search_base</span> <span class="o">=</span> <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_search_fields</span>    <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_expected_answers</span> <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_result_email</span>     <span class="o">=</span> <span class="s">&#39;${mail}&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_result_realname</span>  <span class="o">=</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ignorant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_bind_dn</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_bind_password</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="mi">1</span><span class="p">;</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>The key is to ensure that you use both the <code>ldaps</code>
-prefix <strong>and</strong> explicitely specify the SSL port, 636. Without both of these, you will
-get the TLS confidentiality error.</p>
-
-<p>You can then test that it is working correctly by running a query:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>lbdbq jemima
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>All going well, if there is indeed a Jemima in the shared address book, you will see her
-contact details miraculously appear before you. If there is more than one, you will have a
-list to choose from.</p>
-
-<p>Finally, you just need to set up <code>mutt</code> to query <code>lbdb</code>.
-In your <span class="file">muttrc</span>, add the following:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">query_command</span> <span class="o">=</span> <span class="s2">&quot;lbdbq %s 2&gt;/dev/null&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>I found that suppressing the errors made the whole experience a little smoother. You
-may not require it… Now, hitting <kbd>Shift</kbd><kbd>q</kbd> in <code>mutt</code>
-brings up a prompt to query the LDAP directory (and my <a href="http://abook.sourceforge.net/" title="abook homepage">abook</a> address book that I share via
-<a href="https://www.dropbox.com/" title="Dropbox homepage">dropbox</a>). You can also access the directory
-by starting to type an email address and then hitting <kbd>Ctrl</kbd><kbd>t</kbd> to see
-a list of possible completions.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk's post</a> got me started.</li>
-<li>A <a href="https://bitbucket.org/jasonwryan/eeepc/src/f15bf6e51e62/Scripts/cowerd" title="Script in bitbucket repo">wrapper script for cower</a></li>
-</ol>
-
-
-<p>Creative Commons image <a href="http://www.flickr.com/photos/bertop/2530620838/">by bertop on Flickr</a></p>
 ]]></content>
   </entry>
   

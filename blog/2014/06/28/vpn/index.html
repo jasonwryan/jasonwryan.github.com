@@ -1,0 +1,406 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>OpenVPN and Time on the Raspberry Pi - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="After relieving my Pi of
+seedbox duties,
+I was looking around for some other use for it. I decided, after looking over
+the Arch wiki article on &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/2014/06/28/vpn">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">OpenVPN and Time on the Raspberry Pi</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-28T09:57:00+12:00" pubdate data-updated="true">Jun 28<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="left" src="/images/post_images/raspberry-pi-logo.png" title="Pi logo" >
+After relieving my Pi of
+<a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on Torrent Pi">seedbox duties</a>,
+I was looking around for some other use for it. I decided, after looking over
+the Arch wiki article on <a href="https://wiki.archlinux.org/index.php/Openvpn" title="Simple, really…">OpenVPN</a>,
+that the Pi would be a terrific <acronym title="virtual private network">VPN</acronym>
+server; when I am out and about I can access a secure connection to my home
+network, thereby significantly reducing the risk of my privacy being
+compromised while using connectivity to the Internet provided by the
+notoriously security conscious sysadmins that run networks in hotels and
+other public places.</p>
+
+<p>Setting it up was straightforward enough, the wiki is typically clear and thorough; the only
+bottleneck in the process was waiting for the Pi&#8217;s tiny chip to chug through the creation of
+<a href="https://wiki.archlinux.org/index.php/Create_a_Public_Key_Infrastructure_Using_the_easy-rsa_Scripts" title="Wiki page on the easy-rsa scripts">public keys</a>. Once it was done, and I had tested that it was
+indeed working as intended, a more vexing issue presented itself. The service wouldn&#8217;t come
+up after rebooting. Not a deal breaker, I could always just <acronym title="Secure Shell">SSH</acronym>
+in and manually bring the server up, but that sort of defeats the purpose of being able to
+have the thing running reliably.</p>
+
+<p>The reason that it fails on boot is that, without a hardware clock, the Pi
+resets its time to
+<a href="https://en.wikipedia.org/wiki/Unix_time" title="Wikipedia article">UNIX time</a>
+until the
+<a href="https://wiki.archlinux.org/index.php/Ntp" title="Arch wiki page">NTP</a> daemon can
+start, which in turn depends upon the network being up. So, after rebooting,
+the journal would show the VPN server as having failed as the date was nearly
+half a century ago.</p>
+
+<p>There are a variety of fixes floating around, the most amusing being
+<a href="http://archlinuxarm.org/forum/viewtopic.php?f=31&amp;t=6037#p34228" title="Yes, really…">a wrapper for init</a>.
+Suffice to say, this wasn&#8217;t an option for me. Looking at the problem logically, it occurred to me
+that the issue was actually a trivial one: the correct sequencing of different services
+post boot. Isn&#8217;t this, I asked myself, one of the issues
+<a href="http://www.freedesktop.org/wiki/Software/systemd/" title="At freedesktop.org">systemd</a> was supposed
+to address?</p>
+
+<p>I just had to ensure that the network came up as quickly as possible after boot, that the time
+was reset correctly once there was a viable connection, and that the <code>openvpn.service</code> waited for
+those things to happen before launching.</p>
+
+<p>I have fitted the Pi with a wireless dongle, so the first step was to ditch
+<a href="https://wiki.archlinux.org/index.php/Netctl" title="Arch wiki page">netctl</a> (the
+default network manager on the ARM image) and replace it with
+<a href="https://wiki.archlinux.org/index.php/Systemd-networkd" title="More wiki pages for you…">systemd-networkd</a>.
+This is the point at which all the wingnuts that think that systemd is some
+sort of conspiracy to overthrow the old UNIX gods and replace them with false
+idols in <em>chapeau rouge</em> start foaming at their retrognathic mouths about
+“viral takeovers” and—seriously what fucking planet do these imbeciles hail
+from?—“an abhorrent and violent slap in the face to the Unix
+philosophy.”<sup>1</sup></p>
+
+<p>For those of us that accept the theory of evolution, this technology is both
+effective and non-threatening; in fact, it is quite an improvement over its by
+now ageing predecessor. So, a few minutes later,
+<span class="file">/etc/systemd/network/wlan0.network</span> and
+<span class="file">/etc/wpa_supplicant/wpa_supplicant-wlan0.conf</span> had pretty much
+written themselves and then it was just a matter of enabling the eponymous services
+as well as <code>systemd-resolved.service</code>. Reboot and the network is up seemingly
+<em>instantly</em>.</p>
+
+<p>Compounding my heresy, I then switched out NTP for
+<a href="http://man7.org/linux/man-pages/man8/systemd-timesyncd.8.html" title="Man page">systemd-timesyncd</a>
+and the Pi&#8217;s clock was now reset with the same alacrity. The final piece, ensuring
+that the openvpn service waited for this to happen, was to add two lines to the
+service file:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>
+</span><span class='line'><span class="nv">After</span><span class="o">=</span>network-online.target
+</span><span class='line'><span class="nv">Wants</span><span class="o">=</span>network-online.target
+</span></code></pre></div></figure>
+
+
+<p>That is all there is to it. Reboot and the network comes up, the clock is reset and then
+the OpenVPN server starts. Like magic. The sort of heathen magic that threatens to
+sap and impurify all of our
+<a href="http://www.youtube.com/watch?v=rKR32ImWYzw" title="it's like that…">precious bodily fluids</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>No, Virginia, I did <a href="http://boycottsystemd.org/">not make that up</a>…
+And I don&#8217;t really understand how you can slap a philosophy in the face, but then
+rationality is anathema to zealots; irrespective of which chimæra they
+prostrate before.</li>
+</ol>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-28T09:57:00+12:00" pubdate data-updated="true">Jun 28<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/arm/'>arm</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/06/14/writing/" title="Previous Post: Writing with Vim">&laquo; Writing with Vim</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/07/11/aif/" title="Next Post: Install scripts">Install scripts &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.com/blog/2014/06/28/vpn/';
+        var disqus_url = 'http://jasonwryan.com/blog/2014/06/28/vpn/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

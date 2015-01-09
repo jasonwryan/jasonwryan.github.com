@@ -1,0 +1,419 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Browser tunnels - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="Using a
+Socks proxy over an
+SSH tunnel
+is a well documented and simple if much less flexible stand in for a full-blown
+VPN. It
+can provide a degree &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/2014/05/30/tunnels">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Browser tunnels</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-30T09:32:00+12:00" pubdate data-updated="true">May 30<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="left" src="/images/post_images/tunnel.jpg" title="Creative Commons image" >
+Using a
+<a href="http://en.wikipedia.org/wiki/SOCKS" title="Wikipedia article">Socks proxy</a> over an
+<a href="http://en.wikipedia.org/wiki/Tunneling_protocol#Secure_shell_tunneling" title="Wikipedia entry">SSH tunnel</a>
+is a well documented and simple if much less flexible stand in for a full-blown
+<a href="http://en.wikipedia.org/wiki/Virtual_private_network%20'VPN%20on%20Wikipedia">VPN</a>. It
+can provide a degree of comfort when accessing private or sensitive information
+over a public Internet connection, or you might use it to get around the
+terminally Canutian<sup>1</sup> construct that is known as geo-blocking; that
+asinine practice of pretending that the Internet observes political boundaries…</p>
+
+<p>By way of a digression, it occurred to me at some point while I was wrestling
+with setting this up that, over the last seven or so years, much of the
+“entertainment” provided by corporate content distributors has been in the form
+of encouraging me to spend hundreds? thousands? of hours researching and
+implementing ways to circumvent their litany of failed and defective
+technological restrictions: region codes,
+<a href="http://www.defectivebydesign.org/what_is_drm_digital_restrictions_management" title="Defective by Design">DRM</a>
+and the like. It is worth noting that, in the vast majority of cases, I was
+just seeking access to content that I already owned (in another format), or was
+prepared to pay for.</p>
+
+<p>My move to GNU/Linux in 2007 was in large part motivated by the awful
+realisation that the music I had bought in iTunes was stuck in there. The
+combined intellectual effort globally expended trying to legitimately route
+around broken copyright law would have comfortably powered another golden age
+of the sciences; it&#8217;s not entirely implausible to think that the only reason we
+still have to deal with cancer is the malignant legacy of
+<a href="https://en.wikipedia.org/wiki/Sonny_Bono_Copyright_Term_Extension_Act" title="Sonny's gift…">Sonny Bono</a><sup>2</sup>.</p>
+
+<p>Now, back to our regular programming… One of my approaches to get around this
+sort of economic and policy rigor mortis has been to use a basic script to
+create a proxy tunnel to my home server. It assumes that you have
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia, again">public key</a>
+authentication set up and your passphrase loaded in
+<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Keychain" title="Arch wiki, for a change">keychain</a>,
+or something similar.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">SSH_HOST</span><span class="o">=</span><span class="s2">&quot;jason@XXX.XXX.XXX.XXX -p XXX -i $HOME/.ssh/box1&quot;</span>
+</span><span class='line'>
+</span><span class='line'>up<span class="o">(){</span>
+</span><span class='line'>    ssh -f -N -D 8080 -M -S /tmp/ssh_tunnel_%h.sock -o <span class="nv">ExitOnForwardFailure</span><span class="o">=</span>yes <span class="nv">$SSH_HOST</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel started successfully&quot;</span> <span class="o">||</span> <span class="se">\</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel failed to start&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>down<span class="o">(){</span>
+</span><span class='line'>    ssh -S /tmp/ssh_tunnel_%h.sock -O <span class="nb">exit</span> <span class="nv">$SSH_HOST</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> up <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>up <span class="o">&amp;&amp;</span> chromium --proxy-server<span class="o">=</span><span class="s2">&quot;socks://127.0.0.1:8080&quot;</span> &amp;
+</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> down <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>down
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail…&quot;</span>
+</span><span class='line'>    <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>Over the last couple of weeks, though, while I have been setting up and
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on Syncthing">playing with Syncthing</a>,
+I found this script wanting. With six nodes and, depending if I was on the
+<acronym title="Local Area Network">LAN</acronym> or not, as many as four of those
+hosts only accessible via SSH, then having the ability to quickly and painlessly
+open a browser on any one of the nodes <em>without having to edit the script</em>
+suddenly seemed like quite a good idea.</p>
+
+<p>Accordingly I went to work on the script, including a test to determine if I
+was on my home network and passing the name of the desired host as an
+argument. With this approach, I simply type <code>tunnel $host</code> and chromium
+opens tunneled to that host, where I can the happily open
+<strike>Hulu</strike> the Syncthing GUI.</p>
+
+<p>The updated script is posted as
+<a href="https://gist.github.com/jasonwryan/715a4f3fcb55e995de0d" title="On Github">a gist</a>,
+and as you can see, still needs some work to make it a little more generic.
+You will need, for example, to hand edit in the hosts and ports in
+<code>get_host()</code>. It is also the first time I have played with
+<a href="http://mywiki.wooledge.org/BashGuide/InputAndOutput#Pipes" title="Wooledge wiki">named pipes</a>
+and I am not convinced that my use of <code>mkfifo</code> here is either the correct
+approach or implementation; but it works. Comments enlightening me would
+be gratefully received.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The good king was, appropriately enough, actually called Cnut the Great…</li>
+<li>And, no, I am not referring to his musical corpus, which is as carcinogenic as his
+political career was as a Myrmidon for Big Content.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image, <a href="https://www.flickr.com/photos/lawrence_evil/113733779/">The Tunnel</a>,
+by Lawrence Whitmore.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-30T09:32:00+12:00" pubdate data-updated="true">May 30<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/browser/'>browser</a>, <a class='category' href='/blog/categories/hack/'>hack</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/05/10/syncthing/" title="Previous Post: Using Syncthing">&laquo; Using Syncthing</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/06/14/writing/" title="Next Post: Writing with Vim">Writing with Vim &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.com/blog/2014/05/30/tunnels/';
+        var disqus_url = 'http://jasonwryan.com/blog/2014/05/30/tunnels/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

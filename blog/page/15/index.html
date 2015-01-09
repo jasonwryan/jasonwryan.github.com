@@ -9,9 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I recently threw caution to the wind and
-changed my shell over to vi mode.
-I wanted to take advantage of the superior command editing ability that &hellip;">
+  <meta name="description" content="Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
+Arch boards and in the various
+IRC channels.
+It doesn&# &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +21,7 @@ I wanted to take advantage of the superior command editing ability that &hellip;
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/15">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/15">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -28,8 +29,8 @@ I wanted to take advantage of the superior command editing ability that &hellip;
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -67,7 +68,7 @@ I wanted to take advantage of the superior command editing ability that &hellip;
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -90,7 +91,7 @@ I wanted to take advantage of the superior command editing ability that &hellip;
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/12/01/readline/">Readline Bindings in Vi Mode</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/07/19/breakage/">The Myth of Breakage</a></h1>
     
     
       <p class="meta">
@@ -106,282 +107,361 @@ I wanted to take advantage of the superior command editing ability that &hellip;
   
 
 
-<time datetime="2011-12-01T18:43:00+13:00" pubdate data-updated="true">Dec 1<span>st</span>, 2011</time>
+<time datetime="2012-07-19T19:23:00+12:00" pubdate data-updated="true">Jul 19<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/readline.png" alt="image" /></p>
-
-<p>I recently threw caution to the wind and
-<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
-I wanted to take advantage of the superior command editing ability that
-this mode offered, and also to continue to bake vi[m] methods into every
-aspect of my working environment.</p>
-
-<p>The change has been relatively straightforward; the only issues I have
-experienced are really just around a couple of keybinds that I had
-become accustomed to in normal/Emacs mode:</p>
-
-<ul>
-<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
-<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
-</ul>
-
-
-<p>The first, the ability to recall the final arguments of previous
-commands was a showstopper for me: I really struggled without this.
-Being able to recall a long file path and append it to a new command is
-invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
-exactly this. Why it is not bound by default in vi mode is beyond me…</p>
-
-<p>The other was purely cosmetic, really. I am an inveterate clearer of the
-screen—unless I am referring to something printed to stdout, I always
-prefer to work at the top of the console.</p>
-
-<p>In any event, with the
-<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
-it was a trivial exercize to restore this functionality to my bash shell
-in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
-
-<figure class='code'><figcaption><span>~/inputrc </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc
-</span><span class='line'>
-</span><span class='line'># for vi mode
-</span><span class='line'>set editing-mode vi
-</span><span class='line'>$if mode=vi
-</span><span class='line'>
-</span><span class='line'>set keymap vi-command
-</span><span class='line'># these are for vi-command mode
-</span><span class='line'>"\e[A": history-search-backward            # arrow up
-</span><span class='line'>"\e[B": history-search-forward             # arrow down
-</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
-</span><span class='line'>Control-l: clear-screen
-</span><span class='line'>
-</span><span class='line'>set keymap vi-insert
-</span><span class='line'># these are for vi-insert mode
-</span><span class='line'>"\e[A": history-search-backward
-</span><span class='line'>"\e[B": history-search-forward
-</span><span class='line'>"\ep": yank-last-arg
-</span><span class='line'>Control-l: clear-screen
-</span><span class='line'>$endif</span></code></pre></div></figure>
-
-
-<p>There is an extensive list of
-<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
-with which you can customize your shell environment.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/29/rtorrent/">Building rtorrent on Debian Squeeze</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-29T21:21:00+13:00" pubdate data-updated="true">Nov 29<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/rtorrent.png" alt="image" /></p>
-
-<p>After <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Post on the HP microserver">setting up my server</a>,
-I wanted to use it as a torrent box. The version of
-<a href="http://libtorrent.rakshasa.no/" title="rtorrent &amp; libtorrent homepage">rtorrent</a>
-in the Debian stable repositories is 0.8.6, which is unfortunate as
-support for <a href="http://en.wikipedia.org/wiki/Magnet_URI_scheme" title="Wikipedia page on magnet URIs">magnet links</a>
-was introduced in 0.8.7.</p>
-
-<p>To remedy this, I decided to build the current stable version of
-rtorrent, 0.8.9. At the same time—seeing as I was getting my hands dirty
-anyway—I thought I’d patch in colour support.</p>
-
-<p>This is a straightforward two-step process. First, build the current
-version of libtorrent, 0.12.9:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
-</span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
-</span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
-</span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
-</span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure>
-
-
-<p>Once libtorrent is successfully built and installed, you can begin the
-rtorrent build:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
-</span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
-</span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
-</span></code></pre></div></figure>
-
-
-<p>Then, if you want colour support, you need the patch. I used the version
-in the
-<a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
-but you can also grab a copy from a paste site:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
-</span><span class='line'>mv canvas_colour.patch src/
-</span><span class='line'>patch -uNp1 -i canvas_colour.patch
-</span></code></pre></div></figure>
-
-
-<p>The patch should apply cleanly. Then specify where libtorrent is
-installed to ensure that it is linked during the rtorrent build:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
-</span><span class='line'>make
-</span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure>
-
-
-<p>Once again, this should compile cleanly and you will now have rtorrent
-with colour and magnet link support installed in
-<span class="file">/usr/local/bin/rtorrent</span>.</p>
-
-<h5>Notes</h5>
-
-<p>I prefer to use
-<a href="http://asic-linux.com.mx/~izto/checkinstall/" title="checkinstall homepage">checkinstall</a>
-so that self-installed applications are tracked by
-<a href="http://wiki.debian.org/Apt" title="Debian wiki entry">Apt</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/28/rsync/">rsync + SSH Backups</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-28T12:23:00+13:00" pubdate data-updated="true">Nov 28<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/rsync-ssh.png" alt="image" /></p>
-
-<p>I <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
-and included a
-<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
-script for backing up my files to the server. At the time, I was running
-it manually, but since have sorted out the excludes list and have now
-automated it.</p>
-
-<p>My original scheme was to set up a
-<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
-mount an
-<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
-before rsync’ing the directories across. In the end, I went with SSH and
-<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
-as debugging all of the various permissions issues with the NFS share
-did not seem worth the effort.</p>
-
-<p>First, on my local desktop, I created the keypair called, inventively,
-rsync:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
-</span><span class='line'>mv rsync ~/.ssh <span class="o">&amp;&amp;</span> chmod 600 ~/.ssh/rsync
-</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
-</span></code></pre></div></figure>
-
-
-<p>This keypair was created <em>without a passphrase</em> so that the script could
-be successfully called from <code>cron</code>. To slightly increase the security
-around a key without a passphrase, I used the from option in
-authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
-machine(s), like so:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
-</span></code></pre></div></figure>
-
-
-<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
-</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
-</span></code></pre></div></figure>
-
-
-<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
-the SSH command:</p>
-
-<figure class='code'><figcaption><span>.ssh/config </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>Host backups
-</span><span class='line'>   Hostname 192.168.1.200
-</span><span class='line'>   Port 0000
-</span><span class='line'>   User jason
-</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></div></figure>
-
-
-<p>And I was done. Everynight at 10pm, all of my data will be backed up to
-the server. The rsync command in the script:</p>
-
-<figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># Backup to remote server over SSH</span>
-</span><span class='line'>
-</span><span class='line'>rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\</span>
-</span><span class='line'>    --log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
-</span><span class='line'>    -e ssh /home/jason /etc backups:Backups/Centurion
-</span></code></pre></div></figure>
-
-
-<h5>Notes</h5>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/broken.jpg" title="Image of breakage on Flickr" >
+Breakage is one of the memes of the Arch Linux community; it is referenced frequently on the
+<a href="https://bbs.archlinux.org/" title="Arch Linux BBS">Arch boards</a> and in the various
+<a href="https://wiki.archlinux.org/index.php/IRC_Channels" title="Wiki page listing channels">IRC channels</a>.
+It doesn&#8217;t take newcomers long to realize that, whether something is actually broken or not,
+there is always
+<a href="http://allanmcrae.com/category/arch-linux/" title="Allan's Blog">someone they can blame</a>.<sup>1</sup></p>
+
+<p>My experience of Arch, over the last three and a bit years, is quite the opposite. I have yet to
+experience anything that would qualify as breakage. Sure, there have been bugs, mostly upstream,
+and the more frequent moments where I haven&#8217;t been as diligent as I should, but not once have I
+had a machine that was unbootable or otherwise unusable. Arch has, on both my home and work
+machines, been incredibly stable and reliable.</p>
+
+<p>For a number of Arch Linux users, however, that was not their experience over the last week when
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="News item on the move">/lib was moved to /usr/lib</a>.
+The volume of people on the boards and on IRC reporting unbootable or unusable systems was
+remarkable. Remarkable because, despite the fact that the
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Once more, just in case…">news item</a>, the
+<a href="http://www.archlinux.org/news/the-lib-directory-becomes-a-symlink/" title="Arch wiki page on the change">wiki page</a>,
+and the <a href="http://mailman.archlinux.org/pipermail/arch-announce/2012-July/000317.html" title="Mail archive">email to arch-announce</a>
+all <em>explicitly</em> warned people not to use the <code>--force</code> option,<sup>2</sup> so many did.</p>
+
+<p><span class='pullquote-right' data-pullquote='90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice. '>
+Sadly, these red-boxed warnings were apparently not enough.
+90% of the breakage was because people either didn&#8217;t see, or disregarded, that advice.
+The remaining 10% were either in a hurry and didn&#8217;t pay close attention to how
+to deal with any leftover files in <span class="file">/lib</span> or <code>rm -rf</code>&#8216;ed
+in the wrong directory.
+<a href="http://www.gnu.org/fun/jokes/shit-happens.html" title="GNU Humour…">Accidents happen</a>.
+</span></p>
+
+<p>What I am interested in is the people who fell into the much larger category,
+and principally those that didn&#8217;t see any of the communications about this
+change in advance of updating and reasoned, based on a recent change that did
+<a href="http://www.archlinux.org/news/filesystem-upgrade-manual-intervention-required-1/" title="News item on filesystem upgrade">require the use of &#8211;force</a>,
+that this was the most expedient way to resolve <code>pacman</code> reporting conflicting
+files.</p>
+
+<p>Some context. The <code>glibc</code> update was released to the
+<a href="https://wiki.archlinux.org/index.php/Testing#.5Btesting.5D" title="Wiki entry on Testing">[testing] repository</a>
+in the first week of July: and there were a couple of long threads<sup>3</sup>
+about issues and fixes before it was pushed to [core]. By the time the
+package was released for general consumption, it had been tested and the
+developers had obviously planned how to make what is a fundamental system
+change with a minimal amount of user intervention.  I think that, given the
+magnitude of the challenge, they did a superb job.</p>
+
+<p>How then did it go so wrong for so many?<sup>4</sup> To answer that, you have
+to consider the nature of Arch. It&#8217;s <em>not</em> the sort of distribution where you
+install it and then just go on your merry way, installing
+<a href="http://oswatershed.org/" title="It's SCIENCE, Jim">the least obsolete packages</a>,
+revelling in the speed of the package manager and generally being
+a 1337 h@x0r…</p>
+
+<p>Successfully running a rolling release like Arch, irrespective of your level of
+competence, means staying in touch with what is happening—in
+<a href="http://kmkeen.com/pacmatic/" title="Pacman wrapper that pulls news updates">some form or other</a>.
+Subscribing to the arch-general <acronym title="Mailing list">ML</acronym>,
+visiting the forums, idling in IRC; somehow remaining connected to what is
+going on in the community so that you don&#8217;t blindly update one day and wonder
+why your system is broken.</p>
+
+<p>This strikes me as a real strength; by design Arch encourages its users to
+participate in the community. Even if you are only lurking, over time you will
+inevitably find yourself posting in a thread, responding to an email, editing
+the wiki,
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="Post on aurphan">adopting an orphaned package</a>—increasingly
+getting involved and contributing.</p>
+
+<p>This level of involvement is not for everyone. Some may find it onerous or
+a waste of their time. That&#8217;s fine. There are any number of other distros
+that do not ask for this level of commitment. The <em>quid pro quo</em> for
+running Arch, though, is that you are prepared, in whatever shape or form
+best works for you, to give something back; at the very least, that is your
+attention.</p>
+
+<h4>Notes</h4>
 
 <ol>
-<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
+<li>This is, of course, a reference to said Arch meme: Allan is one
+of the developers who has contributed an enormous amount to Arch and the fact
+that his IRC nick is <code>allanbrokeit</code> is purely coincidental.</li>
+<li>At the end of 2011, the short option <code>-f</code>
+<a href="http://mailman.archlinux.org/pipermail/pacman-dev/2011-October/014589.html" title="Post to ML anouncing change">was removed</a>
+from <code>pacman</code> so “it at least makes people read the word &#8216;force&#8217; and maybe they
+will have some sense to step back and think about what they are doing first.”</li>
+<li><a href="https://bbs.archlinux.org/viewtopic.php?id=144620">https://bbs.archlinux.org/viewtopic.php?id=144620</a> and
+<a href="https://bbs.archlinux.org/viewtopic.php?id=144616">https://bbs.archlinux.org/viewtopic.php?id=144616</a></li>
+<li>Relatively speaking. In situations like this, the overwhelming amount of traffic
+is about what went wrong, not people posting to say they had no difficulties whatsoever…</li>
 </ol>
 
 
-<p>Creative Commons image from
-<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
+<p>Creative Commons image on Flickr from
+<a href="http://www.flickr.com/photos/daviddoctorrose/431786001/" title="Broken keyboard on Flickr">djeucalyptus</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/09/syslinux/">Replacing Grub With Syslinux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-09T13:51:00+12:00" pubdate data-updated="true">Jul 9<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/grub.jpg" title="Image of grub on Flickr" >
+With the announcement late last month that
+<a href="http://lists.gnu.org/archive/html/grub-devel/2012-06/msg00093.html" title="Grub ML announcement">Grub 2.00 has been released</a>
+I thought that it was time to stop procrastinating and do something about moving away from
+<a href="http://www.gnu.org/software/grub/grub-legacy.html" title="Gnu Page for Grub Legacy">Grub Legacy</a>,
+which is no longer actively developed. Not that there is anything wrong with Grub Legacy&#8217;s
+functionality; it has always done whatever I asked of it (admittedly, not a lot) and done so
+without complaint.</p>
+
+<p>I have used Grub2 before, when I was running Ubuntu on my home desktop, and it is the bootloader
+on my Debian Squeeze server. I can&#8217;t, however, say that I have ever really understood—or
+appreciated—its mutliple file, “need to reconfigure after making any changes” type of
+complexity. So, I thought that I would give
+<a href="http://www.syslinux.org/wiki/index.php/The_Syslinux_Project" title="Syslinux Wiki">Syslinux</a>
+a shot.</p>
+
+<p>Syslinux isn&#8217;t a single bootloader, rather it is a collection of lightweight bootloaders,
+with <a href="http://www.syslinux.org/wiki/index.php/EXTLINUX" title="Extlinux page on Syslinux Wiki">Extlinux</a>
+responsible for booting ext2, ext3, ext4 and btrfs filesystems. As the
+<a href="https://wiki.archlinux.org/index.php/Syslinux" title="The FINE Wiki">Arch Wiki Syslinux page</a>
+notes, since Syslinux 4, Extlinux has been merged with Syslinux.</p>
+
+<p>Installing Syslinux is <em>ridiculously</em> easy. It is literally a five step process. First,
+install the package:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -S syslinux</span></code></pre></div></figure>
+
+
+<p>After installing <code>syslinux</code> pacman will helpfully tell you what to do next:</p>
+
+<blockquote><p>==> If you want to use syslinux as your bootloader<br/>==> edit /boot/syslinux/syslinux.cfg and run<br/>==>   # /usr/sbin/syslinux-install_update -i -a -m<br/>==> to install it.</p></blockquote>
+
+
+<p>Arch user <a href="http://pyther.net/" title="Matthew's website">Matthew Gyurgyik</a> has written an
+ingenious script, <code>syslinux-install_update</code> that automates the process of writing the
+<acronym title="Master Boot Record">MBR</acronym> and installing the relevant files to
+<span class="file">/boot/syslinux/</span>. The script also checks if, as is the case
+with my desktop, there is a RAID array present, and if so passes the install command the
+<code>--raid</code> flag:</p>
+
+<blockquote><p>RAID mode.  If boot fails, tell the BIOS to boot the next device in the boot sequence (usually the next  hard<br/>disk) instead of stopping with an error message.  This is useful for RAID-1 booting.</p></blockquote>
+
+
+<p>After running the script, you should receive a message advising you that Syslinux
+has been sucessfully installed on both drives:</p>
+
+<blockquote><p>Detected RAID on /boot - installing Syslinux with &#8211;raid<br/>Syslinux install successful<br/>Boot Flag Set - /dev/sda1<br/>Boot Flag Set - /dev/sdb1<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sda<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sdb</p></blockquote>
+
+
+<p>If you are moving from Grub Legacy, configuring Syslinux is similarly painless.
+There are two sections to a basic  <span class="file">/boot/syslinux/syslinux.cfg</span>,
+the defaults and the prompt entries.</p>
+
+<p>I set up my defaults to be essentially invisible:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'># General settings
+</span><span class='line'>DEFAULT Arch
+</span><span class='line'>PROMPT 0
+</span><span class='line'>TIMEOUT 0</span></code></pre></div></figure>
+
+
+<p>And then copy across the relevant lines from my <span class="file">/boot/grub/menu.lst</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>grep <span class="nv">root</span><span class="o">=</span> /boot/grub/menu.lst &gt;&gt; /boot/syslinux/syslinux.cfg
+</span></code></pre></div></figure>
+
+
+<p>Then it is just a matter of adding the relevant entries under LABEL:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>LABEL Arch
+</span><span class='line'>   MENU LABEL Arch Linux
+</span><span class='line'>   LINUX ../vmlinuz-linux
+</span><span class='line'>   APPEND root=/dev/mapper/vgroup-lvroot cryptdevice=/dev/md1:vgroup ro
+</span><span class='line'>   INITRD ../initramfs-linux.img</span></code></pre></div></figure>
+
+
+<p>You then add entries for Fallback, and any other images that you may wish to
+boot from.</p>
+
+<p>And that, in their entirety, is steps two and three. You then move to steps four and five:</p>
+
+<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -Rsn grub
+</span><span class='line'>shutdown -r now</span></code></pre></div></figure>
+
+
+<p>And you reboot with Syslinux. Done.</p>
+
+<p>The beauty of Syslinux, from my perspective, is that it is simple to install
+and configure, with just the one config file and the options all well documented
+and easy to understand. If you want a menu with a background
+image, you can have that. If, like me, you just want to get on and boot your default,
+it does that.</p>
+
+<p>Additionally, if you want or need to boot into Fallback, or want to dual boot,
+you can just hold down <kbd>Shift</kbd> at boot time and enter the desired
+Label at the prompt. Syslinux has Tab completion, so you only need enter a
+couple of letters, hit <kbd>Tab</kbd> and you will see all of the available
+Labels to boot. Brilliant.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons Flickr image by
+<a href="http://www.flickr.com/photos/sgodt/5103674184/">custer_fluck</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/16/misunderstanding/">Misunderstanding Arch</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-16T10:52:00+12:00" pubdate data-updated="true">Jun 16<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/hands.jpg" title="'mutt logo'" ></p>
+
+<p>I am frequently struck by how many people arrive on the
+<a href="https://bbs.archlinux.org/" title="Arch Linux Forums">Arch boards</a> without <em>any</em>
+understanding of how Arch is different from the other GNU/Linux communities
+they may have spent time with (if, indeed, they have spent any time in
+another community before trying Arch). For me, this is akin to arriving in a
+foreign country and not bothering to familiarize yourself at all with the local
+mores and customs; it lies on a spectrum somewhere between ignorance and
+outright arrogance.</p>
+
+<p>The result, inevitably, is that these people are shocked
+when their expectations of how they <em>should</em> be treated are at odds with the
+reception their behaviour invites…</p>
+
+<p>Before venturing any further, I should preface my remarks about this with
+something of a disclaimer. These are my own views and not those of the current,
+or past, forum staff.</p>
+
+<p>One of Arch&#8217;s significant acheivements is the quality of
+<a href="https://wiki.archlinux.org" title="THE best GNU/Linux Wiki">its documentation</a>.
+Not just the technical documentation describing how to install and configure
+Arch, but the cultural documentation that sets out
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="The Arch Way">Arch&#8217;s philosophy</a>
+and <a href="https://wiki.archlinux.org/index.php/Forum_Etiquette" title="Forum Etiquette">standards of behaviour</a>. Both these pages provide clear statements on what to expect when
+using Arch Linux and a clear indication of how to respectfully interact with the
+community when you are seeking help.</p>
+
+<p>The defining statement about Arch&#8217;s intended user base is quite direct and
+unambiguous:</p>
+
+<blockquote><p>Arch Linux targets and accommodates competent GNU/Linux users <br/>by giving them complete control and responsibility over the system.</p><footer><strong>The Arch Way</strong> <cite><a href='https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric'>wiki.archlinux.org/index.php/&hellip;</a></cite></footer></blockquote>
+
+
+<p>The expression “targets and accommodates” doesn&#8217;t exclude other users—for
+example, those that are not necessarily competent, but are wanting to learn
+more about the specifics of how their machines work—it does, however, signal
+quite explicitly what sort of community Arch is. And what it is not.</p>
+
+<p><a href="http://ubuntu.com" title="Ubuntu Linux">Ubuntu</a> is an excellent distribution. Like Arch,
+it has very specific aims and a clear concept of what the Ubuntu community is.
+Popularity is central to Ubuntu&#8217;s culture. People coming from Ubuntu, who
+haven&#8217;t bothered to familiarize themselves with Arch&#8217;s values, often struggle
+to appreciate the difference; leading to comments like this one:</p>
+
+<blockquote><p>Maybe if Arch is friendly and Arch forum is friendly, it might go some<br/>place, who knows…</p><footer><strong>Linux Journal commenter</strong> <cite><a href='http://www.linuxjournal.com/content/arch-way#comment-361974'>www.linuxjournal.com/content/&hellip;</a></cite></footer></blockquote>
+
+
+<p>This was posted in reply to a post on Arch in which the author noted how to
+seek help with Arch Linux:</p>
+
+<blockquote><p>You&#8217;ll find far less hand-holding on the Arch Forums than some of the other<br/>distro&#8217;s forums, and for good reason.  Arch has one of the most informative,<br/>user-friendly wiki&#8217;s out there. Do not, I repeat, DO NOT ask a question in the<br/>forums or on IRC without searching the wiki and the forums first.</p></blockquote>
+
+
+<p>Similarly, looking through the threads in
+<a href="https://bbs.archlinux.org/viewforum.php?id=23" title="Newbie board">Newbie Corner</a>
+will periodically turn up new posters who are indignant at being told to
+<acronym title="Read The Fscking Manual">RTFM</acronym> and see it as some
+sort of <em>personal</em> attack, when in fact it is just someone pointing out the
+obvious to them. The community hasn&#8217;t compiled all that documentation just
+so they can sit around and regurgitate answers for people who are either
+unwilling or incapable of making the minimum amount of  effort required to
+solve their own problems…</p>
+
+<p>If you want handholding, there are plenty of online communities that will
+cater for you. If you install Arch and think that you are automatically entitled
+to immediate support for issues that you encounter, then you are mistaken.
+If you think that Arch will suffer if you don&#8217;t get what you want, then
+your problems extend significantly beyond your choice of distro.</p>
+
+<p>The community has worked hard over the years to keep the signal-to-noise ratio
+on the boards high, that way, the forums remain a helpful resource for the community,
+not a breeding ground for
+<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on parasites…">help vampires</a>.</p>
+
+<h4>Notes</h4>
+
+<p>Flickr Creative Commons image by
+<a href="http://www.flickr.com/photos/angellic/47031159/">si_si_ay</a></p>
 </div>
   
   
@@ -406,23 +486,23 @@ the server. The rsync command in the script:</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -500,7 +580,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -509,7 +589,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

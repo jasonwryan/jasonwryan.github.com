@@ -1,0 +1,440 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Mutt and iCal - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="I have posted a few times now about how I use
+Mutt1, that most superlative
+of email clients. Using a variety of different tools, I have
+settled on &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/2014/04/05/calendar">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Mutt and iCal</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-05T09:48:00+13:00" pubdate data-updated="true">Apr 5<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="left" src="/images/post_images/calendar.jpg" title="Creative Commons Calendar image" >
+I have posted a few times now about how I use
+<a href="http://www.mutt.org/" title="Mutt homepage">Mutt</a><sup>1</sup>, that most superlative
+of email clients. Using a variety of different tools, I have
+settled on an effective and satisfying workflow for managing both my personal
+and professional email, with one glaring exception: calendaring. This, I should
+stress, is not for want of trying. It is not necessarily a nagging concern in
+terms of my personal use of email, but professionally it is a daily frustration.</p>
+
+<p>Day after day, I receive a <em>lot</em> of meeting invitations and, when these show up
+in my inbox they are, for all intents and purposes, unintelligble. Yes, with
+careful scrutiny you can decypher the
+<a href="http://en.wikipedia.org/wiki/ICalendar" title="Wikipedia entry">iCalendar files</a>, but
+doing so is more likely to induce a seizure than a punctual appearance at an
+important meeting. To get around this, I had been using a basic Awk script that
+would parse the most important parts of the message and print them out. This was
+working well enough until I started to receive invitations from people using
+OSX. For some god-unknown reason, Apple&#8217;s “interpretation” of the
+standard<sup>2</sup> is different enough to those sent from Evolution and
+Thunderbird that my script wouldn&#8217;t successfully print some of the data (just
+the start and end times of the meeting, nothing too important).</p>
+
+<p>I started to try and expand the capability of the script and then realized that
+I would be much better off seeing if someone else had solved this problem;
+satisfactorily, that is.
+<a href="https://github.com/terabyte/mutt-filters" title="Github fork of the repo">And they had</a>.
+In a further delightful coincidence, the original author of the script,
+<a href="https://github.com/martynsmith" title="Martyn's Github repo">Martyn Smith</a> is an
+ex-colleague who, in 2004, first got me interested in Linux (thank you, Martyn).
+Armed with this script and entries in <span class="file">$HOME/.mutt/{mailcap,muttrc}</span>
+now, whenever I open a calendar invitation, the pertinent details are printed
+out perfectly legibly. It&#8217;s a small step, but an important one.</p>
+
+<p>Next I started playing around with
+<a href="http://lostpackets.de/khal/" title="khal homepage">khal</a>, a command line calendaring
+application that uses
+<a href="http://en.wikipedia.org/wiki/CalDAV" title="Wikipedia page">CalDav</a> to sync to
+calendar servers. It is described as being in “the early stages of development”
+and that certainly is the case. Nonetheless, it is incredibly promising as—even
+in this rudimentary form—it performs well and offers most of the basics that I
+require. khal is simple to setup, does not have too many (python2) dependencies
+and handles multiple calendars<sup>3</sup>. Yes, there are bugs, but nothing
+grievous and the developer,
+<a href="http://lostpackets.de/blog/" title="Christian's blog">Christian Geier</a>, is very
+responsive and helpful<sup>4</sup>.</p>
+
+<p>The <a href="http://lostpackets.de/khal/pages/usage.html" title="Usage page">khal documentation</a>
+gives you a pretty good idea of the current feature set. Set up your
+<span class="file">khal.conf</span> with the calendars you want synched and then
+you have two modes of interaction: directly via the command line or an
+interactive mode invoked with <code>ikhal</code>. Both modes allow you to perform the basic
+functions of adding, editing or deleting events.</p>
+
+<p><img class="center" src="/images/post_images/khal.png" title="Simple screenshot of khal" ></p>
+
+<p>While the interactive mode is very simple and straightforward, what I am most
+excited about is the ability to add events from the command line, as per the
+example in the documentation:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>khal --new 25.10. 16:00 18:00 Another Event :: with Alice and Bob
+</span></code></pre></div></figure>
+
+
+<p>I just needed to figure out a way to extract the relevant fields from the iCal
+file and pass them to khal. My first attempt is unashamedly ugly, both in
+conception and execution. However, I don&#8217;t know Perl (and at this stage of my
+life
+<a href="https://twitter.com/jasonwryan/status/204660063669989376" title="Sad, but true…">I have run out of time to learn it</a>),
+and it actually works. I
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/ical_filter.pl" title="In my bitbucket repo">modified</a>
+Martyn&#8217;s script to write to a temp file and then, for iCal events I want to
+import to khal, I bound a key sequence in Mutt to a simple Awk
+script<sup>5</sup>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
+</span><span class='line'><span class="c1"># read from ical_filter.pl and then send ical invitation details </span>
+</span><span class='line'><span class="c1"># in mutt to khal</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">/^Summary/</span>   <span class="p">{</span> <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="o">-</span><span class="mi">2</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="o">$</span><span class="nx">i</span> <span class="o">=</span> <span class="o">$</span><span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="mi">2</span><span class="p">);</span> <span class="nb">NF</span><span class="o">-=</span><span class="mi">2</span><span class="p">;</span> <span class="nx">summ</span> <span class="o">=</span> <span class="o">$</span><span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="sr">/^Location/</span>  <span class="p">{</span> <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="o">-</span><span class="mi">2</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="o">$</span><span class="nx">i</span> <span class="o">=</span> <span class="o">$</span><span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="mi">2</span><span class="p">);</span> <span class="nb">NF</span><span class="o">-=</span><span class="mi">2</span><span class="p">;</span> <span class="nx">meet</span> <span class="o">=</span> <span class="o">$</span><span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="sr">/^Dtstart/</span>   <span class="p">{</span> <span class="nx">date_st</span> <span class="o">=</span> <span class="o">$</span><span class="mi">3</span><span class="p">;</span> <span class="nx">time_st</span> <span class="o">=</span> <span class="o">$</span><span class="mi">4</span> <span class="p">}</span>
+</span><span class='line'><span class="sr">/^Dtend/</span>     <span class="p">{</span> <span class="nx">time_nd</span> <span class="o">=</span> <span class="o">$</span><span class="mi">4</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">END</span>          <span class="p">{</span> <span class="kr">print</span>  <span class="nx">date_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_nd</span><span class="s2">&quot; &quot;</span><span class="nx">summ</span> <span class="p">}</span>
+</span></code></pre></div></figure>
+
+
+<p>In <span class="file">$HOME/.mutt/muttrc</span>, I have
+<kbd>Ctrl</kbd><kbd>k</kbd> in pager view trigger the script like so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># save iCal to khal</span>
+</span><span class='line'>macro pager <span class="se">\C</span>k  <span class="s2">&quot;!/usr/bin/khal --new $(~/Scripts/mutt2khal ~/.mutt/temp/caldata)&quot;</span> <span class="s2">&quot;Saving Calendar event&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Neither elegant nor imaginative, I know; but for a first attempt, it gets the
+job done. If I did know any Perl, I am sure I would be able to avoid the
+additional temp file and the need to reread the information before handing it
+off to khal, but you work with the skills (or lack thereof) that you have.
+Needless to say, patches are welcomed.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See all my mutt posts:
+
+<ul>
+<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using Mutt, LDAP and SSL</a></li>
+<li><a href="http://jasonwryan.com/blog/2012/05/12/mutt/">Mutt and HTML Email</a></li>
+<li><a href="http://jasonwryan.com/blog/2012/05/23/notmuch/">Using Notmuch with Mutt</a></li>
+<li><a href="http://jasonwryan.com/blog/2013/07/20/gnupg/">Encrypting Mutt</a></li>
+</ul>
+</li>
+<li>Yes, I understand how special Apple is but this is particularly annoying…</li>
+<li>There is a <a href="https://aur.archlinux.org/packages/khal-git/">package in AUR</a>.</li>
+<li>I <a href="https://github.com/geier/khal/issues/36">logged a bug</a> and it was fixed in a matter of hours.</li>
+<li>The script is <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/mutt2khal">in my bitbucket repo</a>.</li>
+</ol>
+
+
+<p>Creative Commons image, <a href="https://flic.kr/p/4h1oE5">Calendar</a> by Angela Mabray.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-05T09:48:00+13:00" pubdate data-updated="true">Apr 5<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/mutt/'>mutt</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/03/22/autotext/" title="Previous Post: Autotext Function">&laquo; Autotext Function</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/04/18/vdir/" title="Next Post: Syncing with khal">Syncing with khal &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.com/blog/2014/04/05/calendar/';
+        var disqus_url = 'http://jasonwryan.com/blog/2014/04/05/calendar/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

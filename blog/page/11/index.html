@@ -9,9 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
-mutt posts1 with what I am assuming is the
-final &hellip;">
+  <meta name="description" content="I have posted about using dropbox quite
+a few times
+over the last couple of years; it is one of those utilities that quickly insinuates itself
+into &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +21,7 @@ final &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/11">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/11">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -28,8 +29,8 @@ final &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -67,7 +68,7 @@ final &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -90,7 +91,7 @@ final &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/05/23/notmuch/">Using Notmuch with mutt</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/03/16/sync/">BitTorrent Sync Alpha</a></h1>
     
     
       <p class="meta">
@@ -106,189 +107,120 @@ final &hellip;">
   
 
 
-<time datetime="2012-05-23T19:37:00+12:00" pubdate data-updated="true">May 23<span>rd</span>, 2012</time>
+<time datetime="2013-03-16T10:17:00+13:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/magnifier.png" title="day 307 on Flickr" >
-Seeing as I have been focussing on my mail client, I thought I would round out the trifecta of
-<a href="http://www.mutt.org/" title="mutt homepage">mutt</a> posts<sup>1</sup> with what I am assuming is the
-final piece of the puzzle: searching <code>mutt's</code> maildirs. For a small to average size mailbox, <code>mutt's</code>
-searching works fine, but as your mail volume grows this simple search doesn&#8217;t really scale. That&#8217;s
-where the rather modestly named <a href="http://notmuchmail.org/" title="Notmuch website">Notmuch</a> comes into play.</p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/syncapp.png" title="BitTorrent Sync logo" >
+I have posted about using <a href="http://dropbox.com" title="dropbox homepage">dropbox</a> quite
+<a href="https://duckduckgo.com/?sites=jasonwryan.com&amp;q=dropbox" title="DDG search results">a few times</a>
+over the last couple of years; it is one of those utilities that quickly insinuates itself
+into an indispensable niche in your workflow and, consequently, can be <em>very</em> difficult to
+dislodge. Perhaps because it has started to glue together so much of the way I work, I have
+been wondering when I would find a replacement that would deliver all, or much, of the
+functionality, without the standard
+<a href="http://arstechnica.com/security/2012/07/dropbox-confirms-it-got-hacked-will-offer-two-factor-authentication/" title="Ars post on the dropbox hack">cloud security issues</a>,
+that seem to bedevil these services.<sup>1</sup></p>
 
-<p>It can be run as a standalone mail client, but you can also use it with <code>mutt</code> to provide
-a ruthlessly efficient and fast search tool for your email. I had looked at it and
-<a href="http://sup.rubyforge.org/" title="A console client for people with lots of mail">Sup</a>
-a couple of years ago, but was spurred to do something about it this week when
-<a href="https://twitter.com/#!/chosig" title="Chosig on Twitter">Gunnar Lundström</a> pinged me on twitter and
-suggested I check it out. So I did.</p>
+<p>When I saw that BitTorrent had release a distributed synching app called—appropriately—
+<a href="http://blog.bittorrent.com/2013/01/24/test-bittorrent-sync-pre-alpha/" title="Blog post on sync release">Sync</a>,
+I <a href="http://labs.bittorrent.com/experiments/sync.html" title="Invitation form">signed up for the Alpha</a> and
+have been running it in lieu of dropbox for the past three weeks. My initial reaction is,
+that for a first release, it is very impressive.</p>
 
-<blockquote><p>&#8220;Not much mail&#8221; is what Notmuch thinks about your email collection. Even if you receive 12000 <br/>messages per month or have on the order of  millions of messages that you&#8217;ve been saving for decades. <br/>Regardless, Notmuch will be able to quickly search all of it. It&#8217;s just plain not much mail.</p><footer><strong>Notmuch website</strong> <cite><a href='http://notmuchmail.org'>notmuchmail.org/&hellip;</a></cite></footer></blockquote>
+<p>Essentially, Sync uses the
+<a href="https://en.wikipedia.org/wiki/Bittorent" title="Wikipedia entry">bittorrent peer-to-peer protocol</a>
+and encryption
+(<a href="https://en.wikipedia.org/wiki/Aes_256" title="Wikipedia entry on the standard">AES 256</a>
+using a private key based on the secret generated for each shared folder)
+to sync files between your machines—or anyone with whom you share the secret
+for a particular directory. This has several advantages over dropbox, from my perspective.
+First and foremost, you are not relying on some third party for security<sup>2</sup>, storage
+and uptime. Secondly, all of the traffic between your devices is encrypted. And finally,
+it is free (sadly, only as in beer).</p>
 
+<h3>Positives</h3>
 
-<p>There was previously a
-<a href="http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/">mutt-notmuch script</a>
-for integrating the two, but the functionality was included upstream at the start of this year
-so it is quite straightforward to set it up. There is a
-<a href="http://aur.archlinux.org/packages.php?ID=36289" title="Arch User Repository package">package in the AUR</a>
-but it is intended as the full mail client, complete with, <em>shudder</em>, emacs support amongst
-other things. I have stripped out the uneeded bindings and included the relevant <code>perl</code> libraries in a
-<a href="https://bitbucket.org/jasonwryan/centurion/src/6ff0f252961f/Build/notmuch/PKGBUILD" title="…in my bitbucket repo">modified PKGBUILD</a>
-if you just want the basic search with <code>mutt</code>.</p>
+<p>So what does it do well? It is ridiculously easy to setup. You download the binary, start
+the app and then (on Linux) use the web interface to setup your first synching folder by
+generating a secret and then nominating a folder to share. On your next machine, enter the
+secret and select or create the shared folder and your files will be synched. Done.</p>
 
-<p>Otherwise, you&#8217;ll need to step through it manually.</p>
+<p>On a headless machine, there is a config file that you can create:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl perl-mailtools perl-mail-box perl-string-shellquote
-</span><span class='line'>cowerd notmuch perl-term-readline-gnu
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --dump-sample-config &gt; syncapp.conf
 </span></code></pre></div></figure>
 
 
-<p>As you will see from the PKGBUILD, you will need to copy the <code>notmuch-mutt</code> script
-into your <code>$PATH</code>: you&#8217;ll find it in <span class="file">contrib/notmuch-mutt/</span>.</p>
+<p>Edit it to suit your requirements, and then start <code>syncapp</code> with that configuration:</p>
 
-<p>There is a simple interative setup, which you can complete before running the index the first time:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>notmuch setup
-</span><span class='line'>notmuch new
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --config /path/to/syncapp.conf
 </span></code></pre></div></figure>
 
 
-<p>The final step is to copy across the <code>mutt</code> macros included with the script:</p>
+<p>and you are away, happily synching.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat src/notmuch-0.13/contrib/notmuch-mutt/notmuch-mutt.rc &gt;&gt; <span class="nv">$HOME</span>/.mutt/muttrc
-</span></code></pre></div></figure>
+<p>Like other applications that use the bittorrent protocol, it can take a minute or
+two for the synching to begin, but once it does I found it—over the Internet as well
+as my <acronym title="Local Area Network">LAN</acronym> to be much faster than
+dropbox. Another plus.</p>
+
+<h3>Areas for improvement</h3>
+
+<p>It is Alpha software so there are some areas where you can expect to see improvements
+with subsequent release. For me, that includes:</p>
+
+<ul>
+<li>Better command line tools; the current limited set are servicable, but could do
+with more flexibility and options</li>
+<li>The ability to create your own secret, rather than rely on generated ones</li>
+<li>A less fragile config file; it is written in JSON and the simplest errors will
+break it</li>
+<li>More Linux love; the other platforms have a much more sophisticated <acronym title="User Interface">UI</acronym></li>
+</ul>
 
 
-<p>Now, from within <code>mutt</code>, <kbd>F8</kbd>, <kbd>F9</kbd> and <kbd>F6</kbd> will respectively
-search, create the relevant threads from search results, and tag mails with <code>notmuch</code>.</p>
+<p>A comparison with dropbox is not entirely fair; there are some things that dropbox
+does—like versioning—that Sync can/will not do. Dropbox also allows you to host
+public files and folders, meaning that you can
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on using dropbox to host dotfiles">setup a basic webpage</a>
+or <a href="https://www.dropbox.com/sh/t6ko1rbl9edy8p4/OkwVLtY5fO" title="My Top 10 Albums">share a photo album</a>.
+Sync clearly isn&#8217;t designed for this.</p>
 
-<p>As I use <code>offlineimap</code> to retrieve my mail, I simply added <code>notmuch new</code> to the script that
-runs as a <code>cron</code> job to synch my mail and <code>notmuch</code> reindexes all of my mail as soon as it arrives.</p>
+<p>However, in some other respects, like architectures
+for example, Sync is already a better choice. The ARMv6 port means that I am able
+to run it on my Raspberry Pi, and that I have been able to update my
+<a href="http://jasonwryan.com/blog/2011/11/07/irc-dzen/" title="Post on IRC highlights">IRC notification system</a>
+to use Sync rather than dropbox and it is working perfectly well.</p>
 
-<h3>Updated 27/5/12</h3>
+<p>There is one area, though, where I wish the BitTorrent team would be a lot more
+forthcoming. There has been an unanswered question on the Sync forums for
+over three weeks now asking
+<a href="http://forum.bittorrent.com/topic/8816-will-syncapp-be-open-source/" title="Syncapp Forums">will Syncapp be open sourced?</a>
+Aside from the issue of whether or not the source will be made available (and I am guessing
+that given their reticence to answer the question on their boards the prognosis
+is not promising) people using the application now should know under what terms
+they are using it.</p>
 
-<p>Two of the <code>mutt</code> macros that are shipped in <span class="file">contrib/notmuch-mutt/notmuch-mutt.rc</span>
-do not work. I have written a patch to fix this and
-<a href="http://notmuchmail.org/pipermail/notmuch/2012/011263.html" title="Patch on notmuch list">posted it to the ML</a>.</p>
+<p>In the absence of any definitive licensing, I can only assume that the application
+is covered by BitTorrent&#8217;s
+<a href="http://www.bittorrent.com/legal/eula" title="Licensing agreement on BitTorrent site">default EULA</a>.
+That ambiguity means that I am happy to participate in the
+trial and provide feedback, but I won&#8217;t be using the app for any remotely
+sensitive data and I am unlikely to do so until that issue is clarified.</p>
+
+<p>I&#8217;ll install <a href="http://sparkleshare.org/" title="Sparkleshare site">Sparkleshare</a>
+and give that a shot instead…</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a> and
-<a href="http://jasonwryan.com/blog/2012/05/12/mutt/">mutt and HTML email</a></li>
+<li>Naturally, there are more issues at play here than just their (in)security policies.</li>
+<li>Assuming, of course, you trust what BitTorrent pack into the binary…</li>
 </ol>
-
-
-<p>Creative Commons image by
-<a href="http://www.flickr.com/photos/mjtmail/3008566512/in/photostream/">mjtmail on Flickr</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/12/mutt/">mutt and HTML email</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-12T15:49:00+12:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/mutt-1.png" title="'mutt logo'" ></p>
-
-<p>Following on from my <a href="http://jasonwryan.com/blog/2012/04/21/lbdb/" title="Using mutt, LDAP and SSL">last post about mutt</a>,
-I have been tinkering more with the most suckless of mail clients to
-get it to deal with—of all things—<acronym title="HyperText Markup Language">HTML</acronym>
-emails. I will preface this post with a remark or two that amounts to a warning about
-intemperate language, ranting and a generally cranky disposition: repeated contact with
-email marketers can do that to you…</p>
-
-<p>A further  brief digression is warranted here. HTML email is, without doubt,
-evidence of the imminent end of civilized life as we know it; much like the
-<a href="http://en.wikipedia.org/wiki/Places_in_The_Hitchhiker's_Guide_to_the_Galaxy#Golgafrincham" title="Wikipedia entry on HHGTTG">Golgafrincham diaspora</a>, it is attributable to a depraved cabal of marketing consultants
-and provides the same level of social good as syphilis and fistulas. Suffice to say, it is a blight.</p>
-
-<p>Sadly, it is a blight that I have to deal with. Up until now, I had done that by using the
-excellent <a href="http://w3m.sourceforge.net/" title="w3m homepage on sourceforge">w3m</a> to render
-HTML as text in mutt itself. That is accomplished easily enough with an entry in
-<span class="file">muttrc</span> and another in a <span class="file">mailcap</span> file.</p>
-
-<figure class='code'><figcaption><span>~/.mutt/muttrc </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>auto_view text/html                                      <span class="c"># view html automatically</span>
-</span><span class='line'>alternative_order text/plain text/enriched text/html     <span class="c"># save html for last</span>
-</span></code></pre></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>~/.mutt/mailcap </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
-</span></code></pre></div></figure>
-
-
-<p>This works for 80 percent of the HTML email I get. It is enough to confirm that the mail is useless
-and can be discarded. The other 20 percent, however, is slightly more problematic. The initial
-view in w3m is enough to tell me that, due to the outstanding incompetence of the idiots that
-generated the email, there <em>is</em> actually some information that is contained in the email that I need
-to access <strong>but it is not viewable in a text browser.</strong></p>
-
-<p><img class="left" src="http://miromiro.com/Blog-images/mutt-2.png" title="'An example…'" ></p>
-
-<p>For this special level of retardation, I need to be able to open the email in a graphical browser.
-As I use vimprobable, that means sending the file to
-<a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/" title="My post on Using vimprobable">vimprobable running in tabbed</a>. Fortunately, as you would expect with superior software,
-<code>mutt</code> has a way of handling this gracefully. In mutt&#8217;s extensive documentation, there is a
-<a href="http://www.mutt.org/doc/manual/manual-5.html" title="Go and read it…">page on mutt&#8217;s MIME support</a>
-that details how to set up a graduated response to this pernicious issue:</p>
-
-<blockquote><p>In addition, you can use this with Autoview to denote two commands for viewing<br/>an attachment, one to be viewed automatically, the other to be viewed<br/>interactively from the attachment menu.</p><footer><strong>mutt manual</strong> <cite><a href='http://www.mutt.org/doc/manual/manual-5.html'>www.mutt.org/doc/manual/&hellip;</a></cite></footer></blockquote>
-
-
-<p>So, you can have <code>mutt</code> render the HTML abomination in <code>w3m</code> in most cases, and when those
-instances of particularly cretinous behaviour make it to your inbox, you can choose to
-view them in your web browser. In my case, by altering the <span class="file">mailcap</span>
-entry to look like this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>text/html; vimprobtab.sh %s &amp;; <span class="nb">test</span><span class="o">=</span><span class="nb">test</span> -n <span class="s2">&quot;$DISPLAY&quot;</span>; needsterminal;
-</span><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
-</span></code></pre></div></figure>
-
-
-<p>The first entry tests that X is running, and if it is, it hands the file to <code>vimprobable</code>. The
-default, however, is determined by the <code>copiousoutput</code> tag. So, in <code>mutt</code> it is just a matter
-of hitting <kbd>v</kbd> to view the attached HTML and then <kbd>m</kbd> to send it to <code>mailcap</code>.
-For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">muttrc</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">bind </span>attach &lt;<span class="k">return</span>&gt;    view-mailcap
-</span></code></pre></div></figure>
-
-
 
 </div>
   
@@ -302,7 +234,7 @@ For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/04/21/lbdb/">Using mutt, LDAP and SSL</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/03/02/forking/">Forking Arch</a></h1>
     
     
       <p class="meta">
@@ -318,136 +250,241 @@ For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">
   
 
 
-<time datetime="2012-04-21T11:23:00+12:00" pubdate data-updated="true">Apr 21<span>st</span>, 2012</time>
+<time datetime="2013-03-02T10:04:00+13:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/addressbook.png" title="'Address Book Icon by bertop on Flickr'" ></p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/fork.jpg" title="'Fork on Flickr'" >
+Over the last couple of months there have been a number of discussions on the Arch boards
+about the
+<a href="https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY" title="Forum Etiquette">forum policy</a>
+of only providing support for Arch Linux, culminating in this
+<a href="https://bbs.archlinux.org/viewtopic.php?id=157361" title="Arch Forum thread">long thread about Archbang users</a>
+(login required) being denied support and having their threads summarily
+closed. As it emerged in the discussion, there seem to be two separate issues
+at play here; the question of Arch-derivatives using the Arch brand (logo,
+colours and even the forum style sheets), and how the wider community of
+GNU/Linux distributions are treated on our boards.</p>
 
-<p>One of the great things about starting a new job at
-<a href="http://jasonwryan.com/blog/2012/04/05/catalyst/" title="My post on joining Catalyst IT">an open source company</a>
-is having the freedom to use the tools that suit your workflow, rather than
-having to suffer the indignity of whatever the IT department consider to be the
-lowest comon denominator. Suffice to say, I have had a lot of fun this week
-setting up my working environment—and the ocassional hiccough as I was forced to learn
-something new…</p>
+<p>The first issue is relatively simple to address. Allowing derivative
+distributions to use the Arch brand is, in my view, a mistake. It dilutes the
+value of the Arch “brand” and—as can be seen when people show up having
+installed a derivative and thinking they are running Arch—just confuses people.</p>
 
-<p>One of those “learning opportunities” consisted of trying to get my mail client,
-<a href="http://www.mutt.org/" title="All mail clients suck. This one just sucks less.">mutt</a>
-to talk to the <acronym title="Lightweight Directory Acces Protocol">LDAP</acronym>
-directory over <acronym title="Secure Sockets Layer">SSL</acronym> so that I could
-query the shared address book. There are a number of helpful blog posts that describe
-using <a href="http://www.spinnaker.de/lbdb/" title="The Little Brother Database homepage">lbdb</a>
-with <code>mutt</code><sup>1</sup>. Unfortunately, after a lot of searching, I was unable to find
-any documentation on achieving this integration over a secure connection.
-I kept seeing this error:</p>
+<p>For some of these derivatives, like Archbang, there is an argument to be made
+that once they have completed the installation process, they are in fact
+running Arch, albeit an off-the-shelf version. I find this argument to be
+specious. All of the derivatives that I have come across, in addition to
+“simplifying”<sup>1</sup> the installation process and including <code>X</code> and some
+sort of desktop or window manager by default, also make a number of other
+system changes that invalidate their claim to being Arch by another name.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>Error: Search failed. LDAP server returned an error : 13, description: TLS
-</span><span class='line'>confidentiality required at /usr/lib/mutt_ldap_query line 198, &lt;DATA&gt; line 558.
-</span></code></pre></div></figure>
+<p>See this <a href="http://www.reddit.com/r/archlinux/comments/yj2v5/a_new_guibased_version_of_arch_has_gone_live/c5wc6yo" title="Reddit thread on Manjaro Linux">scathing review of Manjaro</a>
+or Allan&#8217;s <a href="http://allanmcrae.com/2012/12/battle-of-the-arch-spin-offs/" title="Allan McRae's blog">roundup of the Arch Spin-Offs</a>
+for the details on the decisions these developers make that mean it is not
+practicable to support them on the Arch boards, nor desirable to do so in
+future. As a distro, Arch is essentially vanilla packages, pacman and rolling
+release, and a base on which
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric" title="The Arch Way">you build your preferred system</a>.
+Changing two of those three means that you are not running Arch…</p>
 
+<p>That leads in to the second point, which is I&#8217;ll paraphrase as “well, we are
+all Linux users, so everyone should be welcome to ask for support from Arch
+users.” It is a fine sentiment, but one that is neither
+<a href="http://www.catb.org/esr/faqs/smart-questions.html#forum" title="ESR's seminal document">historically accurate</a>,
+nor in the long term interests of Arch. I have harped on in the past about
+<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="My post on the taxonomy of suckers…">help vampires</a>
+and last year I came across the perfect illustration of the unchecked effects
+of this phenomena:</p>
 
-<p>Several hours later, and with some
-help from <a href="https://twitter.com/#!/ibeardslee" title="Ian on Twitter: follow him…">@ibeardslee</a>,
-I managed to set it up, and it was definitely worth the effort.</p>
-
-<p>You will need to install <code>lbdb</code> from
-<a href="http://aur.archlinux.org/packages.php?ID=10225" title="AUR package">the AUR</a>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cowerd lbdb     <span class="c"># 2</span>
-</span></code></pre></div></figure>
-
-
-<p>…and a couple of packages from the repos to make it all work:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S perl-ldap perl-io-socket-ssl netkit-bsd-finger
-</span></code></pre></div></figure>
-
-
-<p>Then it is a matter of configuring <code>lbdb</code> to both
-query the LDAP directory and be able to be called from <code>mutt</code>.
-First, copy the config files into your <span class="file">$HOME</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir .lbdb
-</span><span class='line'>cp /etc/lbdb.rc .lbdb/lbdbrc
-</span><span class='line'>cp /etc/lbdb_ldap.rc .lbdb/ldap.rc
-</span></code></pre></div></figure>
+<blockquote><p>Right now I&#8217;d say the bug queues are flooded with bugs that you can&#8217;t really act on… It&#8217;s a strain on the project that there are so many users that don&#8217;t really get it.</p><footer><strong>Alison Randall</strong> <cite>Ubuntu Technical Architect. Linux Format July 2012</cite></footer></blockquote>
 
 
-<p>And then modify the two configuration files to suit your setup:
-The first, <span class="file">$HOME/.lbdb/lbdbrc</span>, is well commented and
-self-explanatory; add <code>ldap</code> to the methods and the
-nickname of your server:</p>
+<p>Your bugtracker becomes essentially unusable. Your forums end up the same way.
+No-one ends up getting much in the way of assistance at all, let alone anything
+approaching informed help. That may be an inevitable consequence of the
+collision between considerable but still finite resources and a philosophy of being
+the <acronym title="Operating System">OS</acronym> of the masses; Arch has
+nothing like that in terms of resources, and a very different
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="The Arch Way, again…">philosophy</a>.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">METHODS</span><span class="o">=</span><span class="s2">&quot;m_abook m_ldap&quot;</span>
-</span><span class='line'><span class="nv">LDAP_NICKS</span><span class="o">=</span><span class="s2">&quot;catalyst&quot;</span>
-</span></code></pre></div></figure>
+<p>That philosophy doesn&#8217;t include anything about shortcuts or commoditized images
+for a mass user base. It doesn&#8217;t mention making the installation and
+maintenance of your system completely idiot-proof so as to facilitate a
+relentless march to the very top of whatever spurious distro popularity ranking
+system you subscribe to. And it certainly doesn&#8217;t say anything about your
+entitlement to immediate and courteous support from the Arch community in the
+face of your own inability to reach a minimum level of understanding of what it
+is that you have installed on your hard drive.</p>
 
+<p>If you think that you can just skip the whole tiresome
+<a href="http://jasonwryan.com/blog/2013/02/08/documentation/" title="Post on documentation">RTFM thing</a>
+by downloading a derivative and installing that, how exactly do you expect to be able
+to run a rolling release distro that has, on average, a couple of
+<a href="https://www.archlinux.org/news/" title="Arch news">significant changes</a> every year?</p>
 
-<p>The second config file, <span class="file">$HOME/.lbdb/ldap.rc</span>
-is written in Perl and is a bit of a shocker:</p>
+<p>Sooner or later you are going to have to come to terms with <em>the responsibility</em>
+that is an integral part of this type of rolling release and, if you have
+installed it yourself, you will be much better placed to be able to build on
+that understanding and broaden and deepen your knowledge of your system.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='perl'><span class='line'><span class="nv">%ldap_server_db</span> <span class="o">=</span> <span class="p">(</span>
-</span><span class='line'>    <span class="s">&#39;catalyst&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">,</span>
-</span><span class='line'>                    <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">,</span>
-</span><span class='line'>                    <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">,</span>
-</span><span class='line'>                    <span class="s">&#39;${mail}&#39;</span><span class="p">,</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">]</span>
-</span><span class='line'><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># hostname of your ldap server</span>
-</span><span class='line'><span class="nv">$ldap_server</span> <span class="o">=</span> <span class="s">&#39;ldaps://ldap.catalyst.net.nz:636&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$search_base</span> <span class="o">=</span> <span class="s">&#39;ou=Staff,ou=People,dc=catalyst,dc=net,dc=nz&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_search_fields</span>    <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_expected_answers</span> <span class="o">=</span> <span class="s">&#39;givenname sn cn mail&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_result_email</span>     <span class="o">=</span> <span class="s">&#39;${mail}&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_result_realname</span>  <span class="o">=</span> <span class="s">&#39;${givenname} ${sn}&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ignorant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_bind_dn</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$ldap_bind_password</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="mi">1</span><span class="p">;</span>
-</span></code></pre></div></figure>
-
-
-<p>The key is to ensure that you use both the <code>ldaps</code>
-prefix <strong>and</strong> explicitely specify the SSL port, 636. Without both of these, you will
-get the TLS confidentiality error.</p>
-
-<p>You can then test that it is working correctly by running a query:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>lbdbq jemima
-</span></code></pre></div></figure>
-
-
-<p>All going well, if there is indeed a Jemima in the shared address book, you will see her
-contact details miraculously appear before you. If there is more than one, you will have a
-list to choose from.</p>
-
-<p>Finally, you just need to set up <code>mutt</code> to query <code>lbdb</code>.
-In your <span class="file">muttrc</span>, add the following:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">query_command</span> <span class="o">=</span> <span class="s2">&quot;lbdbq %s 2&gt;/dev/null&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>I found that suppressing the errors made the whole experience a little smoother. You
-may not require it… Now, hitting <kbd>Shift</kbd><kbd>q</kbd> in <code>mutt</code>
-brings up a prompt to query the LDAP directory (and my <a href="http://abook.sourceforge.net/" title="abook homepage">abook</a> address book that I share via
-<a href="https://www.dropbox.com/" title="Dropbox homepage">dropbox</a>). You can also access the directory
-by starting to type an email address and then hitting <kbd>Ctrl</kbd><kbd>t</kbd> to see
-a list of possible completions.</p>
+<p>That is ultimately far more satisfying for you, and much more beneficial for
+the rest of the community as it means that you will be more able and likely to
+contribute back in whatever way that you can; reporting bugs to a functioning
+bug tracker, editing the <a href="https://wiki.archlinux.org" title="The finest, actually">fine Wiki</a>,
+maintaining packages in <a href="https://aur.archlinux.org" title="Arch User Repository">the AUR</a>,
+submitting patches, etc.  Doing all the things that will
+sustain Arch and continue to make it an attractive distribution for competent
+GNU/Linux users and those that are willing to invest the time to become so.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li><a href="http://www.christianschenk.org/blog/integrating-ldap-into-mutt/" title="Integrating LDAP into Mutt">Christian Schenk&#8217;s post</a> got me started.</li>
-<li>A <a href="https://bitbucket.org/jasonwryan/eeepc/src/f15bf6e51e62/Scripts/cowerd" title="Script in bitbucket repo">wrapper script for cower</a></li>
+<li>If you have used the Arch install scripts, you would appreciate that it is
+not really possible to provide a simpler installation process.</li>
 </ol>
 
 
-<p>Creative Commons image <a href="http://www.flickr.com/photos/bertop/2530620838/">by bertop on Flickr</a></p>
+<p>Creative Commons licensed image on Flickr by <a href="http://www.flickr.com/photos/pietroizzo/3514191996/">pietroizzo</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/08/documentation/">Read The Fine Manual</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-08T19:57:00+13:00" pubdate data-updated="true">Feb 8<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/documents.jpg" title="'Documents on Flickr'" >
+One of the canards about Free and Open Source Software that is peddled by the unscrupulous
+marketers of proprietary software is that their product is superior because, among other
+things, the scruffy, sandal-wearing Communists that write and distribute their software
+for free do not bother to adequately document that software; thereby placing in jeopardy
+the business processes in the enterprise that rely on said software to continue to
+profitably grease the wheels of the juggernaut of Capitalism.</p>
+
+<p>At heart, it really is an attempt to paint FOSS as a hobbyist&#8217;s pursuit, unworthy of
+consideration by Fortune 500 <acronym title="Chief Inhibiting Officers">CIOs</acronym>
+as it is not in the same league as “professional,” proprietary product. This
+<acronym title="Fear, Uncertainty & Doubt">FUD</acronym> is not restricted to
+the usual suspects; it has also been raised by other, presumably more
+<a href="http://www.osnews.com/story/5180" title="Editorial on OS News">objective commentators</a>:</p>
+
+<blockquote><p>Open Source documentation is terrible. There is no kinder way to put it. Even the commercially distributed software in the Open Source world has substandard documentation. (And believe me, as a technical writer coming from the Windows world, when I tell you that the commercial industrial standards are pretty low). Only a bare handful of Open Source software packages have any documentation at all. And out of the few that do, much of it is either unfinished, inaccurate, or outdated. What counts as explanatory text among geeks would bewilder a nuclear physicist, even a sober one.</p><footer><strong>OSNews Editorial, 2003</strong> <cite><a href='http://www.osnews.com/story/5180'>www.osnews.com/story/5180/&hellip;</a></cite></footer></blockquote>
+
+
+<p>A more recent survey, published in 2010, identifed the same issue for businesses,
+in slightly less histrionic language:</p>
+
+<blockquote><p>The No. 1 reason for not choosing open-source solutions was lack of support followed by poor documentation.</p><footer><strong>Zenoss 2010 Survey</strong> <cite><a href='http://gigaom.com/2010/08/11/enterprise-yeah-were-cool-with-open-source/'>gigaom.com/2010/08/11/&hellip;</a></cite></footer></blockquote>
+
+
+<p>My experience of FOSS documentation, particularly over the last twelve months, has been just the
+opposite.</p>
+
+<p>From the middle of 2012 on, I made a couple of significant changes in my computing
+environment; I moved from
+<a href="https://wiki.archlinux.org/index.php/SysVinit" title="Archwiki page…">SysVinit</a>
+to <a href="http://freedesktop.org/wiki/Software/systemd" title="Project web page">systemd</a>,
+garden variety to
+<a href="http://jasonwryan.com/blog/2013/01/25/uefi/" title="My post on UEFI booting">UEFI booting</a>
+and changed my shell from
+<a href="http://www.gnu.org/software/bash/" title="GNU Bash page">Bash</a> to
+<a href="http://www.zsh.org/" title="Zsh homepage, one of the ugliest on the Web">Zsh</a>.
+In each of these cases I found myself having to turn to the documentation the
+community has provided in order to understand the implications of the change,
+and to familiarise myself with the new tool or approach.</p>
+
+<p>I posted at the time about <a href="http://jasonwryan.com/blog/2012/08/04/systemd/" title="The Leap to systemd">moving to systemd</a>,
+and I don&#8217;t think—in retrospect—I credited Lennart Poettering enough for the series of posts
+he wrote detailing the design decisions and implementation of that system;
+those posts (at the time 12, now
+<a href="http://0pointer.de/blog/projects" title="Lennart Poettering's blog">grown to 20</a>)
+are an impressively thorough, and thoughtful, document of the new init system.</p>
+
+<p>Similarly, when I started reading about <acronym title="Universal Extensible Firmware Interface">UEFI</acronym>
+booting, I quickly found myself at <a href="http://www.rodsbooks.com/" title="The author of… Just go there!">Rod Smith&#8217;s site</a>.
+Rod has compiled an exhaustive and authoritative resource on <a href="http://www.rodsbooks.com/gdisk/" title="gdisk page">GPT</a>,
+EFI Stub loading and UEFI booting in general. Reading through his clear, approachable
+documentation made transitioning to UEFI a much simpler process than, given the
+inherent complexity in the ecosystem, I would have thought possible.</p>
+
+<p>Then there is Zsh.</p>
+
+<blockquote><p>Because zsh contains many features, the zsh manual has been split into a number of sections…</p><footer><strong>zsh manual</strong> <cite><a href='http://linux.die.net/man/1/zsh'>linux.die.net/man/1/zsh/&hellip;</a></cite></footer></blockquote>
+
+
+<p>And goes it on to list those <em>seventeen</em> sections. If you are not a fan of <code>man</code> pages<sup>1</sup>,
+there is the
+<a href="http://zsh.sourceforge.net/Doc/Release/zsh_toc.html" title="What it says on the tin…">Zsh Documentation</a>,
+the <a href="http://zsh.sourceforge.net/Guide/zshguide.html" title="User's Guide">User&#8217;s Guide</a> and
+<a href="http://zshwiki.org/home/" title="Zsh Wiki">wiki</a>. This amounts to a literally staggering
+amount of information—it is no wonder that preconfigured zsh systems like
+<a href="http://grml.org/zsh/" title="grml homepage">grml</a> are so popular; they provide
+relatively simple ingress to the byzantine ways of this powerful shell.</p>
+
+<p>Finally, also last year, I was privileged to chair the judging for the
+<a href="http://www.nzosa.org.nz/" title="NZOSA site">2012 New Zealand Open Source Awards</a>.
+This exposed me to the amazing contribution
+<a href="http://man7.org/mtk/index.html" title="Man pages Michael maintains">Michael Kerrisk</a>
+has made to GNU/Linux over the last decade. He is the author, or co-author, of
+<em>over 300</em> <code>man</code> pages; and these aren&#8217;t the glamorous, application pages read
+by the masses, but the system pages that document the kernel and <code>glibc</code>
+<acronym title="Application Program Interface">APIs</acronym>.</p>
+
+<p>All of this suggests to me that the state of documentation for FOSS is
+anything but parlous. At every turn over the last year, when I needed to
+be able to refer to documentation for a project, there was a surfeit of it.
+And I have only touched on what would normally constitute the primary
+sources; there is also all of the other community-driven documentation
+around projects, like the
+<a href="https://wiki.archlinux.org/" title="The BEST GNU/LINUX wiki on the web">Arch Wiki</a>
+or the <a href="http://unix.stackexchange.com/" title="Unix &amp; Linux SE">Stack Exchange sites</a>,
+the support available on forums, IRC, blog posts, etc.</p>
+
+<p>Compared to the sterile, mostly out-of-date (and expensive) documentation that
+accompanies proprietary software, FOSS is an Alexandrine utopia…</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>And, god knows, <em>I am</em>; <code>man</code> pages are a constant source of knowledge
+and delight (and pretty much the only way I can contribute to projects that
+I am indebted to).</li>
+</ol>
+
+
+<p>Creative Commons image of documents by
+<a href="http://www.flickr.com/photos/mwichary/2322639175/">Marcin Wichary</a> on Flickr.</p>
 </div>
   
   
@@ -472,23 +509,23 @@ a list of possible completions.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -566,7 +603,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -575,7 +612,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

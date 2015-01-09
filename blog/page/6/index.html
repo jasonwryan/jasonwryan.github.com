@@ -9,10 +9,8 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I have posted about using dropbox quite
-a few times
-over the last couple of years; it is one of those utilities that quickly insinuates itself
-into &hellip;">
+  <meta name="description" content="One of the most satisfying aspects of running free and open source software is
+the ability to be able to continually tinker with your setup, limited &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +19,7 @@ into &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/6">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/6">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -29,8 +27,8 @@ into &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -68,7 +66,7 @@ into &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -91,7 +89,7 @@ into &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/03/16/sync/">BitTorrent Sync Alpha</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/01/20/udev/">Scripting with udev</a></h1>
     
     
       <p class="meta">
@@ -107,121 +105,108 @@ into &hellip;">
   
 
 
-<time datetime="2013-03-16T10:17:00+13:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
+<time datetime="2014-01-20T10:02:00+13:00" pubdate data-updated="true">Jan 20<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/syncapp.png" title="'BitTorrent Sync logo'" >
-I have posted about using <a href="http://dropbox.com" title="dropbox homepage">dropbox</a> quite
-<a href="https://duckduckgo.com/?sites=jasonwryan.com&amp;q=dropbox" title="DDG search results">a few times</a>
-over the last couple of years; it is one of those utilities that quickly insinuates itself
-into an indispensable niche in your workflow and, consequently, can be <em>very</em> difficult to
-dislodge. Perhaps because it has started to glue together so much of the way I work, I have
-been wondering when I would find a replacement that would deliver all, or much, of the
-functionality, without the standard
-<a href="http://arstechnica.com/security/2012/07/dropbox-confirms-it-got-hacked-will-offer-two-factor-authentication/" title="Ars post on the dropbox hack">cloud security issues</a>,
-that seem to bedevil these services.<sup>1</sup></p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/usb.jpg" title="Creative Commons image" >
+One of the most satisfying aspects of running free and open source software is
+the ability to be able to continually tinker with your setup, limited only by
+your imagination and ability.  The more you do tinker, the smaller the gap
+between the former and the latter, as each small project inevitably leads you
+into a deeper understanding of various aspects of your system<sup>1</sup> and
+how you can customize that system to suit your exact requirements.</p>
 
-<p>When I saw that BitTorrent had release a distributed synching app called—appropriately—
-<a href="http://blog.bittorrent.com/2013/01/24/test-bittorrent-sync-pre-alpha/" title="Blog post on sync release">Sync</a>,
-I <a href="http://labs.bittorrent.com/experiments/sync.html" title="Invitation form">signed up for the Alpha</a> and
-have been running it in lieu of dropbox for the past three weeks. My initial reaction is,
-that for a first release, it is very impressive.</p>
+<p>Over the last couple of days, I have been playing with
+<a href="http://en.wikipedia.org/wiki/Udev" title="Wikipedia page">udev</a>, the kernel device
+manager, as I was attempting to run a script once a specific
+<acronym title="Universal Serial Bus">USB</acronym> drive was plugged in. It
+turns out, as is so often the case, that udev is only <em>part</em> of the
+picture…</p>
 
-<p>Essentially, Sync uses the
-<a href="https://en.wikipedia.org/wiki/Bittorent" title="Wikipedia entry">bittorrent peer-to-peer protocol</a>
-and encryption
-(<a href="https://en.wikipedia.org/wiki/Aes_256" title="Wikipedia entry on the standard">AES 256</a>
-using a private key based on the secret generated for each shared folder)
-to sync files between your machines—or anyone with whom you share the secret
-for a particular directory. This has several advantages over dropbox, from my perspective.
-First and foremost, you are not relying on some third party for security<sup>2</sup>, storage
-and uptime. Secondly, all of the traffic between your devices is encrypted. And finally,
-it is free (sadly, only as in beer).</p>
+<p>As both my work and personal laptops have relatively small
+<acronym title="Solid State Drives">SSDs</acronym>, I carry around
+<a href="http://alpha.libre.fm/user/jasonwryan/" title="Libre.fm profile">my music</a>
+on a 1TB external drive. As the drive only contains <span class="file">.flac</span>
+files, I wanted to automate the process of <code>rsync</code>’ing music from my desktop to
+the drive and, for the laptops, repopulating the symlinks to
+<span class="file">~/Music/</span> when the drive was plugged in.</p>
 
-<h3>Positives</h3>
+<p>My first thought was a rule in <span class="file">/etc/udev/rules.d/</span>,
+using <code>RUN+=</code>. There are any number of blog posts espousing this approach and,
+as I quickly discovered, they are <em>all</em> wrong. The problem with using this key is
+that, as the <code>man</code> page makes clear, it is not designed for long running
+programs:</p>
 
-<p>So what does it do well? It is ridiculously easy to setup. You download the binary, start
-the app and then (on Linux) use the web interface to setup your first synching folder by
-generating a secret and then nominating a folder to share. On your next machine, enter the
-secret and select or create the shared folder and your files will be synched. Done.</p>
+<blockquote><p>This can only be used for very short-running foreground tasks. Running an event process for a long period of time may block all further events for this or a dependent device.</p><p>Starting daemons or other long running processes is not appropriate for udev; the forked processes, detached or not, will be unconditionally killed after the event handling has finished.</p><footer><strong>udev manual</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/udev.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
 
-<p>On a headless machine, there is a config file that you can create:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --dump-sample-config &gt; syncapp.conf
+<p>The problem, as it manifest for me, was the drive would be blocked from
+mounting until <em>after</em> the script had run, meaning <code>rsync</code> or my symlinks would
+have no target.  There are various “workarounds” on the web for this, including
+using <em>two</em> scripts, one to trigger the other<sup>2</sup>. Even for me, this
+seemed like a
+<a href="http://en.wikipedia.org/wiki/Pyrrhic_victory" title="Wikipedia entry">Pyrrhic victory</a>.</p>
+
+<p>The correct way to do this, as I found once I uncovered
+<a href="https://bbs.archlinux.org/viewtopic.php?id=149419" title="Arch BBS">this thread</a>
+on the Arch boards where WonderWoofy and 65kid helpfully pieced it together, is
+to use <code>SYSTEMD_WANTS</code>.  As it is described in the manual:</p>
+
+<blockquote><p>THE UDEV DATABASE<br/>  The settings of device units may either be configured via unit files, or directly from the udev database (which is recommended). The following udev properties are understood by systemd:</p><p>  SYSTEMD_WANTS=<br/>  Adds dependencies of type Wants from this unit to all listed units. This may be used to activate arbitrary units, when a specific device becomes available. Note that this and the other tags are not taken into account unless the device is tagged with the &#8220;systemd&#8221; string in the udev database, because otherwise the device is not exposed as systemd unit.</p><footer><strong>man systemd.device</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/systemd.device.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
+
+
+<p>So, I edited <span class="file">/etc/udev/rules.d/90-usb-music.rules</span> to
+remove the <code>RUN+=</code> key, using a systemd service file instead, like so<sup>3</sup>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SUBSYSTEMS</span><span class="o">==</span><span class="s2">&quot;usb&quot;</span>, ATTRS<span class="o">{</span>idProduct<span class="o">}==</span><span class="s2">&quot;1905&quot;</span>, <span class="nv">ACTION</span><span class="o">==</span><span class="s2">&quot;add&quot;</span>, ENV<span class="o">{</span>SYSTEMD_WANTS<span class="o">}==</span><span class="s2">&quot;upmusic.service&quot;</span>
 </span></code></pre></div></figure>
 
 
-<p>Edit it to suit your requirements, and then start <code>syncapp</code> with that configuration:</p>
+<p>And then wrote the corresponding service file to have systemd hand off to the bash script:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --config /path/to/syncapp.conf
+<figure class='code'><figcaption><span>/usr/lib/systemd/system/upmusic.service </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>Unit<span class="o">]</span>
+</span><span class='line'><span class="nv">Description</span><span class="o">=</span>Update music links from Apollo
+</span><span class='line'><span class="nv">Requires</span><span class="o">=</span>media-Apollo.mount
+</span><span class='line'><span class="nv">After</span><span class="o">=</span>media-Apollo.mount
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>Service<span class="o">]</span>
+</span><span class='line'><span class="nv">ExecStart</span><span class="o">=</span>/home/jason/Scripts/upmusic
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>Install<span class="o">]</span>
+</span><span class='line'><span class="nv">WantedBy</span><span class="o">=</span>media-Apollo.mount
 </span></code></pre></div></figure>
 
 
-<p>and you are away, happily synching.</p>
+<p>As I mentioned in my post on my
+<a href="http://jasonwryan.com/blog/2013/10/28/dismount/" title="Unmount USB drives…">simple unmounting script</a>,
+I use a naming convention for all my USB drives. In this case, my music is stored on Apollo, and
+it is auto-mounted with
+<a href="https://wiki.archlinux.org/index.php/Udiskie" title="Arch wiki page">udiskie</a>. In the
+service file, systemd uses a hyphen instead of a forward slash, so the correct
+designation is <code>media-Apollo.mount</code>.</p>
 
-<p>Like other applications that use the bittorrent protocol, it can take a minute or
-two for the synching to begin, but once it does I found it—over the Internet as well
-as my <acronym title="Local Area Network">LAN</acronym> to be much faster than
-dropbox. Another plus.</p>
-
-<h3>Areas for improvement</h3>
-
-<p>It is Alpha software so there are some areas where you can expect to see improvements
-with subsequent release. For me, that includes:</p>
-
-<ul>
-<li>Better command line tools; the current limited set are servicable, but could do
-with more flexibility and options</li>
-<li>The ability to create your own secret, rather than rely on generated ones</li>
-<li>A less fragile config file; it is written in JSON and the simplest errors will
-break it</li>
-<li>More Linux love; the other platforms have a much more sophisticated <acronym title="User Interface">UI</acronym></li>
-</ul>
-
-
-<p>A comparison with dropbox is not entirely fair; there are some things that dropbox
-does—like versioning—that Sync can/will not do. Dropbox also allows you to host
-public files and folders, meaning that you can
-<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on using dropbox to host dotfiles">setup a basic webpage</a>
-or <a href="https://www.dropbox.com/sh/t6ko1rbl9edy8p4/OkwVLtY5fO" title="My Top 10 Albums">share a photo album</a>.
-Sync clearly isn&#8217;t designed for this.</p>
-
-<p>However, in some other respects, like architectures
-for example, Sync is already a better choice. The ARMv6 port means that I am able
-to run it on my Raspberry Pi, and that I have been able to update my
-<a href="http://jasonwryan.com/blog/2011/11/07/irc-dzen/" title="Post on IRC highlights">IRC notification system</a>
-to use Sync rather than dropbox and it is working perfectly well.</p>
-
-<p>There is one area, though, where I wish the BitTorrent team would be a lot more
-forthcoming. There has been an unanswered question on the Sync forums for
-over three weeks now asking
-<a href="http://forum.bittorrent.com/topic/8816-will-syncapp-be-open-source/" title="Syncapp Forums">will Syncapp be open sourced?</a>
-Aside from the issue of whether or not the source will be made available (and I am guessing
-that given their reticence to answer the question on their boards the prognosis
-is not promising) people using the application now should know under what terms
-they are using it.</p>
-
-<p>In the absence of any definitive licensing, I can only assume that the application
-is covered by BitTorrent&#8217;s
-<a href="http://www.bittorrent.com/legal/eula" title="Licensing agreement on BitTorrent site">default EULA</a>.
-That ambiguity means that I am happy to participate in the
-trial and provide feedback, but I won&#8217;t be using the app for any remotely
-sensitive data and I am unlikely to do so until that issue is clarified.</p>
-
-<p>I&#8217;ll install <a href="http://sparkleshare.org/" title="Sparkleshare site">Sparkleshare</a>
-and give that a shot instead…</p>
+<p>Then it is just a matter of enabling the service with <code>systemctl enable upmusic</code> and,
+whenever Apollo is plugged in to either my desktop of laptop, the appropriate
+script will run and either update the files on Apollo or the symlinks on one of the
+laptops.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>Naturally, there are more issues at play here than just their (in)security policies.</li>
-<li>Assuming, of course, you trust what BitTorrent pack into the binary…</li>
+<li>This shouldn&#8217;t be taken as any sort of claim of expertise or deep
+understanding of this, or any other, part of my system. See below.</li>
+<li>Which is why you should never trust anything written by bloggers…</li>
+<li>The definitive reference for udev rules remains
+<a href="http://www.reactivated.net/writing_udev_rules.html" title="Daniel Drake's page">Writing udev rules</a></li>
 </ol>
 
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/jacobgarcia/2550146/" title="Licensed CC by Jacob Garcia">Jacob Garcia</a>.</p>
 </div>
   
   
@@ -234,7 +219,7 @@ and give that a shot instead…</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/03/02/forking/">Forking Arch</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a></h1>
     
     
       <p class="meta">
@@ -250,105 +235,79 @@ and give that a shot instead…</p>
   
 
 
-<time datetime="2013-03-02T10:04:00+13:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2013</time>
+<time datetime="2013-12-28T10:09:00+13:00" pubdate data-updated="true">Dec 28<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/fork.jpg" title="'Fork on Flickr'" >
-Over the last couple of months there have been a number of discussions on the Arch boards
-about the
-<a href="https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY" title="Forum Etiquette">forum policy</a>
-of only providing support for Arch Linux, culminating in this
-<a href="https://bbs.archlinux.org/viewtopic.php?id=157361" title="Arch Forum thread">long thread about Archbang users</a>
-(login required) being denied support and having their threads summarily
-closed. As it emerged in the discussion, there seem to be two separate issues
-at play here; the question of Arch-derivatives using the Arch brand (logo,
-colours and even the forum style sheets), and how the wider community of
-GNU/Linux distributions are treated on our boards.</p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/ad_free.png" title="Flickr CC Image" >
+The relentless commercialization of traditional holidays, not just the December
+variety but all of them now, means that what was ostensibly an occasion for
+celebrating your particular flavour of $deity, pagan ritual or just an
+opportunity to reconnect with your wider family, has been co-opted to the
+worship of the most pernicious of all cults, consumerism.</p>
 
-<p>The first issue is relatively simple to address. Allowing derivative
-distributions to use the Arch brand is, in my view, a mistake. It dilutes the
-value of the Arch “brand” and—as can be seen when people show up having
-installed a derivative and thinking they are running Arch—just confuses people.</p>
+<p>Concomitant with this is the increasing corporatisation of the Internet; the
+deliberate and seemingly ineluctable effort by a relatively small number of
+global interests to turn most of the Internet into something more like cable
+television. As someone who has not lived with a television for decades
+precisely because I don&#8217;t want to live in a
+<a href="http://en.wikipedia.org/wiki/Operant_conditioning_chamber" title="Wikipedia page">Skinner box</a>
+that is solely designed to condition me to compliantly purchase more product,
+I find this rankly offensive (in the sense of morally repugnant as well as a
+coordinated and remorseless assault).</p>
 
-<p>For some of these derivatives, like Archbang, there is an argument to be made
-that once they have completed the installation process, they are in fact
-running Arch, albeit an off-the-shelf version. I find this argument to be
-specious. All of the derivatives that I have come across, in addition to
-“simplifying”<sup>1</sup> the installation process and including <code>X</code> and some
-sort of desktop or window manager by default, also make a number of other
-system changes that invalidate their claim to being Arch by another name.</p>
+<p>With the escalation of both the level and nauseating intensity of advertising
+around the “holiday season” and the almost hysterical exhortations to purchase
+more happiness, I decided that the one thing that I would be really thankful for
+this Christmas was better ad blocking.</p>
 
-<p>See this <a href="http://www.reddit.com/r/archlinux/comments/yj2v5/a_new_guibased_version_of_arch_has_gone_live/c5wc6yo" title="Reddit thread on Manjaro Linux">scathing review of Manjaro</a>
-or Allan&#8217;s <a href="http://allanmcrae.com/2012/12/battle-of-the-arch-spin-offs/" title="Allan McRae's blog">roundup of the Arch Spin-Offs</a>
-for the details on the decisions these developers make that mean it is not
-practicable to support them on the Arch boards, nor desirable to do so in
-future. As a distro, Arch is essentially vanilla packages, pacman and rolling
-release, and a base on which
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric" title="The Arch Way">you build your preferred system</a>.
-Changing two of those three means that you are not running Arch…</p>
+<p>I had been using
+<a href="https://wiki.archlinux.org/index.php/Privoxy" title="Arch wiki entry">Privoxy</a> and an
+<acronym title="Arch User Repository">AUR</acronym> script,
+<a href="https://aur.archlinux.org/packages/blocklist-to-privoxy/?ID=63431" title="AUR page">blocklist-to-privoxy</a>
+but I was still experiencing a lot of ads sneaking through (particularly local
+ones) and some unintended side effects of using Privoxy for this job, so I
+decide to give Jake VanderKolk&#8217;s
+<a href="http://gaenserich.github.io/hostsblock/" title="Homepage for Hostsblock">Hostsblock</a>
+a shot.</p>
 
-<p>That leads in to the second point, which is I&#8217;ll paraphrase as “well, we are
-all Linux users, so everyone should be welcome to ask for support from Arch
-users.” It is a fine sentiment, but one that is neither
-<a href="http://www.catb.org/esr/faqs/smart-questions.html#forum" title="ESR's seminal document">historically accurate</a>,
-nor in the long term interests of Arch. I have harped on in the past about
-<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="My post on the taxonomy of suckers…">help vampires</a>
-and last year I came across the perfect illustration of the unchecked effects
-of this phenomena:</p>
+<p>I went with the basic, entry level setup:
+<a href="https://aur.archlinux.org/packages/kwakd/" title="AUR page">kwakd</a> for serving blank
+<acronym title="HyperText Markup Language">HTML</acronym> in place of ads and
+<a href="https://aur.archlinux.org/packages.php?ID=58976" title="AUR package">hostsblock</a> to
+write to my <span class="file">/etc/hosts</span>. I didn&#8217;t see the need for
+<a href="https://wiki.archlinux.org/index.php/Dnsmasq" title="Arch Wiki page">dnsmasq</a> and,
+after a week or so or using it haven&#8217;t seen the need to revisit that decision.</p>
 
-<blockquote><p>Right now I&#8217;d say the bug queues are flooded with bugs that you can&#8217;t really act on… It&#8217;s a strain on the project that there are so many users that don&#8217;t really get it.</p><footer><strong>Alison Randall</strong> <cite>Ubuntu Technical Architect. Linux Format July 2012</cite></footer></blockquote>
+<p>Suffice to say, it is working brilliantly. Where once web pages were festooned
+with garish advertisements promising me ripped abdominals, tropical holidays and the
+lasting serenity that only Apple products can really truly deliver, I now have
+<a href="/images/post_images/herald.png" title="Screenshot of the local rag…">glorious whitespace</a></p>
 
+<p>There are a couple of other factors to consider with Hostsblock. There is a very
+simple command line interface for managing black and white listing of websites,
+and the various “content distribution networks” that infest most commercial
+sites like fleas. You can easily allow advertisements on or from sites and
+organizations that you want to support, while forever muting the inane drivel
+from the likes of Failbook <em>et al</em>.</p>
 
-<p>Your bugtracker becomes essentially unusable. Your forums end up the same way.
-No-one ends up getting much in the way of assistance at all, let alone anything
-approaching informed help. That may be an inevitable consequence of the
-collision between considerable but still finite resources and a philosophy of being
-the <acronym title="Operating System">OS</acronym> of the masses; Arch has
-nothing like that in terms of resources, and a very different
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="The Arch Way, again…">philosophy</a>.</p>
+<p>Installation and setup are very straightforward, with simple instructions on the
+<a href="http://gaenserich.github.io/hostsblock/" title="Two or three steps, max…">Hostsblock site</a>.
+There is also an active thread on the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=139784" title="Arch forum thread">Arch boards</a>
+where Jake and a couple of others are extremely helpful.</p>
 
-<p>That philosophy doesn&#8217;t include anything about shortcuts or commoditized images
-for a mass user base. It doesn&#8217;t mention making the installation and
-maintenance of your system completely idiot-proof so as to facilitate a
-relentless march to the very top of whatever spurious distro popularity ranking
-system you subscribe to. And it certainly doesn&#8217;t say anything about your
-entitlement to immediate and courteous support from the Arch community in the
-face of your own inability to reach a minimum level of understanding of what it
-is that you have installed on your hard drive.</p>
-
-<p>If you think that you can just skip the whole tiresome
-<a href="http://jasonwryan.com/blog/2013/02/08/documentation/" title="Post on documentation">RTFM thing</a>
-by downloading a derivative and installing that, how exactly do you expect to be able
-to run a rolling release distro that has, on average, a couple of
-<a href="https://www.archlinux.org/news/" title="Arch news">significant changes</a> every year?</p>
-
-<p>Sooner or later you are going to have to come to terms with <em>the responsibility</em>
-that is an integral part of this type of rolling release and, if you have
-installed it yourself, you will be much better placed to be able to build on
-that understanding and broaden and deepen your knowledge of your system.</p>
-
-<p>That is ultimately far more satisfying for you, and much more beneficial for
-the rest of the community as it means that you will be more able and likely to
-contribute back in whatever way that you can; reporting bugs to a functioning
-bug tracker, editing the <a href="https://wiki.archlinux.org" title="The finest, actually">fine Wiki</a>,
-maintaining packages in <a href="https://aur.archlinux.org" title="Arch User Repository">the AUR</a>,
-submitting patches, etc.  Doing all the things that will
-sustain Arch and continue to make it an attractive distribution for competent
-GNU/Linux users and those that are willing to invest the time to become so.</p>
+<p>If you are feeling listless, run-down and lacking in energy, why not try
+Hostsblock? It will make your web pages brighter, speed up your page loads,
+protect your privacy and make you insanely popular. Try Hostsblock today!</p>
 
 <h4>Notes</h4>
 
-<ol>
-<li>If you have used the Arch install scripts, you would appreciate that it is
-not really possible to provide a simpler installation process.</li>
-</ol>
-
-
-<p>Creative Commons licensed image on Flickr by <a href="http://www.flickr.com/photos/pietroizzo/3514191996/">pietroizzo</a></p>
+<p>ad free, a Creative Commons image by
+<a href="http://www.flickr.com/photos/louisa_catlover/2875951548/">Louisa Billeter on Flickr</a>.</p>
 </div>
   
   
@@ -361,7 +320,7 @@ not really possible to provide a simpler installation process.</li>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/02/08/documentation/">Read The Fine Manual</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a></h1>
     
     
       <p class="meta">
@@ -377,114 +336,116 @@ not really possible to provide a simpler installation process.</li>
   
 
 
-<time datetime="2013-02-08T19:57:00+13:00" pubdate data-updated="true">Feb 8<span>th</span>, 2013</time>
+<time datetime="2013-11-14T09:51:00+13:00" pubdate data-updated="true">Nov 14<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/documents.jpg" title="'Documents on Flickr'" >
-One of the canards about Free and Open Source Software that is peddled by the unscrupulous
-marketers of proprietary software is that their product is superior because, among other
-things, the scruffy, sandal-wearing Communists that write and distribute their software
-for free do not bother to adequately document that software; thereby placing in jeopardy
-the business processes in the enterprise that rely on said software to continue to
-profitably grease the wheels of the juggernaut of Capitalism.</p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/sync.png" title="Bittorrent logo" >
+I have
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on the Alpha release">written previously</a>
+about
+<a href="http://www.bittorrent.com/sync" title="Sync webpage">BitTorrent Sync</a>, the encrypted
+file syncing application that uses the bittorrent protocol to sync your data
+over your <acronym title="Local Area Network">LAN</acronym>, or over the Internet,
+using <a href="https://en.wikipedia.org/wiki/Peer_to_peer" title="Wikipedia page">P2P technology</a>.
+I have been using it since early this year as a replacement for
+dropbox.<sup>1</sup></p>
 
-<p>At heart, it really is an attempt to paint FOSS as a hobbyist&#8217;s pursuit, unworthy of
-consideration by Fortune 500 <acronym title="Chief Inhibiting Officers">CIOs</acronym>
-as it is not in the same league as “professional,” proprietary product. This
-<acronym title="Fear, Uncertainty & Doubt">FUD</acronym> is not restricted to
-the usual suspects; it has also been raised by other, presumably more
-<a href="http://www.osnews.com/story/5180" title="Editorial on OS News">objective commentators</a>:</p>
+<p>At the beginning of this month, BitTorrent unveiled the
+<a href="http://blog.bittorrent.com/2013/11/05/bittorrent-sync-beta-api-now-available-to-developers/" title="Sync blog announcement">Beta API</a>
+for developers (meaning you have to tell them what you plan to do in order to
+be issued a key). After some equivocation, I signed up with the rather flimsy
+excuse of “writing a shell wrapper for the command line” and found, to my
+chagrin, a key in my inbox the next morning.</p>
 
-<blockquote><p>Open Source documentation is terrible. There is no kinder way to put it. Even the commercially distributed software in the Open Source world has substandard documentation. (And believe me, as a technical writer coming from the Windows world, when I tell you that the commercial industrial standards are pretty low). Only a bare handful of Open Source software packages have any documentation at all. And out of the few that do, much of it is either unfinished, inaccurate, or outdated. What counts as explanatory text among geeks would bewilder a nuclear physicist, even a sober one.</p><footer><strong>OSNews Editorial, 2003</strong> <cite><a href='http://www.osnews.com/story/5180'>www.osnews.com/story/5180/&hellip;</a></cite></footer></blockquote>
+<p>This proved to be something of an unwelcome arrival. In theory, I was excited
+about having access to a tool to query the Sync application. One of the nodes is
+on my
+<a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on setting up a torrent box">headless Raspberry Pi</a>
+and the idea of being able to issue a command from my laptop to ascertain what
+was going on in the Pi&#8217;s synced folders was (and is) a tremendously attractive
+one.</p>
+
+<p>However, now that I was in
+possession of the key, I felt morally obliged to do something with it. The
+problem with this realization was that I had no idea how to work with an
+<acronym title="Application Program Interface">API</acronym>, let alone writing
+a script to accomplish my purported goal.</p>
+
+<p>After spending some time looking at
+<a href="http://www.bittorrent.com/sync/developers/api" title="Such as it is…">the documentation</a>,
+and buoyed by the optimism of ignorance, I decided to make good on my promise.
+My first attempt sort of worked, but was hampered as much by a serious
+conceptual flaw as it was by poor implementation. I decided, in spite of any number
+of Stack Overflow posts warning expressly not to do this, to use <code>awk</code> to parse
+the <a href="http://www.json.org/" title="JSON homepage">JSON data</a><sup>2</sup>. This was what I would
+euphemistically describe as a “learning opportunity.” The result is preserved
+for posterity in my <a href="https://bitbucket.org/jasonwryan/shiv/commits/16c9dee17f097e83fb325e303d867e6fda488992?at=default" title="Bit of a trainwreck, but you have to start somewhere…">bitbucket repo</a>
+(for the completists)…</p>
+
+<p>At this point, I was fortunate that Earnestly in #archlinux introduced me to
+keenerd&#8217;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
+And by “introduced” I mean generously (and patiently) talked me through how it
+worked and how I could use it with the Sync API to achieve what I was after.
+After a while playing with it, there was the—inevitably belated—moment of
+realization: this thing is genius! It allows you to intelligently
+<em>interrogate</em> the data. Not blindly chopping at it with an increasingly complex
+series of actions in <code>awk</code><sup>3</sup>; but quite directly traversing the structure and
+extracting the desired elements.</p>
+
+<p>Now I was <em>cooking</em>. Well, more to the point, I was flailing about in a smoke
+filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
+asphyxiation. Once again, Earnestly&#8217;s patience and bash skills were put to good effect.
+The resulting script,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="In bitbucket">btstat</a>,
+is undeniably a triumph of his good ideas over my own poor execution. In other
+words, the fact that it works so well is testament to his ability, but any and
+all faults are mine alone<sup>4</sup>.</p>
+
+<p>And it does work. It only requires
+<a href="https://www.archlinux.org/packages/?sort=&amp;q=jshon" title="Arch package db">Jshon</a>
+(which you will already have installed because you use
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="My post on this great utility">aurphan, right?</a>)
+and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
+</span><span class='line'>directory2 H0p3fu11yY0uG3tTh31d3@
+</span></code></pre></div></figure>
 
 
-<p>A more recent survey, published in 2010, identifed the same issue for businesses,
-in slightly less histrionic language:</p>
+<p>The functionality in the script is limited at this stage to just querying the
+application; I wasn&#8217;t interested in pushing changes at this point. So you can
+access the version of the currently installed Syncapp, upload and download
+speeds, the size of synced folders and list all of their contents.</p>
 
-<blockquote><p>The No. 1 reason for not choosing open-source solutions was lack of support followed by poor documentation.</p><footer><strong>Zenoss 2010 Survey</strong> <cite><a href='http://gigaom.com/2010/08/11/enterprise-yeah-were-cool-with-open-source/'>gigaom.com/2010/08/11/&hellip;</a></cite></footer></blockquote>
-
-
-<p>My experience of FOSS documentation, particularly over the last twelve months, has been just the
-opposite.</p>
-
-<p>From the middle of 2012 on, I made a couple of significant changes in my computing
-environment; I moved from
-<a href="https://wiki.archlinux.org/index.php/SysVinit" title="Archwiki page…">SysVinit</a>
-to <a href="http://freedesktop.org/wiki/Software/systemd" title="Project web page">systemd</a>,
-garden variety to
-<a href="http://jasonwryan.com/blog/2013/01/25/uefi/" title="My post on UEFI booting">UEFI booting</a>
-and changed my shell from
-<a href="http://www.gnu.org/software/bash/" title="GNU Bash page">Bash</a> to
-<a href="http://www.zsh.org/" title="Zsh homepage, one of the ugliest on the Web">Zsh</a>.
-In each of these cases I found myself having to turn to the documentation the
-community has provided in order to understand the implications of the change,
-and to familiarise myself with the new tool or approach.</p>
-
-<p>I posted at the time about <a href="http://jasonwryan.com/blog/2012/08/04/systemd/" title="The Leap to systemd">moving to systemd</a>,
-and I don&#8217;t think—in retrospect—I credited Lennart Poettering enough for the series of posts
-he wrote detailing the design decisions and implementation of that system;
-those posts (at the time 12, now
-<a href="http://0pointer.de/blog/projects" title="Lennart Poettering's blog">grown to 20</a>)
-are an impressively thorough, and thoughtful, document of the new init system.</p>
-
-<p>Similarly, when I started reading about <acronym title="Universal Extensible Firmware Interface">UEFI</acronym>
-booting, I quickly found myself at <a href="http://www.rodsbooks.com/" title="The author of… Just go there!">Rod Smith&#8217;s site</a>.
-Rod has compiled an exhaustive and authoritative resource on <a href="http://www.rodsbooks.com/gdisk/" title="gdisk page">GPT</a>,
-EFI Stub loading and UEFI booting in general. Reading through his clear, approachable
-documentation made transitioning to UEFI a much simpler process than, given the
-inherent complexity in the ecosystem, I would have thought possible.</p>
-
-<p>Then there is Zsh.</p>
-
-<blockquote><p>Because zsh contains many features, the zsh manual has been split into a number of sections…</p><footer><strong>zsh manual</strong> <cite><a href='http://linux.die.net/man/1/zsh'>linux.die.net/man/1/zsh/&hellip;</a></cite></footer></blockquote>
-
-
-<p>And goes it on to list those <em>seventeen</em> sections. If you are not a fan of <code>man</code> pages<sup>1</sup>,
-there is the
-<a href="http://zsh.sourceforge.net/Doc/Release/zsh_toc.html" title="What it says on the tin…">Zsh Documentation</a>,
-the <a href="http://zsh.sourceforge.net/Guide/zshguide.html" title="User's Guide">User&#8217;s Guide</a> and
-<a href="http://zshwiki.org/home/" title="Zsh Wiki">wiki</a>. This amounts to a literally staggering
-amount of information—it is no wonder that preconfigured zsh systems like
-<a href="http://grml.org/zsh/" title="grml homepage">grml</a> are so popular; they provide
-relatively simple ingress to the byzantine ways of this powerful shell.</p>
-
-<p>Finally, also last year, I was privileged to chair the judging for the
-<a href="http://www.nzosa.org.nz/" title="NZOSA site">2012 New Zealand Open Source Awards</a>.
-This exposed me to the amazing contribution
-<a href="http://man7.orgi/mtk.index.html" title="Man pages Michael maintains">Michael Kerrisk</a>
-has made to GNU/Linux over the last decade. He is the author, or co-author, of
-<em>over 300</em> <code>man</code> pages; and these aren&#8217;t the glamorous, application pages read
-by the masses, but the system pages that document the kernel and <code>glibc</code>
-<acronym title="Application Program Interface">APIs</acronym>.</p>
-
-<p>All of this suggests to me that the state of documentation for FOSS is
-anything but parlous. At every turn over the last year, when I needed to
-be able to refer to documentation for a project, there was a surfeit of it.
-And I have only touched on what would normally constitute the primary
-sources; there is also all of the other community-driven documentation
-around projects, like the
-<a href="https://wiki.archlinux.org/" title="The BEST GNU/LINUX wiki on the web">Arch Wiki</a>
-or the <a href="http://unix.stackexchange.com/" title="Unix &amp; Linux SE">Stack Exchange sites</a>,
-the support available on forums, IRC, blog posts, etc.</p>
-
-<p>Compared to the sterile, mostly out-of-date (and expensive) documentation that
-accompanies proprietary software, FOSS is an Alexandrine utopia…</p>
+<p>It is a beta release, so the odd bug is to be expected. Overall, though, the API is
+a welcome addition to what is a great application. If you have an API key, add
+it to your <span class="file">sync.conf</span>,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="On bitbucket">grab the script</a>
+and give it a whirl. Undoubtedly, over the coming weeks more polished versions
+will emerge in “proper” languages, but for the time being this does exactly what
+I need.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>And, god knows, <em>I am</em>; <code>man</code> pages are a constant source of knowledge
-and delight (and pretty much the only way I can contribute to projects that
-I am indebted to).</li>
+<li>Yes, I would much prefer to use an open source tool to accomplish the same
+thing but I haven&#8217;t found anything comparable that is this good to date…</li>
+<li>In what I imagine is a complete coincidence, the JSON logo is uncannily
+similar to the initial (and much better, I thought) Sync logo, as seen on
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/">my original post</a>.</li>
+<li>This is not intended as a slight on <code>awk</code>; which I am undoubtedly
+<a href="http://jasonwryan.com/blog/2013/09/15/awking/">fond of</a>, but rather the
+limits of my ability with that language.</li>
+<li>I am also indebted to Scott (firecat53) for testing and providing helpful
+feedback on the early versions of the script.</li>
+<li>It is worth noting that in the <code>$json</code> variable, I pass <code>curl</code> the -<code>n</code> option,
+which means it reads my credentials from <span class="file">$HOME/.netrc</span>.</li>
 </ol>
 
-
-<p>Creative Commons image of documents by
-<a href="http://www.flickr.com/photos/mwichary/2322639175/">Marcin Wichary</a> on Flickr.</p>
 </div>
   
   
@@ -509,23 +470,23 @@ I am indebted to).</li>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -603,7 +564,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -612,7 +573,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

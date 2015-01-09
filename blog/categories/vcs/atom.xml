@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: vcs | jasonwryan.com]]></title>
-  <link href="http://jasonwryan.github.com/blog/categories/vcs/atom.xml" rel="self"/>
-  <link href="http://jasonwryan.github.com/"/>
-  <updated>2014-01-20T12:56:27+13:00</updated>
-  <id>http://jasonwryan.github.com/</id>
+  <link href="http://jasonwryan.com/blog/categories/vcs/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-09T23:18:03+13:00</updated>
+  <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
     
@@ -14,11 +14,78 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Building from Source]]></title>
+    <link href="http://jasonwryan.com/blog/2014/08/23/asp/"/>
+    <updated>2014-08-23T09:41:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/08/23/asp</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/lego.jpg" title="Creative Commons image" >
+One of the real strengths of Arch is its ability to be customised. Not just in
+terms of the packages that you choose to install, but how those packages
+themselves can be patched, altered or otherwise configured to suit your
+workflow and setup. I have posted previously about,
+for example, <a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on Vim configuration">building Vim</a>
+or <a href="http://jasonwryan.com/blog/2013/05/18/pkgbuilds/" title="More general observations">hacking PKGBUILDS</a>.
+What makes all this possible is the wonderful
+<a href="https://wiki.archlinux.org/index.php/Arch_Build_System" title="Arch Wiki page">ABS</a>,
+the Arch Build System.</p>
+
+<p>Essentially a tree of all of the PKGBUILDs (and other necessary files) for the
+packages in the official repositories, the ABS is the means by which you can
+easily acquire, compile and install any of the packages on your system:</p>
+
+<p><blockquote><p>ABS is made up of a directory tree (the ABS tree) residing under <span class="file">/var/abs</span>. This tree contains many subdirectories, each within a category and each named by their respective package. This tree represents (but does not contain) all <em>official Arch software</em>, retrievable through the SVN system.</p><footer><strong>Arch Wiki</strong> <cite>ABS</cite></footer></blockquote></p>
+
+<p>I have been using ABS since I started running Arch and it has worked well. I
+wrote a
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/abpkg" title="In my bitbucket repo">simple script</a>
+to check for and download updates when required to help simplify the process
+and have been generally content with that approach. That isn't to say that
+elements of this process couldn't be improved. One of the small niggles is that
+the ABS only syncs once a day so there is almost always—for me down here in
+.nz, anyway—at least a full day's wait between the package hitting the local
+mirror and the updated ABS version arriving. The other issue is that you
+download and sync the entire tree…</p>
+
+<p>That all changed when, at the start of this month, one of the Arch developers,
+<a href="http://blog.falconindy.com/" title="Dave's blog">Dave Reisner</a>, opened a
+<a href="https://bbs.archlinux.org/viewtopic.php?id=185075" title="asp thread">thread on the Arch boards</a>
+announcing <a href="https://github.com/falconindy/asp" title="Github repo">asp</a>, the Arch
+Source Package management tool, a git-based alternative for <code>abs</code><sup>1</sup>.</p>
+
+<p>Basically a 200-line bash script, <code>asp</code> is an improvement over <code>abs</code> insofar as
+you get the updated PKGBUILDs immediately; you can choose between just pulling
+the necessary source files (as <em>per</em> <code>abs</code>), or checking out the package branch
+so that you can create your own development branch and, for example, keep your
+patch set in git as well.</p>
+
+<p>You can elect to locate the local git repository in a directory of your
+choosing by exporting <code>ASPROOT</code>, there are <kbd>Tab</kbd> completion scripts
+for bash and zsh and a succinct <code>man</code> page. Overall, for a utility that is only
+three weeks old, <code>asp</code> is already fulfilling the function of a drop-in
+replacement; a faster, more flexible tool for building Arch packages from
+source.</p>
+
+<p><blockquote><p>With thy sharp teeth this knot intrinsicate<br/>Of life at once untie…</p><footer><strong>Antony and Cleopatra</strong> <cite>V.ii</cite></footer></blockquote></p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The <a href="https://www.archlinux.org/packages/?name=abs">package</a>,
+not the entire build system…</li>
+</ol>
+
+
+<p>Creative Commons image, Red Lego Brick by <a href="https://www.flickr.com/photos/dillpixel/8506365952/">Brian Dill</a>
+on Flickr.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Intuxication]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/01/13/intuxication/"/>
+    <link href="http://jasonwryan.com/blog/2011/01/13/intuxication/"/>
     <updated>2011-01-13T10:00:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/01/13/intuxication</id>
-    <content type="html"><![CDATA[<p><img src="http://miromiro.com/Blog-images/intuxication.png" alt="image" /></p>
+    <id>http://jasonwryan.com/blog/2011/01/13/intuxication</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/intuxication.png" alt="image" /></p>
 
 <p>I have previously posted about using
 <a href="http://jasonwryan.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/" title="My post on using mercurial">Mercurial to share dotfiles</a>,
@@ -60,9 +127,9 @@ there.</p>
   
   <entry>
     <title type="html"><![CDATA[Using Mercurial to Share Dotfiles]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/"/>
+    <link href="http://jasonwryan.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/"/>
     <updated>2010-02-10T20:36:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/02/10/using-mercurial-to-share-dotfiles</id>
+    <id>http://jasonwryan.com/blog/2010/02/10/using-mercurial-to-share-dotfiles</id>
     <content type="html"><![CDATA[<p>I posted a couple of weeks back about
 <a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/">using dropbox to share dotfiles</a>
 and while I am pleased with how well that works, I had always intended to see how well a

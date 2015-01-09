@@ -9,9 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Even with bash completion, endlessly typing and tabbing through the
-directory tree to make a simple change to a config file quickly becomes
-tedious &hellip;">
+  <meta name="description" content="If you have spent any time at all amongst online (or, for that matter,
+off-line) communities, you will be familiar with the help vampire. If,
+by &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +20,7 @@ tedious &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/18">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/18">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -28,8 +28,8 @@ tedious &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -67,7 +67,7 @@ tedious &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -90,7 +90,7 @@ tedious &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/07/19/script-to-edit-config-files/">Script to Edit Config Files</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/03/17/vampires/">A Taxonomy of Help Vampires</a></h1>
     
     
       <p class="meta">
@@ -106,114 +106,104 @@ tedious &hellip;">
   
 
 
-<time datetime="2011-07-19T19:34:00+12:00" pubdate data-updated="true">Jul 19<span>th</span>, 2011</time>
+<time datetime="2012-03-17T16:25:00+13:00" pubdate data-updated="true">Mar 17<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/xdg-script.png" alt="image" /></p>
+  <div class="entry-content"><p><img src="/images/post_images/vampire1.jpg" alt="image" /></p>
 
-<p>Even with bash completion, endlessly typing and tabbing through the
-directory tree to make a simple change to a config file quickly becomes
-tedious, so I concocted this script to make it somewhat more
-straightforward.</p>
+<p>If you have spent any time at all amongst online (or, for that matter,
+off-line) communities, you will be familiar with the help vampire. If,
+by some combination of fortune and ignorance, you haven’t come across
+this term before, read Amy Hoy’s original—and definitive—
+<a href="http://slash7.com/2006/12/22/vampires/" title="Amy's blog on help vampires">post on this scourge</a>,
+<em>now</em>.</p>
 
-<figure class='code'><figcaption><span>xdg.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="nv">dir</span><span class="o">=</span><span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>; <span class="k">then </span>
-</span><span class='line'><span class="k">    for </span>f in <span class="nv">$dir</span>/* ; <span class="k">do</span>
-</span><span class='line'><span class="k">    </span><span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
-</span><span class='line'>        <span class="k">case</span> <span class="nv">$file</span> in
-</span><span class='line'>        conf | config | *.cfg | *rc<span class="o">)</span>  <span class="nv">$EDITOR</span> <span class="s2">&quot;$f&quot;</span> ;;
-</span><span class='line'>        *<span class="o">)</span>  :  ;;
-</span><span class='line'>        <span class="k">esac</span>
-</span><span class='line'><span class="k">    done</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
+<p>Amy has some excellent tips on identifying help vampires, however, since
+she originally shed some sunlight on this odious species, they have
+become even more cunning and have adapted; to the point where there are
+now several varieties that you should be wary of if you are determined
+to prevent your online community from becoming overrun with them.</p>
 
+<p><strong>The Infant</strong> The easiest to spot because, due to their nascent form,
+they have not developed sophisticated anti-detection strategies as yet.
+Also, encouragingly, these are the most likely to respond to the
+corrective measures Amy outlines in her post.</p>
 
-<p>A relatively simple script, with a nice feature or two, it does a couple
-of things. First, it
-<a href="http://wiki.bash-hackers.org/commands/classictest" title="Bash Hackers: test">tests</a>
-that the directory actually exists:</p>
+<p>The infant has probably learned their dependant ways in some other
+online community with a higher tolerance for their spoonfeeding needs.
+Corrective measures, vigorously and repeatedly applied <em>can</em> turn them
+around; but even small amounts of reinforcement of this behaviour can
+quickly see them morph into one of the more sinister types…</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>    <span class="k">if</span> <span class="o">[</span> -d <span class="s2">&quot;$dir&quot;</span> <span class="o">]</span>
-</span></code></pre></div></figure>
+<p><img src="http://media.tumblr.com/tumblr_m10ce18Jda1qz8s9s.jpg" alt="image" /></p>
 
+<p><strong>The Leech</strong> This reprehensible lifeform just sucks and sucks and
+<em>sucks</em> until there is nothing left. Some of their forum threads may
+even appear reasonable, but looking at their profile in totality tells a
+shocking story. All of their posts are in their own threads, they are
+not interested in helping anyone else with a problem. They will move
+remorselessly from issue to issue, expecting the community to provide
+answers for them at a hemorrhagic rate.</p>
 
-<p>and then loops through all of the files in the directory using a
-<a href="http://mywiki.wooledge.org/glob" title="Entry on Greg's Wiki">glob</a> and
-checks for a pattern match.</p>
+<p>They won’t have made any edits to
+<a href="https://wiki.archlinux.org" title="The BEST godamn GNU/Linux wiki on the web">the Wiki</a>,
+no matter how trivial. They won’t
+<a href="https://aur.archlinux.org" title="Arch User repository">maintain any packages</a> or donate
+any time or
+<a href="http://www.archlinux.org/donate/" title="Donate now and recieve a FREE package update!">money</a>
+to your community. But they will be there night after night, posting
+their problems and waiting for the hapless to expend their time and
+energy on them. Like all parasites, they will adapt over time so remain
+vigilant.</p>
 
-<p>In order for the
-<a href="http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_03.html" title="Cases on Bash Guide">case statement</a>
-to work, however, the directory path has to be stripped from the file
-name.</p>
+<p><img src="/images/post_images/vampire3.jpg" alt="image" /></p>
 
-<p>Rather than run another process with
-<a href="http://www.gnu.org/software/coreutils/manual/html_node/basename-invocation.html" title="GNU basename in coreutils">basename</a>,
-I used
-<a href="http://wiki.bash-hackers.org/syntax/pe#substring_removal" title="Bash Hackers Wiki">parameter expansion</a>
-to remove the substring:</p>
+<p><strong>The Fanger</strong> The out-and-out help vampire, unabashed and unashamed of
+their <em>needs</em>. Their sense of entitlement will be telegraphed by needy
+and demanding thread titles, often featuring exhortations like “HELP”
+and “URGENT” and almost always embellished with a liberal—and, at times
+of “real crises,” exclusive—use of all caps and exclamation marks.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>    <span class="nv">file</span><span class="o">=</span><span class="k">${</span><span class="nv">f</span><span class="p">##*/</span><span class="k">}</span>
-</span></code></pre></div></figure>
+<p>The Fanger will also occasionally table (sadly, almost inevitably empty)
+threats about leaving your community and going off to use some other
+software; as if the dependency relationship is somehow reversed and it
+is you, the community, that will suffer if they leave.</p>
 
+<p>The other classic trait of the hardcore vampire is that, like their
+fictional avatars, they see nothing when a mirror is held up to them.
+You can call their behaviour as much as you like, it will have no
+effect. Your only solution here is technology:
+<a href="http://www.codinghorror.com/blog/2011/06/suspension-ban-or-hellban.html" title="Coding Horror on the Hell Ban">the hell ban</a>.</p>
 
-<p>which turns, for example, <span class="file">$XDG_CONGIG_HOME/newsbeuter/conf</span> into a
-simple <span class="file">conf</span>. This can then be evaluated for a match with the file names
-in the <code>case</code> statement and passed to the <code>$EDITOR</code>.</p>
+<hr />
 
-<p>If no match is found, nothing (<code>:</code>) is done.</p>
+<p>The Arch Linux community has grown considerably since it emerged
+<a href="http://www.archlinux.org/news/arch-linux-turns-10/" title="w00t!">ten years ago this month</a>. Over
+the last couple of years, the forums in particular have seen a lot of
+new users signing up to participate. This is unquestionably a good
+thing™</p>
 
-<p>Now, it is simply a matter of entering <code>xdg vimprobable</code> and
-<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span> is opened in Vim.</p>
+<p>However, Arch is clearly labelled as being for
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric" title="The Arch Way: user-centric">competent users</a>
+(and here competent can equally mean accomplished – or prepared to
+invest in themselves and the community to become competent) and that
+means not enabling these sorts of vampiric behaviours, in whatever form
+they manifest.</p>
 
-<h4>Updated 19/10/11</h4>
+<h5>Notes</h5>
 
-<p>After using this script for a while it became clear to me that it has a
-significant drawback: too many applications place their config files in
-directories other than <span class="file">$XDG_CONFIG_HOME</span>. So,
-<a href="https://bbs.archlinux.org/viewtopic.php?id=128585" title="Post on the Arch boards">with some help</a>,
-I updated the script. It now covers all of the directories where you are
-likely to find dotfiles.</p>
+<p>Photography is all Creative Commons licensed on Flickr by, in order of
+appearance:</p>
 
-<figure class='code'><figcaption><span>xdg.sh v2 </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="nb">dirs</span><span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
-</span><span class='line'><span class="nv">IFS</span><span class="o">=</span><span class="s1">$&#39;\n&#39;</span>
-</span><span class='line'><span class="nb">read</span> -r -d <span class="s1">&#39;&#39;</span> -a files &lt; <span class="se">\</span>
-</span><span class='line'>    &lt;<span class="o">(</span>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
-</span><span class='line'>           -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>        -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>        -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
-</span><span class='line'>        -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
-</span><span class='line'>        -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> 2&gt;/dev/null<span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">((</span> <span class="k">${#</span><span class="nv">files</span><span class="p">[*]</span><span class="k">}</span> <span class="o">))</span> <span class="o">&amp;&amp;</span> <span class="s2">&quot;$EDITOR&quot;</span> <span class="s2">&quot;${files}&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>If you would prefer a more portable version—which still relies on GNU
-find—then you could simplify it like so:</p>
-
-<figure class='code'><figcaption><span>xdg.sh v3 </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="nb">dirs</span><span class="o">=(</span><span class="nv">$HOME</span>/.<span class="nv">$1</span>* <span class="nv">$HOME</span>/.<span class="nv">$1</span>/ <span class="nv">$XDG_CONFIG_HOME</span>/<span class="nv">$1</span>/<span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'>find <span class="s2">&quot;${dirs[@]}&quot;</span> -type f <span class="se">\(</span> <span class="se">\</span>
-</span><span class='line'>       -name <span class="s2">&quot;*.conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;conf&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;config&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;*rc&quot;</span> <span class="se">\</span>
-</span><span class='line'>    -o -name <span class="s2">&quot;*.cfg&quot;</span> <span class="se">\)</span> <span class="se">\</span>
-</span><span class='line'>    -exec <span class="s2">&quot;$EDITOR&quot;</span> <span class="o">{}</span> +
-</span></code></pre></div></figure>
-
-
+<ul>
+<li><a href="http://www.flickr.com/photos/randaldroher/2161723492/" title="The Count, by Randall Drohrer on Flickr">Randall Drohrer</a></li>
+<li><a href="http://www.flickr.com/photos/phatcontroller/2620032517" title="Leech, by phatcontroler on Flickr">phatcontroller</a></li>
+<li><a href="http://www.flickr.com/photos/sandrafalkevik/4465039571" title="Vampire, by Sandra Falkevik on Flickr">Sandra Falkevik</a></li>
+</ul>
 
 </div>
   
@@ -227,7 +217,7 @@ find—then you could simplify it like so:</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/06/26/using-vimprobable/">Using Vimprobable</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/03/09/aurphan/">Simple aurphan notifier</a></h1>
     
     
       <p class="meta">
@@ -243,230 +233,217 @@ find—then you could simplify it like so:</p>
   
 
 
-<time datetime="2011-06-26T14:08:00+12:00" pubdate data-updated="true">Jun 26<span>th</span>, 2011</time>
+<time datetime="2012-03-09T16:52:00+13:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/vimprobable2.png" alt="image" /></p>
+  <div class="entry-content"><p><img src="/images/post_images/aurphan.png" alt="image" /></p>
 
-<p>I <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/" title="Post on using Vimprobable">posted last year about Vimprobable</a>
-a <a href="http://www.webkit.org/" title="Webkit site">webkit browser</a> that uses
-Vim-like keybinds and can be run completely without the rodent.</p>
+<p>If you are an Arch Linux user and you are not using
+<a href="http://www.archlinux.org/packages/community/any/aurphan/" title="aurphan package details">aurphan</a>,
+you can take a moment to hang your head in shame before you click on to
+whatever the next thing is. The package description sums up perfectly
+what aurphan does:</p>
 
-<p>Over the last couple of months I have become increasingly comfortable
-with it, and with the addition of
-<a href="http://vimprobable.org/pipermail/vimprobable-users/2011-June/000800.html" title="External handlers patch on ML">some great recent functionality</a>,
-it has become my default browser.</p>
+<blockquote><p>Finds packages in need of maintainers, bug fixes and patches. Adopt
+today!</p></blockquote>
 
-<p>The project has good documentation, in the form of two man pages:
-<code>vimprobable</code> and <code>vimprobablerc</code>, but I thought I’d share some of my
-customizations and working methods.</p>
+<p>Running <code>aurphan -a</code>, for example, will identify any
+<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR packages</a> in your
+database that are not currently maintained; allowing you to log in to
+the AUR and hit the ‘Adopt’ button, leaving you feeling all worthy and
+fulfilled.<sup>1</sup></p>
 
-<h3>Copy &amp; Paste</h3>
+<p>If, like most Archers, you have a compulsive desire to automate
+<em>everything</em> then clearly typing (or even remembering to type) <code>aurphan
+-a</code> into a terminal periodically is as ludicrous as it is onerous. The
+obvious answer is some shell script and a cron job.</p>
 
-<p>The only time I have been tempted to take my hand off the keyboard was
-to insert the cursor at the correct character to begin a selection to
-copy and paste. This is unnecessary. With the right options in
-<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span>,
-you can do it all from the keyboard.</p>
+<p>First, the <code>cron</code> job:</p>
 
-<p>Map the keys you would like to use to enter and exit caret mode. I use
-<kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
-return to normal mode:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
-</span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>@hourly aurphan -a &gt;/tmp/aurphans
 </span></code></pre></div></figure>
 
 
-<p>Then, it is just a matter of identifying the text that you wish to copy
-(in the photo above I was copying a script to launch <code>tabbed</code>), and
-highlighting it via search. So the sequence is:</p>
+<p>Then, as part of my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="Script in mercurial repo">dwm-status script</a>,
+a function to check that there are no new additions to the file and, if
+there are, flash a highlight:</p>
 
-<pre>
-1.  <kbd>/</kbd> - to enter search mode
-2.  <kbd>#</kbd><kbd>!</kbd> <kbd>Enter</kbd> - the shebang and then enter to highlight the correct
-    sequence
-3.  <kbd>Ctrl</kbd><kbd>c</kbd> to enter caret mode
-4.  and then <kbd>Shift</kbd><kbd>Up</kbd> or <kbd>Shift</kbd><kbd>Down</kbd> to highlight the following or
-    preceding lines
-5.  yanking the selected text is <kbd>Shift</kbd><kbd>y</kbd>, and the text is now stored in
-    your clipboard.
-</pre>
-
-
-<h3>Opening new instances in tabbed</h3>
-
-<p>I highlighted the section on tabbed from the
-<a href="http://www.vimprobable.org/" title="Vimprobable website">Vimprobable site</a> for a reason.
-The second tip is how to set up
-<a href="http://tools.suckless.org/tabbed" title="tabbed on suckless.org">tabbed</a> to
-work well with other applications.</p>
-
-<p>By default, any new windows (ie., instances of Vimprobable) opened from
-within Vimprobable are “caught”—and managed— by <code>tabbed</code>. However, if you
-open a link from, say
-<a href="http://newsbeuter.org/" title="ncurses rss reader">newsbeuter</a> or
-<a href="http://tyrs.nicosphere.net/index.html" title="ncurses twitter/identi.ca client">Tyrs</a>,
-this will open an instance outside <code>tabbed</code> which, if you are using a
-tiling window manager like
-<a href="http://dwm.suckless.org/" title="THE titling wm">dwm</a>, means this window gets
-pushed to master in your stack. This is not entirely satisfactory.</p>
-
-<p>Thanks to
-<a href="http://lists.suckless.org/dev/1106/8761.html" title="Tabbed thread on suckless ML">Connor Lane Smith on the suckless ML</a>,
-I have a solution to have all new instances of Vimprobable sent to
-<code>tabbed</code>, whether opened in another application, or if I click on a link
-in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
-
-<p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
-<psan class="file">/tmp</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&lt;/tmp/tabbed.xid)&quot;</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>aur<span class="o">(){</span>
+</span><span class='line'>    <span class="nv">aurphans</span><span class="o">=</span><span class="s2">&quot;$(awk &#39;$0 !~ /^No /&#39; /tmp/aurphans | wc -l)&quot;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$aurphans</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">        </span><span class="nb">echo</span> -en <span class="s2">&quot;\x03*\x01&quot;</span>
+</span><span class='line'>    <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></div></figure>
 
 
-<p>Then it is just a matter of setting up other applications to pass links
-to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
-<span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> %s
-</span></code></pre></div></figure>
-
-
-<p>The workaround for Urxvtc was a little trickier. I finally got there
-with some help from
-<a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
-In my <span class="file">~/.Xdefaults</span> I have:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
-</span><span class='line'>URxvt.perl-ext-common: default,matcher
-</span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
-</span><span class='line'>URxvt.matcher.button: 1
-</span></code></pre></div></figure>
-
-
-<p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="c"># Script to open Vimprobable instances in tabbed</span>
-</span><span class='line'><span class="nb">exec </span>vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>Now whenever I open a link in an application or by clicking a link in
-the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
-it is passed to Vimprobable in <code>tabbed</code>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/10/setting-tmux-statusbar-if-in-x/">Setting tmux statusbar if in X</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-06-10T22:56:00+12:00" pubdate data-updated="true">Jun 10<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5636783883/" title="Arch Linux: dwm, tmux &amp; scratchpad by jasonwryan, on Flickr"><img src="http://farm6.static.flickr.com/5303/5636783883_5b7272453b.jpg" alt="Arch Linux: dwm, tmux &amp; scratchpad" /></a></p>
-
-<p>I have been posting quite a bit about
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a> of late<sup>1</sup>.
-It is a marvellous application and lends itself to all sorts of interesting
-uses. When you first install it, you will find a number of user config
-files in <span class="file">/usr/share/tmux/</span>. I started with tmux by copying
-<a href="http://cinderwick.ca/" title="Thayer Williams' site">Thayer’s</a> config across
-and then working up from there. There is a section
-<a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
-that has always puzzled me, and so I decided to get to the bottom of it.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># show some useful stats but only when tmux is started</span>
-</span><span class='line'><span class="c"># outside of Xorg, otherwise dwm statusbar shows these already </span>
-</span></code></pre></div></figure>
-
-
-<p>It is a great idea. If you are running tmux in X, then you have
-<a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
-what the time is,
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/dwm-status" title="dwm status bar in my mercurial repo">how much battery you have left</a>
-etc,. You don’t need to replicate that functionality in tmux. If,
-however, you are in the console, you don’t have that information, unless
-you print it in tmux’s statusbar.</p>
-
-<p>I had tried to get this to work once or twice over the last couple of
-years, but never persevered with it. However, as I have been doing a bit
-of work making the console as functional as possible<sup>2</sup>, I thought I
-would revisit it.</p>
-
-<p><img src="http://miromiro.com/Blog-images/tmux-status1.png" alt="image" /></p>
-
-<p>The insight that I had that got it working for me was to use the
-source-file option in <span class="file">.tmux.conf</span> to call the relevant statusbar,
-depending if X was running or not. I just adapted Thayer’s code, like
-so:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Statusbar starting in X or not</span>
-</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
-</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>And then created those files with the desired statusbar options. So, for
-example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
-loaded:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Statusbar if tmux run in console</span>
-</span><span class='line'><span class="c"># information normally in dwm bar</span>
-</span><span class='line'><span class="nb">set</span> -g status-right-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
-</span></code></pre></div></figure>
-
-
-<p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
-
-<p><img src="http://miromiro.com/Blog-images/tmux-status2.png" alt="image" /></p>
-
-<p>All the relevant files are in
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.tmux" title="My mercurial repository">my mercurial repo</a>.</p>
+<p>The awk filter excludes a null return, which is “No aurphans found.”
+Now, if any of the packages that I use from the AUR are disowned, I’ll
+be the first to know about it.</p>
 
 <h5>Notes</h5>
 
 <ol>
-<li><p><a href="http://jasonwryan.com/blog/2011/06/07/copy-and-paste-in-tmux/" title="Post on copy &amp; paste in tmux">Copy &amp; paste in tmux</a>,
-<a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/" title="Sessions in tmux">Sessions in tmux</a>
-&amp; <a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/" title="Intro to tmux">Introduction to tmux</a></p></li>
-<li><p><a href="http://jasonwryan.com/blog/2011/04/06/vim-colours-in-the-console/" title="Setting Vim colours in the console">Vim colours in the console</a></p></li>
-<li><p>Image squashed to fit the requirements of this blog…</p></li>
+<li>Actual feeling may differ depending on the package you have adopted
+and the amount of prescription painkillers that you are currently
+ingesting…</li>
 </ol>
 
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/13/chroot/">Chroot in LVM on LUKS on Raid: Arch Linux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-13T10:25:00+13:00" pubdate data-updated="true">Feb 13<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="/images/post_images/chroot-lvm.jpg" alt="image" /></p>
+
+<p>In <a href="http://jasonwryan.com/blog/2012/02/11/lvm/" title="Post on setting this system up">my previous post describing this setup</a>
+I made the point that grub won’t be installed and that it is necessary
+to <code>chroot</code> in to install grub on both drives. This is the procedure I use
+to do that—and to perform any other maintenance that requires working
+from a live environment.</p>
+
+<p>Again, most of this information is on the
+<a href="https://wiki.archlinux.org/index.php/Chroot" title="Arch wiki page">Arch Wiki chroot page</a>, I
+am just going to fill in the detail around this setup: LVM on LUKS on
+Raid1.</p>
+
+<p>Once you have booted into your live environment, load the modules that
+are required; in this case: <code>raid1</code>, <code>dm-mod</code> and <code>dm-crypt</code>.</p>
+
+<p>Check that udev hasn’t helpfully read the superblock of your Raid drives
+and assembled phantom arrays:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/mdstat
+</span></code></pre></div></figure>
+
+
+<p>I find that there are a couple there generally assigned the names
+<span class="file">/dev/md126</span> and <span class="file">/dev/md127</span>.
+These need to be stopped before assembling the correct arrays:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --stop /dev/md12<span class="o">[</span>67<span class="o">]</span>
+</span><span class='line'>mdadm --assemble /dev/md0 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
+</span><span class='line'>mdadm --assemble /dev/md1 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
+</span></code></pre></div></figure>
+
+
+<p>You should now have both your arrays up and running. The next step is to
+unlock your encrypted device:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk
+</span></code></pre></div></figure>
+
+
+<p>After entering your passphrase, your device will be unlocked. Next, make
+the logical volumes available, and then check they are correct:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vgchange --available y vgroup
+</span><span class='line'>lvscan
+</span></code></pre></div></figure>
+
+
+<p>At this point, you are ready to mount the devices and <code>chroot</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mkdir /mnt/arch
+</span><span class='line'>mount /dev/mapper/vgroup-lvroot /mnt/arch
+</span></code></pre></div></figure>
+
+
+<p>The next steps are straight from the wiki:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd</span> /mnt/arch
+</span><span class='line'>mount -t proc proc proc/
+</span><span class='line'>mount -t sysfs sys sys/
+</span><span class='line'>mount -o <span class="nb">bind</span> /dev dev/
+</span></code></pre></div></figure>
+
+
+<p>Mount the other parts of the system that you need to use in your
+recovery – in this case, I need my <span class="file">/boot</span> partition:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mount /dev/md0 boot/
+</span></code></pre></div></figure>
+
+
+<p>Now <code>chroot</code> to the device and define your shell:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>chroot . /bin/bash
+</span></code></pre></div></figure>
+
+
+<p>The wiki has some good advice about customizing your prompt to reinforce
+the fact that you are in a chroot:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">PS1</span><span class="o">=</span><span class="s2">&quot;(chroot) $PS1&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>With everything mounted, it is just a matter of performing your
+maintenance. To reinstall <code>grub</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># grub</span>
+</span><span class='line'>grub&gt; find /grub/stage1
+</span><span class='line'>grub&gt; device <span class="o">(</span>hd0<span class="o">)</span> /dev/sda
+</span><span class='line'>grub&gt; root <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>grub&gt; setup <span class="o">(</span>hd0<span class="o">)</span>
+</span><span class='line'>grub&gt; quit
+</span></code></pre></div></figure>
+
+
+<p>Repeat for <span class="file">/dev/sdb</span> and both your drives will be bootable in the event
+that one fails.</p>
+
+<p>With the maintenance accomplished, all that remains is to exit the
+<code>chroot</code> and unmount the devices cleanly:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">exit</span>
+</span><span class='line'>umount <span class="o">{</span>proc,sys,dev,boot...<span class="o">}</span>
+</span><span class='line'><span class="nb">cd</span> ..
+</span><span class='line'>umount arch/
+</span><span class='line'>reboot
+</span></code></pre></div></figure>
+
+
+<p>Simple.</p>
+
+<p>Creative Commons image by
+<a href="http://www.flickr.com/photos/mpd01605/4152508668/" title="Rescue Engine 6 on Flickr">MPD01605</a></p>
 </div>
   
   
@@ -491,23 +468,23 @@ loaded:</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -585,7 +562,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -594,7 +571,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

@@ -9,10 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="A couple of weeks ago, I came across these
-simple bash functions
-written by Jack Mottram of One Thing Well for managing text
-notes. The functions as &hellip;">
+  <meta name="description" content="I’ve posted a couple of times1 about
+tmux, the brilliant
+terminal mutliplexer. One question I see raised a lot in #tmux is how
+to copy and paste. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +21,7 @@ notes. The functions as &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/24">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/24">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -29,8 +29,8 @@ notes. The functions as &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -68,7 +68,7 @@ notes. The functions as &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -91,7 +91,7 @@ notes. The functions as &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/09/28/command-line-notes/">Command Line Notes</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/06/07/copy-and-paste-in-tmux/">Copy &amp; Paste in tmux</a></h1>
     
     
       <p class="meta">
@@ -107,177 +107,296 @@ notes. The functions as &hellip;">
   
 
 
-<time datetime="2010-09-28T17:56:00+13:00" pubdate data-updated="true">Sep 28<span>th</span>, 2010</time>
+<time datetime="2011-06-07T19:54:00+12:00" pubdate data-updated="true">Jun 7<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/cli-notes-1.png" alt="image" /></p>
+  <div class="entry-content"><p><img src="/images/post_images/tmux-copy.png" alt="image" /></p>
 
-<p>A couple of weeks ago, I came across these
-<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
-written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
-notes.</p>
+<p>I’ve posted a couple of times<sup>1</sup> about
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
+terminal mutliplexer. One question I see raised a lot in #tmux is how
+to copy and paste.</p>
 
-<p>The functions as described in the article are so:</p>
+<p>The documentation for tmux is excellent: the
+<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
+one of the most clear and thorough I have read. And while it is
+explained there, I thought I would share my approach anyway.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$*&quot;</span>.txt <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$*&quot;</span> <span class="o">}</span>
+<p>First, I set tmux to use vi keys:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setw -g mode-keys vi
 </span></code></pre></div></figure>
 
 
-<p>Unfortunately, the second function – for retrieving the list of files in
-the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
-and it will only list files in the top level directory. If you are an
-inverterate note taker, this plainly won’t scale.</p>
+<p>Then I change the default keybinds to suit my workflow. As explained in
+the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
+and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
+to more intuitive and Vim-like keys:</p>
 
-<p>My first attempt at hacking a solution yielded this little beauty:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\ </span>
-</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
+</span><span class='line'><span class="nb">bind </span>Escape copy-mode
+</span><span class='line'>unbind p
+</span><span class='line'><span class="nb">bind </span>p paste-buffer
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
 </span></code></pre></div></figure>
 
 
-<p>Which removes <code>ls</code> from the function and allows nested directories, but
-is needlessly complex and, with four pipes, hideously <del>inefficient</del>
-inelegant.</p>
+<p>This seems a lot closer to all of the other Vim-like apps that I run -
+where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
+<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
 
-<p>After reading up on Awk, particularly
-<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
-I arrived at something marginally longer but relying solely on the
-awesome power of awk to make the various transformations I was seeking…</p>
+<p>So, to string it all together, the command sequence necessary to copy
+some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
-</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
+<pre>
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
+# move cursor to the start or end of the desired text string
+<kbd>v</kbd>                        # to activate highlighting
+# move cursor to cover the requisite string
+<kbd>y</kbd>                        # to capture the string
+<kbd>q</kbd>                        # exit copy mode
+<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
+</pre>
+
+
+<p>Simple.</p>
+
+<p>This means that you can scroll back through the output of <em>anything</em> in
+your terminal, and copy and paste it anywhere. Once you set it up, it is
+a very powerful tool…</p>
+
+<h5>Notes</h5>
+
+<p>1.<a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/">Sessions in tmux</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/06/network-flooding-on-ubuntu/">Network Flooding on Ubuntu</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-06-06T13:40:00+12:00" pubdate data-updated="true">Jun 6<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="/images/post_images/ubuntu-logo.png" alt="image" /></p>
+
+<p>I have been experiencing problems with my wifi LAN when playing music
+through
+<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
+or watching movies. My upload speeds would climb to around 120-130Kb/s
+and my wifi would just go down.</p>
+
+<p>Apart from being frustrating, this was inconvenient as it meant that if
+I was doing either of those things, my stereo in the living room
+couldn’t stream music from my
+<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
+other members of the family (or guests) couldn’t connect to the access
+point to get online.</p>
+
+<p>After asking on
+<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
+(which, like many of the Ubuntu-related fora is populated with people
+who are more well-intentioned than they are knowledgeable - which seems
+to me one of the fundamental problems the distro has; but I’ll save that
+rant for another day), one helpful user suggested I use
+<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
+the network traffic.</p>
+
+<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
+immediately instructive. Wireshark quickly identified that, as soon as I
+started mpd, one of my ports was being flooded: 46560</p>
+
+<p><code>lsof</code> showed that pulse audio was the culprit:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
 </span></code></pre></div></figure>
 
 
-<p>An added advantage is that it is scalable irrespective of how deep the
-directories go. I’m sure that with some more awk-foo I could write a
-more effective set of conditionals, but this seemed a pretty good start
-for a simple note taking utility.</p>
+<p>Quelle surprise… When software engineers want a case study of opacity
+and abstraction from the user, this should be their first port of call.</p>
 
-<h3>Updated 3/11/10</h3>
+<p>Worse, it is a known bug.
+<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
+And apparently insufficiently serious to warrant any attention. Fair
+enough, I suppose, given the fix is easy enough <em>if you know what you
+are trying to fix…</em></p>
 
-<p>To remove a little of the visual clutter, I amended the awk script to
-strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
+<p>Install the Pulse audio preferences tool:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
-</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install papref
 </span></code></pre></div></figure>
 
 
-<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
-in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
-symlink to it from <span class="file">~/.notes</span>.</p>
+<p>…and disable Multicast/RTP.</p>
+
+<p>Another example for me of Ubuntu’s fast waning utility as a distribution
+for people that want to be able to exercize some control over their
+system. It is only still installed on this machine because there isn’t
+an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
+here and, with my international traffic capped to 30Kb/s until last
+month, I wasn’t prepared to try and run a distro on that sort of
+bandwidth. Now that has changed, I suspect that Ubuntu’s days are
+numbered on this box.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/05/28/quoras-quandary/">Quora&#8217;s Quandary</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-28T10:05:00+12:00" pubdate data-updated="true">May 28<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="/images/post_images/quora1.png" alt="image" /></p>
+
+<p>I joined <a href="http://www.quora.com/" title="Quora: Q&amp;A site">Quora</a> early in the
+new year and, while
+<a href="http://techcrunch.com/2011/01/23/why-i-don%E2%80%99t-buy-the-quora-hype/" title="TC article on the hype">the hype has in no way abated</a>,
+I have found that increasingly over the months that I have been
+visiting, there is less and less reason for me to return on any regular
+basis. And this puzzles me as I think the concept is, for me, an
+attractive one.</p>
+
+<p>In the five-odd months I have been visiting the site, I have managed to
+<a href="http://www.quora.com/Jason-Ryan" title="My Quora profile">contribute 58 answers</a>
+and over one hundred edits (more on that below); this strikes me as a reasonable
+commitment on my part and one that should return some dividend to me –
+at least in terms of satisfaction with the site. Alas, no.</p>
+
+<p>And why not? For several reasons. And reasons that have only really
+become apparent over the last month as I started to spend time on the
+<a href="http://unix.stackexchange.com/" title="Unix and Linux Stack Exchange">Unix &amp; Linux Stack Exchange site</a>.
+The contrast between the <em>experience</em> of the two sites, that are in
+essence very similar, couldn’t be more striking.</p>
+
+<p>The primary difference between the two is that Unix.SE isn’t a social
+site: you don’t follow anyone. Which, when you think about Q&amp;A sites,
+makes a lot more sense than Quora’s model. I still don’t understand the
+point of following people on Quora. Perhaps I am not following enough
+people, or the wrong ones, but I have yet to see <em>any benefit</em> in
+following on the site.</p>
+
+<p>One other area of seeming similarity between the sites is the ability to
+vote up (or down) questions and answers. On Unix.SE, this is implemented
+as a real strength as these votes determine contributor’s reputation,
+described thus:</p>
+
+<blockquote><p>Reputation is a rough measurement of how much the community trusts
+you. Reputation is never given, it is earned by convincing fellow
+users that you know what you’re talking about.</p></blockquote>
+
+<p>This has a twofold effect: it motivates contributors to provide quality
+answers (and
+<a href="http://unix.stackexchange.com/badges" title="StackExchange badges">rewards</a>
+them when they do), and more importantly, gives you a heuristic for how
+credible an answer may be. Quora doesn’t have this concept and, for me,
+is much the poorer for it.</p>
+
+<p>Reputation has consequences on Unix.SE: the more you accrue, the more
+privileges on the site you are granted. Again, this builds the
+community’s capability while encouraging individual contributors.</p>
+
+<p>Some of the other areas where Quora is really left wanting in comparison
+to Unix.SE are around the design of the site. The text box where you
+enter your answers or edits is a case in point:</p>
+
+<p><img src="/images/post_images/quora2.png" alt="image" /></p>
+
+<p>On Quora, it is like trying to change a car battery through a letterbox.
+The single, overriding impression is that entering information into the
+site is neither a priority nor pleasurable which, for a site aspiring to
+be a knowledge repository is incredibly perverse.</p>
+
+<p>This is compounded by the fact that the tools for presenting the
+information that you want to add to the site can charitably be described
+as rudimentary (one of the reasons that I have 100-odd edits is that it
+takes at least two to three attempts to present information in a
+semi-acceptable fashion). Searching for
+“<a href="http://www.quora.com/Quora-product/Are-there-any-markup-tags-when-writing-a-question?q=quora+markup+tools" title="Recursion alert">quora markup tools</a>”
+is as disappointing as it is frustrating.</p>
+
+<p>Being able to present information appropriately is critical. The
+StackExchange sites
+<a href="http://unix.stackexchange.com/editing-help" title="Unix.SE editing guidleines">allow all sorts</a>
+of HTML tags and
+<a href="http://daringfireball.net/projects/markdown/syntax" title="markdown syntax">markdown</a>,
+without apparently any additional
+<a href="http://en.wikipedia.org/wiki/Cross-site_scripting" title="Wikipedia page on Cross site scripting">XSS risk</a><sup>1</sup>.
+The result is questions and answers that are formatted in a way that
+enhances their legibility, rather than detracting from it.</p>
+
+<p>There are some other areas where Quora is not measuring up for me:
+opaque editorial and moderation policies and practices and an
+unwillingness to more actively curate the questions – and no, those two
+statements are not contradictory.</p>
+
+<p>The overall impression I am left with is that while both sites have
+similar aims (albeit Unix.SE’s is much more specific in terms of the
+subject matter), Quora seems to me to be really failing at building a
+community around it. Unless, of course, you count social media experts…</p>
 
 <h5>Notes</h5>
 
 <ol>
-<li><p>See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.</p></li>
-<li><p>Obligatory “after” screenshot:</p></li>
+<li>God knows if that is actually the reason they refuse to allow
+potential contributors the ability to adequately format their
+information, but it seems plausible enough.</li>
 </ol>
-
-
-<p><img src="http://miromiro.com/Blog-images/cli-notes-2.png" title="'Screenshot of editing text'" ></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/08/06/mailers/">5 Alternate Mail Clients</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-08-06T17:03:00+12:00" pubdate data-updated="true">Aug 6<span>th</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/462324481/lightbox/"><img src="http://miromiro.com/Blog-images/mail-5alts.png"/></a></p>
-
-<p>Rather than just download <a href="http://www.mozillamessaging.com/en-US/thunderbird/" title="Thunderbird homepage">Thunderbird</a>, you can always install something a little more interesting that will a) provide hours of fun setting up and configuring so that it works <em>exactly</em> the way you want it to, and b) will free you of the rodent…</p></p>
-
-<ul>
-<li><a href="http://www.mutt.org/" title="mutt homepage">Mutt</a> - a small but very powerful text-based mail client for Unix operating systems. Eminently extensible and configurable. mutt + imap + gmail ftw!</li>
-<li><a href="http://www.washington.edu/alpine/" title="Alpine homepage">Alpine</a> - based on the Pine® Message System. Not as intimidating for the novice as mutt…</li>
-<li><a href="http://sup.rubyforge.org/" title="sup homepage">Sup</a> - a console-based email client for people with a lot of email. “The goal of Sup is to become the email client of choice for nerds everywhere”</li>
-<li><a href="http://notmuchmail.org/">Notmuch</a> - an answer to Sup. Still in the early stages of development, there are two user interfaces available for it, one for <a href="http://www.vim.org/" title="THE text editor...">vim</a> and one for those poor benighted souls still using emacs…</li>
-<li><a href="http://www.courier-mta.org/cone/cone00index.html" title="Cone homepage">Cone</a> - a screen-oriented E-mail/News reader and writer. Cone contains an experimental implementation of a new remote mail access protocol, <a href="http://en.wikipedia.org/wiki/Simple_Mail_Access_Protocol" title="Wikipedia page">SMAP</a></li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/05/21/browsers/">5 Alternate Browsers</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-05-21T15:22:00+12:00" pubdate data-updated="true">May 21<span>st</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/4352140405/"><img src="http://miromiro.com/Blog-images/browser-5alt.png"/></a></p>
-
-<p>Tired of Firefox&#8217;s bloated, buggy behaviour?</p>
-
-<p>Here are five alternatives that are lighter, faster and much more fun…</p>
-
-<ul>
-<li><a href="http://www.uzbl.org/" title="Uzbl homepage">Uzbl</a>. My current browser of choice. Completely customizable, integrates well with other programs and is scriptable.</li>
-<li><a href="http://surf.suckless.org/" title="Surf on the suckless wiki">Surf</a>. From suckless.org. &#8216;Nuff said.</li>
-<li><a href="http://conkeror.org/" title="Conkeror homepage">Conkeror</a>. I used this for a long time before moving to uzbl - the emacs-like keybindings are why I gave it up…</li>
-<li><a href="http://www.vimprobable.org/" title="Home of the wonderfully named  Vimprobable">Vimprobable</a>. Gets great raps on the Arch boards. One to watch (…and a homepage that telegraphs exactly what to expect).</li>
-<li><a href="http://bbs.archlinux.org/viewtopic.php?id=95589&amp;p=1" title="dwb thread on the Arch Forums">dwb</a>. Another browser, like uzbl, to come from the Arch community. As the name suggests, built for tilers…</li>
-</ul>
 
 </div>
   
@@ -303,23 +422,23 @@ symlink to it from <span class="file">~/.notes</span>.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -397,7 +516,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -406,7 +525,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

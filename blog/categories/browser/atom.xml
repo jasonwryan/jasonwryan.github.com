@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: browser | jasonwryan.com]]></title>
-  <link href="http://jasonwryan.github.com/blog/categories/browser/atom.xml" rel="self"/>
-  <link href="http://jasonwryan.github.com/"/>
-  <updated>2014-01-20T12:56:27+13:00</updated>
-  <id>http://jasonwryan.github.com/</id>
+  <link href="http://jasonwryan.com/blog/categories/browser/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-09T23:18:03+13:00</updated>
+  <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
     
@@ -14,11 +14,133 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Browser tunnels]]></title>
+    <link href="http://jasonwryan.com/blog/2014/05/30/tunnels/"/>
+    <updated>2014-05-30T09:32:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/05/30/tunnels</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/tunnel.jpg" title="Creative Commons image" >
+Using a
+<a href="http://en.wikipedia.org/wiki/SOCKS" title="Wikipedia article">Socks proxy</a> over an
+<a href="http://en.wikipedia.org/wiki/Tunneling_protocol#Secure_shell_tunneling" title="Wikipedia entry">SSH tunnel</a>
+is a well documented and simple if much less flexible stand in for a full-blown
+<a href="http://en.wikipedia.org/wiki/Virtual_private_network%20'VPN%20on%20Wikipedia">VPN</a>. It
+can provide a degree of comfort when accessing private or sensitive information
+over a public Internet connection, or you might use it to get around the
+terminally Canutian<sup>1</sup> construct that is known as geo-blocking; that
+asinine practice of pretending that the Internet observes political boundaries…</p>
+
+<p>By way of a digression, it occurred to me at some point while I was wrestling
+with setting this up that, over the last seven or so years, much of the
+“entertainment” provided by corporate content distributors has been in the form
+of encouraging me to spend hundreds? thousands? of hours researching and
+implementing ways to circumvent their litany of failed and defective
+technological restrictions: region codes,
+<a href="http://www.defectivebydesign.org/what_is_drm_digital_restrictions_management" title="Defective by Design">DRM</a>
+and the like. It is worth noting that, in the vast majority of cases, I was
+just seeking access to content that I already owned (in another format), or was
+prepared to pay for.</p>
+
+<p>My move to GNU/Linux in 2007 was in large part motivated by the awful
+realisation that the music I had bought in iTunes was stuck in there. The
+combined intellectual effort globally expended trying to legitimately route
+around broken copyright law would have comfortably powered another golden age
+of the sciences; it's not entirely implausible to think that the only reason we
+still have to deal with cancer is the malignant legacy of
+<a href="https://en.wikipedia.org/wiki/Sonny_Bono_Copyright_Term_Extension_Act" title="Sonny's gift…">Sonny Bono</a><sup>2</sup>.</p>
+
+<p>Now, back to our regular programming… One of my approaches to get around this
+sort of economic and policy rigor mortis has been to use a basic script to
+create a proxy tunnel to my home server. It assumes that you have
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia, again">public key</a>
+authentication set up and your passphrase loaded in
+<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Keychain" title="Arch wiki, for a change">keychain</a>,
+or something similar.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;SSH_HOST<span class="o">=</span><span class="s2">&quot;jason@XXX.XXX.XXX.XXX -p XXX -i $HOME/.ssh/box1&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;up<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;ssh -f -N -D 8080 -M -S /tmp/ssh_tunnel_%h.sock -o <span class="nv">ExitOnForwardFailure</span><span class="o">=</span>yes <span class="nv">$SSH_HOST</span> &amp;amp;&amp;amp; <span class="se">\</span>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel started successfully&quot;</span> <span class="o">||</span> <span class="se">\</span>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel failed to start&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;down<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;ssh -S /tmp/ssh_tunnel_%h.sock -O <span class="nb">exit</span> <span class="nv">$SSH_HOST</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> up <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;up &amp;amp;&amp;amp; chromium --proxy-server<span class="o">=</span><span class="s2">&quot;socks://127.0.0.1:8080&quot;</span> &amp;amp;
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> down <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;down
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;else&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail…&quot;</span>
+</span><span class='line'><span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Over the last couple of weeks, though, while I have been setting up and
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on Syncthing">playing with Syncthing</a>,
+I found this script wanting. With six nodes and, depending if I was on the
+<acronym title="Local Area Network">LAN</acronym> or not, as many as four of those
+hosts only accessible via SSH, then having the ability to quickly and painlessly
+open a browser on any one of the nodes <em>without having to edit the script</em>
+suddenly seemed like quite a good idea.</p>
+
+<p>Accordingly I went to work on the script, including a test to determine if I
+was on my home network and passing the name of the desired host as an
+argument. With this approach, I simply type <code>tunnel $host</code> and chromium
+opens tunneled to that host, where I can the happily open
+<strike>Hulu</strike> the Syncthing GUI.</p>
+
+<p>The updated script is posted as
+<a href="https://gist.github.com/jasonwryan/715a4f3fcb55e995de0d" title="On Github">a gist</a>,
+and as you can see, still needs some work to make it a little more generic.
+You will need, for example, to hand edit in the hosts and ports in
+<code>get_host()</code>. It is also the first time I have played with
+<a href="http://mywiki.wooledge.org/BashGuide/InputAndOutput#Pipes" title="Wooledge wiki">named pipes</a>
+and I am not convinced that my use of <code>mkfifo</code> here is either the correct
+approach or implementation; but it works. Comments enlightening me would
+be gratefully received.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The good king was, appropriately enough, actually called Cnut the Great…</li>
+<li>And, no, I am not referring to his musical corpus, which is as carcinogenic as his
+political career was as a Myrmidon for Big Content.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image, <a href="https://www.flickr.com/photos/lawrence_evil/113733779/">The Tunnel</a>,
+by Lawrence Whitmore.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Replacing Google Reader]]></title>
-    <link href="http://jasonwryan.github.com/blog/2013/05/25/greader/"/>
+    <link href="http://jasonwryan.com/blog/2013/05/25/greader/"/>
     <updated>2013-05-25T09:10:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2013/05/25/greader</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/commafeed.png" title="'CommaFeed Logo'" >
+    <id>http://jasonwryan.com/blog/2013/05/25/greader</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/commafeed.png" title="'CommaFeed Logo'" >
 I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
 everyday since I first discovered the service over seven years ago. It is my
 primary source of news and information and the announcement that Google is, on July 1 this year,
@@ -107,7 +229,7 @@ then pushing to <code>openshift master</code>.</p>
 errors from builds late this week), but if you import from an existing <code>.opml</code>
 or <code>.xml</code> file you will see CommaFeed in all it's glory:</p>
 
-<p><img class="left" src="http://miromiro.com/Blog-images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
+<p><img class="left" src="/images/post_images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
 
 <p>As you can see, it is remarkably similar to the Google Reader interface; a
 clean, minimalist design that is focussed—quite rightly—on the content. There
@@ -156,10 +278,10 @@ will soon be even better than Google Reader, you might want to use it.</li>
   
   <entry>
     <title type="html"><![CDATA[A Vimprobable Walkthrough]]></title>
-    <link href="http://jasonwryan.github.com/blog/2012/11/20/vimprobable/"/>
+    <link href="http://jasonwryan.com/blog/2012/11/20/vimprobable/"/>
     <updated>2012-11-20T18:58:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2012/11/20/vimprobable</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://miromiro.com/Blog-images/vimprobable-logo.png" title="'Vimprobable logo'" >
+    <id>http://jasonwryan.com/blog/2012/11/20/vimprobable</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/vimprobable-logo.png" title="'Vimprobable logo'" >
 I have written about <a href="http://vimprobable.org" title="Vimprobable homepage">Vimprobable</a>
 a couple of times over the last two years<sup>1</sup>,
 it is one of those projects that, for a variety of reasons, I have picked up
@@ -210,10 +332,10 @@ more recently, in <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobab
   
   <entry>
     <title type="html"><![CDATA[Using Vimprobable]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/06/26/using-vimprobable/"/>
+    <link href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/"/>
     <updated>2011-06-26T14:08:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/06/26/using-vimprobable</id>
-    <content type="html"><![CDATA[<p><img src="http://miromiro.com/Blog-images/vimprobable2.png" alt="image" /></p>
+    <id>http://jasonwryan.com/blog/2011/06/26/using-vimprobable</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/vimprobable2.png" alt="image" /></p>
 
 <p>I <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/" title="Post on using Vimprobable">posted last year about Vimprobable</a>
 a <a href="http://www.webkit.org/" title="Webkit site">webkit browser</a> that uses
@@ -327,10 +449,10 @@ it is passed to Vimprobable in <code>tabbed</code>.</p>
   
   <entry>
     <title type="html"><![CDATA[w3m, Surfraw and Yanking URLs]]></title>
-    <link href="http://jasonwryan.github.com/blog/2011/05/05/w3m/"/>
+    <link href="http://jasonwryan.com/blog/2011/05/05/w3m/"/>
     <updated>2011-05-05T19:57:00+12:00</updated>
-    <id>http://jasonwryan.github.com/blog/2011/05/05/w3m</id>
-    <content type="html"><![CDATA[<p><img src="http://miromiro.com/Blog-images/w3m.png" alt="image" /></p>
+    <id>http://jasonwryan.com/blog/2011/05/05/w3m</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/w3m.png" alt="image" /></p>
 
 <p>I posted a couple of weeks ago about
 <a href="http://jasonwryan.com/blog/2011/04/13/archwiki-elvis-for-surfraw/" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
@@ -409,89 +531,6 @@ and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
 </span></code></pre></div></figure></notextile></div></p>
 
 <p>This prevents a new line being appended.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Vimprobable]]></title>
-    <link href="http://jasonwryan.github.com/blog/2010/10/07/vimprobable/"/>
-    <updated>2010-10-07T16:23:00+13:00</updated>
-    <id>http://jasonwryan.github.com/blog/2010/10/07/vimprobable</id>
-    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5055695051/" title="Vimprobable on Flickr"><img src="http://miromiro.com/Blog-images/vimprobable.png" title="Hacked Vimprobable2" alt="image" /></a></p>
-
-<p>After just posting details of <a href="http://jasonwryan.com/blog/2010/10/04/the-setup/">my setup</a>,
-I have made a reasonably significant (and it goes almost without saying, unplanned)
-change: after <a href="http://www.uzbl.org/">uzbl</a> began unaccountably maxxing
-out my CPU, I decided to give <a href="http://www.vimprobable.org/">Vimprobable</a>
-a go.</p>
-
-<p>I covered it briefly in my review of <a href="http://jasonwryan.com/blog/2010/05/21/5-alternate-browsers/">5 alternate browsers</a> and liked the
-idea of another vim-based browsing experience.</p>
-
-<p>There are two versions of Vimprobable; the differences, as described on
-the website:</p>
-
-<blockquote><p>Both versions are actively maintained. The first version can only be
-customised by editing config.h before compiling. It is pretty stable
-and very usable. Version 2 has grown fairly stable already as well,
-but it’s still seeing bigger changes, of course. It aims at allowing
-more customisation, for example through :set and :map commands.</p></blockquote>
-
-<p>I downloaded the tarball for
-<a href="http://aur.archlinux.org/packages.php?ID=33779" title="Arch User Repository: Vimprobable2">Vimprobable2 from the AUR</a>,
-extracted the files and built the package.</p>
-
-<p>Customization occurs in 3 files<sup>1</sup>: the first two,
-<span class="file">config.h</span> and <span class="file">keymap.h</span>
-both require you to recompile after editing, which is a trivial task
-given the size of the programme.</p>
-
-<p>Vimprobable2 also features a third configuration option that doesn’t
-require compiling after changes, <span class="file">vimprobablerc</span>.
-Should you wish to use it, you will need to create this file in
-<span class="file">~/.config/vimprobable/</span>.
-Helpfully, there is a man page for all of the options in this file, to
-read it issue:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>man vimprobablerc
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>Despite it’s spartan appearance, Vimprobable is a full-featured browser
-— with the advantage of being driven solely from the keyboard. It
-handles bookmarks (and the tagging thereof, which is impressive and
-handy), multiple search engines, cookies, history, etc…</p>
-
-<p>I have made a number of changes to the defaults, including moving some
-of the keybindings to be closer to uzbl’s (habit, really). The other
-area where I made some minor changes was to the hinting style. Hinting
-is just the way Vimprobable (and other browsers like uzbl and
-<a href="http://conkeror.org/">Conkeror</a>) follow links; the default is, to put
-it mildly, garish<sup>2</sup>, so I hacked around in <span class="file">hinting.js</span>
-to make it more attractive.</p>
-
-<p>If you are interested, my vimprobable files are in
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/vimprobable2-git/">bitbucket</a>,
-including the modified hinting.js.</p>
-
-<h3>Update</h3>
-
-<p>I think this is a keeper. I installed
-<a href="http://tools.suckless.org/tabbed" title="suckless' tabbed">tabbed</a> and now
-open Vimprobable in tabbed for tab management. A quick addition to my
-keybinds in <a href="http://dwm.suckless.org/" title="dynamic window manager">dwm</a> and
-I have a minimalist and powerful browser…</p>
-
-<h5>Notes</h5>
-
-<ol>
-<li><p>Of course, you are not limited to these files; the beauty of free
-and open-source software is that you can change any of it…</p></li>
-<li><p>To support this claim, I searched google for an image of the default
-Vimprobable hinting style, and I could only find this
-<a href="http://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/103/10387/10387f2.jpg">screenshot of conkeror</a>,
-which will give you an idea…</p></li>
-</ol>
-
 ]]></content>
   </entry>
   

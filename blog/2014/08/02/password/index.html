@@ -1,0 +1,450 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>pass{,word} manager - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="After posting last week about
+KeePassC as a password manager,
+a couple of people immediately commented about a utility billed as “the
+standard Unix &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/2014/08/02/password">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">pass{,word} manager</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-02T09:28:00+12:00" pubdate data-updated="true">Aug 2<span>nd</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="left" src="/images/post_images/key-board.jpg" title="Creative Commons image on Flickr" >
+After posting last week about
+<a href="http://jasonwryan.com/blog/2014/07/25/keepass/" title="Redundant blog post">KeePassC as a password manager</a>,
+a couple of people immediately commented about a utility billed as “the
+standard Unix password manager.” This is definitely one of the reasons I
+continue to write up my experiences with free and open source software: as soon
+as you think that you have learned something, someone will either offer a
+correction or encourage you to explore something else that is similar, related
+or interesting for some other tangential reason.</p>
+
+<p>So, I was off down that path… Called simply <a href="http://www.passwordstore.org/" title="Homepage">pass</a>,
+it is a 600 line bash script that uses
+<a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard" title="Wikpedia entry">GPG encryption</a>
+and some other standard tools and scripts to organize and manage your password
+files. I had never heard of it but, based on Cayetano and Bigby&#8217;s
+recommendations, I thought it would be worth a look.</p>
+
+<p>On of the reasons that I had not come across it before was that, after using
+<a href="http://www.keepassx.org/" title="KeePassX homepage">KeePassX</a> for so long, I had
+assumed that I would need to continue to use that database format; so when I
+was looking for an alternative,
+<a href="http://raymontag.github.io/keepassc/" title="KeePassC homepage">KeePassC</a>
+was a natural fit (and a fine application). The question of migrating my data
+hadn&#8217;t even occurred to me…</p>
+
+<p>It turns out that the migration process to pass is extraordinarily well catered
+for: there are
+<a href="http://git.zx2c4.com/password-store/tree/contrib/importers" title="pass git repo">10 migration scripts</a>
+for a range of different formats, including
+<a href="http://git.zx2c4.com/password-store/tree/contrib/importers/keepassx2pass.py" title="Said script…">keepassx2pass.py</a>,
+which takes the exported <acronym title="Extensible Markup Language">XML</acronym>
+KeePassX database file and creates your pass files,ordered by the schema you
+had used in that application.  You just need to make sure you amend the shebang
+to <code>python2</code> before running the script, otherwise it will fail with an
+unhelpful error message.</p>
+
+<p>After using KeePassX to dump my database, before I could use the script to
+create my pass directories, I had to export the <code>PASSWORD_STORE_DIR</code>
+environment variable to place the top level pass directory in an alternate
+location. This way, instead of initializing a git repository, I could have the
+store synced by
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="My post on Syncthing">Syncthing</a>.
+The git idea is a good one, but I&#8217;m not particularly interested in version
+controlling these directories, and I have no intention, encrypted or not, of
+pushing them to someone else&#8217;s server.</p>
+
+<p>That constitutes the basic setup. It took a grand total of five minutes. The
+real strength of pass, however, is in its integration with two other fantastic
+tools:
+<a href="http://www.funtoo.org/Keychain" title="Keychain homepage">keychain</a> and
+<a href="http://tools.suckless.org/dmenu/" title="Another quality Suckless product">dmenu</a>.
+Together with pass, these constitute a secure, convenient and effortless
+workflow for managing your passwords. With your GPG key loaded into keychain,
+you are only prompted for your master passphrase once<sup>1</sup> and with
+Chris Down&#8217;s excellent
+<a href="http://git.zx2c4.com/password-store/tree/contrib/dmenu/passmenu" title="In the pass repo">passmenu script</a>,
+you can use dmenu to sort through your password files, <kbd>Tab</kbd> complete
+the one you are looking for and have it copied to your clipboard with a couple
+of keystrokes.</p>
+
+<p>After using Chris&#8217; script for a couple of days, I made a few alterations to
+suit my setup: removed the <code>xdotool</code> stuff (as I don&#8217;t need it), included dmenu
+formatting options to match my
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/dwm-status" title="In my bitbucket repo">dwm statusbar</a>
+and, most significantly, changed the way that the files are printed in dmenu to
+remove the visual clutter of the parent directories, ie., print <span class="file">archwiki</span>
+as opposed to <span class="file">internet/archwiki</span>:</p>
+
+<figure class='code'><figcaption><span>dpass </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># based on: https://github.com/cdown/passmenu</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">shopt</span> -s nullglob globstar
+</span><span class='line'>
+</span><span class='line'><span class="nv">nb</span><span class="o">=</span><span class="s1">&#39;#121212&#39;</span>
+</span><span class='line'><span class="nv">nf</span><span class="o">=</span><span class="s1">&#39;#696969&#39;</span>
+</span><span class='line'><span class="nv">sb</span><span class="o">=</span><span class="s1">&#39;#121212&#39;</span>
+</span><span class='line'><span class="nv">sf</span><span class="o">=</span><span class="s1">&#39;#914E89&#39;</span>
+</span><span class='line'><span class="nv">font</span><span class="o">=</span><span class="s2">&quot;Dejavu Sans Mono:medium:size=7.5&quot;</span>
+</span><span class='line'><span class="nv">dmenucmd</span><span class="o">=(</span> dmenu -i -fn <span class="s2">&quot;$font&quot;</span> -nb <span class="s2">&quot;$nb&quot;</span> -nf <span class="s2">&quot;$nf&quot;</span> -sb <span class="s2">&quot;$sb&quot;</span> -sf <span class="s2">&quot;$sf&quot;</span> <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">prefix</span><span class="o">=</span><span class="k">${</span><span class="nv">PASSWORD_STORE_DIR</span><span class="k">:-</span><span class="p">~/.password-store</span><span class="k">}</span>
+</span><span class='line'><span class="nv">files</span><span class="o">=(</span> <span class="s2">&quot;$prefix&quot;</span>/**/*.gpg <span class="o">)</span>
+</span><span class='line'><span class="nv">files</span><span class="o">=(</span> <span class="s2">&quot;${files[@]#&quot;</span><span class="nv">$prefix</span><span class="s2">&quot;/}&quot;</span> <span class="o">)</span>
+</span><span class='line'><span class="nv">files</span><span class="o">=(</span> <span class="s2">&quot;${files[@]%.gpg}&quot;</span> <span class="o">)</span>
+</span><span class='line'><span class="nv">fbase</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##*/}&quot;</span> <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">word</span><span class="o">=</span><span class="k">$(</span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${fbase[@]}&quot;</span> | <span class="s2">&quot;${dmenucmd[@]}&quot;</span> <span class="s2">&quot;$@&quot;</span><span class="k">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -n <span class="nv">$word</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  for </span>match in <span class="s2">&quot;${files[@]}&quot;</span>; <span class="k">do  </span>
+</span><span class='line'><span class="k">    if</span> <span class="o">[[</span> <span class="nv">$word</span> <span class="o">==</span> <span class="k">${</span><span class="nv">match</span><span class="p">#*/</span><span class="k">}</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'>      /usr/bin/pass show -c <span class="s2">&quot;$match&quot;</span> 2&gt;/dev/null
+</span><span class='line'>    <span class="k">fi  </span>
+</span><span class='line'><span class="k">  done</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>It does introduce some more complexity into the script, but it makes it a lot
+easier for me to identify the desired password when reading it in dmenu.</p>
+
+<p>Now, when I need a to enter a password, I hit my dmenu hotkey, type <code>dpass</code>
+<kbd>Enter</kbd> and the first couple of letters of the desired password
+filename, <kbd>Tab</kbd><kbd>Enter</kbd> and the password is loaded and ready
+to go. There are also
+<a href="http://git.zx2c4.com/password-store/tree/src/completion" title="Git repo">completion scripts</a>
+for the main shells, and even one for
+<a href="http://fishshell.com/" title="Fish homepage">fish</a><sup>2</sup> for the iconoclasts…</p>
+
+<p>While I have no complaints at all with KeePassC, I have found this pass setup to
+be a lot less intrusive to use, it seamlessly integrates with my workflow,
+and the passwords themselves are much simpler to manage. Short of someone else
+popping up in the comments with another compelling proposition, I&#8217;m content
+with the way this has worked out. Many thanks to Cayetano Santos and Bigby
+James for the push.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>There is a very annoying <a href="https://bugs.funtoo.org/browse/FL-69">bug open for keychain</a>
+that means if, as I do, you start keychain from your <span class="file">$HOME/.profile</span>
+or <span class="file">$ZDOTDIR/.zprofile</span> you <em>will</em> need to enter the same
+passphrase to unlock a sub-key before you can use pass (the same thing applies
+to Mutt).  This gets really ugly if you attempt to use dmenu before unlocking
+your key…</li>
+<li><q>Finally, a command line shell for the 90s…</q> Indeed.</li>
+</ol>
+
+
+<p>Creative Commons image by <a href="http://www.flickr.com/photos/54450095@N05/8229504229/">Intel Free Press</a> on Flickr.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-02T09:28:00+12:00" pubdate data-updated="true">Aug 2<span>nd</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/hack/'>hack</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/07/25/keepass/" title="Previous Post: CLI Password Manager">&laquo; CLI Password Manager</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/08/23/asp/" title="Next Post: Building from Source">Building from Source &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.com/blog/2014/08/02/password/';
+        var disqus_url = 'http://jasonwryan.com/blog/2014/08/02/password/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

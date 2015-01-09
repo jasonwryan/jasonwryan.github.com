@@ -9,11 +9,12 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I was fortunate enough to be given a
-Raspberry Pi earlier this year
-and, naturally enough, have been running
-Arch ARM on it over the
-last several &hellip;">
+  <meta name="description" content="Using a
+Socks proxy over an
+SSH tunnel
+is a well documented and simple if much less flexible stand in for a full-blown
+VPN. It
+can provide a degree &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -22,7 +23,7 @@ last several &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/4">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/4">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -30,8 +31,8 @@ last several &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -69,7 +70,7 @@ last several &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -92,7 +93,7 @@ last several &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/06/29/raspberry/">RPi Headless Torrent Box</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/05/30/tunnels/">Browser tunnels</a></h1>
     
     
       <p class="meta">
@@ -108,104 +109,258 @@ last several &hellip;">
   
 
 
-<time datetime="2013-06-29T09:40:00+12:00" pubdate data-updated="true">Jun 29<span>th</span>, 2013</time>
+<time datetime="2014-05-30T09:32:00+12:00" pubdate data-updated="true">May 30<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/raspberry-pi-logo.png" title="Raspberry Pi logo" >
-I was fortunate enough to be given a
-<a href="http://www.raspberrypi.org/" title="Pi homepage">Raspberry Pi</a> earlier this year
-and, naturally enough, have been running
-<a href="http://archlinuxarm.org/" title="Arch Linux ARM site">Arch ARM</a> on it over the
-last several months. Initially, I was at somewhat of a loss as to what to do
-with it, so was just (under)using it<sup>1</sup> for a persistent IRC connection.
-I have now, with very little effort, set it up as a headless torrent box and it is
-working nicely.</p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/tunnel.jpg" title="Creative Commons image" >
+Using a
+<a href="http://en.wikipedia.org/wiki/SOCKS" title="Wikipedia article">Socks proxy</a> over an
+<a href="http://en.wikipedia.org/wiki/Tunneling_protocol#Secure_shell_tunneling" title="Wikipedia entry">SSH tunnel</a>
+is a well documented and simple if much less flexible stand in for a full-blown
+<a href="http://en.wikipedia.org/wiki/Virtual_private_network%20'VPN%20on%20Wikipedia">VPN</a>. It
+can provide a degree of comfort when accessing private or sensitive information
+over a public Internet connection, or you might use it to get around the
+terminally Canutian<sup>1</sup> construct that is known as geo-blocking; that
+asinine practice of pretending that the Internet observes political boundaries…</p>
 
-<p>As is generally the case, this involved little more than stitching together a
-few lightweight tools to accomplish the task. In this case, it is a combination
-of
-<a href="http://libtorrent.rakshasa.no/" title="rotrrent homepage">rtorrent</a>
-(with the canvas-colour patch applied),
-<a href="http://jasonwryan.com/blog/categories/surfraw/" title="Posts on surfraw">surfraw</a>
-and
-<a href="http://w3m.sourceforge.net/" title="w3m homepage">w3m</a> for discovering
-torrents,<sup>2</sup>
-<a href="http://labs.bittorrent.com/experiments/sync.html" title="Peer to Peer synching">bittorrent sync</a>
-and, optionally, a <acronym title="Virtual Private Network">VPN</acronym>.</p>
+<p>By way of a digression, it occurred to me at some point while I was wrestling
+with setting this up that, over the last seven or so years, much of the
+“entertainment” provided by corporate content distributors has been in the form
+of encouraging me to spend hundreds? thousands? of hours researching and
+implementing ways to circumvent their litany of failed and defective
+technological restrictions: region codes,
+<a href="http://www.defectivebydesign.org/what_is_drm_digital_restrictions_management" title="Defective by Design">DRM</a>
+and the like. It is worth noting that, in the vast majority of cases, I was
+just seeking access to content that I already owned (in another format), or was
+prepared to pay for.</p>
 
-<p>I use a 16GB <acronym title="Universal Serial Bus">USB</acronym> drive to act as
-storage for the device, and mount it at <span class="file">~/Downloads</span>
-via <span class="file">/etc/fstab</span>; depending on the size of your
-<acronym title="Secure Digital">SD card</acronym>, this may be superfluous.</p>
+<p>My move to GNU/Linux in 2007 was in large part motivated by the awful
+realisation that the music I had bought in iTunes was stuck in there. The
+combined intellectual effort globally expended trying to legitimately route
+around broken copyright law would have comfortably powered another golden age
+of the sciences; it&#8217;s not entirely implausible to think that the only reason we
+still have to deal with cancer is the malignant legacy of
+<a href="https://en.wikipedia.org/wiki/Sonny_Bono_Copyright_Term_Extension_Act" title="Sonny's gift…">Sonny Bono</a><sup>2</sup>.</p>
 
-<p>First a note on building packages; building <em>anything</em> on the Pi—with only
-512MB <acronym title="Random Access Memory">RAM</acronym>—is a protracted
-and thankless task. So if you intend to do more of this, or do it regularly,
-set up
-<a href="http://archlinuxarm.org/developers/distcc-cross-compiling" title="Arch ARM instructions">cross-compiling</a>;
-you won&#8217;t regret the initial investment.</p>
+<p>Now, back to our regular programming… One of my approaches to get around this
+sort of economic and policy rigor mortis has been to use a basic script to
+create a proxy tunnel to my home server. It assumes that you have
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia, again">public key</a>
+authentication set up and your passphrase loaded in
+<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Keychain" title="Arch wiki, for a change">keychain</a>,
+or something similar.</p>
 
-<p><code>rtorrent</code> is in the ARM repos, but I wanted to patch in colour, so I wrote
-<a href="https://gist.github.com/jasonwryan/5794623" title="Gist of the thing…">a PKGBUILD</a>,
-based on the package in [community] and
-<a href="https://aur.archlinux.org/packages.php?ID=31956" title="Arch User Repository">ashren&#8217;s AUR package</a>.
-Once you have rtorrent installed and working, the rest is straightforward.</p>
-
-<p>The default config for w3m is perfectly functional, but can be easily customized
-further. The key to this setup is being able to find a torrent and then easily
-add it to rtorrent&#8217;s queue.  To do this, I modified the hack that I wrote up
-<a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Post on yanking URLs in w3m">a couple years back</a>.
-Essentially, you use w3m&#8217;s external link function to trigger a script to grab
-the magnet link. Like so:</p>
-
-<figure class='code'><figcaption><span>~/.w3m/config </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>extbrowser /home/jason/Scripts/magnets %s
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">SSH_HOST</span><span class="o">=</span><span class="s2">&quot;jason@XXX.XXX.XXX.XXX -p XXX -i $HOME/.ssh/box1&quot;</span>
+</span><span class='line'>
+</span><span class='line'>up<span class="o">(){</span>
+</span><span class='line'>    ssh -f -N -D 8080 -M -S /tmp/ssh_tunnel_%h.sock -o <span class="nv">ExitOnForwardFailure</span><span class="o">=</span>yes <span class="nv">$SSH_HOST</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel started successfully&quot;</span> <span class="o">||</span> <span class="se">\</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel failed to start&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>down<span class="o">(){</span>
+</span><span class='line'>    ssh -S /tmp/ssh_tunnel_%h.sock -O <span class="nb">exit</span> <span class="nv">$SSH_HOST</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> up <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>up <span class="o">&amp;&amp;</span> chromium --proxy-server<span class="o">=</span><span class="s2">&quot;socks://127.0.0.1:8080&quot;</span> &amp;
+</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> down <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>down
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail…&quot;</span>
+</span><span class='line'>    <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
 </span></code></pre></div></figure>
 
 
-<p>and the script from the
-<a href="http://wiki.rtorrent.org/MagnetUri#Handling_.22magnet:.22_URIs_via_a_bash_script" title="Script for magnet links">rtorrent wiki</a>:</p>
+<p>Over the last couple of weeks, though, while I have been setting up and
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on Syncthing">playing with Syncthing</a>,
+I found this script wanting. With six nodes and, depending if I was on the
+<acronym title="Local Area Network">LAN</acronym> or not, as many as four of those
+hosts only accessible via SSH, then having the ability to quickly and painlessly
+open a browser on any one of the nodes <em>without having to edit the script</em>
+suddenly seemed like quite a good idea.</p>
 
-<figure class='code'><figcaption><span>~/Scripts/magnets </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'><span class="nb">cd</span> <span class="nv">$HOME</span>/Downloads/Queue/watch/    <span class="c"># set your watch directory here</span>
-</span><span class='line'><span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span>~ <span class="nv">xt</span><span class="o">=</span>urn:btih:<span class="o">([</span>^&amp;/<span class="o">]</span>+<span class="o">)</span> <span class="o">]]</span> <span class="o">||</span> <span class="nb">exit</span>;
-</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;d10:magnet-uri${#1}:${1}e&quot;</span> &gt; <span class="s2">&quot;meta-${BASH_REMATCH[1]}.torrent&quot;</span>
-</span></code></pre></div></figure>
+<p>Accordingly I went to work on the script, including a test to determine if I
+was on my home network and passing the name of the desired host as an
+argument. With this approach, I simply type <code>tunnel $host</code> and chromium
+opens tunneled to that host, where I can the happily open
+<strike>Hulu</strike> the Syncthing GUI.</p>
 
-
-<p>Remapping the w3m key to trigger the script to make it more Vim-like:</p>
-
-<figure class='code'><figcaption><span>~/.w3m/keymap </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>keymap Y EXTERN_LINK
-</span></code></pre></div></figure>
-
-
-<p>And now hitting <kbd>Shift</kbd><kbd>y</kbd> over a magnet link adds it to your
-queue.</p>
-
-<p>The final piece was to ameliorate the step of transferring the completed files
-from the Pi, or for allowing me to add torrents remotely. To do this, I used
-a <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="My post on Sync">bittorrent sync</a>
-shared directory as <span class="file">~/Downloads</span>. All files are synched
-to my desktop as they are downloaded to the Pi. Simple.</p>
-
-<p><img src="http://miromiro.com/Blog-images/rtorrent-2.png" title="'Screenshot of rtorrent in action…'" ></p>
-
-<p>As I mentioned above, you could also use a VPN and, with a service
-file, have it connect on boot if you wished to further protect your privacy.</p>
+<p>The updated script is posted as
+<a href="https://gist.github.com/jasonwryan/715a4f3fcb55e995de0d" title="On Github">a gist</a>,
+and as you can see, still needs some work to make it a little more generic.
+You will need, for example, to hand edit in the hosts and ports in
+<code>get_host()</code>. It is also the first time I have played with
+<a href="http://mywiki.wooledge.org/BashGuide/InputAndOutput#Pipes" title="Wooledge wiki">named pipes</a>
+and I am not convinced that my use of <code>mkfifo</code> here is either the correct
+approach or implementation; but it works. Comments enlightening me would
+be gratefully received.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>This is not to say that I am now using it to it&#8217;s full potential; quite the
-opposite. Recommendations or suggestions gratefully received.</li>
-<li>Discovery is <em>your</em> business; what you choose to download and share may be the
-business of copyright holders…</li>
+<li>The good king was, appropriately enough, actually called Cnut the Great…</li>
+<li>And, no, I am not referring to his musical corpus, which is as carcinogenic as his
+political career was as a Myrmidon for Big Content.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image, <a href="https://www.flickr.com/photos/lawrence_evil/113733779/">The Tunnel</a>,
+by Lawrence Whitmore.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/05/10/syncthing/">Using Syncthing</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-10T09:30:00+12:00" pubdate data-updated="true">May 10<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/syncthing.png" title="Syncthing logo" >
+Just over a year ago, I was invited to participate in an exciting Alpha, for
+<a href="http://www.bittorrent.com/sync" title="Sync website), an application
+that allows you to sync selected directories across devices using a
+[peer-to-peer protocol](https://en.wikipedia.org/wiki/Bittorent 'Wikipedia article">BitTorrent Sync</a>.
+I <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Click the damn thing…">wrote up my experience</a>
+and, with one reservation, found it to be a fantastic tool that did pretty much everything I
+needed, including letting me finally get rid of Dropbox. That one reservation, although not
+entirely clear at the time, was clarified soon after and was crushingly disappointing:
+the programme was closed source.</p>
+
+<p>Due to a combination of inertia (it was installed on all my devices and working well) and
+the lack of an alternative that didn&#8217;t involve installing and running a
+<a href="https://en.wikipedia.org/wiki/Lamp_stack" title="Wikipedia page">LAMP stack</a> just to sync
+my files, I have persisted with it; even writing a
+<a href="http://jasonwryan.com/blog/2013/11/14/api/" title="Post on said script">simple Awk script</a>
+to interact with the <acronym title="Application Program Interface">API</acronym>.
+For the last twelve months I have been pretty happy with it.</p>
+
+<p>In addition to the licensing choice, there are some other small issues that I have discovered: the
+<a href="https://play.google.com/store/apps/details?id=com.bittorrent.sync" title="On Google Play">Android App</a>
+<em>chews</em> through your battery if it is left on (which sort of defeats the purpose, but I
+learned to live with it), the syncing can take a little while to pick up changes, and
+nodes that don&#8217;t see much action may flake out completely after a while.</p>
+
+<p>Then, a few weeks ago I read about <a href="https://github.com/jewel/clearskies" title="On Github">clearskies</a>,
+an open source implementation of this concept. Sadly, it is still a proof of
+concept. This discovery, however, led to an extremely fortuitous exchange
+<a href="https://twitter.com/csantosb/status/460714748322258944" title="Twitter conversation">on Twitter</a>
+with <a href="https://twitter.com/csantosb" title="His profile on Twitter">cayetano santos</a> who pointed me
+at <a href="http://syncthing.net/" title="Syncthing homepage">Syncthing</a>. Described thus (cue
+<a href="http://www.youtube.com/watch?v=7YaGwI7GjlA" title="G.F. Handel on Youtube">background music</a>):</p>
+
+<blockquote><p>Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it&#8217;s transmitted over the Internet.</p></blockquote>
+
+
+<p>Written in <a href="http://golang.org/" title="Go language site">Go</a>, Syncthing is still in
+early development, but judging by the
+<a href="https://github.com/calmh/syncthing/releases" title="Releases on Github">release history</a>,
+it is moving ahead quickly. The developer, <a href="https://nym.se/" title="Jakob's site">Jakob Borg</a>,
+is obviously both talented and productive. After using it for the last
+couple of weeks, I have uninstalled BitTorrent Sync from all my machines
+and have Syncthing set up and running nicely. It is simple, elegant and
+works wonderfully; <em>for what it does</em>.</p>
+
+<p>Which is to say that it is not all of the things that either of its
+predecessors are: it isn&#8217;t intended to distribute files, or to host images or
+simple websites. It doesn&#8217;t include versioning or have a built-in editor. It is
+for securely syncing your files independent of any third parties. And there is no
+Android app, so your battery is safe<sup>1</sup>.</p>
+
+<p>Setup is through a tidy, <a href="http://getbootstrap.com/" title="Bootstrap site">bootstrap</a>
+built web interface, by default running on <code>127.0.0.1:8080</code>. I subsequently found
+that once I understood how the configuration worked, editing the config file at
+<span class="file">$XDG_CONFIG_HOME/syncthing/config.xml</span> was much
+simpler.  When setting up, you will also do a lot of stopping and starting of
+<code>syncthing</code>; if you use the service file that comes with the
+<a href="https://aur.archlinux.org/packages/syncthing/" title="Arch User Repo">AUR package</a>,
+that won&#8217;t work so well from the web interface… Run it from the command line
+with one of the <code>STTRACE</code> variables to debug and then, once it is running to
+your liking, hand it off to systemd<sup>2</sup>.</p>
+
+<p>With a reasonably tricky cluster setup (six machines; two outside the
+<acronym title="Local Area Network">LAN</acronym> sharing half a dozen
+repositories with three different topologies), there is a fair bit of trial and
+error involved getting everything set up and working correctly. But when you
+do, it is much faster to pick up changes than either of the other two and there
+is none of the risk around privacy and security presented by Dropbox and—to a
+(much, I would hazard to guess) lesser extent—BitTorrent Sync.</p>
+
+<p>I have also found that it is much quicker for all of the nodes connect if,
+for the LAN connections in your cluster, you specify the
+<acronym title="Internet Protocol">IP</acronym> addresses and port and disable
+global discovery for those nodes: this speeds up the discovery time when
+the nodes are started. Nodes still, from time-to-time, flake out, particularly
+if one of them is rebooted. Restarting the offending node is usually sufficient
+to bring the cluster back into sync.</p>
+
+<p>That isn&#8217;t to say that there aren&#8217;t any issues with it. The documentation is in
+need of some work; your best bet at the moment is a combination of the rather
+terse <code>--help</code> message and reading the source. There are also some hidden gems
+in the Github commits; for example, details on using
+<span class="file">.stignore</span> files, a very handy feature, are buried in
+an earlier
+<a href="https://github.com/calmh/syncthing/commit/986b15573a66f95beae53b10371ba50ab147124a" title="Github commit">commit to README.md</a> that didn&#8217;t survive the move of the documentation to the
+forum.</p>
+
+<p>The only other significant issue I have encountered is that getting all of the
+nodes across the cluster to connect to each other at the same time seems to be
+inexplicably difficult. It may just be my setup, but more often than not, nodes
+(on the LAN) will timeout while trying to connect to at least one of their peers.
+This isn&#8217;t a huge issue as you only really need one chained connection to bring
+all the data up to date, but it does cause a something of a minor
+<acronym title="Obsessive Compulsive Disorder">OCD</acronym> flare up.</p>
+
+<p>Given the early stages of the project, though, and the fact that it is open
+source, these anomalies are trivial. Overall, Syncthing is a delight. It does
+exactly what I need it to do, and it does it securely. Given the promise it is
+showing this early, I can only imagine it getting a lot better over time as
+more
+<a href="https://github.com/calmh/syncthing/issues?state=open" title="Issues on Github">bugs are squashed</a>
+and features rolled out.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Naturally enough, someone is <a href="https://github.com/calmh/syncthing/issues/177">on the case</a>…
+<strong>Update: 17/5/14</strong> App is available on
+<a href="https://play.google.com/store/apps/details?id=com.nutomic.syncthingandroid">Google Play</a> and it works pretty well.</li>
+<li>I added a debian daemon script to a thread on
+<a href="http://discourse.syncthing.net/t/keeping-syncthing-running/30/2">the Syncthing boards</a>
+as there is no built in daemon functionality (yet).</li>
 </ol>
 
 </div>
@@ -220,7 +375,7 @@ business of copyright holders…</li>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/06/15/asking/">Asking for Help</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/05/03/standards/">Minimum Standards</a></h1>
     
     
       <p class="meta">
@@ -236,275 +391,93 @@ business of copyright holders…</li>
   
 
 
-<time datetime="2013-06-15T10:39:00+12:00" pubdate data-updated="true">Jun 15<span>th</span>, 2013</time>
+<time datetime="2014-05-03T10:58:00+12:00" pubdate data-updated="true">May 3<span>rd</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/bowl.jpg" title="'Flickr image of Begging Bowl'" >
-Another great peristaltic movement in Arch&#8217;s rolling release digestive system
-happened over the last couple of weeks, the move of all binaries
-<a href="https://www.archlinux.org/news/binaries-move-to-usrbin-requiring-update-intervention/" title="Arch News update">to /usr/bin</a>.
-This move had been foreshadowed for several months and, despite announcements
-on the front page of the Arch website, the mailing lists and the release going
-through [testing] and the resulting thread on the forums, there was still a
-surprising amount of carnage<sup>1</sup> in it&#8217;s wake.</p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/crowd.jpg" title="Creative Commons crowd image" >
+Late last month there was a post on
+<a href="http://meta.stackoverflow.com/questions/251758/why-is-stack-overflow-so-negative-of-late" title="All the hate…">Meta Stack Overflow</a> wondering why SO is “so negative of late.” Reading through the
+extensive list of answers, and all the comments that quickly adhered to them
+like barnacles on a becalmed schooner, it was hard not to extrapolate to the
+experiences of online communities elsewhere, especially in the free and open
+software world. Stack Overflow is going on six years old now and has grown to
+be a truly formidable<sup>1</sup> resource for programmers, <em>dilettantes</em>—the
+category to which I clearly belong—and, apparently, people wanting their
+homework done for them. This isn&#8217;t the first time this question has been raised
+there, and I am sure it won&#8217;t be the last.</p>
 
-<p>In the aftermath (although I expect that it will take some months for it to
-completely pass through the system), what struck me was not so much the variety
-and ingenuity of the ways people had managed to break their installs<sup>2</sup>
-as how they approached the community seeking help afterwards.</p>
+<p>I don&#8217;t spend <a href="http://stackoverflow.com/users/712613/jasonwryan" title="My SO profile">much time on SO</a>,
+mostly because I am not a programmer and so I don&#8217;t have much to contribute there, but also because
+I <a href="http://unix.stackexchange.com/users/6761/jasonwryan" title="U&amp;L profile">am active on Unix &amp; Linux</a><sup>2</sup>,
+one of the clones that has emerged out of the metastasizing StackExchange
+empire. I do, however, subscribe to quite a few of the <acronym title="Really Simple Syndication">RSS</acronym>
+feeds for question tags on SO: things like #awk, #bash, and other topics that are of interest
+to me. Given the amount of noise in these feeds; in the form of redundancy (ie., questions
+that have been asked in one form or another <em>many</em> times before) or just a signal failure to read
+<em>any</em> documentation, it is not surprising that the people responsible for this degradation
+see the site as negative, or unfriendly, or elitist. This is perfectly natural: it is the
+community attempting to defend itself from
+<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on the scourge">help vampires</a>.</p>
 
-<p>There are already some fine guides on how to do this, notably
-ESR&#8217;s <a href="http://www.catb.org/esr/faqs/smart-questions.html" title="Just read it…">How to ask Questions the Smart Way</a>
-and—specifically for Arch—zendeavour&#8217;s
-<a href="http://redd.it/tjjwr" title="On Reddit">troubleshooting for newcomers</a>;
-this isn&#8217;t an attempt to add or expand on that genre. Rather, it is
-a look at a subset of attitudes that some people adopt<sup>3</sup>
-as they seek the assistance of the community.</p>
+<p>What was also quite predictable, given StackExchange&#8217;s response to this “problem” which was the
+2012 <a href="http://blog.stackoverflow.com/2012/07/kicking-off-the-summer-of-love/" title="SE Blog post">Summer of Love</a>
+campaign where they wanted to make SO a more friendly place, was that this would only
+exacerbate the issue. My experience of the site over that time is that the signal to noise has
+not improved at all, quite the contrary. I think that setting an expectation that the site
+would be more welcoming has two perverse consequences: first, it validates the perceptions
+of the newcomers about purported hostility, and in doing so signals to the existing community
+that built the value of the site that their culture needs remediation. Secondly, it signals
+more tolerance for behaviours that add no value to the community; so it is hardly surprising
+to see those behaviours proliferate.</p>
 
-<p>The first is the <strong>blamer</strong>. The proponent of the  “all-guns-blazing” approach.
-I&#8217;ll paraphrase, but there are enough examples on the boards to illustrate the
-point: “my system can&#8217;t boot, it&#8217;s not my fault and I am here to let you know
-that I am unhappy and demand recourse.” This is, unquestionably, the most
-puzzling of all the strategies. It is often coupled with the (sadly almost
-always empty) threat to abandon the distro and it&#8217;s apparently beleaguered
-community.</p>
+<p>From time to time the Arch community faces exactly the same criticisms: we are unfriendly,
+or elitist. I neither agree with these types of comments, nor am I particularly perturbed by
+them. Arch is a small community of volunteers, in order to create an environment where people
+who are willing and able to actively contribute, I think is important to ensure that there
+are clearly articulated standards<sup>3</sup> and that they are maintained by the
+community at large.</p>
 
-<p>Puzzling because I have yet to encounter a single situation in life, online
-or off, where opening with hostility and blame is an intelligent approach to
-seeking assistance. If you are going to adopt this approach, please supersize
-to “rage quit” and expend your energy actually delivering on your threat.</p>
+<p>I don&#8217;t see any scope for increasing the community&#8217;s tolerance for vampirism or the sort
+of self-entitlement that has a sad habit of appearing from time-to-time:</p>
 
-<p>The next is the <strong>wheedler</strong>. Less objectionable than the incendiary approach,
-it is nonetheless similarly ineffective. Wheedlers are distinguished by
-peppering their posts liberally with declarations of their ineptitude and
-“noobness”, in the mistaken belief that this will engender a wave of sympathy
-prior to soothing hand-holding and spoon-feeding. There is a strong correlation
-between this behaviour and the various types of
-<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on the taxonomy of vampires">help vampirism</a>.</p>
+<blockquote> As for the Arch team and their lacking resources, let&#8217;s take your point at face value.  Now, we&#8217;ve known what the problem is for almost four hours and no fix has been issued.</blockquote>
 
-<p>Wheedling won&#8217;t lead to quicker, or more informed, advice and assistance; in
-all likelihood it will just discourage others from helping because
-they can see that rewarding this sort of behaviour has a longer-term
-deleterious impact on the health of the community.</p>
 
-<p>Then there is the <strong>Vulcan</strong>. A curiosity more than an annoyance, these
-people seem to inhabit some sort of adolescent fantasy land where the Internet
-is a venue for them to revel in their almost superhero-like powers of technical
-<em>awesomeness</em>; said powers manifesting to others as a sort of benign
-cluelessness.</p>
+<p>There is some sort of “problem” that “we” have known about for <em>four hours</em> and
+yet, inconceivably<sup>4</sup>, <em>nothing</em> has been done about it?</p>
 
-<p>Their posts are invariably brief and completely devoid of relevant detail to the
-point of cryptic because, “hey, we all <em>know</em> what this issue is,” and are
-littered with smilies and that stupid emoticon with the sunglasses. Rather than
-actually describing their problem, they want people to think that, by a process
-of <a href="http://en.memory-alpha.org/wiki/Vulcan_mind_meld" title="There is a Star Trek wiki?">mind-melding</a>,
-other “hackers” will intuit the subtle depth and intricacy of the issue and
-then type out a detailed step-by-step guide of how to solve it.</p>
+<p>There is no bug report on the <a href="https://bugs.archlinux.org/" title="Flyspray">Arch tracker</a> so
+I am not sure why the collective pronoun is warranted here, that quibble aside; in what
+universe is this sort of petulance considered acceptable? The only reasonable response
+to this sort of whining is to close the thread and ban the infractor and their progeny, who
+will no doubt suffer from the same sort of genetic deficiencies, <em>in perpetuam</em>…</p>
 
-<p>Finally, there is the <strong>conspiracist</strong>. These malcontents see every
-significant change in Arch as being part of a wider agenda to corrupt the purity
-of the UNIX® philosophy. They also tend to blame
-<a href="https://en.wikipedia.org/wiki/Lennart_Poettering" title="Lennarts wikipedia page">Lennart Poettering</a>
-for <em>everything</em>. These unfortunates are clearly already suffering such mental anguish
-trying to reconcile their obsessiveness about the past with a rolling
-release that they deserve our pity more than our contempt (but I am equally
-happy providing either)…</p>
-
-<p>As I said, these are fortunately just a subset and very much represent the
-minority of attitudes.  The vast majority tend to be aware that, at
-one time or another, <em>everyone</em> will need some help to solve a problem.
-Therefore it is best to approach it in a matter-of-fact way, using the practical
-guidance on asking questions on a technical forum, and with a degree of humility
-and a willingness to learn from the people who are prepared to share their
-knowledge and experience.</p>
+<p>Clearly articulating, and enforcing, minimum standards of behaviour doesn&#8217;t
+make your community hostile or unfriendly; it establishes boundaries for people
+that supports respectful collaboration and the effective ability of that
+community to self-moderate.  People new to the community who take the time to
+read the guidelines and observe how things work will have no problem
+adapting<sup>5</sup>. It may not make you popular, but it will make a
+significant contribution to the sustainability of the community and the levels
+of engagement of those that do contribute and wish to continue doing so.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>Where “carnage” should be understood as a minor PEBKAC epidemia…</li>
-<li>From shutting down mid-update (because a reboot fixes <em>everything</em>) to
-still using <code>consolekit</code>, <code>initscripts</code> and <code>grub-legacy</code>: all deprecated some time
-ago.</li>
-<li>I resisted linking to specific posts on the boards to provide actual examples,
-the more motivated among you will find them without difficulty.</li>
+<li>“Fear” and it&#8217;s synonyms appear with remarkable frequency in that thread and the accompanying one on
+<a href="https://news.ycombinator.com/item?id=7650799">Hacker News</a>.</li>
+<li>I have written about U&amp;L <a href="http://jasonwryan.com/blog/2011/05/28/quoras-quandary/">previously</a>.</li>
+<li>The <a href="https://wiki.archlinux.org/index.php/Forum_Etiquette">Forum Etiquette</a>, for example.</li>
+<li>With apologies to Wallace Shawn…</li>
+<li>I have written about this <a href="http://jasonwryan.com/blog/categories/community/">in the past</a>.</li>
 </ol>
 
 
-<p>Flickr Creative Commons image by
-<a href="http://www.flickr.com/photos/buddhist_fox/4795942625/">Buddhist Fox</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/25/greader/">Replacing Google Reader</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-25T09:10:00+12:00" pubdate data-updated="true">May 25<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/commafeed.png" title="'CommaFeed Logo'" >
-I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
-everyday since I first discovered the service over seven years ago. It is my
-primary source of news and information and the announcement that Google is, on July 1 this year,
-set to <a href="http://googlereader.blogspot.ca/2013/03/powering-down-google-reader.html" title="Official announcemet on Google Blog">shut down Reader</a>
-was something considerably more than just an inconvenience for me.</p>
-
-<p>Over the years, I had looked at other <acronym title="Rich Site Summary">RSS</acronym>
-readers but, for a variety of reasons, had invariably found that the speed,
-simplicity and flexibility that Google Reader offered meant that any dalliances
-were unsatisfactory and short-lived. I resigned myself to having to settle for
-an inferior alternative, rather than moving to a genuine replacement.</p>
-
-<p>On the recommendation of <a href="https://pinboard.in/" title="Not so-social bookmarking">@pinboard</a>,
-I first signed up for a premium account at
-<a href="https://www.newsblur.com/" title="NewsBlur website">NewsBlur</a>. It is open source and,
-given the recommendation from Maciej<sup>1</sup>, I was hopeful that it would
-bridge the gap. Newsblur is a good service (especially considering the rush of
-signups in the days after the Google announcement), but it has a couple of
-critical weaknesses for me: no search (yes, you read that correctly—there is <em>no
-way to search through your feeds</em>) and, less importantly but just as annoying,
-occasionally sluggish performance.</p>
-
-<p>After a couple of weeks using NewBlur I happily stumbled across
-<a href="https://www.commafeed.com/" title="CommaFeed homepage">CommaFeed</a>, a
-Reader clone that emulates the austere minimalism of Google Reader. Apart from
-the fact that it is open source, the other aspect that attracted me to it
-was the ability to run it on Red Hat&#8217;s Platform as a Service offering,
-<a href="http://www.openshift.com/" title="Red Hat PaaS">OpenShift</a>.</p>
-
-<p>The README on the <a href="https://github.com/Athou/commafeed" title="CommaFeed repo">Github repo</a>
-explains how to set it all up. Unfortunately, due to an
-<a href="https://github.com/Athou/commafeed/issues/91" title="OpenShift fails silently">open issue</a>,
-some manual intervention is required, but it is still a very
-straightforward and painless process to get your own instance of CommaFeed up
-and running.</p>
-
-<p>Creat an OpenShift account, log in and add the JBoss 6.0 application (or
-cartridge as it is called on OpenShift) and the MySQL cartridge. Once your setup
-is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
-under your <code>My Applications</code> tab, copy down your Git repo address, which will be
-of the form:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
-</span></code></pre></div></figure>
-
-
-<p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
-server:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
-</span><span class='line'><span class="nb">cd </span>commafeed
-</span><span class='line'><span class="c"># add OpenShift as a repo</span>
-</span><span class='line'>git remote add openshift -f ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.etc…
-</span><span class='line'>git merge openshift/master -s recursive -X ours
-</span><span class='line'>git push openshift master
-</span></code></pre></div></figure>
-
-
-<p>This will then trigger a series of hooks that build the application and restart
-the server. If everything goes well you will see something like:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Total <span class="nb">time</span>: 3:18.195s
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Finished at: Mon May 20 03:21:37 EDT 2013
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Final Memory: 42M/185M
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
-</span><span class='line'>remote: Running .openshift/action_hooks/build
-</span><span class='line'>remote: Running .openshift/action_hooks/deploy
-</span><span class='line'>remote: <span class="nv">hot_deploy_added</span><span class="o">=</span><span class="nb">false</span>
-</span><span class='line'>remote: MySQL already running
-</span><span class='line'>remote: Found 127.12.712.712:8080 listening port
-</span><span class='line'>remote: Done
-</span><span class='line'>remote: Running .openshift/action_hooks/post_deploy
-</span><span class='line'>To ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
-</span></code></pre></div></figure>
-
-
-<p>You now have CommaFeed successfully running on OpenShift. After a couple of
-minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
-and you will be able to login to your CommaFeed instance. Updating your
-CommaFeed is as simple as pulling to your local repo, merging and
-then pushing to <code>openshift master</code>.</p>
-
-<p>Importing directly from Google Reader still seems broken (I was  getting
-errors from builds late this week), but if you import from an existing <code>.opml</code>
-or <code>.xml</code> file you will see CommaFeed in all it&#8217;s glory:</p>
-
-<p><img class="left" src="http://miromiro.com/Blog-images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
-
-<p>As you can see, it is remarkably similar to the Google Reader interface; a
-clean, minimalist design that is focussed—quite rightly—on the content. There
-is an option to load your own <code>.css</code> if you want to apply some additional
-styling, but for me the base style is just about perfect.</p>
-
-<p>More impressively, in the week or so that I have been using CommaFeed, the
-developer,
-<a href="https://github.com/Athou" title="Athou on Github">Athou</a>, has been committing
-enhancements and bug fixes several times <em>a day</em>; almost every night,
-I have pushed changes to OpenShift, reloaded my browser and found a
-smoother, enhanced feed reader with additional functionality; it is
-literally growing in leaps and bounds, and is a great reminder of the power
-of open source<sup>2</sup>.</p>
-
-<p>The performance of OpenShift has also been solid; feeds are delivered
-seemingly instantaneously and, apart from the slight lag after restarting
-the application, I haven&#8217;t experienced any issues whatsoever in terms
-of availability.</p>
-
-<p>There are still a couple of areas where CommaFeed can be improved. Most
-notably, there is an open feature request for a
-<a href="https://github.com/Athou/commafeed/issues/54" title="Github Issue">mobile friendly CSS</a>
-and this is badly needed, the site is pretty much unusable on my phone. With
-any luck, some enterprising Android developer will build a CommaFeed app (for
-which I would happily pay good money)…</p>
-
-<p>In any event, if you are looking for a Google Reader replacement, try
-running CommaFeed (either on your own server or one of Red Hat&#8217;s); for
-a project that is only a couple of months old, it has covered a
-tremendous amount of ground and will undoubtedly continue to grow
-and improve.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>In conjunction with his great advice about not being a
-<a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/" title="Pinboard blog">free user</a>.</li>
-<li>The <a href="http://feeds-jwr.rhcloud.com/#/feeds/help" title="About and Help page">about page</a>
-has a donate button: if you want to support an application which I have no doubt
-will soon be even better than Google Reader, you might want to use it.</li>
-</ol>
-
+<p>Creative Commons photo on Flickr by <a href="https://www.flickr.com/photos/moonstoneportrait/75687093/">Chris Lester</a></p>
 </div>
   
   
@@ -529,23 +502,23 @@ will soon be even better than Google Reader, you might want to use it.</li>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -623,7 +596,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -632,7 +605,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

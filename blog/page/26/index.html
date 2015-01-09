@@ -9,8 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="There is currently an interesting debate on Wikipedia about deleting the article on dwm. According to the Wikipedia notability guidelines,
-only &hellip;">
+  <meta name="description" content="I have spent the last couple of days trying to understand why I couldn’t
+get Vim to display the
+correct 16 colours in the console. Not in a terminal &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +20,7 @@ only &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/26">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/26">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -27,8 +28,8 @@ only &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -66,7 +67,7 @@ only &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -89,7 +90,7 @@ only &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/02/25/wikipedia-discriminates-against-foss/">Wikipedia Discriminates Against FOSS</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/04/06/vim-colours-in-the-console/">Vim Colours in the Console</a></h1>
     
     
       <p class="meta">
@@ -105,48 +106,135 @@ only &hellip;">
   
 
 
-<time datetime="2010-02-25T06:59:00+13:00" pubdate data-updated="true">Feb 25<span>th</span>, 2010</time>
+<time datetime="2011-04-06T21:19:00+12:00" pubdate data-updated="true">Apr 6<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>There is currently an interesting debate on Wikipedia about <a href="http://en.wikipedia.org/wiki/Wikipedia:Articles_for_deletion/Dwm" title="Wikipedia page">deleting the article on dwm.</a></p>
+  <div class="entry-content"><p><img src="/images/post_images/vim-colours1.png" alt="image" /></p>
 
-<p>According to the Wikipedia <a href="http://en.wikipedia.org/wiki/Wikipedia:Notability" title="Wikipedia page">notability guidelines</a>,
-only</p>
+<p>I have spent the last couple of days trying to understand why I couldn’t
+get <a href="http://www.vim.org/" title="Vim: the _only_ editor">Vim</a> to display the
+correct 16 colours in the console. Not in a terminal emulator in X, like
+<a href="http://invisible-island.net/xterm/xterm.html" title="XTerm homepage">xterm</a>
+or
+<a href="http://software.schmorp.de/pkg/rxvt-unicode.html" title="Homepage for urxvt">rxvt-unicode</a>,
+but in the consoles, TTY1-6.</p>
 
-<blockquote><p>significant coverage in reliable sources that are independent of the
-subject</p></blockquote>
+<p>After a lot of searching, more reading into the
+<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-16.html" title="The Linux terminal...">arcane documentation</a>
+of Linux terminals than I was either prepared for or keen on and some
+experimentation, I have it working. With one caveat; I wasn’t prepared
+to set the <code>TERM</code> environment in my <span class="file">.vimrc</span>. Apart from being
+<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-10.html#ss10.5" title="Console documentation">cautioned against</a>,
+as I <em>do</em> set it for tmux, I was anxious to avoid any clashes when
+running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+(which I do most of the time).</p>
 
-<p>constitutes notability.</p>
+<p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
+colours, gave me the default:</p>
 
-<p>So 300 words by the likes of <a href="http://blogs.zdnet.com/BTL/?p=31024" title="ZDNet article exposing corrupt practice in Tech reporting">Randall Kennedy</a>
-counts for more in terms of “notability” than the hundreds of thousands
-of lines of code contributed to
-<a href="http://dwm.suckless.org/" title="dwm wiki">dwm</a> and its forks
-(<a href="http://awesome.naquadah.org/" title="awesome home page">awesome</a> and
-<a href="http://www.rootshell.be/~polachok/code/" title="echinus page">echinus</a>) and
-clones (<a href="http://www.xmonad.org/" title="xmonad homepage">xmonad</a>,
-<a href="http://aerosuidae.net/musca.html" title="musca homepage">musca</a>,
-<a href="http://www.peereboom.us/scrotwm/html/scrotwm.html">scrotwm</a> <em>et al</em>)?</p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> <span class="o">&amp;&amp;</span> tput colors
+</span><span class='line'>linux
+</span><span class='line'>8
+</span></code></pre></div></figure>
 
-<p>The notion that, in the free/libre and open source software world, a
-project’s notability is measured in terms of the <em>prose</em> that appears in
-journals, books etc is myopic and—in terms of Wikipedia’s status as a
-FOSS project—quite disappointing. The real measure of notability of
-projects like this is the <strong>code they generate</strong>.</p>
 
-<p>Wikipedia’s criteria actively discriminates against free and open source
-projects where the measure of notability is not the column inches in
-trade magazines sponsored by advertising and advertorial, but by the
-passion and commitment of large communities of contributors who believe
-in the project enough to devote their code, time and money.</p>
+<p>Which, under my current configuration of Vim, rendered colours like so:</p>
 
-<p>Wikipedians need to review their criteria to reflect this reality;
-otherwise the “free encyclopedia” will continue to exclude exactly those
-free/libre projects…</p>
+<p><img src="/images/post_images/vim-colours2.png" alt="image" /></p>
+
+<p>Hardly satisfactory.</p>
+
+<p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
+colours:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
+</span></code></pre></div></figure>
+
+
+<p>Then I had to rewrite my colourscheme to change all of the references to
+the terminal colour numbers to colour <em>names</em>, as apparently that is
+what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
+</span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
+</span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
+</span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
+</span></code></pre></div></figure>
+
+
+<p>…to the more literal:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
+</span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
+</span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
+</span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
+</span></code></pre></div></figure>
+
+
+<p>Once I had made the necessary changes, I saved this new colourscheme as
+<span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
+have included it in an <code>if</code> condition in my original colourscheme<sup>2</sup>,
+but I was intent on keeping things compartmentalized until I had it working…</p>
+
+<p>Running Vim in the console was now starting to look promising:</p>
+
+<p><img src="/images/post_images/vim-colours3.png" alt="image" /></p>
+
+<p>The final piece of the puzzle was to pass my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.colours/dark" title="jwr dark colours: mercurial repo">X colours</a>
+to the console. Fortunately,
+<a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
+made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Linux console colors (jwr dark) </span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
+</span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>Then it was just a case of setting the relevant colourscheme in my
+<span class="file">.vimrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;<span class="nb">t_Co</span> <span class="p">&lt;</span> <span class="m">256</span>
+</span><span class='line'>    <span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>    <span class="k">colorscheme</span> miromiro
+</span><span class='line'><span class="k">endif</span>
+</span></code></pre></div></figure>
+
+
+<p>And you can see
+<a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>
+of the finished product on Flickr.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p><a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.vim/colors/miro8.vim" title="Mercurial repo: miro8 colourscheme">miro8.vim</a></p></li>
+<li><p><a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a></p></li>
+</ol>
+
 </div>
   
   
@@ -159,7 +247,7 @@ free/libre projects…</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/02/21/capslock/">Mapping CapsLock to Escape in Ubuntu</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/01/25/setting-urgent-hints-in-dwm/">Setting Urgent Hints in dwm</a></h1>
     
     
       <p class="meta">
@@ -175,72 +263,78 @@ free/libre projects…</p>
   
 
 
-<time datetime="2010-02-21T16:11:00+13:00" pubdate data-updated="true">Feb 21<span>st</span>, 2010</time>
+<time datetime="2011-01-25T17:45:00+13:00" pubdate data-updated="true">Jan 25<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>The <kbd>CapsLock</kbd> key is one of the best examples of persistent usability failure;
-it continues to appear on just about every English-language keyboard, despite
-the fact that —aside from no-one ever uses it— it is an active hindrance to
-both the average typist and the sedulous coder…</p>
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5379701719/#/photos/jasonwryan/5379701719/lightbox/" title="Arch Linux: dwm with statuscolors patch"><img src="/images/post_images/dwm-urgent.png" alt="image" /></a></p>
 
-<p>As a matter of course, I remove it in my Arch machines with an entry in my
-<span class="file"><a href="https://bitbucket.org/jasonwryan/workstation/src/tip/.xinitrc"
-title="My xinitrc on bitbucket">.xinitrc</a></span>, but in Ubuntu/Gnome, there is no
-such file. Consequently, there is this equally effective way of dispatching the
-<kbd>CapsLock</kbd>, or in my case, mapping it to something
-actually useful, <kbd>Esc</kbd>.</p>
+<p>After nearly 12 months of running a pretty stable
+<a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>, with a consistent
+patchset (cycle,
+<a href="http://dwm.suckless.org/patches/push" title="Push on suckless wiki">push</a>,
+and init pertag<sup>1</sup>) I finally added another one:
+statuscolours<sup>2</sup>…</p>
 
-<p>First, create the <code>mapkey</code> file in your home directory:</p>
+<p>I have been experimenting with
+<a href="http://jasonwryan.com/blog/2010/12/26/wmfs-window-manager-from-scratch/" title="My post on using WMFS">WMFS</a>,
+which is another very nice, minimal tiling window manager and was really
+enjoying the urgency hints in the status bar, so I decided to patch that
+functionality into dwm.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>xmodmap -pke &gt; ~/.xmodmap.mapkey
+<p>Most terminal applications will send a bell when your attention is
+required; in my case, I was looking for a way to trigger notifications
+for new mail in
+<a href="http://www.mutt.org/" title="If you are using another mail user agent, you are doing it wrong...">mutt</a>
+or highlights in <a href="http://irssi.org/" title="IRC client">irssi</a>. In mutt, it
+was just a case of setting a bell for when mail arrived:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span>beep_new             <span class="c"># bell on new mail</span>
 </span></code></pre></div></figure>
 
 
-<p>Then open the file and edit it:</p>
+<p>And in irssi:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vim ~/.xmodmap.mapkey
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">beep_msg_level</span> <span class="o">=</span> <span class="s2">&quot;NOTICE MSGS HILIGHT&quot;</span>;
 </span></code></pre></div></figure>
 
 
-<p>Look for the <kbd>CapsLock</kbd> key, on my machine it is 66 (you can use
-<a href="http://www.x.org/archive/X11R7.5/doc/man/man1/xev.1.html" title="xev man page">xev</a>
-to locate all of your key codes), and then wreak your revenge. Just deleting
-everything after <code>keycode 66 =</code></p>
+<p>In <a href="http://tmux.sourceforge.net/" title="terminal mulitplexer">tmux</a>, to cover
+all your terminal bases, add:</p>
 
-<p>will render it useless, which may suit your style. I change the entry to make
-it another <kbd>Escape</kbd> key:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>keycode <span class="nv">66</span> <span class="o">=</span> Escape NoSymbol Escape NoSymbol Escape
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set</span> -g bell-action any <span class="c"># listen for activity on all windows</span>
 </span></code></pre></div></figure>
 
 
-<p>Log out and when you log back in, you have a useful key.</p>
+<p>The next step is to pass those beeps to your terminal. The entry for
+Urxvt is one I picked up after a quick search turned up
+<a href="http://rsontech.net/articles/2008/11/17/1/handling-urgency-hints" title="Post on reson.tech">this post by rson</a>
+which had the .Xdefaults line I was looking for:</p>
 
-<h3>Updated for 10.04</h3>
-
-<p>The above hack was for 9.10 and earlier versions of Ubuntu.
-I have no idea why, but it (alone) doesn&#8217;t work in Lucid Lynx.
-You need a couple of extra steps:</p>
-
-<p>Open <code>System &gt; Preferences &gt; Startup Applications</code>  and add
-two new items:</p>
-
-<ul>
-<li>Clear the <kbd>CapsLock</kbd> key with <code>xmodmap -e "clear Lock</code></li>
-<li>Map it to <kbd>Escape</kbd> by pointing to your xmodmap file</li>
-</ul>
-
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>xmodmap ~/.xmodmap.mapkeys
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>URxvt*urgentOnBell: <span class="nb">true</span>
 </span></code></pre></div></figure>
 
 
-<p>Now, whenever you login the script(s) will run and your <kbd>CapsLock</kbd> will map
-to something actually useful, like <kbd>Escape</kbd>.</p>
+<p>Now, whenever a bell is triggered in irssi or mutt, that is passed to
+the terminal as an urgent hint. The final step was patching statuscolors
+into dwm.c to change the tag colour when the hint was received.</p>
+
+<p>You can see my
+<a href="https://bitbucket.org/jasonwryan/workstation/src/82e7f34ee0a3/dwm-5.8.2-2/5.8.2-2.diff" title="dwm.c patched">patched dwm.c</a>
+in my mercurial repo.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>These patches are from the extremely helpful Arch Forum thread:
+<a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a></li>
+<li>I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
+from the suckless mailing list. It irons out the padding issues in the one on the wiki.</li>
+</ol>
+
 </div>
   
   
@@ -253,7 +347,7 @@ to something actually useful, like <kbd>Escape</kbd>.</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/02/10/using-mercurial-to-share-dotfiles/">Using Mercurial to Share Dotfiles</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/01/13/intuxication/">Intuxication</a></h1>
     
     
       <p class="meta">
@@ -269,95 +363,50 @@ to something actually useful, like <kbd>Escape</kbd>.</p>
   
 
 
-<time datetime="2010-02-10T20:36:00+13:00" pubdate data-updated="true">Feb 10<span>th</span>, 2010</time>
+<time datetime="2011-01-13T10:00:00+13:00" pubdate data-updated="true">Jan 13<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>I posted a couple of weeks back about
-<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/">using dropbox to share dotfiles</a>
-and while I am pleased with how well that works, I had always intended to see how well a
-version control system would handle that (relatively trivial) chore.</p>
+  <div class="entry-content"><p><img src="/images/post_images/intuxication.png" alt="image" /></p>
 
-<p>I chose <a href="http://mercurial.selenic.com/">Mercurial</a> only because it is the
-system used by <a href="http://suckless.org/">the suckless community</a> and, as their
-<a href="http://suckless.org/manifest/">philosophy</a> and the products they
-produce are of such exceptional quality, no further investigation seemed
-necessary.</p>
+<p>I have previously posted about using
+<a href="http://jasonwryan.com/blog/2010/02/10/using-mercurial-to-share-dotfiles/" title="My post on using mercurial">Mercurial to share dotfiles</a>,
+and how I have been using
+<a href="http://bitbucket.org/" title="bitbucket homepage">bitbucket</a> as a free host
+for that service.</p>
 
-<p>Installing mercurial, on both my Arch machines and the Ubuntu box was simple
-enough:</p>
+<p>Recently, I came across
+<a href="http://beta.intuxication.org/" title="Free mercurial hosting">Intuxication</a>,
+who describe themselves thus:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># pacman -S mercurial</span>
-</span></code></pre></div></figure>
+<blockquote><p>Intuxication provides a free, fast and lightweight platform to host
+your Mercurial repositories.</p></blockquote>
 
+<p>You will see from their URL that they are only in beta, but the service—while
+undeniably rough around the edges—looks quite promising.</p>
 
-<p>Then, rather than use my <span class="file">/home</span> directory as the local repo
-(which for some reason—probably completely irrational—seemed somewhat risky),
-I opted to create the repository in a separate directory in my home folder and
-link to the relevant files.</p>
+<p>For small projects, the limit is 1GB disk space, Intuxication provides
+all of the basic features you need to maintain a mercurial repository.</p>
 
-<p>I signed up for a free account at <a href="http://bitbucket.org">bitbucket</a> and created a repository
-called “dotfiles.”</p>
+<p>One of the advantages it has over bitbucket is that the default
+stylesheet makes it much easier to read the files that you host. And
+while there are obviously plans to introduce more styles (from the
+Configure menu you can select a dropdown of five different styles),
+currently only one works.</p>
 
-<p>The it was just a matter of cloning the new repository to my local
-machine:</p>
+<p>If I had any criticism at all, it would be that the unfinished nature of
+the website (like the broken styles and the fact that quite a few of the
+other features like that don’t work) means that it feels a lot more like
+an alpha than a beta.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg clone https://jasonwryan@bitbucket.org/jasonwryan/dotfiles/
-</span></code></pre></div></figure>
-
-
-<p>and then entering the newly created directory and linking to the files that
-I wanted to share:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd </span>dotfiles/ ln /home/jason/.Xdefaults ln /home/jason/.apvlvrc
-</span><span class='line'>…
-</span></code></pre></div></figure>
-
-
-<p>Note: I initially tried symlinking, but Mercurial didn&#8217;t like that
-<em>at all</em>, hence the hard links…</p>
-
-<p>Then it was just a matter of telling Mercurial that the requisite files
-are in the folder:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg add
-</span></code></pre></div></figure>
-
-
-<p>Commit the changes:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg ci
-</span></code></pre></div></figure>
-
-
-<p>…and then push the changes to the <a href="https://bitbucket.org/jasonwryan/">bitbucket repository</a>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg push
-</span></code></pre></div></figure>
-
-
-<p>This was certainly a lot quicker to setup than the Dropbox method but, for
-all that I am using it for, it seems a little like overkill. I&#8217;ll chalk
-it up as a good way for me to get my head around <acronym title="Version
-Control Systems">vcs</acronym> more than anything else…</p>
-
-<h3>The Mercurial Book</h3>
-
-<p>For more information on Mercurial, I highly
-recommend Bryan O&#8217;Sullivan&#8217;s excellent
-<a href="http://hgbook.red-bean.com/">Mercurial: The Definitive Guide</a>.</p>
-
-<h4>Update</h4>
-
-<p>Post edited to reflect that fact that I now run two repos,
-one for the <a href="https://bitbucket.org/jasonwryan/workstation/src/"
-title="work machine repo" target="_blank">workstation</a> (as described here),
-and a second one for my <a href="https://bitbucket.org/jasonwryan/eeepc/src/"
-title="Netbook repo" target="_blank">EeePC</a> – which I did successfully
-create in <span class="file">/home</span> without any apocalyptic consequences.</p>
+<p>However, I’m sure that with time and some support (there is a donate
+button on every page), Intuxication will continue to develop. I think it
+is a site with potential, and I’m currently pushing my
+<a href="http://beta.intuxication.org/jasonwryan/archer/browse/tip/" title="EeePC tip">EeePC dotfiles</a>
+there.</p>
 </div>
   
   
@@ -382,23 +431,23 @@ create in <span class="file">/home</span> without any apocalyptic consequences.<
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -476,7 +525,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -485,7 +534,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

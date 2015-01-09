@@ -9,10 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I posted a couple of weeks ago about
-Building Vim and how,
-using ABS
-and makepkg it is possible to customize packages in the repositories to suit &hellip;">
+  <meta name="description" content="Following up on my post from last week, about using
+khal and mutt,
+where I covered off a couple of simple hacks to integrate command line &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +20,7 @@ and makepkg it is possible to customize packages in the repositories to suit &he
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/5">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/5">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -29,8 +28,8 @@ and makepkg it is possible to customize packages in the repositories to suit &he
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -68,7 +67,7 @@ and makepkg it is possible to customize packages in the repositories to suit &he
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -91,7 +90,7 @@ and makepkg it is possible to customize packages in the repositories to suit &he
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/05/18/pkgbuilds/">Hacking PKGBUILDs</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/04/18/vdir/">Syncing with khal</a></h1>
     
     
       <p class="meta">
@@ -107,444 +106,357 @@ and makepkg it is possible to customize packages in the repositories to suit &he
   
 
 
-<time datetime="2013-05-18T10:10:00+12:00" pubdate data-updated="true">May 18<span>th</span>, 2013</time>
+<time datetime="2014-04-18T10:32:00+12:00" pubdate data-updated="true">Apr 18<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/woodcutting.jpg" title="'Cutting wood'" >
-I posted a couple of weeks ago about
-<a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on Vim">Building Vim</a> and how,
-using <a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Build System on the Wiki">ABS</a>
-and <code>makepkg</code> it is possible to customize packages in the repositories to suit your
-individual requirements, in that case with a specific feature set.</p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/arrows.png" title="Creative Commons image" >
+Following up on my post from last week, about using
+<a href="http://jasonwryan.com/blog/2014/04/05/calendar/" title="Check it out…">khal and mutt</a>,
+where I covered off a couple of simple hacks to integrate command line
+calendaring with <a href="http://www.mutt.org/" title="Mutt hompeage">Mutt</a>, I had been using
+the main development branch of
+<a href="https://github.com/geier/khal" title="Master branch on github">khal</a> which includes
+syncing capability. However, as I was conversing with the developer, Christian,
+around
+<a href="https://github.com/geier/khal/issues/47" title="Issue on khal github repo">a bug report</a>,
+he indicated that this functionality would be superseded by development in a
+separate branch that uses
+<a href="https://github.com/untitaker/vdirsyncer" title="Github repo">vdirsyncer</a> to
+synchronise calendars.</p>
 
-<p>One of Arch&#8217;s real strengths is in the flexibility that <code>makepkg</code> and PKGBUILDs provide
-the community; the ability to adapt official packages—or unofficial ones in the
-<a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>—as you see fit. As PKGBUILDs
-are just shell scripts, the entry level to start playing around with them is quite
-low<sup>1</sup>.</p>
+<p>As Christian intimated that this change would happen in the
+<a href="https://github.com/geier/khal/issues/47#issuecomment-40175915" title="Relevant comment">very near future</a>,
+and “js” had commented on my last post to the effect that it was working well, I
+thought I should take a look for myself.</p>
 
-<p>A fairly standard, and simple, example of the type of customization that I might make
-is with <a href="http://tools.suckless.org/dmenu/" title="dmenu page">dmenu</a>, the suckless dynamic
-menu, where the
-<a href="https://www.archlinux.org/packages/community/x86_64/dmenu/" title="Arch package">standard package</a>
-in the Arch repositories is not patched for Xft support. There is a patch for this on the
-<a href="http://tools.suckless.org/dmenu/patches/xft" title="Xft patch on suckless.org">suckless wiki</a>, so it
-is just a case of making the requisite changes in the PKGBUILD from ABS and building it.</p>
+<p>There are packages in the AUR for
+<a href="https://aur.archlinux.org/packages/python2-vdirsyncer/" title="Grab it">vdirsyncer-git</a> and
+<a href="https://aur.archlinux.org/packages/python2-argvard/" title="Same deal…">python2-argvard</a>
+so you will just need to grab the khal branch that uses <code>vdirsyncer</code> as it&#8217;s
+syncing engine. I have thrown up a
+<a href="https://gist.github.com/jasonwryan/10949540" title="Nothing too flash…">PKGBUILD gist</a>,
+or—as we are only talking about a couple of simple scripts—you could install the
+complete set using
+<a href="http://www.pip-installer.org/en/latest/" title="Official documentation">pip</a>, the
+Python package manager; in which case it would be a straightforward:</p>
 
-<p>As you can see from the <code>diff</code> below, there is not a lot involved in this exercize; essentially,
-adding <code>libxft</code> as a dependency, sourcing the patch from the suckless site (and including the
-hash for it), and then in the <code>build</code> function ensuring that the patch is applied and the
-Makefile updated with the new library:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='diff'><span class='line'><span class="gd">--- PKGBUILD   2013-05-18 09:33:07.156328812 +1200</span>
-</span><span class='line'><span class="gi">+++ PKGBUILD   2012-11-14 09:25:15.915335588 +1300</span>
-</span><span class='line'><span class="gu">@@ -11,16 +6,22 @@</span>
-</span><span class='line'> pkgdesc=&quot;A generic menu for X&quot;
-</span><span class='line'> url=&quot;http://tools.suckless.org/dmenu/&quot;
-</span><span class='line'> arch=(&#39;i686&#39; &#39;x86_64&#39;)
-</span><span class='line'><span class="gi">+groups=(&#39;modified&#39;)</span>
-</span><span class='line'> license=(&#39;MIT&#39;)
-</span><span class='line'><span class="gd">-depends=(&#39;sh&#39; &#39;libxinerama&#39;)</span>
-</span><span class='line'><span class="gd">-source=(http://dl.suckless.org/tools/$pkgname-$pkgver.tar.gz)</span>
-</span><span class='line'><span class="gd">-md5sums=(&#39;9c46169ed703732ec52ed946c27d84b4&#39;)</span>
-</span><span class='line'><span class="gi">+depends=(&#39;sh&#39; &#39;libxinerama&#39; &#39;libxft&#39;)</span>
-</span><span class='line'><span class="gi">+source=(http://dl.suckless.org/tools/$pkgname-$pkgver.tar.gz</span>
-</span><span class='line'><span class="gi">+http://tools.suckless.org/dmenu/patches/$pkgname-$pkgver-xft.diff)</span>
-</span><span class='line'><span class="gi">+md5sums=(&#39;9c46169ed703732ec52ed946c27d84b4&#39;</span>
-</span><span class='line'><span class="gi">+         &#39;d448ec9120718b0aedbdb338f4fa69ba&#39;)</span>
-</span><span class='line'>
-</span><span class='line'> build(){
-</span><span class='line'>   cd $srcdir/$pkgname-$pkgver
-</span><span class='line'><span class="gi">+  patch -p1 &lt; ../$pkgname-$pkgver-xft.diff</span>
-</span><span class='line'><span class="gi">+  sed -i &#39;s:-I/usr/local/include/freetype2:-I/usr/include/freetype2:&#39; config.mk</span>
-</span><span class='line'><span class="gi">+</span>
-</span><span class='line'>   make \
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S python2-pip
+</span><span class='line'>pip2 install --user git+https://github.com/geier/khal.git@vdir
+</span><span class='line'>pip2 install --user vdirsyncer
 </span></code></pre></div></figure>
 
 
-<p>Running <code>makepkg -i</code> will build and install dmenu with Xft support. This is the most
-straightforward approach. I also, primarily by way of experimentation and in an effort
-to try an understand how this actually works, have slightly more convoluted examples.
-<a href="https://www.archlinux.org/packages/extra/x86_64/msmtp/" title="Arch package">msmtp</a>, the
-<acronym title="Simple Mail Transfer Protocol">SMTP</acronym> client has a couple
-of makedepends in
-<a href="https://www.archlinux.org/packages/extra/x86_64/libgnome-keyring/" title="Arch package">libgnome-keyring</a>
-and <a href="https://www.archlinux.org/packages/extra/any/texlive-core/" title="Arch package">texlive-core</a>; the former
-I have zero use for and the latter is only installed on my desktop, so I have no wish to install it on
-my laptop just to be able to send emails…</p>
+<p>…and then remember to make sure that <span class="file">$HOME/.local/bin</span>
+is included in your <code>$PATH</code>.</p>
 
-<p>In this case, I modified the PKGBUILD to completely remove the <code>libgnome-keyring</code> dependency
-and to only build the <code>msmtp</code> documentation in <code>.pdf</code> and <code>.html</code> if <code>texlive-core</code> was
-already installed on the machine. Unfortunately, I wasn&#8217;t able to test for the presence of
-<code>texlive-core</code> with the standard utilities like <code>type</code> or <code>which</code>, so—as it is installed
-on all my boxes—I went with <code>expac</code> (<code>pacman -Q</code> would also work):</p>
+<p>I wanted to have vdirsyncer manage two of my calendars, my
+<a href="http://en.wikipedia.org/wiki/CalDAV" title="Wikipedia page">CalDav</a> work calendar and
+a simple <a href="http://en.wikipedia.org/wiki/ICalendar" title="Wikipedia, again…">iCalendar</a>
+with all of the New Zealand public holidays. Configuring vdirsyncer to
+successfully do this took me a <em>lot</em> longer than I would like to admit: a
+combination of my ineptitude, a bug and a broken schema in the original
+<span class="file">holidays.ics</span> that I wanted to use.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='diff'><span class='line'><span class="gd">--- PKGBUILD    2013-05-18 09:32:07.393095131 +1200</span>
-</span><span class='line'><span class="gi">+++ PKGBUILD    2013-05-18 09:31:55.449986364 +1200</span>
-</span><span class='line'><span class="gu">@@ -1,7 +1,8 @@</span>
-</span><span class='line'> arch=(&#39;i686&#39; &#39;x86_64&#39;)
-</span><span class='line'><span class="gi">+groups=(&#39;modified&#39;)</span>
-</span><span class='line'> license=(&#39;GPL3&#39;)
-</span><span class='line'> url=&quot;http://msmtp.sourceforge.net&quot;
-</span><span class='line'><span class="gd">-makedepends=(&#39;texlive-core&#39; &#39;gsasl&#39; &#39;libgnome-keyring&#39;)</span>
-</span><span class='line'><span class="gi">+makedepends=(&#39;gsasl&#39;)</span>
-</span><span class='line'> source=(http://download.sourceforge.net/sourceforge/msmtp/${pkgbase}-${pkgver}.tar.bz2)
-</span><span class='line'> sha1sums=(&#39;c0edce1e1951968853f15209c8509699ff9e9ab5&#39;)
-</span><span class='line'>
-</span><span class='line'><span class="gu">@@ -12,19 +13,24 @@</span>
-</span><span class='line'>
-</span><span class='line'> build() {
-</span><span class='line'>   cd ${pkgbase}-${pkgver}
-</span><span class='line'><span class="gd">-  ./configure --prefix=/usr --sysconfdir=/etc --with-ssl=gnutls</span>
-</span><span class='line'><span class="gi">+  ./configure --prefix=/usr --sysconfdir=/etc --with-ssl=gnutls --without-gnome-keyring</span>
-</span><span class='line'>   make
-</span><span class='line'><span class="gd">-  make -C doc html pdf</span>
-</span><span class='line'><span class="gi">+  if [[ -n $(expac -Q &#39;%n&#39; texlive-core) ]]; then</span>
-</span><span class='line'><span class="gi">+      make -C doc html pdf</span>
-</span><span class='line'><span class="gi">+  fi</span>
-</span><span class='line'> }
-</span><span class='line'>
-</span><span class='line'> package_msmtp() {
-</span><span class='line'>   pkgdesc=&quot;A mini smtp client&quot;
-</span><span class='line'><span class="gd">-  depends=(&#39;gsasl&#39; &#39;libgnome-keyring&#39;)</span>
-</span><span class='line'><span class="gi">+  depends=(&#39;gsasl&#39;)</span>
-</span><span class='line'>   install=msmtp.install
-</span><span class='line'>
-</span><span class='line'>   cd ${pkgbase}-${pkgver}
-</span><span class='line'>   make DESTDIR=&quot;${pkgdir}&quot; install
-</span><span class='line'><span class="gi">+</span>
-</span><span class='line'><span class="gi">+  if [[ -n $(expac -Q &#39;%n&#39; texlive-core) ]]; then</span>
-</span><span class='line'>   make DESTDIR=&quot;${pkgdir}&quot; -C doc install-html install-pdf
-</span><span class='line'><span class="gi">+  fi</span>
-</span><span class='line'>
-</span><span class='line'> # Installing example configs and scripts to /usr/share/doc/msmtp
+<p>The <code>collections</code> variable in the config file merits a mention in this regard.
+If you choose to use it, be aware that your <acronym title="Unique Resource Locator">URL</acronym>
+will have this value appended to it, which may throw
+<a href="http://en.wikipedia.org/wiki/HTTP_404" title="Wikipedia entry">a 404</a>. Using the
+<code>DEBUG</code> verbosity level will identify this issue if you are struck by it.</p>
+
+<p>Eventually, with the help of both Christian and Markus, the vdirsyncer
+developer, I got it set up and running smoothly. I then just had to create
+a <code>cron</code> job to sync my work calendar every two hours and it was done.</p>
+
+<p>As you would expect with such a simple tool, there is not a lot to say, or do,
+with vdirsycner. It runs on a similar model to
+<a href="http://offlineimap.org/" title="Home page">OfflineIMAP</a>, in that it synchronises a
+remote and local repository. There are a couple of nice touches: it will read
+your credentials from <span class="file">$HOME/.netrc</span> so you don&#8217;t have
+to worry about sensitive information in plain text in yet another file, and there
+is a <code>VDIRSYNCER_CONFIG</code> variable, so you can place the config file wherever it
+suits.</p>
+
+<h4>Notes</h4>
+
+<p><a href="https://flic.kr/p/Re9Sb">Elevator</a>, a Creative Commons image on Flickr by Mykl Roventine.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/04/05/calendar/">Mutt and iCal</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-05T09:48:00+13:00" pubdate data-updated="true">Apr 5<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/calendar.jpg" title="Creative Commons Calendar image" >
+I have posted a few times now about how I use
+<a href="http://www.mutt.org/" title="Mutt homepage">Mutt</a><sup>1</sup>, that most superlative
+of email clients. Using a variety of different tools, I have
+settled on an effective and satisfying workflow for managing both my personal
+and professional email, with one glaring exception: calendaring. This, I should
+stress, is not for want of trying. It is not necessarily a nagging concern in
+terms of my personal use of email, but professionally it is a daily frustration.</p>
+
+<p>Day after day, I receive a <em>lot</em> of meeting invitations and, when these show up
+in my inbox they are, for all intents and purposes, unintelligble. Yes, with
+careful scrutiny you can decypher the
+<a href="http://en.wikipedia.org/wiki/ICalendar" title="Wikipedia entry">iCalendar files</a>, but
+doing so is more likely to induce a seizure than a punctual appearance at an
+important meeting. To get around this, I had been using a basic Awk script that
+would parse the most important parts of the message and print them out. This was
+working well enough until I started to receive invitations from people using
+OSX. For some god-unknown reason, Apple&#8217;s “interpretation” of the
+standard<sup>2</sup> is different enough to those sent from Evolution and
+Thunderbird that my script wouldn&#8217;t successfully print some of the data (just
+the start and end times of the meeting, nothing too important).</p>
+
+<p>I started to try and expand the capability of the script and then realized that
+I would be much better off seeing if someone else had solved this problem;
+satisfactorily, that is.
+<a href="https://github.com/terabyte/mutt-filters" title="Github fork of the repo">And they had</a>.
+In a further delightful coincidence, the original author of the script,
+<a href="https://github.com/martynsmith" title="Martyn's Github repo">Martyn Smith</a> is an
+ex-colleague who, in 2004, first got me interested in Linux (thank you, Martyn).
+Armed with this script and entries in <span class="file">$HOME/.mutt/{mailcap,muttrc}</span>
+now, whenever I open a calendar invitation, the pertinent details are printed
+out perfectly legibly. It&#8217;s a small step, but an important one.</p>
+
+<p>Next I started playing around with
+<a href="http://lostpackets.de/khal/" title="khal homepage">khal</a>, a command line calendaring
+application that uses
+<a href="http://en.wikipedia.org/wiki/CalDAV" title="Wikipedia page">CalDav</a> to sync to
+calendar servers. It is described as being in “the early stages of development”
+and that certainly is the case. Nonetheless, it is incredibly promising as—even
+in this rudimentary form—it performs well and offers most of the basics that I
+require. khal is simple to setup, does not have too many (python2) dependencies
+and handles multiple calendars<sup>3</sup>. Yes, there are bugs, but nothing
+grievous and the developer,
+<a href="http://lostpackets.de/blog/" title="Christian's blog">Christian Geier</a>, is very
+responsive and helpful<sup>4</sup>.</p>
+
+<p>The <a href="http://lostpackets.de/khal/pages/usage.html" title="Usage page">khal documentation</a>
+gives you a pretty good idea of the current feature set. Set up your
+<span class="file">khal.conf</span> with the calendars you want synched and then
+you have two modes of interaction: directly via the command line or an
+interactive mode invoked with <code>ikhal</code>. Both modes allow you to perform the basic
+functions of adding, editing or deleting events.</p>
+
+<p><img class="center" src="/images/post_images/khal.png" title="Simple screenshot of khal" ></p>
+
+<p>While the interactive mode is very simple and straightforward, what I am most
+excited about is the ability to add events from the command line, as per the
+example in the documentation:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>khal --new 25.10. 16:00 18:00 Another Event :: with Alice and Bob
 </span></code></pre></div></figure>
 
 
-<p>It isn&#8217;t necessarily an attractive solution, but it works for me…
-On the subject of unattractive solutions, as of pacman 4.1, released
-last month, the packaging standards for
-<a href="https://wiki.archlinux.org/index.php/VCS_PKGBUILD_Guidelines" title="Arch Wiki page">VCS PKGBUILDs</a>
-have been changed, principally around how sources and versioning is handled. For
-the couple of VCS packages I maintain in the <acronym title="Arch User
-Repository">AUR</acronym><sup>2</sup>, I have been
-experimenting with how to capture the <code>pkgver</code> in a way that conforms to the
-standards and provides people with a meaningful version number.</p>
+<p>I just needed to figure out a way to extract the relevant fields from the iCal
+file and pass them to khal. My first attempt is unashamedly ugly, both in
+conception and execution. However, I don&#8217;t know Perl (and at this stage of my
+life
+<a href="https://twitter.com/jasonwryan/status/204660063669989376" title="Sad, but true…">I have run out of time to learn it</a>),
+and it actually works. I
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/ical_filter.pl" title="In my bitbucket repo">modified</a>
+Martyn&#8217;s script to write to a temp file and then, for iCal events I want to
+import to khal, I bound a key sequence in Mutt to a simple Awk
+script<sup>5</sup>:</p>
 
-<p>By default, the version number for these projects from their git repos
-is not that helpful:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git describe --always
-</span><span class='line'>4861046
+<figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
+</span><span class='line'><span class="c1"># read from ical_filter.pl and then send ical invitation details </span>
+</span><span class='line'><span class="c1"># in mutt to khal</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">/^Summary/</span>   <span class="p">{</span> <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="o">-</span><span class="mi">2</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="o">$</span><span class="nx">i</span> <span class="o">=</span> <span class="o">$</span><span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="mi">2</span><span class="p">);</span> <span class="nb">NF</span><span class="o">-=</span><span class="mi">2</span><span class="p">;</span> <span class="nx">summ</span> <span class="o">=</span> <span class="o">$</span><span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="sr">/^Location/</span>  <span class="p">{</span> <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="o">-</span><span class="mi">2</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="o">$</span><span class="nx">i</span> <span class="o">=</span> <span class="o">$</span><span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="mi">2</span><span class="p">);</span> <span class="nb">NF</span><span class="o">-=</span><span class="mi">2</span><span class="p">;</span> <span class="nx">meet</span> <span class="o">=</span> <span class="o">$</span><span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="sr">/^Dtstart/</span>   <span class="p">{</span> <span class="nx">date_st</span> <span class="o">=</span> <span class="o">$</span><span class="mi">3</span><span class="p">;</span> <span class="nx">time_st</span> <span class="o">=</span> <span class="o">$</span><span class="mi">4</span> <span class="p">}</span>
+</span><span class='line'><span class="sr">/^Dtend/</span>     <span class="p">{</span> <span class="nx">time_nd</span> <span class="o">=</span> <span class="o">$</span><span class="mi">4</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">END</span>          <span class="p">{</span> <span class="kr">print</span>  <span class="nx">date_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_nd</span><span class="s2">&quot; &quot;</span><span class="nx">summ</span> <span class="p">}</span>
 </span></code></pre></div></figure>
 
 
-<p>After looking through the git logs, and playing around with <code>awk</code> to filter
-the results, I came up with this:</p>
+<p>In <span class="file">$HOME/.mutt/muttrc</span>, I have
+<kbd>Ctrl</kbd><kbd>k</kbd> in pager view trigger the script like so:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pkgver<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nb">cd</span> <span class="s2">&quot;$_gitname&quot;</span>
-</span><span class='line'>  <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;$(awk &#39;/^ / {print $2}&#39; &lt;(git log --grep=version -1))_\</span>
-</span><span class='line'><span class="s2">  $(git describe --always)&quot;</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># save iCal to khal</span>
+</span><span class='line'>macro pager <span class="se">\C</span>k  <span class="s2">&quot;!/usr/bin/khal --new $(~/Scripts/mutt2khal ~/.mutt/temp/caldata)&quot;</span> <span class="s2">&quot;Saving Calendar event&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Neither elegant nor imaginative, I know; but for a first attempt, it gets the
+job done. If I did know any Perl, I am sure I would be able to avoid the
+additional temp file and the need to reread the information before handing it
+off to khal, but you work with the skills (or lack thereof) that you have.
+Needless to say, patches are welcomed.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See all my mutt posts:
+
+<ul>
+<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using Mutt, LDAP and SSL</a></li>
+<li><a href="http://jasonwryan.com/blog/2012/05/12/mutt/">Mutt and HTML Email</a></li>
+<li><a href="http://jasonwryan.com/blog/2012/05/23/notmuch/">Using Notmuch with Mutt</a></li>
+<li><a href="http://jasonwryan.com/blog/2013/07/20/gnupg/">Encrypting Mutt</a></li>
+</ul>
+</li>
+<li>Yes, I understand how special Apple is but this is particularly annoying…</li>
+<li>There is a <a href="https://aur.archlinux.org/packages/khal-git/">package in AUR</a>.</li>
+<li>I <a href="https://github.com/geier/khal/issues/36">logged a bug</a> and it was fixed in a matter of hours.</li>
+<li>The script is <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/mutt2khal">in my bitbucket repo</a>.</li>
+</ol>
+
+
+<p>Creative Commons image, <a href="https://flic.kr/p/4h1oE5">Calendar</a> by Angela Mabray.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/22/autotext/">Autotext Function</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-22T09:20:00+13:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/cans.jpg" title="Flickr CC image" ></p>
+
+<p>Once you have your environment set up; your
+<a href="http://dwm.suckless.org" title="dwm site">window manager</a>
+patched
+<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="Post on mercurial queues"><em>exactly</em> the way you want</a>,
+same for
+<a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on building Vim">your editor</a>
+and even
+<a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="Yet another post…">your kernel builds automated</a>,
+then you either start from scratch and learn a whole lot more, or you start to
+focus on the really small details. The endless polishing that is bred of a
+mania for automation and customisation and the liberating freedom of using
+software that allows, and even encourages, this approach.</p>
+
+<p>Since I started using a couple of basic functions for managing my
+<a href="http://jasonwryan.com/blog/2012/09/01/notes-updated/" title="Post on the updated functions">note taking</a>,
+I have been conscious of the way I can use this tool to make my workflow a
+little less onerous.</p>
+
+<p>One of the things I find myself doing <em>a lot</em> is reusing the same snippets of
+text; either prose in work documents, or links to relevant articles on the
+Arch Wiki and Forums. It is simple enough to add this material to my
+<span class="file">~/.notes</span>, but retrieval has always been&mdash;for the
+text I reuse frequently&mdash;unwieldy.</p>
+
+<p>How many times do you really want to open the file, search for the relevant
+excerpt, highlight it and then copy it to the system clipboard before closing
+the file and pasting it into your email or a web form? I must have logged
+several thousand before I finally decided to do something about it.</p>
+
+<p>I now have a couple of different files in <span class="file">~/.notes/</span>
+depending upon the context; the example I&#8217;ll use is the one for the Arch Forums
+kept, naturally enough, at
+<span class="file">$HOME/Sync/notes/arch</span> (I symlink to
+<span class="file">~/.notes</span> so that the directory is synched using
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on using Sync">BitTorrent Sync</a>).</p>
+
+<p>This is just a simple text file with all of the links, guidance and wisdom that
+I generously share with those people, mostly new to the community, who have yet
+to embrace the opportunity to commit the
+<a href="https://wiki.archlinux.org/index.php/Forum_Etiquette" title="On the Wiki">Forum Etiquette</a>
+to memory. The format of each file is the same and is pretty basic:</p>
+
+<blockquote><p># rules sticky<br/>https://bbs.archlinux.org/viewtopic.php?id=130309</p><p># smart questions<br/>[url=http://www.catb.org/esr/faqs/smart-questions.html]How To Ask Questions The Smart Way[/url]</p><p># arch only<br/>https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY</p></blockquote>
+
+
+<p>I use the commented title to identify the desired piece of text and then just
+copy it to the clipboard, ready to pasted into a post that will undoubtedly
+be gratefully received by the infractor:</p>
+
+<figure class='code'><figcaption><span>$HOME/.bashrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># board snippets</span>
+</span><span class='line'>bbs<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;$HOME/.notes/arch&quot;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">((</span> <span class="nv">$# </span><span class="o">==</span> 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">local </span><span class="nv">opt</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span>
+</span><span class='line'>    awk -v <span class="nv">line</span><span class="o">=</span><span class="s2">&quot;$opt&quot;</span> <span class="s1">&#39;index($0, line) { getline; print }&#39;</span> <span class="s2">&quot;$file&quot;</span> | xsel -b
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">    </span>awk <span class="s1">&#39;/^# /&#39;</span> <span class="s2">&quot;$file&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></div></figure>
 
 
-<p>This prints a more, for me anyway, intelligble package version: <code>vimprobable2-git
-1.2.1_c5936cc-1</code> that relates back to the last stable release and appends the
-current commit. I&#8217;m sure that this could be improved upon; suggestions are
-welcome.</p>
+<p>So, on the rare occasion that I need to remind someone that on the Arch boards
+we only support Arch Linux (I know, quite the revelation…), I just open
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/tip/base.config.customizations#cl-76" title="Config in Bitbucket">a scratchpad</a>
+and enter <code>bbs only</code> and then <kbd>Shift</kbd>+<kbd>Insert</kbd> the
+text into the post and I am done. Not passing an argument just prints the
+commented titles in the file in the event that I forget what the damn thing
+is called.</p>
 
-<p>The other change to note in all of these PKGBUILDs is the inclusion of the
-<code>groups</code> variable. By adding all of the modified packages from the official
-repositories to the—imaginatively titled—<code>modified</code> group, I can then add a line
-to <code>/etc/pacman.conf</code> that prevents those packages from being overwritten on
-upgrade<sup>3</sup>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">IgnoreGroup</span> <span class="o">=</span> modified
-</span></code></pre></div></figure>
-
-
-<p>Issuing <code>pacman -Syu</code>, or running <code>checkupdates</code> from a <code>cron</code> job, will
-notify you that the packages have had a version bump and that they need
-to be rebuilt. The PKGBUILDs for all of these packages can be found in
-<a href="https://bitbucket.org/jasonwryan/centurion/src/ff3b3c9d805e197f35aa28dbeb6a9a6555ee7b63/Build?at=default" title="Files in bitbucket">my bitbucket repo</a>.</p>
+<p>I have a similar setup for work, with a couple of files that feature longer
+pieces of text that I find myself reusing for proposals, email responses
+and other administrivia. It&#8217;s a simple enough approach, but it works well and
+does lend a certain satisfaction to the otherwise tedious business of writing
+boilerplate.</p>
 
 <h4>Notes</h4>
 
-<ol>
-<li>As my experiments attest…</li>
-<li><a href="https://aur.archlinux.org/packages/vimprobable2-git/">Vimprobable2-git</a>,
-<a href="https://aur.archlinux.org/packages/surfraw-git/">Surfraw-git</a> and
-<a href="https://aur.archlinux.org/packages/ruby-build-git/">ruby-build-git</a>.</li>
-<li>All credit to ataraxia <a href="https://bbs.archlinux.org/viewtopic.php?pid=623841#p623841">for this idea</a>.</li>
-</ol>
-
-
-<p>Creative Commons image on Flickr by
-<a href="http://www.flickr.com/photos/wellspwilson/6481217091/" title="Wood
-Cutting Wood">Wells P. Wilson</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/09/helpers/">AUR Helpers</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-09T19:07:00+12:00" pubdate data-updated="true">Apr 9<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/crutches.jpg" title="'Crutches on Flickr'" ></p>
-
-<h3>Or, &#8220;Why you should uninstall Yaourt and embrace <em>makepkg</em>…&#8221;</h3>
-
-<p>The <a href="https://bbs.archlinux.org/viewtopic.php?id=160655" title="Announcement on the Arch boards">release of Pacman 4.1</a>
-saw the same flurry of posts on the boards, in IRC and the mailing lists about
-people being “unable” to upgrade or, worse, claiming that pacman was “broken”
-because their upgrade was failing due to unsatisfied dependencies, that pretty
-much every pacman upgrade ocassions. How is it possible that so many people can
-run an operating system designed for competent users without having even a
-basic understanding of how the package manager—one of the single most critical
-components of the distribution—works?</p>
-
-<p>Even a cursory perusal of the resulting threads on the boards will quickly
-identify the common denominator in these cases:</p>
-
-<blockquote><p>resolving dependencies&#8230;<br/>looking for inter-conflicts&#8230;<br/>error: failed to prepare transaction (could not satisfy dependencies)<br/>:: package-query: requires pacman<4.1</p></blockquote>
-
-
-<p><a href="https://aur.archlinux.org/packages/package-query/" title="AUR page">package-query</a>
-is required by <a href="https://aur.archlinux.org/packages/yaourt/" title="yaourt on AUR">yaourt</a>;
-so these upgrades have been stymied by a package that is in the (unsupported)
-<acronym title="Arch User Repository">AUR</acronym>? There are a
-<a href="https://wiki.archlinux.org/index.php/AUR_Helpers" title="Arch Wiki entry">multitude of AUR helpers</a>,
-but <code>yaourt</code> is most commonly used by people who are new to Arch<sup>1</sup>
-for two reasons.  First, it is one of the most “featureful” and secondly, and
-more to the point of my argument, it can be installed by simply adding an
-unsupported repo to <code>pacman.conf</code>; thereby effectively bypassing the need for
-the hapless user ever having to use or understand <code>makepkg</code>.</p>
-
-<p>Consequently, over time, people who are habitually using <code>yaourt -Syu --aur</code> to
-update both the packages in the supported repositories and those they have
-installed from the AUR lose the conceptual distinction between the two.
-<code>yaourt</code> obscures this from them and—if they are completely reliant upon it, as
-these threads attest they are—they have abnegated responsibility for managing
-those unsupported packages and in doing so have found themselves incapable of
-understanding the bind they are in.</p>
-
-<p>This sort of obscuring of fundamental operating principles in the pursuit of
-“convenience” is anathema to Arch and is precisely the reason I moved away from
-using <code>yaourt</code> (and indeed from using Ubuntu when I jumped from that sinking
-ship). Any convenience is purely illusory, in reality it just fosters
-<a href="http://en.wikipedia.org/wiki/Learned_helplessness" title="Wikipedia entry">learned helplessness</a>.</p>
-
-<p>I understand that the <code>yaourt</code> developer(s) was scratching their own itch, and
-this post is not about maligning the project; but there are significant
-unintended consequences of giving people a tool that abstracts such a
-fundamental element of the distribution away from the user, especially for a
-distribution where you are expected to have
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way#User-centric" title="The Arch Way">complete control <em>and responsbility</em> over your system</a>.</p>
-
-<p>To be clear, I don&#8217;t have a complaint with the <em>concept</em> of AUR helpers. I used
-<code>yaourt</code> initially before switching to
-<a href="http://pbrisbin.com/posts/aurget" title="Patrick Brisbin's AUR helper">aurget</a> and then
-alighting on
-<a href="https://github.com/falconindy/cower" title="Cower on github">cower</a>, or more particularly,
-a partial wrapper for <code>cower</code>:</p>
-
-<figure class='code'><figcaption><span>cowerd </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># install AUR packages with cower</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">cd</span> <span class="nv">$HOME</span>/Build <span class="o">&amp;&amp;</span> cower -d <span class="s2">&quot;$1&quot;</span>
-</span><span class='line'><span class="nv">builddir</span><span class="o">=</span><span class="s2">&quot;$_&quot;</span>
-</span><span class='line'><span class="nb">cd</span> <span class="s2">&quot;$builddir&quot;</span> <span class="o">&amp;&amp;</span> <span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> PKGBUILD
-</span><span class='line'>
-</span><span class='line'>makepkg -si <span class="o">&amp;&amp;</span> <span class="nb">cd</span> - &amp;&gt;/dev/null
-</span><span class='line'>
-</span><span class='line'><span class="nb">read</span> -p <span class="s2">&quot;Remove Build directory? [Y/n]? &quot;</span> yn
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$yn&quot;</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;Removing build directory...&quot;</span>
-</span><span class='line'>    rm -rf <span class="s2">&quot;$builddir&quot;</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Build completed.&quot;</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
-
-
-<p>This provides me the minimum level of automation I require—essentially only
-around downloading and installing a package. It doesn&#8217;t automatically handle
-dependencies, nor manage updating the packages; that remains, rightly in my
-view, <em>my</em> responsibility.</p>
-
-<p>If I were to look to a more fully featured wrapper, I would undoubtedly choose
-<a href="https://github.com/e36freak/meat" title="meat on Github">meat</a>, however as on my
-desktop machine, I only have ~30 AUR packages installed, I don&#8217;t really need
-anything more sophisticated.</p>
-
-<p>So by all means, use an AUR helper. But recognize that it is intended to help
-you, not preclude you from being able to accomplish the most simple and
-critical task of system maintenance, updating your package manager. Uninstall
-<code>yaourt</code> if you are using it and familiarize yourself with <code>makepkg</code>; once you
-do understand the relationship between the official repositories and the AUR,
-download <code>cower</code> or <code>meat</code>, they are both <em>much</em> better solutions.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li><a href="http://jasonwryan.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/" title="Post from 2009">Myself included</a>…</li>
-</ol>
-
-
-<p>Creative Commons image of crutches by
-<a href="http://www.flickr.com/photos/wheatfields/118700600/" title="Flickr CC image">net_efekt on Flickr</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/03/29/vim/">Building Vim</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-03-29T10:17:00+13:00" pubdate data-updated="true">Mar 29<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/vim-logo.png" title="'Vim logo'" >
-Apart from a brief, but nevertheless instructive, flirtation with
-<a href="http://www.gnu.org/software/emacs/" title="Emacs homepage">Emacs</a><sup>1</sup> I have
-been a consistent <a href="http://www.vim.org/" title="Vim home">Vim</a> user over the last three
-or four years. Like most Vim users, I have made some progress over that time
-in spite of Vim&#8217;s
-<a href="http://stackoverflow.com/a/1815372/712613" title="SO answer on Vim">notorious learning curve</a>
-and have now reached the point where, belatedly, I think I understand it just enough
-to really grasp how little I actually know. It&#8217;s a milestone that speaks more to
-necessity than gratification, granted.</p>
-
-<p>In any event, as part of confronting my Vim shortcomings (no
-<a href="http://www.vimgolf.com/" title="Vim golf…">golfing</a> for me), I have been able
-to land on the features of Vim that I require to be enabled so that I am moderately
-productive (in my own, admittedly cloistered, working environment). That, you will
-probably not be surprised to read, does not include needing support for Arabic or
-Farsi to be built into Vim.</p>
-
-<p>Part of the beauty of Vim is that, unlike it&#8217;s
-<a href="http://en.wikipedia.org/wiki/Editor_war#Humor" title="…lacking a decent editor">operating system counterpart Emacs</a>,
-you can choose how much functionality you wish to enable at compile-time. You do want
-support for Farsi? Then the <code>--with-features=big</code> option is what you are looking for.
-If, on the other hand, you just want the barest of bones, editor-wise, you could opt
-for the austere minimalism that is <code>--with-features=tiny</code> and find yourself happily
-transported back in time to
-<a href="https://en.wikipedia.org/wiki/Vi" title="Wikipedia page on Vi">Bill Joy&#8217;s lab in 1976</a>.</p>
-
-<p>You can peruse all of the various features available to Vim using the <code>:help version</code>
-command.<sup>2</sup> There is also
-<a href="http://www.drchip.org/astronaut/vim/vimfeat.html" title="Vim's versions and features">this table</a>
-where the various features are listed against the respective feature flags (tiny, small,
-normal, big &amp; huge).</p>
-
-<p>After this
-<a href="https://bugs.archlinux.org/task/33019" title="Add +profile to gvim on Flyspray">bug report</a>
-late last year, the default Arch PKGBUILD ships with <code>huge</code> as the feature set. Make
-what you will of that, but for my purposes it is overkill. With all the magic of
-<a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Wiki page on ABS">ABS</a> and
-<code>makepkg</code>, however, it is simple enough to build a Vim package that is tailored
-to exactly your requirements. For me, that means this set of simplified <code>configure</code>
-options:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>  ./configure <span class="se">\</span>
-</span><span class='line'>    --prefix<span class="o">=</span>/usr <span class="se">\</span>
-</span><span class='line'>    --localstatedir<span class="o">=</span>/var/lib/vim <span class="se">\</span>
-</span><span class='line'>    --with-features<span class="o">=</span>normal <span class="se">\</span>
-</span><span class='line'>    --with-compiledby<span class="o">=</span>Arch:jwr <span class="se">\</span>
-</span><span class='line'>    --with-x<span class="o">=</span>yes <span class="se">\</span>
-</span><span class='line'>    --enable-acl <span class="se">\</span>
-</span><span class='line'>    --disable-gui <span class="se">\</span>
-</span><span class='line'>    --disable-signs <span class="se">\</span>
-</span><span class='line'>    --disable-netbeans <span class="se">\</span>
-</span><span class='line'>    --enable-multibyte
-</span></code></pre></div></figure>
-
-
-<p>With these options, I have the minimum amount of functionality I comfortably
-require (including the ability to access the system clipboard, <code>--with-x=yes</code>)
-but without the other bloat.</p>
-
-<p>In addition to these changes to the config options, I also strip out all of the
-<code>gvim</code>-related stuff from the PKGBUILD as I do not require it. Even though it
-is a split package, just building <code>vim</code> still includes options superfluous to
-my needs.  As a result, I get Vim with just the features I need, without the
-dependencies of <code>ruby</code> and <code>lua</code> and god knows what else.</p>
-
-<p>I&#8217;m not operating under any illusions about the fact that this is
-really saving a huge amount of space or, for that matter, drastically reducing the
-number of dependencies I have installed. It is partly about understanding how Vim
-works at another level while also catering for the obsessive-compulsive drive to
-micro-control what is and isn&#8217;t installed on my systems. If you want to scratch either
-of the same itches, you can see the full
-<a href="https://bitbucket.org/jasonwryan/shiv/src/e6ccbe61780dfe24a5f7edda0d4b082dbb572e4a/Build/vim/PKGBUILD?at=default" title="Eviscerated Vim PKGBUILD">PKGBUILD in Bitbucket</a>.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>Still visible in some of my early Arch screenshots
-<a href="http://www.flickr.com/photos/jasonwryan/3748882572/in/photostream" title="Emacs in Openbox">on Flickr</a>…</li>
-<li>The official documentation for the features is also
-<a href="http://vimdoc.sourceforge.net/htmldoc/various.html#+feature-list" title="Vim Feature list">online</a>.</li>
-</ol>
-
+<p>Flickr Creative Commons image
+<a href="http://www.flickr.com/photos/shrapnel1/134674051/">how many cans</a> by shrapnel1</p>
 </div>
   
   
@@ -569,23 +481,23 @@ of the same itches, you can see the full
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -663,7 +575,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -672,7 +584,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

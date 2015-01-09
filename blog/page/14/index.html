@@ -9,10 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="After much procrastination, I finally got around to moving the last of
-my machines to Arch Linux:
-my home desktop,
-which has been running Ubuntu &hellip;">
+  <meta name="description" content="I posted a couple of weeks ago about the impact of some of the current
+changes to Arch Linux.
+There seems to be quite a bit of it about, because in &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +20,7 @@ which has been running Ubuntu &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/14">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/14">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -29,8 +28,8 @@ which has been running Ubuntu &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -68,7 +67,7 @@ which has been running Ubuntu &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -91,7 +90,7 @@ which has been running Ubuntu &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/02/11/lvm/">LVM on LUKS on RAID1 on Arch Linux</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/08/04/systemd/">The Leap to systemd</a></h1>
     
     
       <p class="meta">
@@ -107,231 +106,134 @@ which has been running Ubuntu &hellip;">
   
 
 
-<time datetime="2012-02-11T15:58:00+13:00" pubdate data-updated="true">Feb 11<span>th</span>, 2012</time>
+<time datetime="2012-08-04T09:32:00+12:00" pubdate data-updated="true">Aug 4<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/lvm-luks-raid.png" alt="image" /></p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/leap.jpg" title="Leap image on Flickr" >
+I posted a couple of weeks ago about the impact of some of the current
+<a href="http://jasonwryan.com/blog/2012/07/19/breakage/" title="Post on the glibc change">changes to Arch Linux</a>.
+There seems to be quite a bit of it about, because in conjunction with the move from
+<span class="file">/lib</span> to <span class="file">/usr/lib</span>—and motivated by the same
+overarching shifts in the other distributions—the other major change making its way through
+the Arch community is the move to
+<a href="http://freedesktop.org/wiki/Software/systemd" title="Project page">systemd</a>. This change, however, has
+been more controversial because it marks a shift away from Arch&#8217;s central configuration
+file, <a href="https://wiki.archlinux.org/index.php/Rc.conf" title="Arch wiki entry on rc.conf">/etc/rc.conf</a>;
+a move that has disconcerted a number of people.</p>
 
-<p>After much procrastination, I finally got around to moving the last of
-my machines to Arch Linux:
-<a href="http://jasonwryan.com/blog/2010/10/04/the-setup/" title="The Setup post">my home desktop</a>,
-which has been running Ubuntu since the end of 2007. I’d like to share a
-few thoughts about why I finally walked away from Ubuntu, but I’ll save
-that for another long post.</p>
+<p>I&#8217;m not going to get into whether or not this move is consistent with
+<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="Wiki entry">The Arch Way</a>, because that has
+been thrashed over extensively on the
+<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023283.html" title="ML thread on rc.conf">mailing</a>
+<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023258.html" title="And another one…">lists</a>,
+but also—and more importantly—because Arch is a rolling release, which means change is <em>inevitable</em>.
+What is more, after watching all the back and forth on the <acronym title="Mailing lists">ML</acronym>
+and on the <a href="https://bbs.archlinux.org/viewtopic.php?id=96316&amp;p=1" title="Arch BBS thread on systemd">boards</a>, I am convinced that the
+<a href="http://www.archlinux.org/developers/#tomegun" title="Tom Gunderson">developer overseeing this shift</a>
+both knows what he is doing and is acting in the best interests of Arch.</p>
 
-<p>Anyway, the setup I decided on was reasonably straightforward: two 1TB
-drives comprising two Raid1 devices, one for a small (150Mb)
-<span class="file">/boot</span> and the other holding three logical volumes
-in a LUKS crypt. This way, I have the flexibility to grow the volumes as
-needed, and only require thesingle passphrase at boot to unlock the
-enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
-and <span class="file">/home</span>.</p>
+<p>This view has been validated by my experience of shifting to systemd on my machines.</p>
 
-<p>Almost all of the information here has been gleaned gratefully from
-other sources; principally the Arch Wiki entries on
-<a href="https://wiki.archlinux.org/index.php/LUKS" title="Arch wiki entry">LUKS</a> and
-<a href="https://wiki.archlinux.org/index.php/Lvm" title="Arch LVM article">LVM</a> and
-this <a href="http://www.pindarsign.de/webblog/?p=767" title="Blog post on LUKS and LVM">helpful blog post</a>.
-This post (and the next) are notes to remind me how I got here and, in
-the follow-up, what I need to do to restore this build…</p>
+<p>When the new initscripts package was pushed to [testing] in the middle of last month,
+I stripped out all of the redundant options in <span class="file">/etc/rc.conf</span>
+and took the ten minutes or so to read about and then create the new files. I then spent some
+time reading up on systemd, principally
+<a href="http://0pointer.de/blog/projects/systemd-for-admins-1.html" title="One of TWELVE…">Lennart Poettering&#8217;s series of posts</a>,
+the <a href="https://wiki.archlinux.org/index.php/Systemd" title="Good, but needing some structure">Arch wiki entry</a>
+and the many and various
+<a href="http://0pointer.de/public/systemd-man/" title="One for everything">manual pages</a>.</p>
 
-<p>First up, prepare the two hard drives. This took roughly ~90 hours for
-the 1TB drives, so allow some time:</p>
+<p>Over the last couple of days, I have migrated all of my machines over to systemd. I found it
+to be a very straightforward process. I went for a pure systemd approach, for reasons I will
+return to. Essentially, this is how I tackled it.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
+<p>First, for each machine, I established what daemons were running. I did this by using
+<a href="http://pikacode.com/jasonwryan/Veles/file/default/Scripts/daemons.sh" title="Pretty sure it is one of Xyne's">this shell script</a>
+and cross checking entries in my <span class="file">/etc/rc.conf</span>. Then
+it was just a matter of installing systemd:<sup>1</sup></p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S systemd systemd-sysvcompat systemd-arch-units
 </span></code></pre></div></figure>
 
 
-<p>Once the drives are scrubbed (read the Arch Wiki on why that is
-necessary), you can move to the actual installation business. I used a
-256Mb thumb drive with the most recent x86_64 netinstall image burned
-to it. Boot into the live environment and set up the initial partitions
-using <code>cfdisk</code>:</p>
+<p>The only outstanding file to be created was <span class="file">/etc/timezone</span>, the
+others—all documented in <code>man rc.conf</code>—I had created earlier in the month. Then, with the
+list of the services I would need running on each box, I enabled them. I think it is
+fair to say that the only thing that is clunky about systemd is the command syntax for
+managing units. Repeatedly typing <code>systemctl enable foo.service</code> is as tedious as it is
+error prone, so I hacked up a
+<a href="https://bitbucket.org/jasonwryan/centurion/src/default/Scripts/sysd" title="sysd - *so* much easier">wrapper script</a>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cfdisk /dev/sda
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sysd <span class="nb">enable </span>acpid
+</span><span class='line'>sysd <span class="nb">enable </span>lvm
+</span><span class='line'>etc…
 </span></code></pre></div></figure>
 
 
-<p>I created a 150Mb partition for <span class="file">/boot</span> - marked
-with the boot flag, and then partitoned the rest of the drive. Both partitons
-should be primary and be <code>FSType linux_raid</code> (the FD option). Write the
-partition tabel toa file and then import it to the second drive so both are exactly the
-same:</p>
+<p>I also activated some additional gettys, as I like to log into a tmux session in TTY2 when
+I don&#8217;t need or want to start <code>X</code>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
-</span><span class='line'>sfdisk /dev/sdb &lt; part-table
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty2.service
 </span></code></pre></div></figure>
 
 
-<p>Now, set up the Raid arrays. Start by loading the required modules and
-then create the two arrays. The metadata flag is important: if you are
-using legacy grub, as I did, you must use the 0.90 type or your MBR will
-get overwritten:</p>
+<p>And I misguidedly wrote a couple of custom service files that turned out to be
+<a href="https://bbs.archlinux.org/viewtopic.php?id=146207" title="BBS post on said files">completely unnecessary</a>;
+and then I was done.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>modprobe raid1 <span class="o">&amp;&amp;</span> modprobe dm-mod
-</span><span class='line'>mdadm --create /dev/md0 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 <span class="se">\</span>
-</span><span class='line'>    --metadata<span class="o">=</span>0.90 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
-</span><span class='line'>mdadm --create /dev/md1 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
-</span></code></pre></div></figure>
+<p>On all three boxes I rebooted and that was it. The only issue I experienced was
+the final shutdown after removing initscripts and before booting up with
+systemd. After issuing <code>shutdown -r now</code> the process
+hung with a message about a missing <span class="file">inittab</span> file.
+In retrospect, I should have added <code>init=/bin/systemd</code> to my kernel parameters
+and not unistalled instiscripts until I had booted with systemd. This has
+now been added to the
+<a href="https://wiki.archlinux.org/index.php/Systemd" title="Archwiki systemd page">systemd wiki page</a>.</p>
 
+<p>Overall, though: no real drama, just a blur of text<sup>2</sup> and then the
+login prompt. While I haven&#8217;t seen a dramatic decrease in boot time,
+booting does <em>feel</em> a bit snappier and two of my three machines shutdown
+markedly more quickly. Consider me sold.</p>
 
-<p><sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup></p>
+<p>That brings me back to the decision to opt for a pure systemd approach, rather than
+hanging on to a completely eviscerated <span class="file">/etc/rc.conf</span>. The
+Arch community has been told that the intention is to
+<a href="https://bbs.archlinux.org/viewtopic.php?pid=1133957#p1133957" title="BBS post by tomegun">support the rc.conf format forever</a>;
+I can&#8217;t help but think this is a mistake. In the same way that
+<a href="https://wiki.archlinux.org/index.php/Pacman#Partial_upgrades_are_unsupported" title="Pacman entry on Arch Wiki">partial upgrades are unsupported</a>,
+I think that systemd is Arch&#8217;s inevitable future and the community should be encouraged to accept that, <code>Syu</code> and
+move on…</p>
 
-<p>At this point, you can switch to another TTY to watch the disks
-sync—again, this could take some time, depending on the size of the
-drives.</p>
+<p>Having said that, I appreciate the consideration shown by the developers in wanting to assure
+people that their choice would continue to be catered for; and perhaps, over time, people still
+using initscripts will be regarded with the same sense of wry amusement as those who still show
+up from time to time with <code>hal</code> in their <code>DAEMONS</code> line.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
-</span></code></pre></div></figure>
+<h3>Update 4/8/12</h3>
 
+<p>Tom Gunderson, the developer who looks after this part of Arch, has clarified the
+comment about the long term support for initscripts. As comments are hosted on
+a third-party paltform, I thought that it should be included in the body of the
+post.</p>
 
-<p>Check that it all went to plan…</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
-</span></code></pre></div></figure>
-
-
-<p>Once the drives are synched and pronounced clean, it it time to encrypt
-the second Raid device, <span class="file">dev/md1</span>. You can’t encrypt
-the array that contains <span class="file">/boot</span>,
-but having it duplicated in a Raid array means that, ifone drive goes down,
-you can still boot the other.</p>
-
-<p>Load the module for encryption, and then set it up:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>modprobe dm-crypt
-</span><span class='line'>cryptsetup --cipher<span class="o">=</span>aes-xts-plain --verify-passphrase <span class="se">\</span>
-</span><span class='line'>    --key-size<span class="o">=</span>512 luksFormat /dev/md1
-</span></code></pre></div></figure>
-
-
-<p>Now, open the encrypted device to create the logical volumes:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
-</span></code></pre></div></figure>
+<blockquote><p>Just a clarification: regarding the (probably very unwise) promise of &#8220;supporting <span="file">rc.conf</span> forever&#8221;, the intended meaning was that initscripts will support the syntax, not that initscripts themselves will always stay around (nor that systemd will gain support for the syntax in case initscripts is dropped).</p><p>At the moment systemd <strong>does</strong> support <span class="file">rc.conf</span> (when installed in conjunction with initscripts), but this is meant as a transitional measure only, and will likely go away eventually (though probably not soon).</p></blockquote>
 
 
-<p>The three next steps create, in this order, the physical volume (the
-container, if you will), the group and then the individual volumes
-contained in the group. Choose simple, memorable names and do not
-hypenate them. The {pv,vg,lv}display commands print out the details of
-the devices once created.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk
-</span><span class='line'>pvdisplay
-</span><span class='line'>
-</span><span class='line'>vgcreate vgroup /dev/mapper/cryptdisk
-</span><span class='line'>vgdisplay
-</span><span class='line'>
-</span><span class='line'>lvcreate --size 20G --name lvroot vgroup
-</span><span class='line'>lvcreate --contiguous y --size 2G --name lvswap vgroup
-</span><span class='line'>lvcreate --extents +100%FREE --name lvdata vgroup
-</span><span class='line'>lvdisplay
-</span></code></pre></div></figure>
-
-
-<p>It should be pointed out that the
-<a href="https://github.com/Dieterbe/aif" title="AIF on Github">Arch Installer Framework</a> supports
-LUKS and LVM, so you can accomplish these last two steps from within the
-installer. I tried both and I found that I had a little more control
-doing it manually, but YMMV.</p>
-
-<p>At this point, you are ready to enter the installer and complete the
-install. Run /arch/setup and move through the early setup until you
-reach the &#8216;Prepare Hard Drives&#8217; section. Select option 3, &#8216;Configure block
-devices, mountpoints and filesystems&#8217;. Make sure that the only “raw”
-device that you configure is <span class="file">/dev/md0</span>, your
-<span class="file">/boot</span> partition. Otherwise,
-you are configuring the logical volumes, <em>not</em> the devices they are
-built on.</p>
-
-<p>After succesfully setting up the drives, install the base packages and
-then, once that is complete, switch TTYs and update your Raid
-configuration <em>prior to configuring your system</em>. This means that when
-your <code>initrd</code> is regenerated, it will inlcude the correct Raid
-information:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
-</span></code></pre></div></figure>
-
-
-<p>When you are done, move to configure your system and make sure to add
-the relevant details to both your <span class="file">/etc/rc.conf</span> and your
-<span class="file">/etc/mkinitcpio.conf</span>. In the former:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
-</span><span class='line'><span class="nv">USEDMRAID</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>and in /etc/mkinitcpio.conf:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
-</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm_udev encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
-</span></code></pre></div></figure>
-
-
-<p>That is the straightforward part of the install over. The final step is
-a little more tricky: installing a bootloader. My experience, and I
-tried a number of times using different approaches, is that this <em>won’t
-work</em>. The installer doesn’t seem to like the Raid setup, so it
-complains about it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>It’s not all bad, as this is the final hurdle and it is not a
-particularly high one.</p>
-
-<p>The important step is to ensure that your <span class="file">/boot/grub/menu.lst</span> is setup
-correctly. Given the names I chose above for my devices, mine looks like
-this:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># (0) Arch</span>
-</span><span class='line'>title  Arch Linux
-</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
-</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
-</span><span class='line'>initrd /kernel26.img
-</span><span class='line'>
-</span><span class='line'><span class="c"># (1) Arch Fallback</span>
-</span><span class='line'>title  Arch Linux Fallback
-</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
-</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
-</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
-</span><span class='line'>initrd /kernel26-fallback.img
-</span></code></pre></div></figure>
-
-
-<p>Once it is all setup, simply exit the installer. At this point, you have
-a perfectly secure, redundant, new Arch Linux install that you can’t
-boot into. You have two choices; chroot in and manually install grub
-now, or reboot and do it then. I opted for the latter as it would be
-more like a recovery mission—and I wanted to make sure that I was
-capable enough to manage that before committing all of my backed-up data
-to the machine.</p>
-
-<p>I’ll post the details of the relatively straightforward steps required
-to chroot into the system and install grub on both hard drives in a
-couple of days.</p>
-
-<h5>Notes</h5>
+<h4>Notes</h4>
 
 <ol>
-<li><p>The name <code>cryptdisk</code> is arbitrary - just make it memorable and use it
-consistently…</p></li>
-<li><p>I am not sure how necessary it is to have the Raid modules included
-here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
-warranted. <strong>UPDATED 12/4/12</strong> as per the <a href="https://wiki.archlinux.org/index.php/Mkinitcpio#HOOKS">mkinitcpio article on the Wiki</a>
-the <code>mdadm_udev</code> hook is preferred over the plain <code>mdadm</code> hook in your
-<span class="file">/etc/mkinitcpio.conf</span>.</p></li>
+<li>Note this approach will <em>remove</em> sysvinit and initscripts and <code>mv /etc/rc.conf{,.pacsave}</code>.</li>
+<li>Make sure you remove <code>quiet</code> from your kernel parameters for your first systemd
+boot so you can see that everything starts correctly…</li>
 </ol>
 
+
+<p>Creative commons image on Flickr by
+<a href="http://www.flickr.com/photos/sovietuk/486119799/" title="leap by rick harrison">Tricky</a></p>
 </div>
   
   
@@ -344,7 +246,7 @@ the <code>mdadm_udev</code> hook is preferred over the plain <code>mdadm</code> 
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/01/18/monsterwm/">monsterwm</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a></h1>
     
     
       <p class="meta">
@@ -360,76 +262,178 @@ the <code>mdadm_udev</code> hook is preferred over the plain <code>mdadm</code> 
   
 
 
-<time datetime="2012-01-18T10:03:00+13:00" pubdate data-updated="true">Jan 18<span>th</span>, 2012</time>
+<time datetime="2012-07-26T18:48:00+12:00" pubdate data-updated="true">Jul 26<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/monster.jpg" alt="image" /></p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/guard.jpg" title="'On Guard image on Flickr'" >
+In my last post, on
+<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="You should read it…">Mercurial Queues</a>,
+I outlined how you might use MQ to manage a
+<a href="http://dwm.suckless.org/" title="Dynamic window manager">dwm</a> patchset.
+Mercurial makes this process ridiculously easy, and this functionality is more
+than enough to recommend it. However, where I think it really gets interesting
+is when you share that same patchset across multiple machines and are easily
+able to customize which patches in the queue are applied, based upon the
+particular machine you are building dwm on.</p>
 
-<p>If you have visited here at all over the last couple of weeks, you would
-have seen some screenshots from
-<a href="http://www.flickr.com/photos/jasonwryan/" title="All of my screenshots on Flickr">my Flickr stream</a>
-of a new window manager,
-<a href="https://github.com/c00kiemon5ter/monsterwm" title="Project on Github">monsterwm</a>.
-Over the break, I have been playing around with it and, despite the fact
-that the project is only really a few weeks old, it is well worth a
-look.</p>
+<p>For example, in my case I use dwm on all three of my machines: my desktop at home,
+my laptop at work and my EeePC. Given the nature of each of these three machines,
+though, I want a slightly different stack of patches applied. These differences
+might extend only to particular rules applied in <span class="file">config.def.h</span>
+based upon the number of tags I use, or the different applications that I run
+at home as opposed to at work.</p>
 
-<p>Originally a fork of
-<a href="https://github.com/moetunes/dminiwm" title="dminiwm on Github">dminiwm</a>,
-which was in turn based on
-<a href="https://github.com/pyknite/catwm" title="Project on Github">catwm</a> and
-<a href="http://dwm.suckless.org" title="dwm on suckless">dwm</a><sup>1</sup>, monsterwm for
-me—having used dwm for years—feels very much like a stripped down
-version of dwm, with a few of the patches (like pertag, for example)
-built in.</p>
+<p>In any event, what I want to be able to do is maintain
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/" title="Patchset in Bitbucket">a single patchset</a>
+in a mercurial repository, clone it to all my machines and then, using MQ,
+filter which specific patches are applied. This is all possible using a killer
+feature of MQ called
+<a href="http://hgbook.red-bean.com/read/advanced-uses-of-mercurial-queues.html%20'Advanced%20uses%20of%20MQ%20in%20the%20Mercurial%20book">guards</a>.
+Guards allow you to conditionally apply patches in a queue. Essentially, in
+a queue, you “tag” a patch with a guard and—depending on whether or not the
+guard is positive (to be applied), or negative (to be skipped)—when you
+<code>hg qpush -a</code> MQ takes care of applying the correct patches in the queue.</p>
 
-<p>One of the projects goals, like it’s antecedents, is to keep the SLOC
-low. By way of comparison, dwm’s long-standing goal has been to keep the
-SLOC below 2000<sup>2</sup>. monsterwm’s current count is under 700. One of the
-ways that monsterwm achieves this is <em>not</em> to incorporate a status bar;
-as the README says:</p>
+<p>So, in the case of my work laptop, I begin by cloning dwm and intializing
+a patch queue:</p>
 
-<blockquote><p>Monsterwm does not provide a panel and/or statusbar itself. Instead it
-adheres to the <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="Wikipedia entry">UNIX philosophy</a>
-and outputs information about the existent desktop, the number of
-windows on each, the mode of each desktop, the current desktop and
-urgent hints whenever needed. The user can use whatever tool or panel
-suits him best (dzen2, conky, w/e), to process and display that
-information.</p></blockquote>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd </span>Build/
+</span><span class='line'>hg clone http://hg.suckless.org/dwm
+</span><span class='line'>hg qinit -c
+</span></code></pre></div></figure>
 
-<p>So, what is it like to run? Obviously it is fast. It comes with four
-tiling modes: standard tile, backstack, grid and monocle and, as
-mentioned above, the ability to define different layouts per desktop.
-There are still a couple of features to be implemented; floating mode
-being one of the more significant and a couple of minor bugs—as you
-would expect for a project still in its relative infancy.</p>
 
-<p>Overall, it is a very nice, minimalist window manager. If you don’t use
-the <a href="http://lubutu.com/rant/dwm-faq" title="CLS on dwm's tagging feature">dynamic tagging feature of dwm</a>,
-then this would be a window manager to consider switching to. The
-developer, Ivan “c00kiemon5ter” Kanakarakis, has been extremely
-responsive to user’s suggestions and requests (the
-<a href="https://bbs.archlinux.org/viewtopic.php?id=132122" title="Arch Linux forums: monsterwm thread">thread on the Arch boards</a>
-is quite active) and has been admirably clear about his vision for the
-wm.</p>
+<p>I setup my <span class="file">.hgrc</span> within the patches directory so that
+it points at the correct mercurial repository:</p>
 
-<p>You can see my monsterwm configs in
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Build/monsterwm-git" title="Mercurial repo: monsterwm">my mercurial repository</a>.</p>
+<figure class='code'><figcaption><span>.hg/patches/.hg/hgrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'> <span class="c"># Mercurial config file</span>
+</span><span class='line'><span class="o">[</span>ui<span class="o">]</span>
+</span><span class='line'><span class="nv">username</span> <span class="o">=</span> jasonwryan &lt;jasonwryan@gmail.com&gt;
+</span><span class='line'><span class="nv">ssh</span> <span class="o">=</span> ssh -i ~/.ssh/bb -C
+</span><span class='line'><span class="o">[</span>paths<span class="o">]</span>
+</span><span class='line'><span class="nv">default</span> <span class="o">=</span> ssh://hg@bitbucket.com/jasonwryan/dwm-patchset
+</span></code></pre></div></figure>
 
-<h5>Notes</h5>
+
+<p>Then I pull down my dwm patchset from the mercurial repository
+with <code>hg pull</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulling from ssh://hg@bitbucket.com/jasonwryan/dwm-patchset
+</span><span class='line'>requesting all changes
+</span><span class='line'>adding changesets
+</span><span class='line'>adding manifests
+</span><span class='line'>adding file changes
+</span><span class='line'>added 6 changesets with 16 changes to 10 files
+</span><span class='line'><span class="o">(</span>run <span class="s1">&#39;hg update&#39;</span> to get a working copy<span class="o">)</span>
+</span></code></pre></div></figure>
+
+
+<p>After I update my local repo,<sup>1</sup> I can see the full patchset with
+<code>hg qseries</code>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setup.makefile
+</span><span class='line'>base.config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span><span class='line'>bstack
+</span><span class='line'>centurion.config
+</span></code></pre></div></figure>
+
+
+<p>Then, as I decribed in my previous post, I make the changes to
+<span class="file">config.def.h</span> that are specific to this
+machine:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew veles.config
+</span><span class='line'> <span class="c"># “hack, hack, hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Adaptions for Veles&#39;</span>
+</span></code></pre></div></figure>
+
+
+<p>My patchset now has an additional patch in it:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>setup.makefile
+</span><span class='line'>base.config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span><span class='line'>bstack
+</span><span class='line'>centurion.config
+</span><span class='line'>veles.config
+</span></code></pre></div></figure>
+
+
+<p>This is where guards come in to play. If I wasn&#8217;t interested in sharing
+the patchset, it would just be a matter of deleting the patch for Centurion.
+However, what I want to do is direct MQ to ignore that specific patch
+when applying the queue. I do that by creating a negative guard and then
+activating it:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qguard centurion.config -- -block
+</span><span class='line'>hg qselect block
+</span><span class='line'>number of unguarded, unapplied patches has changed from 8 to 7
+</span></code></pre></div></figure>
+
+
+<p>That&#8217;s it! Adding a verbose flag to <code>hg qseries</code><sup>2</sup> will print out the
+patchset and the accompanying guard status:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries -v
+</span><span class='line'>0 U setup.makefile
+</span><span class='line'>1 U base.config.customizations
+</span><span class='line'>2 U statuscolours
+</span><span class='line'>3 U cycle
+</span><span class='line'>4 U push
+</span><span class='line'>5 U bstack
+</span><span class='line'>6 G centurion.config
+</span><span class='line'>7 U veles.config
+</span></code></pre></div></figure>
+
+
+<p>The real test, of course, is pushing the patchset onto the fresh
+dwm code:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpush -a
+</span><span class='line'>applying setup.makefile
+</span><span class='line'>applying base.config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>applying bstack
+</span><span class='line'>skipping centurion.config - guarded by <span class="s1">&#39;-block&#39;</span>
+</span><span class='line'>applying veles.config
+</span><span class='line'>now at: veles.config
+</span></code></pre></div></figure>
+
+
+<p>How cool is that? One central patchset, applied conditionally depending
+upon the machine you are using at the time.</p>
+
+<h4>Notes</h4>
 
 <ol>
-<li><p>Updated with the correct genealogy…</p></li>
-<li><p>“dwm is only a single binary, and its source code is intended to
-never exceed 2000 SLOC.” <a href="http:..dwm.suckless.org" title="dwm homepage">dwm.suckless.org</a></p></li>
+<li>Any guards applied on other machines will be present in the newly
+pulled <span class="file">series</span> file: these conflicts will need
+to be manually merged…</li>
+<li>The options for all of the <code>hg</code> commands can be read with
+<code>hg -v help $command</code>. For those related to queues, just prepend
+a <code>q</code> to <code>$command</code>.</li>
 </ol>
 
 
-<p>Cookie Monster image from <a href="http://www.flickr.com/photos/nathaninsandiego/3757033518/" title="Creative Commons image on Flickr">San Diego Shooter</a>.</p>
+<p>Creative Commons image on Flickr by
+<a href="http://www.flickr.com/photos/alternatewords/4903560373/" title="On Guard on Flickr">Thorsten Becker</a></p>
 </div>
   
   
@@ -442,7 +446,7 @@ never exceed 2000 SLOC.” <a href="http:..dwm.suckless.org" title="dwm homepage
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/12/18/login/">Logging Straight Into X</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a></h1>
     
     
       <p class="meta">
@@ -458,102 +462,190 @@ never exceed 2000 SLOC.” <a href="http:..dwm.suckless.org" title="dwm homepage
   
 
 
-<time datetime="2011-12-18T22:13:00+13:00" pubdate data-updated="true">Dec 18<span>th</span>, 2011</time>
+<time datetime="2012-07-24T19:18:00+12:00" pubdate data-updated="true">Jul 24<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/login.png" alt="image" /></p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/queue.jpg" title="'Queue image on Flickr'" >
+Over the last week or so, I have finally gotten around to digging into the whole concept of
+using
+<a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
+to manage patches against an upstream project; in my case
+<a href="http://dwm.suckless.org" title="The truly suckless window manager…">dwm</a>.<sup>1</sup>
+Essentially, this mercurial extension helps you manage a stack of patches on
+top of a directory tree. This gives you quite a lot of fine-grained control
+over your patchset and assists immeasurably with automating the application of
+patches when the underlying codebase changes.</p>
 
-<p>I have been using
-<a href="https://wiki.archlinux.org/index.php/CDM" title="Arcjh Wiki entry on CDM">CDM</a>
-to log into X on my Arch machines and, if I were to continue to require
-the ability to access different window managers with any frequency, I
-would use this approach. However, on my EeePC, I really only ever login
-to a <a href="http://dwm.suckless.org/" title="dwm at suckless.org">dwm</a> session or
-the console, so having a login manager seemed like an unnecessary step.</p>
+<p>After having played around with queues for the last couple of days, I am quite
+impressed: both the concept and the execution are simple and powerful. The concept
+of Mercurial Queues is best described in the Mercurial book: the aptly titled,
+<em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
 
-<p>Consequently, over the weekend, with the help of the
-<a href="https://wiki.archlinux.org/index.php/Start_X_at_Boot" title="Arch Linux wiki entry">Start X at Boot</a>
-article on the Arch Wiki, I removed CDM and arrived at a secure,
-flexible approach to logging into X (or the console).</p>
+<blockquote><p>MQ&#8217;s marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don&#8217;t like a patch, you can drop it. If a patch isn&#8217;t quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote>
 
-<p>My <span class="file">/etc/inittab</span> already boots me into runlevel 5:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Boot to X11</span>
-</span><span class='line'>id:5:initdefault:
+<p>I followed Filippo Negroni&#8217;s excellent
+<a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
+to setup my own
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src" title="Patchset in Bitbucket repo">dwm patchset</a>
+based on
+<a href="http://hg.suckless.org/dwm" title="dwm hg repository">tip</a>, and the process was
+surprisingly straightforward; the only caveat being it is a good idea to plan
+quite carefully what changes you want in each particular patch. Once I had
+completed the setup, it got me thinking about the fact that the final install
+is done without <code>pacman</code>, just using <code>make install</code>. And, as a proof-of-concept
+more than anything else, I wondered whether this functionality could be used
+with <code>makepkg</code>.<sup>3</sup></p>
+
+<p>Turns out, as you might expect with Arch, it was not much of a job to set it
+up at all.</p>
+
+<p><strong>Note</strong>: this doesn&#8217;t mean I think it is a good idea; I was just interested
+to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
+like dwm, this is definitely a case of introducing a huge amount of complexity for
+no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
+
+<p>I have a
+<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD" title="If you must…">working PKGBUILD</a>
+that you can use if you want to follow along at home. Once you have downloaded
+it into <span class="file">dwm-hg/</span>, run <code>makepkg</code> to clone the dwm
+repository and build the binary.  Then you need to make sure that the mercurial
+queue extension is enabled, so your <span class="file">.hgrc</span> needs to
+contain:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
+</span><span class='line'>hgext.mq <span class="o">=</span>
 </span></code></pre></div></figure>
 
 
-<p>So it was just a case of putting a couple of lines in the correct
-<a href="http://www.gnu.org/software/bash/manual/bashref.html#Bash-Startup-Files" title="GNU Bash reference: startup files">invocation file</a>.
-I chose <span class="file">$HOME/.bash_profile</span> because I only use Bash; if you use another
-shell you should probably go with <span class="file">$HOME/.profile</span>. The recommended lines
-from the Arch Wiki are:</p>
+<p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
+is <span class="file">dwm-hg/src/dwm</span>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="nv">$DISPLAY</span> <span class="o">&amp;&amp;</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">exec </span>startx
-</span><span class='line'>  <span class="c"># Could use xinit instead of startx</span>
-</span><span class='line'>  <span class="c">#exec xinit -- /usr/bin/X -nolisten tcp vt7</span>
-</span><span class='line'><span class="k">fi</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
 </span></code></pre></div></figure>
 
 
-<p>…and this works as advertised. If you are in TTY1 and you login, X is
-started. The disadvantage for me, though, was that when you shutdown,
-you must manually change to TTY7 (if that is your last
-<a href="http://tldp.org/HOWTO/Remote-Serial-Console-HOWTO/getty-agetty.html" title="agetty remote serial console">agetty</a>)
-to see the shutdown messages.</p>
+<p>The next step is to start applying the various patches that you want to comprise
+your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
+and three other patches:
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/statuscolours" title="Patch in mercurial queue">statuscolours</a>,
+<a href="http://https://bitbucket.org/jasonwryan/dwm-patchset/src/default/cycle" title="ditto">cycle</a>, and
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/push" title="etc…">push</a>.
+There are other patches in my repository, one of which patches the appropriate
+settings for an Arch build in the
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/setup.makefile" title="Arch settings for Makefiles">relevant makefiles</a>.
+This is taken care of by the PKGBUILD in this case.</p>
 
-<p>After rummaging around through various man and web pages, I finally
-alighted on this helpful option: <code>-novtswitch</code>. So, my entry to start X
-now looked like:</p>
+<p>From here, it is very much as Filippo describes it in his tutorial: make
+some changes, add them to the queue and rinse and repeat:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nb">exec </span>xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
-</span><span class='line'>    <span class="nb">logout</span>
-</span><span class='line'><span class="k">fi</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
+</span><span class='line'> <span class="c"># “hack hack hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
 </span></code></pre></div></figure>
 
 
-<p>Now, on shutdown and reboot, I see all of the shutdown messages. All
-that remained was to add an option to log into a tmux session if I
-didn’t want to use X. The final code looks like this:</p>
+<p>After committing each of your changes as a discrete patch, you can review the queue
+with <code>hg qseries</code>:</p>
 
-<figure class='code'><figcaption><span>~/.profile </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1 and tmux on tty2</span>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nb">exec </span>xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
-</span><span class='line'>    <span class="nb">logout</span>
-</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty2 <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span>tmux -f <span class="nv">$HOME</span>/.tmux/conf new -s secured
-</span><span class='line'><span class="k">fi</span>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
 </span></code></pre></div></figure>
 
 
-<p>Logging in from TTY1 takes me into my dwm session, if I switch to TTY2 I
-am logged into a tmux session with keychain running. To start consolekit
-with dwm, I have this in my <span class="file">$HOME/.xinitrc</span>:</p>
+<p>And <code>hg qapplied</code> will tell you which of the patches is currently
+applied in the working repository; at this stage the list should look
+the same as that in <code>hg qseries</code>. The next step is to remove all of the
+patches from the queue so that we have a clean repository:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">exec </span>ck-launch-session <span class="nv">$HOME</span>/Scripts/dwm-start.
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop -a
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>popping config.customizations
+</span><span class='line'>patch queue now empty
 </span></code></pre></div></figure>
 
 
-<p>You can see my full <span class="file">$HOME/.bash_profile</span> in
-<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.profile" title="profile in mercurial repo">my mercurial repo</a>.</p>
+<p>Should you need to edit a patch, it is simply a matter of popping
+to that spot in the stack (you can do so by name or by index
+number, beginning at 0):</p>
 
-<h4>Updated 4/2/12</h4>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop config.customizations
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>now at: config.customizations
+</span><span class='line'> <span class="c"># “hack hack hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qpush -a
+</span></code></pre></div></figure>
 
-<p>For various reasons, I moved my environment variables from <span class="file">$HOME/.bashrc</span>
-into <span class="file">$HOME/.profile</span>; this meant that these variables were only inherited in
-interactive shells if <code>xinit</code> was called with <code>exec</code>.</p>
 
-<p>I have also ditched <code>consolekit</code> - for all of the processes it was
-spawning, it actually wasn’t performing any critical functions; or
-indeed any functions that I really needed at all…</p>
+<p>Once you are satisfied with the state of the stack, remove all of the
+patches to return to the original clean working directory and <code>cd</code> back
+to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> to
+rebuild the package and you should see the pushed patches as part of
+the output:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
+</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
+</span><span class='line'>applying config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>now at: push
+</span><span class='line'>dwm build options:
+</span></code></pre></div></figure>
+
+
+<p>…and when you restart dwm, your customizations will be applied.
+When new changes are pushed to
+<a href="http://hg.suckless.org/dwm" title="dwm mercurial repo">the dwm repo</a>
+you can just <code>makepkg -fi</code>, and, if any of the patches fail due
+to changes in the underlying code, pop the stack to the failed
+patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
+
+<p>As I said at the beginning of this post, this isn&#8217;t a particularly smart way to
+use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
+better off just cloning dwm to your local repository, initializing a queue
+repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
+sudo make install</code>.</p>
+
+<p>If you have more than one machine, you can easily setup a repository for
+your patchset on
+<a href="https://bitbucket.org/" title="bitbucket free mercurial hosting">bitbucket</a>
+and host it there: then just pull the patchset queue
+from your other boxes and <code>hg qpush -a</code>. If you require a slightly
+different patchset for each box, you can use MQ to manage this
+process as well. This is where MQ really excels;
+I&#8217;ll cover this in more detail in my next post.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
+<li>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
+example of thorough, accessible documentation.</li>
+<li>In the case of something like dwm, this is really irrelevant, as there
+is a single tiny binary and a <code>man</code> page, so keeping track of these files on
+your system is not an issue at all.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image by
+<a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
 </div>
   
   
@@ -578,23 +670,23 @@ indeed any functions that I really needed at all…</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -672,7 +764,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -681,7 +773,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

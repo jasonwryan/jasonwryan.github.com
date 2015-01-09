@@ -9,10 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I’ve posted a couple of times1 about
-tmux, the brilliant
-terminal mutliplexer. One question I see raised a lot in #tmux is how
-to copy and paste. &hellip;">
+  <meta name="description" content="After much procrastination, I finally got around to moving the last of
+my machines to Arch Linux:
+my home desktop,
+which has been running Ubuntu &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +21,7 @@ to copy and paste. &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/19">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/19">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -29,8 +29,8 @@ to copy and paste. &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -68,7 +68,7 @@ to copy and paste. &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -91,7 +91,7 @@ to copy and paste. &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/06/07/copy-and-paste-in-tmux/">Copy &amp; Paste in tmux</a></h1>
+      <h1 class="entry-title"><a href="/blog/2012/02/11/lvm/">LVM on LUKS on RAID1 on Arch Linux</a></h1>
     
     
       <p class="meta">
@@ -107,297 +107,453 @@ to copy and paste. &hellip;">
   
 
 
-<time datetime="2011-06-07T19:54:00+12:00" pubdate data-updated="true">Jun 7<span>th</span>, 2011</time>
+<time datetime="2012-02-11T15:58:00+13:00" pubdate data-updated="true">Feb 11<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/tmux-copy.png" alt="image" /></p>
+  <div class="entry-content"><p><img src="/images/post_images/lvm-luks-raid.png" alt="image" /></p>
 
-<p>I’ve posted a couple of times<sup>1</sup> about
-<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>, the brilliant
-terminal mutliplexer. One question I see raised a lot in #tmux is how
-to copy and paste.</p>
+<p>After much procrastination, I finally got around to moving the last of
+my machines to Arch Linux:
+<a href="http://jasonwryan.com/blog/2010/10/04/the-setup/" title="The Setup post">my home desktop</a>,
+which has been running Ubuntu since the end of 2007. I’d like to share a
+few thoughts about why I finally walked away from Ubuntu, but I’ll save
+that for another long post.</p>
 
-<p>The documentation for tmux is excellent: the
-<a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="BSD man page: tmux">man page</a>
-one of the most clear and thorough I have read. And while it is
-explained there, I thought I would share my approach anyway.</p>
+<p>Anyway, the setup I decided on was reasonably straightforward: two 1TB
+drives comprising two Raid1 devices, one for a small (150Mb)
+<span class="file">/boot</span> and the other holding three logical volumes
+in a LUKS crypt. This way, I have the flexibility to grow the volumes as
+needed, and only require thesingle passphrase at boot to unlock the
+enclosed partitions: <span class="file">/root</span>, <span class="file">swap</span>
+and <span class="file">/home</span>.</p>
 
-<p>First, I set tmux to use vi keys:</p>
+<p>Almost all of the information here has been gleaned gratefully from
+other sources; principally the Arch Wiki entries on
+<a href="https://wiki.archlinux.org/index.php/LUKS" title="Arch wiki entry">LUKS</a> and
+<a href="https://wiki.archlinux.org/index.php/Lvm" title="Arch LVM article">LVM</a> and
+this <a href="http://www.pindarsign.de/webblog/?p=767" title="Blog post on LUKS and LVM">helpful blog post</a>.
+This post (and the next) are notes to remind me how I got here and, in
+the follow-up, what I need to do to restore this build…</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setw -g mode-keys vi
+<p>First up, prepare the two hard drives. This took roughly ~90 hours for
+the 1TB drives, so allow some time:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>dd <span class="k">if</span><span class="o">=</span>/dev/random <span class="nv">of</span><span class="o">=</span>/dev/sd<span class="o">[</span>a,b<span class="o">]</span>
 </span></code></pre></div></figure>
 
 
-<p>Then I change the default keybinds to suit my workflow. As explained in
-the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
-and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
-to more intuitive and Vim-like keys:</p>
+<p>Once the drives are scrubbed (read the Arch Wiki on why that is
+necessary), you can move to the actual installation business. I used a
+256Mb thumb drive with the most recent x86_64 netinstall image burned
+to it. Boot into the live environment and set up the initial partitions
+using <code>cfdisk</code>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
-</span><span class='line'><span class="nb">bind </span>Escape copy-mode
-</span><span class='line'>unbind p
-</span><span class='line'><span class="nb">bind </span>p paste-buffer
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cfdisk /dev/sda
 </span></code></pre></div></figure>
 
 
-<p>This seems a lot closer to all of the other Vim-like apps that I run -
-where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
-<kbd>y</kbd> yanks text to the buffer and <kbd>p</kbd> puts text copied from the buffer.</p>
+<p>I created a 150Mb partition for <span class="file">/boot</span> - marked
+with the boot flag, and then partitoned the rest of the drive. Both partitons
+should be primary and be <code>FSType linux_raid</code> (the FD option). Write the
+partition tabel toa file and then import it to the second drive so both are exactly the
+same:</p>
 
-<p>So, to string it all together, the command sequence necessary to copy
-some text from tmux and paste it is now (I bind my prefix to <kbd>t</kbd>):</p>
-
-<pre>
-<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>Escape</kbd>   # enter copy mode
-# move cursor to the start or end of the desired text string
-<kbd>v</kbd>                        # to activate highlighting
-# move cursor to cover the requisite string
-<kbd>y</kbd>                        # to capture the string
-<kbd>q</kbd>                        # exit copy mode
-<kbd>Ctrl</kbd><kbd>t</kbd>,<kbd>p</kbd>       # put/paste the text in the desired location
-</pre>
-
-
-<p>Simple.</p>
-
-<p>This means that you can scroll back through the output of <em>anything</em> in
-your terminal, and copy and paste it anywhere. Once you set it up, it is
-a very powerful tool…</p>
-
-<h5>Notes</h5>
-
-<p>1.<a href="http://jasonwryan.com/blog/2010/01/07/tmux-terminal-multiplexer/">tmux - Terminal-multiplexer</a> &amp; <a href="http://jasonwryan.com/blog/2010/10/03/sessions-in-tmux/">Sessions in tmux</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/06/network-flooding-on-ubuntu/">Network Flooding on Ubuntu</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-06-06T13:40:00+12:00" pubdate data-updated="true">Jun 6<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/ubuntu-logo.png" alt="image" /></p>
-
-<p>I have been experiencing problems with my wifi LAN when playing music
-through
-<a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki" title="Music Player Daemon homepage">mpd</a>
-or watching movies. My upload speeds would climb to around 120-130Kb/s
-and my wifi would just go down.</p>
-
-<p>Apart from being frustrating, this was inconvenient as it meant that if
-I was doing either of those things, my stereo in the living room
-couldn’t stream music from my
-<a href="http://www.mysqueezebox.com/index/Home" title="Squeezebox home">squeezebox server</a>, or
-other members of the family (or guests) couldn’t connect to the access
-point to get online.</p>
-
-<p>After asking on
-<a href="http://askubuntu.com/questions/45772/playing-music-or-movies-kills-my-wifi" title="My question on Ask Ubuntu">Ask Ubuntu</a>
-(which, like many of the Ubuntu-related fora is populated with people
-who are more well-intentioned than they are knowledgeable - which seems
-to me one of the fundamental problems the distro has; but I’ll save that
-rant for another day), one helpful user suggested I use
-<a href="http://www.wireshark.org/" title="Wireshark website">wireshark</a> to diagnose
-the network traffic.</p>
-
-<p>I <em>really</em> should have thought of that myself. Nonetheless, it was
-immediately instructive. Wireshark quickly identified that, as soon as I
-started mpd, one of my ports was being flooded: 46560</p>
-
-<p><code>lsof</code> showed that pulse audio was the culprit:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulseaudi 2190 jason 39u IPv4 14110 0t0 UDP mybox:56751-&gt;224.0.0.56:46560
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sfdisk -d /dev/sda &gt; part-table
+</span><span class='line'>sfdisk /dev/sdb &lt; part-table
 </span></code></pre></div></figure>
 
 
-<p>Quelle surprise… When software engineers want a case study of opacity
-and abstraction from the user, this should be their first port of call.</p>
+<p>Now, set up the Raid arrays. Start by loading the required modules and
+then create the two arrays. The metadata flag is important: if you are
+using legacy grub, as I did, you must use the 0.90 type or your MBR will
+get overwritten:</p>
 
-<p>Worse, it is a known bug.
-<a href="https://bugs.launchpad.net/ubuntu/+source/pulseaudio/+bug/411688" title="Pulse bug on launchpad">First logged in August, 2009</a>.
-And apparently insufficiently serious to warrant any attention. Fair
-enough, I suppose, given the fix is easy enough <em>if you know what you
-are trying to fix…</em></p>
-
-<p>Install the Pulse audio preferences tool:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo apt-get install papref
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>modprobe raid1 <span class="o">&amp;&amp;</span> modprobe dm-mod
+</span><span class='line'>mdadm --create /dev/md0 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 <span class="se">\</span>
+</span><span class='line'>    --metadata<span class="o">=</span>0.90 /dev/sd<span class="o">[</span>ab<span class="o">]</span>1
+</span><span class='line'>mdadm --create /dev/md1 --level<span class="o">=</span>1 --raid-devices<span class="o">=</span>2 /dev/sd<span class="o">[</span>ab<span class="o">]</span>2
 </span></code></pre></div></figure>
 
 
-<p>…and disable Multicast/RTP.</p>
+<p><sup>NOTE: I have split some of the lines of code in this post to ensure they remain readable…</sup></p>
 
-<p>Another example for me of Ubuntu’s fast waning utility as a distribution
-for people that want to be able to exercize some control over their
-system. It is only still installed on this machine because there isn’t
-an official <a href="https://wiki.archlinux.org/index.php/Mirrors" title="Arch wiki mirror list">Arch Linux mirror</a>
-here and, with my international traffic capped to 30Kb/s until last
-month, I wasn’t prepared to try and run a distro on that sort of
-bandwidth. Now that has changed, I suspect that Ubuntu’s days are
-numbered on this box.</p>
-</div>
-  
-  
+<p>At this point, you can switch to another TTY to watch the disks
+sync—again, this could take some time, depending on the size of the
+drives.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>watch -n1 cat /proc/mdstat
+</span></code></pre></div></figure>
 
 
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/05/28/quoras-quandary/">Quora&#8217;s Quandary</a></h1>
-    
-    
-      <p class="meta">
-        
+<p>Check that it all went to plan…</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --misc --detail /dev/md<span class="o">[</span>01<span class="o">]</span> | less
+</span></code></pre></div></figure>
 
 
+<p>Once the drives are synched and pronounced clean, it it time to encrypt
+the second Raid device, <span class="file">dev/md1</span>. You can’t encrypt
+the array that contains <span class="file">/boot</span>,
+but having it duplicated in a Raid array means that, ifone drive goes down,
+you can still boot the other.</p>
+
+<p>Load the module for encryption, and then set it up:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>modprobe dm-crypt
+</span><span class='line'>cryptsetup --cipher<span class="o">=</span>aes-xts-plain --verify-passphrase <span class="se">\</span>
+</span><span class='line'>    --key-size<span class="o">=</span>512 luksFormat /dev/md1
+</span></code></pre></div></figure>
 
 
+<p>Now, open the encrypted device to create the logical volumes:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>cryptsetup luksOpen /dev/md1 cryptdisk   <span class="o">[</span>1<span class="o">]</span>
+</span></code></pre></div></figure>
 
 
+<p>The three next steps create, in this order, the physical volume (the
+container, if you will), the group and then the individual volumes
+contained in the group. Choose simple, memorable names and do not
+hypenate them. The {pv,vg,lv}display commands print out the details of
+the devices once created.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pvcreate /dev/mapper/cryptdisk
+</span><span class='line'>pvdisplay
+</span><span class='line'>
+</span><span class='line'>vgcreate vgroup /dev/mapper/cryptdisk
+</span><span class='line'>vgdisplay
+</span><span class='line'>
+</span><span class='line'>lvcreate --size 20G --name lvroot vgroup
+</span><span class='line'>lvcreate --contiguous y --size 2G --name lvswap vgroup
+</span><span class='line'>lvcreate --extents +100%FREE --name lvdata vgroup
+</span><span class='line'>lvdisplay
+</span></code></pre></div></figure>
 
 
-  
+<p>It should be pointed out that the
+<a href="https://github.com/Dieterbe/aif" title="AIF on Github">Arch Installer Framework</a> supports
+LUKS and LVM, so you can accomplish these last two steps from within the
+installer. I tried both and I found that I had a little more control
+doing it manually, but YMMV.</p>
+
+<p>At this point, you are ready to enter the installer and complete the
+install. Run /arch/setup and move through the early setup until you
+reach the &#8216;Prepare Hard Drives&#8217; section. Select option 3, &#8216;Configure block
+devices, mountpoints and filesystems&#8217;. Make sure that the only “raw”
+device that you configure is <span class="file">/dev/md0</span>, your
+<span class="file">/boot</span> partition. Otherwise,
+you are configuring the logical volumes, <em>not</em> the devices they are
+built on.</p>
+
+<p>After succesfully setting up the drives, install the base packages and
+then, once that is complete, switch TTYs and update your Raid
+configuration <em>prior to configuring your system</em>. This means that when
+your <code>initrd</code> is regenerated, it will inlcude the correct Raid
+information:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>mdadm --examine --scan &gt; /mnt/etc/mdadm.conf
+</span></code></pre></div></figure>
 
 
-<time datetime="2011-05-28T10:05:00+12:00" pubdate data-updated="true">May 28<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
+<p>When you are done, move to configure your system and make sure to add
+the relevant details to both your <span class="file">/etc/rc.conf</span> and your
+<span class="file">/etc/mkinitcpio.conf</span>. In the former:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">USELVM</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</span><span class='line'><span class="nv">USEDMRAID</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</span></code></pre></div></figure>
 
 
-  <div class="entry-content"><p><img src="http://miromiro.com/Blog-images/quora1.png" alt="image" /></p>
+<p>and in /etc/mkinitcpio.conf:</p>
 
-<p>I joined <a href="http://www.quora.com/" title="Quora: Q&amp;A site">Quora</a> early in the
-new year and, while
-<a href="http://techcrunch.com/2011/01/23/why-i-don%E2%80%99t-buy-the-quora-hype/" title="TC article on the hype">the hype has in no way abated</a>,
-I have found that increasingly over the months that I have been
-visiting, there is less and less reason for me to return on any regular
-basis. And this puzzles me as I think the concept is, for me, an
-attractive one.</p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">MODULES</span><span class="o">=</span><span class="s2">&quot;... dm_mod dm_crypt aes_x86_64 raid1 ...&quot;</span>
+</span><span class='line'><span class="nv">HOOKS</span><span class="o">=</span><span class="s2">&quot;... udev mdadm_udev encrypt lvm2 filesystems ...&quot;</span>  <span class="o">[</span>2<span class="o">]</span>
+</span></code></pre></div></figure>
 
-<p>In the five-odd months I have been visiting the site, I have managed to
-<a href="http://www.quora.com/Jason-Ryan" title="My Quora profile">contribute 58 answers</a>
-and over one hundred edits (more on that below); this strikes me as a reasonable
-commitment on my part and one that should return some dividend to me –
-at least in terms of satisfaction with the site. Alas, no.</p>
 
-<p>And why not? For several reasons. And reasons that have only really
-become apparent over the last month as I started to spend time on the
-<a href="http://unix.stackexchange.com/" title="Unix and Linux Stack Exchange">Unix &amp; Linux Stack Exchange site</a>.
-The contrast between the <em>experience</em> of the two sites, that are in
-essence very similar, couldn’t be more striking.</p>
+<p>That is the straightforward part of the install over. The final step is
+a little more tricky: installing a bootloader. My experience, and I
+tried a number of times using different approaches, is that this <em>won’t
+work</em>. The installer doesn’t seem to like the Raid setup, so it
+complains about it:</p>
 
-<p>The primary difference between the two is that Unix.SE isn’t a social
-site: you don’t follow anyone. Which, when you think about Q&amp;A sites,
-makes a lot more sense than Quora’s model. I still don’t understand the
-point of following people on Quora. Perhaps I am not following enough
-people, or the wrong ones, but I have yet to see <em>any benefit</em> in
-following on the site.</p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;Missing/Invalid root device for /dev/md0&quot;</span>
+</span></code></pre></div></figure>
 
-<p>One other area of seeming similarity between the sites is the ability to
-vote up (or down) questions and answers. On Unix.SE, this is implemented
-as a real strength as these votes determine contributor’s reputation,
-described thus:</p>
 
-<blockquote><p>Reputation is a rough measurement of how much the community trusts
-you. Reputation is never given, it is earned by convincing fellow
-users that you know what you’re talking about.</p></blockquote>
+<p>It’s not all bad, as this is the final hurdle and it is not a
+particularly high one.</p>
 
-<p>This has a twofold effect: it motivates contributors to provide quality
-answers (and
-<a href="http://unix.stackexchange.com/badges" title="StackExchange badges">rewards</a>
-them when they do), and more importantly, gives you a heuristic for how
-credible an answer may be. Quora doesn’t have this concept and, for me,
-is much the poorer for it.</p>
+<p>The important step is to ensure that your <span class="file">/boot/grub/menu.lst</span> is setup
+correctly. Given the names I chose above for my devices, mine looks like
+this:</p>
 
-<p>Reputation has consequences on Unix.SE: the more you accrue, the more
-privileges on the site you are granted. Again, this builds the
-community’s capability while encouraging individual contributors.</p>
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># (0) Arch</span>
+</span><span class='line'>title  Arch Linux
+</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
+</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
+</span><span class='line'>initrd /kernel26.img
+</span><span class='line'>
+</span><span class='line'><span class="c"># (1) Arch Fallback</span>
+</span><span class='line'>title  Arch Linux Fallback
+</span><span class='line'>root   <span class="o">(</span>hd0,0<span class="o">)</span>
+</span><span class='line'>kernel /vmlinuz26 <span class="nv">root</span><span class="o">=</span>/dev/mapper/vgroup-lvroot <span class="se">\</span>
+</span><span class='line'><span class="nv">cryptdevice</span><span class="o">=</span>/dev/md1:vgroup ro
+</span><span class='line'>initrd /kernel26-fallback.img
+</span></code></pre></div></figure>
 
-<p>Some of the other areas where Quora is really left wanting in comparison
-to Unix.SE are around the design of the site. The text box where you
-enter your answers or edits is a case in point:</p>
 
-<p><img src="http://miromiro.com/Blog-images/quora2.png" alt="image" /></p>
+<p>Once it is all setup, simply exit the installer. At this point, you have
+a perfectly secure, redundant, new Arch Linux install that you can’t
+boot into. You have two choices; chroot in and manually install grub
+now, or reboot and do it then. I opted for the latter as it would be
+more like a recovery mission—and I wanted to make sure that I was
+capable enough to manage that before committing all of my backed-up data
+to the machine.</p>
 
-<p>On Quora, it is like trying to change a car battery through a letterbox.
-The single, overriding impression is that entering information into the
-site is neither a priority nor pleasurable which, for a site aspiring to
-be a knowledge repository is incredibly perverse.</p>
-
-<p>This is compounded by the fact that the tools for presenting the
-information that you want to add to the site can charitably be described
-as rudimentary (one of the reasons that I have 100-odd edits is that it
-takes at least two to three attempts to present information in a
-semi-acceptable fashion). Searching for
-“<a href="http://www.quora.com/Quora-product/Are-there-any-markup-tags-when-writing-a-question?q=quora+markup+tools" title="Recursion alert">quora markup tools</a>”
-is as disappointing as it is frustrating.</p>
-
-<p>Being able to present information appropriately is critical. The
-StackExchange sites
-<a href="http://unix.stackexchange.com/editing-help" title="Unix.SE editing guidleines">allow all sorts</a>
-of HTML tags and
-<a href="http://daringfireball.net/projects/markdown/syntax" title="markdown syntax">markdown</a>,
-without apparently any additional
-<a href="http://en.wikipedia.org/wiki/Cross-site_scripting" title="Wikipedia page on Cross site scripting">XSS risk</a><sup>1</sup>.
-The result is questions and answers that are formatted in a way that
-enhances their legibility, rather than detracting from it.</p>
-
-<p>There are some other areas where Quora is not measuring up for me:
-opaque editorial and moderation policies and practices and an
-unwillingness to more actively curate the questions – and no, those two
-statements are not contradictory.</p>
-
-<p>The overall impression I am left with is that while both sites have
-similar aims (albeit Unix.SE’s is much more specific in terms of the
-subject matter), Quora seems to me to be really failing at building a
-community around it. Unless, of course, you count social media experts…</p>
+<p>I’ll post the details of the relatively straightforward steps required
+to chroot into the system and install grub on both hard drives in a
+couple of days.</p>
 
 <h5>Notes</h5>
 
 <ol>
-<li>God knows if that is actually the reason they refuse to allow
-potential contributors the ability to adequately format their
-information, but it seems plausible enough.</li>
+<li><p>The name <code>cryptdisk</code> is arbitrary - just make it memorable and use it
+consistently…</p></li>
+<li><p>I am not sure how necessary it is to have the Raid modules included
+here, given they are explicitly called in <span class="file">/etc/rc.conf</span>, but caution is
+warranted. <strong>UPDATED 12/4/12</strong> as per the <a href="https://wiki.archlinux.org/index.php/Mkinitcpio#HOOKS">mkinitcpio article on the Wiki</a>
+the <code>mdadm_udev</code> hook is preferred over the plain <code>mdadm</code> hook in your
+<span class="file">/etc/mkinitcpio.conf</span>.</p></li>
 </ol>
 
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/01/18/monsterwm/">monsterwm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-01-18T10:03:00+13:00" pubdate data-updated="true">Jan 18<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="/images/post_images/monster.jpg" alt="image" /></p>
+
+<p>If you have visited here at all over the last couple of weeks, you would
+have seen some screenshots from
+<a href="http://www.flickr.com/photos/jasonwryan/" title="All of my screenshots on Flickr">my Flickr stream</a>
+of a new window manager,
+<a href="https://github.com/c00kiemon5ter/monsterwm" title="Project on Github">monsterwm</a>.
+Over the break, I have been playing around with it and, despite the fact
+that the project is only really a few weeks old, it is well worth a
+look.</p>
+
+<p>Originally a fork of
+<a href="https://github.com/moetunes/dminiwm" title="dminiwm on Github">dminiwm</a>,
+which was in turn based on
+<a href="https://github.com/pyknite/catwm" title="Project on Github">catwm</a> and
+<a href="http://dwm.suckless.org" title="dwm on suckless">dwm</a><sup>1</sup>, monsterwm for
+me—having used dwm for years—feels very much like a stripped down
+version of dwm, with a few of the patches (like pertag, for example)
+built in.</p>
+
+<p>One of the projects goals, like it’s antecedents, is to keep the SLOC
+low. By way of comparison, dwm’s long-standing goal has been to keep the
+SLOC below 2000<sup>2</sup>. monsterwm’s current count is under 700. One of the
+ways that monsterwm achieves this is <em>not</em> to incorporate a status bar;
+as the README says:</p>
+
+<blockquote><p>Monsterwm does not provide a panel and/or statusbar itself. Instead it
+adheres to the <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="Wikipedia entry">UNIX philosophy</a>
+and outputs information about the existent desktop, the number of
+windows on each, the mode of each desktop, the current desktop and
+urgent hints whenever needed. The user can use whatever tool or panel
+suits him best (dzen2, conky, w/e), to process and display that
+information.</p></blockquote>
+
+<p>So, what is it like to run? Obviously it is fast. It comes with four
+tiling modes: standard tile, backstack, grid and monocle and, as
+mentioned above, the ability to define different layouts per desktop.
+There are still a couple of features to be implemented; floating mode
+being one of the more significant and a couple of minor bugs—as you
+would expect for a project still in its relative infancy.</p>
+
+<p>Overall, it is a very nice, minimalist window manager. If you don’t use
+the <a href="http://lubutu.com/rant/dwm-faq" title="CLS on dwm's tagging feature">dynamic tagging feature of dwm</a>,
+then this would be a window manager to consider switching to. The
+developer, Ivan “c00kiemon5ter” Kanakarakis, has been extremely
+responsive to user’s suggestions and requests (the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=132122" title="Arch Linux forums: monsterwm thread">thread on the Arch boards</a>
+is quite active) and has been admirably clear about his vision for the
+wm.</p>
+
+<p>You can see my monsterwm configs in
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Build/monsterwm-git" title="Mercurial repo: monsterwm">my mercurial repository</a>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>Updated with the correct genealogy…</p></li>
+<li><p>“dwm is only a single binary, and its source code is intended to
+never exceed 2000 SLOC.” <a href="http:..dwm.suckless.org" title="dwm homepage">dwm.suckless.org</a></p></li>
+</ol>
+
+
+<p>Cookie Monster image from <a href="http://www.flickr.com/photos/nathaninsandiego/3757033518/" title="Creative Commons image on Flickr">San Diego Shooter</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/18/login/">Logging Straight Into X</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-18T22:13:00+13:00" pubdate data-updated="true">Dec 18<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="/images/post_images/login.png" alt="image" /></p>
+
+<p>I have been using
+<a href="https://wiki.archlinux.org/index.php/CDM" title="Arcjh Wiki entry on CDM">CDM</a>
+to log into X on my Arch machines and, if I were to continue to require
+the ability to access different window managers with any frequency, I
+would use this approach. However, on my EeePC, I really only ever login
+to a <a href="http://dwm.suckless.org/" title="dwm at suckless.org">dwm</a> session or
+the console, so having a login manager seemed like an unnecessary step.</p>
+
+<p>Consequently, over the weekend, with the help of the
+<a href="https://wiki.archlinux.org/index.php/Start_X_at_Boot" title="Arch Linux wiki entry">Start X at Boot</a>
+article on the Arch Wiki, I removed CDM and arrived at a secure,
+flexible approach to logging into X (or the console).</p>
+
+<p>My <span class="file">/etc/inittab</span> already boots me into runlevel 5:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Boot to X11</span>
+</span><span class='line'>id:5:initdefault:
+</span></code></pre></div></figure>
+
+
+<p>So it was just a case of putting a couple of lines in the correct
+<a href="http://www.gnu.org/software/bash/manual/bashref.html#Bash-Startup-Files" title="GNU Bash reference: startup files">invocation file</a>.
+I chose <span class="file">$HOME/.bash_profile</span> because I only use Bash; if you use another
+shell you should probably go with <span class="file">$HOME/.profile</span>. The recommended lines
+from the Arch Wiki are:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="nv">$DISPLAY</span> <span class="o">&amp;&amp;</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">exec </span>startx
+</span><span class='line'>  <span class="c"># Could use xinit instead of startx</span>
+</span><span class='line'>  <span class="c">#exec xinit -- /usr/bin/X -nolisten tcp vt7</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>…and this works as advertised. If you are in TTY1 and you login, X is
+started. The disadvantage for me, though, was that when you shutdown,
+you must manually change to TTY7 (if that is your last
+<a href="http://tldp.org/HOWTO/Remote-Serial-Console-HOWTO/getty-agetty.html" title="agetty remote serial console">agetty</a>)
+to see the shutdown messages.</p>
+
+<p>After rummaging around through various man and web pages, I finally
+alighted on this helpful option: <code>-novtswitch</code>. So, my entry to start X
+now looked like:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">exec </span>xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
+</span><span class='line'>    <span class="nb">logout</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>Now, on shutdown and reboot, I see all of the shutdown messages. All
+that remained was to add an option to log into a tmux session if I
+didn’t want to use X. The final code looks like this:</p>
+
+<figure class='code'><figcaption><span>~/.profile </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># startx if on tty1 and tmux on tty2</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$DISPLAY&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">exec </span>xinit -- :0 -novtswitch &amp;&gt;/dev/null &amp;
+</span><span class='line'>    <span class="nb">logout</span>
+</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="k">$(</span>tty<span class="k">)</span> <span class="o">=</span> /dev/tty2 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>tmux -f <span class="nv">$HOME</span>/.tmux/conf new -s secured
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>Logging in from TTY1 takes me into my dwm session, if I switch to TTY2 I
+am logged into a tmux session with keychain running. To start consolekit
+with dwm, I have this in my <span class="file">$HOME/.xinitrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">exec </span>ck-launch-session <span class="nv">$HOME</span>/Scripts/dwm-start.
+</span></code></pre></div></figure>
+
+
+<p>You can see my full <span class="file">$HOME/.bash_profile</span> in
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.profile" title="profile in mercurial repo">my mercurial repo</a>.</p>
+
+<h4>Updated 4/2/12</h4>
+
+<p>For various reasons, I moved my environment variables from <span class="file">$HOME/.bashrc</span>
+into <span class="file">$HOME/.profile</span>; this meant that these variables were only inherited in
+interactive shells if <code>xinit</code> was called with <code>exec</code>.</p>
+
+<p>I have also ditched <code>consolekit</code> - for all of the processes it was
+spawning, it actually wasn’t performing any critical functions; or
+indeed any functions that I really needed at all…</p>
 </div>
   
   
@@ -422,23 +578,23 @@ information, but it seems plausible enough.</li>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -516,7 +672,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -525,7 +681,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 

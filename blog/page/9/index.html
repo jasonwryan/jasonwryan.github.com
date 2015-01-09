@@ -9,9 +9,11 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I posted a couple of weeks ago about the impact of some of the current
-changes to Arch Linux.
-There seems to be quite a bit of it about, because in &hellip;">
+  <meta name="description" content="I was fortunate enough to be given a
+Raspberry Pi earlier this year
+and, naturally enough, have been running
+Arch ARM on it over the
+last several &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +22,7 @@ There seems to be quite a bit of it about, because in &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.github.com/blog/page/9">
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/9">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -28,8 +30,8 @@ There seems to be quite a bit of it about, because in &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
   <!-- OpenId login -->
-<link rel="openid.server" href="http://openid.claimid.com/server" />
-<link rel="openid.delegate" href="http://openid.claimid.com/jasonwryan" />
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -67,7 +69,7 @@ There seems to be quite a bit of it about, because in &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.github.com" /> -->
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
     <input type="hidden" name="sites" value="jasonwryan.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
   </fieldset>
@@ -90,7 +92,7 @@ There seems to be quite a bit of it about, because in &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/08/04/systemd/">The Leap to systemd</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/06/29/raspberry/">RPi Headless Torrent Box</a></h1>
     
     
       <p class="meta">
@@ -106,134 +108,106 @@ There seems to be quite a bit of it about, because in &hellip;">
   
 
 
-<time datetime="2012-08-04T09:32:00+12:00" pubdate data-updated="true">Aug 4<span>th</span>, 2012</time>
+<time datetime="2013-06-29T09:40:00+12:00" pubdate data-updated="true">Jun 29<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/leap.jpg" title="Leap image on Flickr" >
-I posted a couple of weeks ago about the impact of some of the current
-<a href="http://jasonwryan.com/blog/2012/07/19/breakage/" title="Post on the glibc change">changes to Arch Linux</a>.
-There seems to be quite a bit of it about, because in conjunction with the move from
-<span class="file">/lib</span> to <span class="file">/usr/lib</span>—and motivated by the same
-overarching shifts in the other distributions—the other major change making its way through
-the Arch community is the move to
-<a href="http://freedesktop.org/wiki/Software/systemd" title="Project page">systemd</a>. This change, however, has
-been more controversial because it marks a shift away from Arch&#8217;s central configuration
-file, <a href="https://wiki.archlinux.org/index.php/Rc.conf" title="Arch wiki entry on rc.conf">/etc/rc.conf</a>;
-a move that has disconcerted a number of people.</p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/raspberry-pi-logo.png" title="Raspberry Pi logo" >
+I was fortunate enough to be given a
+<a href="http://www.raspberrypi.org/" title="Pi homepage">Raspberry Pi</a> earlier this year
+and, naturally enough, have been running
+<a href="http://archlinuxarm.org/" title="Arch Linux ARM site">Arch ARM</a> on it over the
+last several months. Initially, I was at somewhat of a loss as to what to do
+with it, so was just (under)using it<sup>1</sup> for a persistent IRC connection.
+I have now, with very little effort, set it up as a headless torrent box and it is
+working nicely.</p>
 
-<p>I&#8217;m not going to get into whether or not this move is consistent with
-<a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="Wiki entry">The Arch Way</a>, because that has
-been thrashed over extensively on the
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023283.html" title="ML thread on rc.conf">mailing</a>
-<a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023258.html" title="And another one…">lists</a>,
-but also—and more importantly—because Arch is a rolling release, which means change is <em>inevitable</em>.
-What is more, after watching all the back and forth on the <acronym title="Mailing lists">ML</acronym>
-and on the <a href="https://bbs.archlinux.org/viewtopic.php?id=96316&amp;p=1" title="Arch BBS thread on systemd">boards</a>, I am convinced that the
-<a href="http://www.archlinux.org/developers/#tomegun" title="Tom Gunderson">developer overseeing this shift</a>
-both knows what he is doing and is acting in the best interests of Arch.</p>
+<p>As is generally the case, this involved little more than stitching together a
+few lightweight tools to accomplish the task. In this case, it is a combination
+of
+<a href="http://libtorrent.rakshasa.no/" title="rotrrent homepage">rtorrent</a>
+(with the canvas-colour patch applied),
+<a href="http://jasonwryan.com/blog/categories/surfraw/" title="Posts on surfraw">surfraw</a>
+and
+<a href="http://w3m.sourceforge.net/" title="w3m homepage">w3m</a> for discovering
+torrents,<sup>2</sup>
+<a href="http://labs.bittorrent.com/experiments/sync.html" title="Peer to Peer synching">bittorrent sync</a>
+and, optionally, a <acronym title="Virtual Private Network">VPN</acronym>.</p>
 
-<p>This view has been validated by my experience of shifting to systemd on my machines.</p>
+<p>I use a 16GB <acronym title="Universal Serial Bus">USB</acronym> drive to act as
+storage for the device, and mount it at <span class="file">~/Downloads</span>
+via <span class="file">/etc/fstab</span>; depending on the size of your
+<acronym title="Secure Digital">SD card</acronym>, this may be superfluous.</p>
 
-<p>When the new initscripts package was pushed to [testing] in the middle of last month,
-I stripped out all of the redundant options in <span class="file">/etc/rc.conf</span>
-and took the ten minutes or so to read about and then create the new files. I then spent some
-time reading up on systemd, principally
-<a href="http://0pointer.de/blog/projects/systemd-for-admins-1.html" title="One of TWELVE…">Lennart Poettering&#8217;s series of posts</a>,
-the <a href="https://wiki.archlinux.org/index.php/Systemd" title="Good, but needing some structure">Arch wiki entry</a>
-and the many and various
-<a href="http://0pointer.de/public/systemd-man/" title="One for everything">manual pages</a>.</p>
+<p>First a note on building packages; building <em>anything</em> on the Pi—with only
+512MB <acronym title="Random Access Memory">RAM</acronym>—is a protracted
+and thankless task. So if you intend to do more of this, or do it regularly,
+set up
+<a href="http://archlinuxarm.org/developers/distcc-cross-compiling" title="Arch ARM instructions">cross-compiling</a>;
+you won&#8217;t regret the initial investment.</p>
 
-<p>Over the last couple of days, I have migrated all of my machines over to systemd. I found it
-to be a very straightforward process. I went for a pure systemd approach, for reasons I will
-return to. Essentially, this is how I tackled it.</p>
+<p><code>rtorrent</code> is in the ARM repos, but I wanted to patch in colour, so I wrote
+<a href="https://gist.github.com/jasonwryan/5794623" title="Gist of the thing…">a PKGBUILD</a>,
+based on the package in [community] and
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="Arch User Repository">ashren&#8217;s AUR package</a>.
+Once you have rtorrent installed and working, the rest is straightforward.</p>
 
-<p>First, for each machine, I established what daemons were running. I did this by using
-<a href="http://pikacode.com/jasonwryan/Veles/file/default/Scripts/daemons.sh" title="Pretty sure it is one of Xyne's">this shell script</a>
-and cross checking entries in my <span class="file">/etc/rc.conf</span>. Then
-it was just a matter of installing systemd:<sup>1</sup></p>
+<p>The default config for w3m is perfectly functional, but can be easily customized
+further. The key to this setup is being able to find a torrent and then easily
+add it to rtorrent&#8217;s queue.  To do this, I modified the hack that I wrote up
+<a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Post on yanking URLs in w3m">a couple years back</a>.
+Essentially, you use w3m&#8217;s external link function to trigger a script to grab
+the magnet link. Like so:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S systemd systemd-sysvcompat systemd-arch-units
+<figure class='code'><figcaption><span>~/.w3m/config </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>extbrowser /home/jason/Scripts/magnets %s
 </span></code></pre></div></figure>
 
 
-<p>The only outstanding file to be created was <span class="file">/etc/timezone</span>, the
-others—all documented in <code>man rc.conf</code>—I had created earlier in the month. Then, with the
-list of the services I would need running on each box, I enabled them. I think it is
-fair to say that the only thing that is clunky about systemd is the command syntax for
-managing units. Repeatedly typing <code>systemctl enable foo.service</code> is as tedious as it is
-error prone, so I hacked up a
-<a href="https://bitbucket.org/jasonwryan/centurion/src/default/Scripts/sysd" title="sysd - *so* much easier">wrapper script</a>:</p>
+<p>and the script from the
+<a href="http://wiki.rtorrent.org/MagnetUri#Handling_.22magnet:.22_URIs_via_a_bash_script" title="Script for magnet links">rtorrent wiki</a>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sysd <span class="nb">enable </span>acpid
-</span><span class='line'>sysd <span class="nb">enable </span>lvm
-</span><span class='line'>etc…
+<figure class='code'><figcaption><span>~/Scripts/magnets </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nb">cd</span> <span class="nv">$HOME</span>/Downloads/Queue/watch/    <span class="c"># set your watch directory here</span>
+</span><span class='line'><span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span>~ <span class="nv">xt</span><span class="o">=</span>urn:btih:<span class="o">([</span>^&amp;/<span class="o">]</span>+<span class="o">)</span> <span class="o">]]</span> <span class="o">||</span> <span class="nb">exit</span>;
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;d10:magnet-uri${#1}:${1}e&quot;</span> &gt; <span class="s2">&quot;meta-${BASH_REMATCH[1]}.torrent&quot;</span>
 </span></code></pre></div></figure>
 
 
-<p>I also activated some additional gettys, as I like to log into a tmux session in TTY2 when
-I don&#8217;t need or want to start <code>X</code>:</p>
+<p>Remapping the w3m key to trigger the script to make it more Vim-like:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty2.service
+<figure class='code'><figcaption><span>~/.w3m/keymap </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>keymap Y EXTERN_LINK
 </span></code></pre></div></figure>
 
 
-<p>And I misguidedly wrote a couple of custom service files that turned out to be
-<a href="https://bbs.archlinux.org/viewtopic.php?id=146207" title="BBS post on said files">completely unnecessary</a>;
-and then I was done.</p>
+<p>And now hitting <kbd>Shift</kbd><kbd>y</kbd> over a magnet link adds it to your
+queue.</p>
 
-<p>On all three boxes I rebooted and that was it. The only issue I experienced was
-the final shutdown after removing initscripts and before booting up with
-systemd. After issuing <code>shutdown -r now</code> the process
-hung with a message about a missing <span class="file">inittab</span> file.
-In retrospect, I should have added <code>init=/bin/systemd</code> to my kernel parameters
-and not unistalled instiscripts until I had booted with systemd. This has
-now been added to the
-<a href="https://wiki.archlinux.org/index.php/Systemd" title="Archwiki systemd page">systemd wiki page</a>.</p>
+<p>The final piece was to ameliorate the step of transferring the completed files
+from the Pi, or for allowing me to add torrents remotely. To do this, I used
+a <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="My post on Sync">bittorrent sync</a>
+shared directory as <span class="file">~/Downloads</span>. All files are synched
+to my desktop as they are downloaded to the Pi. Simple.</p>
 
-<p>Overall, though: no real drama, just a blur of text<sup>2</sup> and then the
-login prompt. While I haven&#8217;t seen a dramatic decrease in boot time,
-booting does <em>feel</em> a bit snappier and two of my three machines shutdown
-markedly more quickly. Consider me sold.</p>
+<p><img src="/images/post_images/rtorrent-2.png" title="'Screenshot of rtorrent in action…'" ></p>
 
-<p>That brings me back to the decision to opt for a pure systemd approach, rather than
-hanging on to a completely eviscerated <span class="file">/etc/rc.conf</span>. The
-Arch community has been told that the intention is to
-<a href="https://bbs.archlinux.org/viewtopic.php?pid=1133957#p1133957" title="BBS post by tomegun">support the rc.conf format forever</a>;
-I can&#8217;t help but think this is a mistake. In the same way that
-<a href="https://wiki.archlinux.org/index.php/Pacman#Partial_upgrades_are_unsupported" title="Pacman entry on Arch Wiki">partial upgrades are unsupported</a>,
-I think that systemd is Arch&#8217;s inevitable future and the community should be encouraged to accept that, <code>Syu</code> and
-move on…</p>
-
-<p>Having said that, I appreciate the consideration shown by the developers in wanting to assure
-people that their choice would continue to be catered for; and perhaps, over time, people still
-using initscripts will be regarded with the same sense of wry amusement as those who still show
-up from time to time with <code>hal</code> in their <code>DAEMONS</code> line.</p>
-
-<h3>Update 4/8/12</h3>
-
-<p>Tom Gunderson, the developer who looks after this part of Arch, has clarified the
-comment about the long term support for initscripts. As comments are hosted on
-a third-party paltform, I thought that it should be included in the body of the
-post.</p>
-
-<blockquote><p>Just a clarification: regarding the (probably very unwise) promise of &#8220;supporting <span="file">rc.conf</span> forever&#8221;, the intended meaning was that initscripts will support the syntax, not that initscripts themselves will always stay around (nor that systemd will gain support for the syntax in case initscripts is dropped).</p><p>At the moment systemd <strong>does</strong> support <span class="file">rc.conf</span> (when installed in conjunction with initscripts), but this is meant as a transitional measure only, and will likely go away eventually (though probably not soon).</p></blockquote>
-
+<p>As I mentioned above, you could also use a VPN and, with a service
+file, have it connect on boot if you wished to further protect your privacy.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>Note this approach will <em>remove</em> sysvinit and initscripts and <code>mv /etc/rc.conf{,.pacsave}</code>.</li>
-<li>Make sure you remove <code>quiet</code> from your kernel parameters for your first systemd
-boot so you can see that everything starts correctly…</li>
+<li>This is not to say that I am now using it to it&#8217;s full potential; quite the
+opposite. Recommendations or suggestions gratefully received.</li>
+<li>Discovery is <em>your</em> business; what you choose to download and share may be the
+business of copyright holders…</li>
 </ol>
 
-
-<p>Creative commons image on Flickr by
-<a href="http://www.flickr.com/photos/sovietuk/486119799/" title="leap by rick harrison">Tricky</a></p>
 </div>
   
   
@@ -246,7 +220,7 @@ boot so you can see that everything starts correctly…</li>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/07/26/guards/">Sharing Mercurial Patchsets</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/06/15/asking/">Asking for Help</a></h1>
     
     
       <p class="meta">
@@ -262,390 +236,275 @@ boot so you can see that everything starts correctly…</li>
   
 
 
-<time datetime="2012-07-26T18:48:00+12:00" pubdate data-updated="true">Jul 26<span>th</span>, 2012</time>
+<time datetime="2013-06-15T10:39:00+12:00" pubdate data-updated="true">Jun 15<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/guard.jpg" title="'On Guard image on Flickr'" >
-In my last post, on
-<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="You should read it…">Mercurial Queues</a>,
-I outlined how you might use MQ to manage a
-<a href="http://dwm.suckless.org/" title="Dynamic window manager">dwm</a> patchset.
-Mercurial makes this process ridiculously easy, and this functionality is more
-than enough to recommend it. However, where I think it really gets interesting
-is when you share that same patchset across multiple machines and are easily
-able to customize which patches in the queue are applied, based upon the
-particular machine you are building dwm on.</p>
+  <div class="entry-content"><p><img class="left" src="/images/post_images/bowl.jpg" title="'Flickr image of Begging Bowl'" >
+Another great peristaltic movement in Arch&#8217;s rolling release digestive system
+happened over the last couple of weeks, the move of all binaries
+<a href="https://www.archlinux.org/news/binaries-move-to-usrbin-requiring-update-intervention/" title="Arch News update">to /usr/bin</a>.
+This move had been foreshadowed for several months and, despite announcements
+on the front page of the Arch website, the mailing lists and the release going
+through [testing] and the resulting thread on the forums, there was still a
+surprising amount of carnage<sup>1</sup> in it&#8217;s wake.</p>
 
-<p>For example, in my case I use dwm on all three of my machines: my desktop at home,
-my laptop at work and my EeePC. Given the nature of each of these three machines,
-though, I want a slightly different stack of patches applied. These differences
-might extend only to particular rules applied in <span class="file">config.def.h</span>
-based upon the number of tags I use, or the different applications that I run
-at home as opposed to at work.</p>
+<p>In the aftermath (although I expect that it will take some months for it to
+completely pass through the system), what struck me was not so much the variety
+and ingenuity of the ways people had managed to break their installs<sup>2</sup>
+as how they approached the community seeking help afterwards.</p>
 
-<p>In any event, what I want to be able to do is maintain
-<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/" title="Patchset in Bitbucket">a single patchset</a>
-in a mercurial repository, clone it to all my machines and then, using MQ,
-filter which specific patches are applied. This is all possible using a killer
-feature of MQ called
-<a href="http://hgbook.red-bean.com/read/advanced-uses-of-mercurial-queues.html%20'Advanced%20uses%20of%20MQ%20in%20the%20Mercurial%20book">guards</a>.
-Guards allow you to conditionally apply patches in a queue. Essentially, in
-a queue, you “tag” a patch with a guard and—depending on whether or not the
-guard is positive (to be applied), or negative (to be skipped)—when you
-<code>hg qpush -a</code> MQ takes care of applying the correct patches in the queue.</p>
+<p>There are already some fine guides on how to do this, notably
+ESR&#8217;s <a href="http://www.catb.org/esr/faqs/smart-questions.html" title="Just read it…">How to ask Questions the Smart Way</a>
+and—specifically for Arch—zendeavour&#8217;s
+<a href="http://redd.it/tjjwr" title="On Reddit">troubleshooting for newcomers</a>;
+this isn&#8217;t an attempt to add or expand on that genre. Rather, it is
+a look at a subset of attitudes that some people adopt<sup>3</sup>
+as they seek the assistance of the community.</p>
 
-<p>So, in the case of my work laptop, I begin by cloning dwm and intializing
-a patch queue:</p>
+<p>The first is the <strong>blamer</strong>. The proponent of the  “all-guns-blazing” approach.
+I&#8217;ll paraphrase, but there are enough examples on the boards to illustrate the
+point: “my system can&#8217;t boot, it&#8217;s not my fault and I am here to let you know
+that I am unhappy and demand recourse.” This is, unquestionably, the most
+puzzling of all the strategies. It is often coupled with the (sadly almost
+always empty) threat to abandon the distro and it&#8217;s apparently beleaguered
+community.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd </span>Build/
-</span><span class='line'>hg clone http://hg.suckless.org/dwm
-</span><span class='line'>hg qinit -c
-</span></code></pre></div></figure>
+<p>Puzzling because I have yet to encounter a single situation in life, online
+or off, where opening with hostility and blame is an intelligent approach to
+seeking assistance. If you are going to adopt this approach, please supersize
+to “rage quit” and expend your energy actually delivering on your threat.</p>
 
+<p>The next is the <strong>wheedler</strong>. Less objectionable than the incendiary approach,
+it is nonetheless similarly ineffective. Wheedlers are distinguished by
+peppering their posts liberally with declarations of their ineptitude and
+“noobness”, in the mistaken belief that this will engender a wave of sympathy
+prior to soothing hand-holding and spoon-feeding. There is a strong correlation
+between this behaviour and the various types of
+<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on the taxonomy of vampires">help vampirism</a>.</p>
 
-<p>I setup my <span class="file">.hgrc</span> within the patches directory so that
-it points at the correct mercurial repository:</p>
+<p>Wheedling won&#8217;t lead to quicker, or more informed, advice and assistance; in
+all likelihood it will just discourage others from helping because
+they can see that rewarding this sort of behaviour has a longer-term
+deleterious impact on the health of the community.</p>
 
-<figure class='code'><figcaption><span>.hg/patches/.hg/hgrc </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'> <span class="c"># Mercurial config file</span>
-</span><span class='line'><span class="o">[</span>ui<span class="o">]</span>
-</span><span class='line'><span class="nv">username</span> <span class="o">=</span> jasonwryan &lt;jasonwryan@gmail.com&gt;
-</span><span class='line'><span class="nv">ssh</span> <span class="o">=</span> ssh -i ~/.ssh/bb -C
-</span><span class='line'><span class="o">[</span>paths<span class="o">]</span>
-</span><span class='line'><span class="nv">default</span> <span class="o">=</span> ssh://hg@bitbucket.com/jasonwryan/dwm-patchset
-</span></code></pre></div></figure>
+<p>Then there is the <strong>Vulcan</strong>. A curiosity more than an annoyance, these
+people seem to inhabit some sort of adolescent fantasy land where the Internet
+is a venue for them to revel in their almost superhero-like powers of technical
+<em>awesomeness</em>; said powers manifesting to others as a sort of benign
+cluelessness.</p>
 
+<p>Their posts are invariably brief and completely devoid of relevant detail to the
+point of cryptic because, “hey, we all <em>know</em> what this issue is,” and are
+littered with smilies and that stupid emoticon with the sunglasses. Rather than
+actually describing their problem, they want people to think that, by a process
+of <a href="http://en.memory-alpha.org/wiki/Vulcan_mind_meld" title="There is a Star Trek wiki?">mind-melding</a>,
+other “hackers” will intuit the subtle depth and intricacy of the issue and
+then type out a detailed step-by-step guide of how to solve it.</p>
 
-<p>Then I pull down my dwm patchset from the mercurial repository
-with <code>hg pull</code>:</p>
+<p>Finally, there is the <strong>conspiracist</strong>. These malcontents see every
+significant change in Arch as being part of a wider agenda to corrupt the purity
+of the UNIX® philosophy. They also tend to blame
+<a href="https://en.wikipedia.org/wiki/Lennart_Poettering" title="Lennarts wikipedia page">Lennart Poettering</a>
+for <em>everything</em>. These unfortunates are clearly already suffering such mental anguish
+trying to reconcile their obsessiveness about the past with a rolling
+release that they deserve our pity more than our contempt (but I am equally
+happy providing either)…</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulling from ssh://hg@bitbucket.com/jasonwryan/dwm-patchset
-</span><span class='line'>requesting all changes
-</span><span class='line'>adding changesets
-</span><span class='line'>adding manifests
-</span><span class='line'>adding file changes
-</span><span class='line'>added 6 changesets with 16 changes to 10 files
-</span><span class='line'><span class="o">(</span>run <span class="s1">&#39;hg update&#39;</span> to get a working copy<span class="o">)</span>
-</span></code></pre></div></figure>
-
-
-<p>After I update my local repo,<sup>1</sup> I can see the full patchset with
-<code>hg qseries</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setup.makefile
-</span><span class='line'>base.config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span><span class='line'>bstack
-</span><span class='line'>centurion.config
-</span></code></pre></div></figure>
-
-
-<p>Then, as I decribed in my previous post, I make the changes to
-<span class="file">config.def.h</span> that are specific to this
-machine:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew veles.config
-</span><span class='line'> <span class="c"># “hack, hack, hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qcommit -m <span class="s1">&#39;Adaptions for Veles&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>My patchset now has an additional patch in it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries
-</span><span class='line'>setup.makefile
-</span><span class='line'>base.config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span><span class='line'>bstack
-</span><span class='line'>centurion.config
-</span><span class='line'>veles.config
-</span></code></pre></div></figure>
-
-
-<p>This is where guards come in to play. If I wasn&#8217;t interested in sharing
-the patchset, it would just be a matter of deleting the patch for Centurion.
-However, what I want to do is direct MQ to ignore that specific patch
-when applying the queue. I do that by creating a negative guard and then
-activating it:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qguard centurion.config -- -block
-</span><span class='line'>hg qselect block
-</span><span class='line'>number of unguarded, unapplied patches has changed from 8 to 7
-</span></code></pre></div></figure>
-
-
-<p>That&#8217;s it! Adding a verbose flag to <code>hg qseries</code><sup>2</sup> will print out the
-patchset and the accompanying guard status:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries -v
-</span><span class='line'>0 U setup.makefile
-</span><span class='line'>1 U base.config.customizations
-</span><span class='line'>2 U statuscolours
-</span><span class='line'>3 U cycle
-</span><span class='line'>4 U push
-</span><span class='line'>5 U bstack
-</span><span class='line'>6 G centurion.config
-</span><span class='line'>7 U veles.config
-</span></code></pre></div></figure>
-
-
-<p>The real test, of course, is pushing the patchset onto the fresh
-dwm code:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpush -a
-</span><span class='line'>applying setup.makefile
-</span><span class='line'>applying base.config.customizations
-</span><span class='line'>applying statuscolours
-</span><span class='line'>applying cycle
-</span><span class='line'>applying push
-</span><span class='line'>applying bstack
-</span><span class='line'>skipping centurion.config - guarded by <span class="s1">&#39;-block&#39;</span>
-</span><span class='line'>applying veles.config
-</span><span class='line'>now at: veles.config
-</span></code></pre></div></figure>
-
-
-<p>How cool is that? One central patchset, applied conditionally depending
-upon the machine you are using at the time.</p>
+<p>As I said, these are fortunately just a subset and very much represent the
+minority of attitudes.  The vast majority tend to be aware that, at
+one time or another, <em>everyone</em> will need some help to solve a problem.
+Therefore it is best to approach it in a matter-of-fact way, using the practical
+guidance on asking questions on a technical forum, and with a degree of humility
+and a willingness to learn from the people who are prepared to share their
+knowledge and experience.</p>
 
 <h4>Notes</h4>
 
 <ol>
-<li>Any guards applied on other machines will be present in the newly
-pulled <span class="file">series</span> file: these conflicts will need
-to be manually merged…</li>
-<li>The options for all of the <code>hg</code> commands can be read with
-<code>hg -v help $command</code>. For those related to queues, just prepend
-a <code>q</code> to <code>$command</code>.</li>
-</ol>
-
-
-<p>Creative Commons image on Flickr by
-<a href="http://www.flickr.com/photos/alternatewords/4903560373/" title="On Guard on Flickr">Thorsten Becker</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/24/queues/">Using Mercurial Queues</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-24T19:18:00+12:00" pubdate data-updated="true">Jul 24<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="http://miromiro.com/Blog-images/queue.jpg" title="'Queue image on Flickr'" >
-Over the last week or so, I have finally gotten around to digging into the whole concept of
-using
-<a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
-to manage patches against an upstream project; in my case
-<a href="http://dwm.suckless.org" title="The truly suckless window manager…">dwm</a>.<sup>1</sup>
-Essentially, this mercurial extension helps you manage a stack of patches on
-top of a directory tree. This gives you quite a lot of fine-grained control
-over your patchset and assists immeasurably with automating the application of
-patches when the underlying codebase changes.</p>
-
-<p>After having played around with queues for the last couple of days, I am quite
-impressed: both the concept and the execution are simple and powerful. The concept
-of Mercurial Queues is best described in the Mercurial book: the aptly titled,
-<em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
-
-<blockquote><p>MQ&#8217;s marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don&#8217;t like a patch, you can drop it. If a patch isn&#8217;t quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote>
-
-
-<p>I followed Filippo Negroni&#8217;s excellent
-<a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
-to setup my own
-<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src" title="Patchset in Bitbucket repo">dwm patchset</a>
-based on
-<a href="http://hg.suckless.org/dwm" title="dwm hg repository">tip</a>, and the process was
-surprisingly straightforward; the only caveat being it is a good idea to plan
-quite carefully what changes you want in each particular patch. Once I had
-completed the setup, it got me thinking about the fact that the final install
-is done without <code>pacman</code>, just using <code>make install</code>. And, as a proof-of-concept
-more than anything else, I wondered whether this functionality could be used
-with <code>makepkg</code>.<sup>3</sup></p>
-
-<p>Turns out, as you might expect with Arch, it was not much of a job to set it
-up at all.</p>
-
-<p><strong>Note</strong>: this doesn&#8217;t mean I think it is a good idea; I was just interested
-to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
-like dwm, this is definitely a case of introducing a huge amount of complexity for
-no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
-
-<p>I have a
-<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD" title="If you must…">working PKGBUILD</a>
-that you can use if you want to follow along at home. Once you have downloaded
-it into <span class="file">dwm-hg/</span>, run <code>makepkg</code> to clone the dwm
-repository and build the binary.  Then you need to make sure that the mercurial
-queue extension is enabled, so your <span class="file">.hgrc</span> needs to
-contain:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
-</span><span class='line'>hgext.mq <span class="o">=</span>
-</span></code></pre></div></figure>
-
-
-<p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
-is <span class="file">dwm-hg/src/dwm</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
-</span></code></pre></div></figure>
-
-
-<p>The next step is to start applying the various patches that you want to comprise
-your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
-and three other patches:
-<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/statuscolours" title="Patch in mercurial queue">statuscolours</a>,
-<a href="http://https://bitbucket.org/jasonwryan/dwm-patchset/src/default/cycle" title="ditto">cycle</a>, and
-<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/push" title="etc…">push</a>.
-There are other patches in my repository, one of which patches the appropriate
-settings for an Arch build in the
-<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/setup.makefile" title="Arch settings for Makefiles">relevant makefiles</a>.
-This is taken care of by the PKGBUILD in this case.</p>
-
-<p>From here, it is very much as Filippo describes it in his tutorial: make
-some changes, add them to the queue and rinse and repeat:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
-</span><span class='line'> <span class="c"># “hack hack hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
-</span></code></pre></div></figure>
-
-
-<p>After committing each of your changes as a discrete patch, you can review the queue
-with <code>hg qseries</code>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qseries
-</span><span class='line'>config.customizations
-</span><span class='line'>statuscolours
-</span><span class='line'>cycle
-</span><span class='line'>push
-</span></code></pre></div></figure>
-
-
-<p>And <code>hg qapplied</code> will tell you which of the patches is currently
-applied in the working repository; at this stage the list should look
-the same as that in <code>hg qseries</code>. The next step is to remove all of the
-patches from the queue so that we have a clean repository:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpop -a
-</span><span class='line'>popping push
-</span><span class='line'>popping cycle
-</span><span class='line'>popping statuscolours
-</span><span class='line'>popping config.customizations
-</span><span class='line'>patch queue now empty
-</span></code></pre></div></figure>
-
-
-<p>Should you need to edit a patch, it is simply a matter of popping
-to that spot in the stack (you can do so by name or by index
-number, beginning at 0):</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
-</span><span class='line'>└─╼ hg qpop config.customizations
-</span><span class='line'>popping push
-</span><span class='line'>popping cycle
-</span><span class='line'>popping statuscolours
-</span><span class='line'>now at: config.customizations
-</span><span class='line'> <span class="c"># “hack hack hack…”</span>
-</span><span class='line'>hg qrefresh
-</span><span class='line'>hg qpush -a
-</span></code></pre></div></figure>
-
-
-<p>Once you are satisfied with the state of the stack, remove all of the
-patches to return to the original clean working directory and <code>cd</code> back
-to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> to
-rebuild the package and you should see the pushed patches as part of
-the output:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
-</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
-</span><span class='line'>applying config.customizations
-</span><span class='line'>applying statuscolours
-</span><span class='line'>applying cycle
-</span><span class='line'>applying push
-</span><span class='line'>now at: push
-</span><span class='line'>dwm build options:
-</span></code></pre></div></figure>
-
-
-<p>…and when you restart dwm, your customizations will be applied.
-When new changes are pushed to
-<a href="http://hg.suckless.org/dwm" title="dwm mercurial repo">the dwm repo</a>
-you can just <code>makepkg -fi</code>, and, if any of the patches fail due
-to changes in the underlying code, pop the stack to the failed
-patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
-
-<p>As I said at the beginning of this post, this isn&#8217;t a particularly smart way to
-use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
-better off just cloning dwm to your local repository, initializing a queue
-repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
-sudo make install</code>.</p>
-
-<p>If you have more than one machine, you can easily setup a repository for
-your patchset on
-<a href="https://bitbucket.org/" title="bitbucket free mercurial hosting">bitbucket</a>
-and host it there: then just pull the patchset queue
-from your other boxes and <code>hg qpush -a</code>. If you require a slightly
-different patchset for each box, you can use MQ to manage this
-process as well. This is where MQ really excels;
-I&#8217;ll cover this in more detail in my next post.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
-<li>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
-example of thorough, accessible documentation.</li>
-<li>In the case of something like dwm, this is really irrelevant, as there
-is a single tiny binary and a <code>man</code> page, so keeping track of these files on
-your system is not an issue at all.</li>
+<li>Where “carnage” should be understood as a minor PEBKAC epidemia…</li>
+<li>From shutting down mid-update (because a reboot fixes <em>everything</em>) to
+still using <code>consolekit</code>, <code>initscripts</code> and <code>grub-legacy</code>: all deprecated some time
+ago.</li>
+<li>I resisted linking to specific posts on the boards to provide actual examples,
+the more motivated among you will find them without difficulty.</li>
 </ol>
 
 
 <p>Flickr Creative Commons image by
-<a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
+<a href="http://www.flickr.com/photos/buddhist_fox/4795942625/">Buddhist Fox</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/25/greader/">Replacing Google Reader</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-25T09:10:00+12:00" pubdate data-updated="true">May 25<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/commafeed.png" title="'CommaFeed Logo'" >
+I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
+everyday since I first discovered the service over seven years ago. It is my
+primary source of news and information and the announcement that Google is, on July 1 this year,
+set to <a href="http://googlereader.blogspot.ca/2013/03/powering-down-google-reader.html" title="Official announcemet on Google Blog">shut down Reader</a>
+was something considerably more than just an inconvenience for me.</p>
+
+<p>Over the years, I had looked at other <acronym title="Rich Site Summary">RSS</acronym>
+readers but, for a variety of reasons, had invariably found that the speed,
+simplicity and flexibility that Google Reader offered meant that any dalliances
+were unsatisfactory and short-lived. I resigned myself to having to settle for
+an inferior alternative, rather than moving to a genuine replacement.</p>
+
+<p>On the recommendation of <a href="https://pinboard.in/" title="Not so-social bookmarking">@pinboard</a>,
+I first signed up for a premium account at
+<a href="https://www.newsblur.com/" title="NewsBlur website">NewsBlur</a>. It is open source and,
+given the recommendation from Maciej<sup>1</sup>, I was hopeful that it would
+bridge the gap. Newsblur is a good service (especially considering the rush of
+signups in the days after the Google announcement), but it has a couple of
+critical weaknesses for me: no search (yes, you read that correctly—there is <em>no
+way to search through your feeds</em>) and, less importantly but just as annoying,
+occasionally sluggish performance.</p>
+
+<p>After a couple of weeks using NewBlur I happily stumbled across
+<a href="https://www.commafeed.com/" title="CommaFeed homepage">CommaFeed</a>, a
+Reader clone that emulates the austere minimalism of Google Reader. Apart from
+the fact that it is open source, the other aspect that attracted me to it
+was the ability to run it on Red Hat&#8217;s Platform as a Service offering,
+<a href="http://www.openshift.com/" title="Red Hat PaaS">OpenShift</a>.</p>
+
+<p>The README on the <a href="https://github.com/Athou/commafeed" title="CommaFeed repo">Github repo</a>
+explains how to set it all up. Unfortunately, due to an
+<a href="https://github.com/Athou/commafeed/issues/91" title="OpenShift fails silently">open issue</a>,
+some manual intervention is required, but it is still a very
+straightforward and painless process to get your own instance of CommaFeed up
+and running.</p>
+
+<p>Creat an OpenShift account, log in and add the JBoss 6.0 application (or
+cartridge as it is called on OpenShift) and the MySQL cartridge. Once your setup
+is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
+under your <code>My Applications</code> tab, copy down your Git repo address, which will be
+of the form:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></div></figure>
+
+
+<p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
+server:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
+</span><span class='line'><span class="nb">cd </span>commafeed
+</span><span class='line'><span class="c"># add OpenShift as a repo</span>
+</span><span class='line'>git remote add openshift -f ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.etc…
+</span><span class='line'>git merge openshift/master -s recursive -X ours
+</span><span class='line'>git push openshift master
+</span></code></pre></div></figure>
+
+
+<p>This will then trigger a series of hooks that build the application and restart
+the server. If everything goes well you will see something like:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Total <span class="nb">time</span>: 3:18.195s
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Finished at: Mon May 20 03:21:37 EDT 2013
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Final Memory: 42M/185M
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: Running .openshift/action_hooks/build
+</span><span class='line'>remote: Running .openshift/action_hooks/deploy
+</span><span class='line'>remote: <span class="nv">hot_deploy_added</span><span class="o">=</span><span class="nb">false</span>
+</span><span class='line'>remote: MySQL already running
+</span><span class='line'>remote: Found 127.12.712.712:8080 listening port
+</span><span class='line'>remote: Done
+</span><span class='line'>remote: Running .openshift/action_hooks/post_deploy
+</span><span class='line'>To ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></div></figure>
+
+
+<p>You now have CommaFeed successfully running on OpenShift. After a couple of
+minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
+and you will be able to login to your CommaFeed instance. Updating your
+CommaFeed is as simple as pulling to your local repo, merging and
+then pushing to <code>openshift master</code>.</p>
+
+<p>Importing directly from Google Reader still seems broken (I was  getting
+errors from builds late this week), but if you import from an existing <code>.opml</code>
+or <code>.xml</code> file you will see CommaFeed in all it&#8217;s glory:</p>
+
+<p><img class="left" src="/images/post_images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
+
+<p>As you can see, it is remarkably similar to the Google Reader interface; a
+clean, minimalist design that is focussed—quite rightly—on the content. There
+is an option to load your own <code>.css</code> if you want to apply some additional
+styling, but for me the base style is just about perfect.</p>
+
+<p>More impressively, in the week or so that I have been using CommaFeed, the
+developer,
+<a href="https://github.com/Athou" title="Athou on Github">Athou</a>, has been committing
+enhancements and bug fixes several times <em>a day</em>; almost every night,
+I have pushed changes to OpenShift, reloaded my browser and found a
+smoother, enhanced feed reader with additional functionality; it is
+literally growing in leaps and bounds, and is a great reminder of the power
+of open source<sup>2</sup>.</p>
+
+<p>The performance of OpenShift has also been solid; feeds are delivered
+seemingly instantaneously and, apart from the slight lag after restarting
+the application, I haven&#8217;t experienced any issues whatsoever in terms
+of availability.</p>
+
+<p>There are still a couple of areas where CommaFeed can be improved. Most
+notably, there is an open feature request for a
+<a href="https://github.com/Athou/commafeed/issues/54" title="Github Issue">mobile friendly CSS</a>
+and this is badly needed, the site is pretty much unusable on my phone. With
+any luck, some enterprising Android developer will build a CommaFeed app (for
+which I would happily pay good money)…</p>
+
+<p>In any event, if you are looking for a Google Reader replacement, try
+running CommaFeed (either on your own server or one of Red Hat&#8217;s); for
+a project that is only a couple of months old, it has covered a
+tremendous amount of ground and will undoubtedly continue to grow
+and improve.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In conjunction with his great advice about not being a
+<a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/" title="Pinboard blog">free user</a>.</li>
+<li>The <a href="http://feeds-jwr.rhcloud.com/#/feeds/help" title="About and Help page">about page</a>
+has a donate button: if you want to support an application which I have no doubt
+will soon be even better than Google Reader, you might want to use it.</li>
+</ol>
+
 </div>
   
   
@@ -670,23 +529,23 @@ your system is not an issue at all.</li>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/01/20/udev/">Scripting with udev</a>
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a>
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a>
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/10/28/dismount/">Simple Unmounting</a>
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/15/awking/">Managing modules with Awk</a>
+        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
@@ -764,7 +623,7 @@ function showLastfmFeed(xml){
 </a></p>
 </section>
 <section>
-<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="http://dl.dropbox.com/u/261312/running-on-arch.png" /></a></p>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
 </section>
 
   
@@ -773,7 +632,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2014 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
