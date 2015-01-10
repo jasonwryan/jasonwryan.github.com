@@ -12,7 +12,7 @@ You can email me at this domain using **mail@**...
 #### GPG
 If you'd like to send me encrypted mail, you can use:
 
-* [my personal GPG Key](http://dl.dropbox.com/u/261312/jwr_public.key)
+* [my personal GPG Key](jwr.asc)
 * or [my work key](http://dl.dropbox.com/u/261312/catalyst.asc) for <jason@catalyst.net.nz>
 
 ## Other venues ##
