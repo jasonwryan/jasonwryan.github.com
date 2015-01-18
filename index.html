@@ -9,10 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I started using Tarsnap about
-three years ago
-and I have been nothing but impressed with it since. It is simple to use,
-extremely cost effective and &hellip;">
+  <meta name="description" content="Around this time last year, I posted about setting up a
+udev rule to run a script
+when I plugged my USB drive containing all of my music into one of &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +84,139 @@ extremely cost effective and &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-19T08:20:00+13:00" pubdate data-updated="true">Jan 19<span>th</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/jello.jpg" title="Creative Commons Image" >
+Around this time last year, I posted about setting up a
+<a href="http://jasonwryan.com/blog/2014/01/20/udev/" title="Post in Jan 14">udev rule to run a script</a>
+when I plugged my USB drive containing all of my music into one of my
+laptops; the script, a
+<a href="https://gist.github.com/jasonwryan/0df98a396af89bf82eb6" title="A gist…">couple of lines of bash</a>,
+removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
+repopulates the directory with an updated set. Almost. The one flaw that has
+been an irritant of variable intensity, depending on what I felt like listening
+at any given time, is that the symlinks aren&#8217;t written for directories that
+already exist on the target filesystem.</p>
+
+<p>In order that I am able to play some music if I forget the USB drive, each of
+the laptops has a subset of albums on it, depending on the size of their
+respective hard drives. If I add a new album to the USB drive, then that change won&#8217;t
+get written to either of the laptops when the drive is plugged in. Not entirely
+satisfactory. I had tinkered around with
+<a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
+having <a href="http://mywiki.wooledge.org/UsingFind" title="Wooledge again, because it is so great…"><code>find(1)</code></a>
+scan deeper into the tree, or even a loop to check for the presence of directories in an array…</p>
+
+<p>It just got too hard. My rudimentary scripting skills and the spectre of recursion,
+I am sorry to admit, conspired to undermine my resolve. So, rather than concede
+unconditional surrender, I
+<a href="http://unix.stackexchange.com/q/179397/6761%20'Question%20on%20Unix%20&amp;%20Linux%20SE">asked for help</a>.
+As is almost always the case in these situations, this proved to be a particularly
+wise move; the response I received was neither what I expected, nor was it anything I
+was even remotely familiar with: so in addition to an excellent solution (one far
+better suited to what I was trying to achieve), I learned something new.</p>
+
+<p>The first comment on my question proved singularly insightful.</p>
+
+<blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote>
+
+
+<p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
+
+<blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote>
+
+
+<p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
+<a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
+The genealogy of these mounts has been well covered in this 2010 LWN
+<a href="http://lwn.net/Articles/396020/" title="LWN.net">article by Valerie Aurora</a>. However, it is only
+in the current kernel, 3.18, that a union mount has been accepted into the kernel tree.</p>
+
+<p>After reading the
+<a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/overlayfs.txt" title="Kernel docs">documentation for overlayfs</a>, it seemed this was <em>exactly</em> what I
+was looking for. Essentially, an overlay mount would allow me to “merge&#8221;
+the underlying tree (the Music directory on the USB drive) with an “upper”
+one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
+seamlessly</em>.</p>
+
+<blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote>
+
+
+<p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
+trivial:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># union mount Music when Apollo plugged in</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">low</span><span class="o">=</span>/media/Apollo/Music
+</span><span class='line'><span class="nv">upp</span><span class="o">=</span>/home/jason/Music
+</span><span class='line'><span class="nv">wod</span><span class="o">=</span>/home/jason/.local/tmp
+</span><span class='line'><span class="nb">export </span><span class="nv">DISPLAY</span><span class="o">=</span>:0
+</span><span class='line'><span class="nb">export </span><span class="nv">XAUTHORITY</span><span class="o">=</span>/home/jason/.Xauthority
+</span><span class='line'>
+</span><span class='line'><span class="c"># overlayfs mount</span>
+</span><span class='line'>mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
+</span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>
+</span><span class='line'>mpc update &amp;&gt;/dev/null
+</span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 <span class="o">&amp;&amp;</span> <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>And now, when I plug in the USB drive, the contents of the drive are merged
+with my local music directory, and I can access whichever album I feel inclined
+to listen to. I can also copy files across to the local machines, knowing if I
+update the portable drive, it will no longer mean I have to forego listening to
+any newer additions by that artist in the future (without manually intervening,
+anyway).</p>
+
+<p>Overall, this is a lightweight union mount. There is neither a lot of functionality,
+nor complexity. As the
+<a href="https://github.com/torvalds/linux/commit/e9be9d5e76e34872f0c37d72e25bc27fe9e2c54c" title="Git commit">commit note</a>
+makes clear, this “simplifies the implementation and allows native performance
+in these cases.” Just note the warning about attempting to write to a mounted
+underlying filesystem, where the behaviour is described as “undefined”.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, <a href="https://flic.kr/p/5RRRXP">mulitlayered jello</a> by Frank Farm.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -416,132 +548,6 @@ shiny, new version of Syncthing. You can see the full version of the script in
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/09/06/reminder/">Simple Reminders</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-09-06T10:59:00+12:00" pubdate data-updated="true">Sep 6<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="/images/post_images/alarm_clock.jpg" title="Creative Commons image" >
-Due to a rather embarrassing episode in #archlinux a couple of weeks ago,
-where I naively shared one of the first bash scripts I had written without
-first looking back over it<sup>1</sup>, and had to subsequently endure what
-felt like the ritual
-<a href="http://www.dilbert.com/strips/comic/2013-02-24/" title="Classic Dilbert strip">code mocking</a>,
-but was in fact some helpful pointers as to how I could make the script suck
-less (a <em>lot</em> less) I have been going through those older scripts and applying
-the little knowledge that I have picked up in the interim; reappraising the
-usefulness of the scripts as I go.</p>
-
-<p>One that has proved to be of some utility for many years now is a simple
-wrapper script I wrote to help manage my finances. Like many useful scripts, it
-was written quickly and has been in constant use ever since; becoming almost
-transparent it is so ingrained in my workflow.</p>
-
-<p>The script allows me to manage the lag between when a company emails me an
-invoice and when the payment is actually due. I find that companies will
-typically email their invoices to me some weeks in advance, whereupon I will
-make a mental note and then, unsurprisingly, promptly forget all about it,
-thereby opening myself up for penalties for late payment.  It didn&#8217;t take me
-long (well, in my defence, a lot less time than it took for invoices to become
-digital) to realise that there was a better way™ - a script.</p>
-
-<p>The <a href="http://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html" title="POSIX spec">at command</a>
-is purpose built for running aperiodic commands at a later time (whereas
-<a href="http://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html" title="POSIX spec">cron</a>
-is for periodic tasks). So, using at(1), once I receive an invoice, I can set a
-reminder closer to the final payment window, thereby avoiding both the late
-payment penalty—and the loss of interest were I to pay it on receipt. I just
-needed a script to make it painless to achieve.</p>
-
-<p>The main function of the script is pretty self-explanatory:</p>
-
-<figure class='code'><figcaption><span>todo </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>aread<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Time of message? [HH:MM] &quot;</span> attime
-</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Date of message? [DD.MM.YY] &quot;</span> atdate
-</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Message body? &quot;</span> message
-</span><span class='line'>
-</span><span class='line'>  <span class="nv">timexp</span><span class="o">=</span><span class="s1">&#39;^[0-9]{2}:[0-9]{2}&#39;</span>
-</span><span class='line'>  <span class="nv">datexp</span><span class="o">=</span><span class="s1">&#39;^[0-9]{2}.[0-9]{2}.[0-9]{2}&#39;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$attime</span> <span class="o">=</span>~ <span class="nv">$timexp</span> <span class="o">&amp;&amp;</span> <span class="nv">$atdate</span> <span class="o">=</span>~ <span class="nv">$datexp</span> <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">     </span>at <span class="s2">&quot;$attime&quot;</span> <span class="s2">&quot;$atdate&quot;</span> <span class="s">&lt;&lt; EOF</span>
-</span><span class='line'><span class="s">     printf &#39;%s\n&#39; &quot;$message&quot; | mutt -s &quot;REMINDER&quot; jasonwryan@gmail.com</span>
-</span><span class='line'><span class="s">EOF</span>
-</span><span class='line'>  <span class="k">else</span>
-</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Incorrectly formatted values, bailing...&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>1
-</span><span class='line'>  <span class="k">fi</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></div></figure>
-
-
-<p>Now, an invoice arrives, I open it and fire up
-<a href="https://github.com/jasonwryan/dwm/blob/patches/patchset/Base_config_changes.patch#L85" title="patch on github">a scratchpad</a>, and follow the prompts. A couple of weeks later, the
-reminder email arrives and I login to my bank account and dispatch payment.
-You could, of course, have the script trigger some other form of notification,
-but an email works well for me.</p>
-
-<p>The rest of the script is similarly basic; just some options for listing and
-reading any queued jobs and some more rudimentary checking. The full script is
-in my
-<a href="https://bitbucket.org/jasonwryan/centurion/src/tip/Scripts/todo" title="todo script">bitbucket repo</a><sup>2</sup>.</p>
-
-<h3>Update 7/09/14</h3>
-
-<p>Not more than a couple of hours after posting this,
-<a href="http://bluewind.at/">Florian Pritz</a> pinged me in #archlinux with some great suggestions
-for improving the script. I particularly liked relying on date(1) handling the input format
-for the time and date values. He also suggested a
-<a href="http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html" title="GNU readline page">readline</a>
-wrapper called (appropriately enough)
-<a href="https://github.com/hanslub42/rlwrap" title="Github repo">rlwrap</a> and a <code>tmpfile</code> to better manage
-input validation. You can see his
-<a href="https://gist.github.com/jasonwryan/54fead5ad2b0c3b82621" title="Gist on github">full diff</a> of
-changes. In the end, I adopted the <code>date</code> suggestion but passed on <code>rlwrap</code>. Thanks for the
-great pointers, Florian.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>In the interests of full disclosure, the most egregious line was
-<code>myterm=$(echo $TERM)</code> which I would hope I copied blindly from somewhere
-else, but accept full responsibility for nonetheless.</li>
-<li>Don&#8217;t poke around too much in there, I still have quite a lot of cleaning up to do…</li>
-</ol>
-
-
-<p>Creative Commons image by <a href="https://www.flickr.com/photos/h_is_for_home/3494382794/">Adelle and Justin</a>
-on Flickr.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -557,6 +563,10 @@ on Flickr.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
@@ -570,10 +580,6 @@ on Flickr.</p>
     
       <li class="post">
         <a href="/blog/2014/08/23/asp/">Building from Source</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>

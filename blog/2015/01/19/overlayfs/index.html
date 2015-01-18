@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Playing with overlayfs - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="Around this time last year, I posted about setting up a
+udev rule to run a script
+when I plugged my USB drive containing all of my music into one of &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/2015/01/19/overlayfs">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Playing with overlayfs</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-19T08:20:00+13:00" pubdate data-updated="true">Jan 19<span>th</span>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="left" src="/images/post_images/jello.jpg" title="Creative Commons Image" >
+Around this time last year, I posted about setting up a
+<a href="http://jasonwryan.com/blog/2014/01/20/udev/" title="Post in Jan 14">udev rule to run a script</a>
+when I plugged my USB drive containing all of my music into one of my
+laptops; the script, a
+<a href="https://gist.github.com/jasonwryan/0df98a396af89bf82eb6" title="A gist…">couple of lines of bash</a>,
+removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
+repopulates the directory with an updated set. Almost. The one flaw that has
+been an irritant of variable intensity, depending on what I felt like listening
+at any given time, is that the symlinks aren&#8217;t written for directories that
+already exist on the target filesystem.</p>
+
+<p>In order that I am able to play some music if I forget the USB drive, each of
+the laptops has a subset of albums on it, depending on the size of their
+respective hard drives. If I add a new album to the USB drive, then that change won&#8217;t
+get written to either of the laptops when the drive is plugged in. Not entirely
+satisfactory. I had tinkered around with
+<a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
+having <a href="http://mywiki.wooledge.org/UsingFind" title="Wooledge again, because it is so great…"><code>find(1)</code></a>
+scan deeper into the tree, or even a loop to check for the presence of directories in an array…</p>
+
+<p>It just got too hard. My rudimentary scripting skills and the spectre of recursion,
+I am sorry to admit, conspired to undermine my resolve. So, rather than concede
+unconditional surrender, I
+<a href="http://unix.stackexchange.com/q/179397/6761%20'Question%20on%20Unix%20&amp;%20Linux%20SE">asked for help</a>.
+As is almost always the case in these situations, this proved to be a particularly
+wise move; the response I received was neither what I expected, nor was it anything I
+was even remotely familiar with: so in addition to an excellent solution (one far
+better suited to what I was trying to achieve), I learned something new.</p>
+
+<p>The first comment on my question proved singularly insightful.</p>
+
+<blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote>
+
+
+<p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
+
+<blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote>
+
+
+<p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
+<a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
+The genealogy of these mounts has been well covered in this 2010 LWN
+<a href="http://lwn.net/Articles/396020/" title="LWN.net">article by Valerie Aurora</a>. However, it is only
+in the current kernel, 3.18, that a union mount has been accepted into the kernel tree.</p>
+
+<p>After reading the
+<a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/overlayfs.txt" title="Kernel docs">documentation for overlayfs</a>, it seemed this was <em>exactly</em> what I
+was looking for. Essentially, an overlay mount would allow me to “merge&#8221;
+the underlying tree (the Music directory on the USB drive) with an “upper”
+one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
+seamlessly</em>.</p>
+
+<blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote>
+
+
+<p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
+trivial:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># union mount Music when Apollo plugged in</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">low</span><span class="o">=</span>/media/Apollo/Music
+</span><span class='line'><span class="nv">upp</span><span class="o">=</span>/home/jason/Music
+</span><span class='line'><span class="nv">wod</span><span class="o">=</span>/home/jason/.local/tmp
+</span><span class='line'><span class="nb">export </span><span class="nv">DISPLAY</span><span class="o">=</span>:0
+</span><span class='line'><span class="nb">export </span><span class="nv">XAUTHORITY</span><span class="o">=</span>/home/jason/.Xauthority
+</span><span class='line'>
+</span><span class='line'><span class="c"># overlayfs mount</span>
+</span><span class='line'>mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
+</span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>
+</span><span class='line'>mpc update &amp;&gt;/dev/null
+</span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 <span class="o">&amp;&amp;</span> <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>And now, when I plug in the USB drive, the contents of the drive are merged
+with my local music directory, and I can access whichever album I feel inclined
+to listen to. I can also copy files across to the local machines, knowing if I
+update the portable drive, it will no longer mean I have to forego listening to
+any newer additions by that artist in the future (without manually intervening,
+anyway).</p>
+
+<p>Overall, this is a lightweight union mount. There is neither a lot of functionality,
+nor complexity. As the
+<a href="https://github.com/torvalds/linux/commit/e9be9d5e76e34872f0c37d72e25bc27fe9e2c54c" title="Git commit">commit note</a>
+makes clear, this “simplifies the implementation and allows native performance
+in these cases.” Just note the warning about attempting to write to a mounted
+underlying filesystem, where the behaviour is described as “undefined”.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, <a href="https://flic.kr/p/5RRRXP">mulitlayered jello</a> by Frank Farm.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-01-19T08:20:00+13:00" pubdate data-updated="true">Jan 19<span>th</span>, 2015</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/kernel/'>kernel</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/10/25/snapclean/" title="Previous Post: Pruning Tarsnap Archives">&laquo; Pruning Tarsnap Archives</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.com/blog/2015/01/19/overlayfs/';
+        var disqus_url = 'http://jasonwryan.com/blog/2015/01/19/overlayfs/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

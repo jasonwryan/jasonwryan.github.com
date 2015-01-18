@@ -9,9 +9,8 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="It is now almost exactly two years since the AIF
-was put out to pasture.
-At the time, it caused a degree of consternation, inexplicably causing some &hellip;">
+  <meta name="description" content="Managing passwords is a necessary evil. You can choose a number of different strategies
+for keeping track of all of your login credentials; from &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +83,106 @@ At the time, it caused a degree of consternation, inexplicably causing some &hel
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/07/25/keepass/">CLI Password Manager</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-07-25T09:36:00+12:00" pubdate data-updated="true">Jul 25<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/lock.jpg" title="Creative Commons Lock image" >
+Managing passwords is a necessary evil. You can choose a number of different strategies
+for keeping track of all of your login credentials; from using the same password for every
+site which prioritises convenience over <strike>sanity</strike>security, through to
+creating heinously complex unique passwords for every service and then balancing the relief
+of knowing your risks of being hacked have been minimised with the very real fear you will
+only remember any of them for a short period—if at all—and will shortly be locked out of
+everything.</p>
+
+<p>Fortunately, this is a solved problem. There are a number of password managers available,
+both as desktop clients and cloud services. Personally, I find the idea of storing my
+passwords in the cloud has all the fascination of bungee jumping; it&#8217;s apparently
+<a href="http://en.wikipedia.org/wiki/Bungee_jumping#Safety_and_possible_injury" title="Wikipedia page">mostly safe</a>,
+but that can be cold comfort… The first application that I used, and used happily for
+quite a long time, was
+<a href="http://www.keepassx.org/" title="Homepage for KeePassX">KeePassX</a>.</p>
+
+<p>Around the end of 2012, I started experimenting with
+<a href="http://raymontag.github.io/keepassc/" title="Homepage">KeePassC</a>, a curses-based password manager
+that is completely compatible with KeePassX and has very little in the way of dependencies.
+I have been using it solidly on my home and work laptops ever since and, after recently
+uninstalling Skype on my desktop, have switched over to it completely<sup>1</sup>.
+I&#8217;m still not entirely clear why I haven&#8217;t written about it previously.</p>
+
+<p>Written in <a href="https://www.python.org/download/releases/3.0/" title="The New Python">Python 3</a>,
+KeePassC is entirely keyboard driven (naturally enough, you can use Vim keybinds) and
+integrates seamlessly with your browser and clipboard. My experience of the
+software over the last eighteen-odd months is that it has been incredibly stable and
+the developer, Karsten-Kai, has been exceptionally responsive and helpful in the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=148004" title="Arch BBS thread">forum thread</a>.</p>
+
+<p>Like most good software, there is not a lot to it. You pull up the login page, switch
+to a terminal and run <code>keepassc</code>, enter your passphrase (I use a
+<a href="http://www.yubico.com/products/yubikey-hardware/yubikey/" title="Yubico site">Yubikey</a>
+for this and it works wonderfully) and then search for your desired entry with
+<kbd>/</kbd> and then hit <kbd>c</kbd> to copy the password to your clipboard before
+switching back to the browser and you are in.</p>
+
+<p>KeePassC also has a set of simple command line options, run <code>keepassc -h</code> to see them.
+Additionally, you can set up KeePassC as
+<a href="http://raymontag.github.io/keepassc/server.html" title="Server documentation">a server</a>, I haven&#8217;t
+experimented with this as I sync my database. The only functionality that the X application
+offers in addition, as far as I can tell, is the auto-filling of your username and password
+fields bound to a keybind; undoubtedly, this is a very handy feature, but I haven&#8217;t
+really missed it at all.</p>
+
+<p>As I said, I store the database in a directory synced between all my machines<sup>2</sup> (using
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on the same">Syncthing</a>),
+so I have access to an up-to-date versions of my credentials everywhere. Well, almost
+everywhere. I don&#8217;t use the Android client because the mobile web is just such a
+fundamentally <a href="http://en.wikipedia.org/wiki/Mobile_security" title="Wikipedi page">insecure environment</a>
+and I see it as just being sensible, rather than any sort of inconvenience.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Skype and KeePassX were the only two applications I used that required
+<a href="http://qt-project.org/">Qt</a>, so once Skype was gone there was no reason to keep
+KeePassX installed.</li>
+<li>And, after a nasty scare very early on with a corrupt database, I back that file up
+daily.</li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -323,135 +422,6 @@ prostrate before.</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/06/14/writing/">Writing with Vim</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-06-14T09:30:00+12:00" pubdate data-updated="true">Jun 14<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="/images/post_images/vimbot.jpg" title="Practical Vim cover image" >
-<a href="http://www.vim.org/" title="Vim homepage">Vim</a> is not just an editor (and not in the way that
-<a href="http://www.gnu.org/software/emacs/" title="GNU Emacs page">Emacs</a> is more than
-<a href="http://en.uncyclopedia.co/wiki/Emacs" title="Uncyclopedia entry">just an editor</a>);
-it is for all intents and purposes a universal design pattern. The concept of using
-Vim&#8217;s modes and keybinds extends from
-<a href="http://jasonwryan.com/blog/2011/12/01/readline/" title="Post on readline">the shell</a>
-through to <a href="http://jasonwryan.com/blog/2009/12/28/changing-keybinds-in-vifm/" title="Post on Vifm">file managers</a>
-and <a href="http://jasonwryan.com/blog/2012/11/20/vimprobable/" title="Vimprobable screencast">browsers</a>.
-If you so choose (and I <em>do</em>), then a significant amount of your interactions with your
-operating system are mediated by Vim&#8217;s design principles. This is undeniably a
-good thing™ as it goes some way to standardising your command interface (whether at the
-command line or in a <acronym title="Graphic User Interface">GUI</acronym>).</p>
-
-<p>To that end, I have been spending more time working with Vim and trying to
-improve both my understanding of it&#8217;s capabilities, the environment in which I
-use it and how I can optimise both of those conditions to not necessarily just
-be more productive, but to minimise friction in my work flows.</p>
-
-<p>A large part of my job involves writing and, happily, so does a good deal of
-what constitutes my leisure activity. Whether it is emails written in
-<a href="http://jasonwryan.com/blog/categories/mutt/" title="Mutt category">Mutt</a>, these blog posts,
-longer documents written in <a href="http://www.latex-project.org/" title="LaTeX website">LaTeX</a>,
-or just <a href="http://jasonwryan.com/blog/2014/03/22/autotext/" title="Autotext function">roboposting to forums</a>;
-it is Vim all the way down. So I have spent some effort setting up Vim to make
-that experience as comfortable as possible.</p>
-
-<p><a href="/images/post_images/distract-full.png"><img class="right" src="/images/post_images/distract.png" title="Click for full-size" ></a>
-The first step, and one I took several years ago now, was to write custom
-<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/.vim/colors/" title="In Bitbucket repo">colour schemes</a>,
-depending on whether I am in the console or X. Several weeks ago, I came across a Vim plugin
-called <a href="https://github.com/chrisbra/DistractFree" title="Github repo">DistractFree</a>, which
-is described as “enabling a distraction free writing mode.” I had always been slightly
-(well, perhaps <em>scathingly</em> would be more accurate) cynical when reading about these sorts
-of things when they first started to appear, but—after playing with two or three of them—this
-one has really grown on me (see the screenshot on the right).</p>
-
-<p>I <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/.vim/colors/mirowriter.vim" title="Bitbucket repo">adapted my colour scheme</a> for it, added a line to my <span class="file">~/.vimrc</span>
-to enable it for specific document types, and have not looked back.</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'>autocmd <span class="nb">BufRead</span> *.markdown<span class="p">,</span>*tex <span class="k">call</span> DistractFree#DistractFreeToggle<span class="p">()</span> <span class="p">|</span> <span class="k">wincmd</span> <span class="k">w</span>
-</span></code></pre></div></figure>
-
-
-<p>The final piece was to set up spell checking  to work properly. As well as
-using English, I wanted to share my personal whitelist of words between all of
-my machines, so I define a location in <span class="file">~/.vimrc</span>
-as well:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">spelllang</span><span class="p">=</span>en_gb                               <span class="c">&quot; real English spelling</span>
-</span><span class='line'><span class="k">set</span> <span class="nb">dictionary</span><span class="p">+=</span><span class="sr">/usr/</span>share<span class="sr">/dict/</span>words             <span class="c">&quot; use standard dictionary</span>
-</span><span class='line'><span class="k">set</span> <span class="nb">spellfile</span><span class="p">=</span>$HOME<span class="sr">/Sync/</span><span class="k">vim</span><span class="sr">/spell/</span><span class="k">en</span>.utf<span class="m">-8</span>.add   <span class="c">&quot; my whitelist</span>
-</span></code></pre></div></figure>
-
-
-<p>Then it is just a matter of ensuring that misspelled or other flagged words (like those
-that should be capitalised) are highlighted correctly. This required a couple of lines in
-my colour schemes:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="c">&quot; Spell checking  --- </span>
-</span><span class='line'><span class="k">if</span> <span class="k">version</span> <span class="p">&gt;=</span> <span class="m">700</span>
-</span><span class='line'>  <span class="k">hi</span> clear SpellBad
-</span><span class='line'>  <span class="k">hi</span> clear SpellCap
-</span><span class='line'>  <span class="k">hi</span> clear SpellRare
-</span><span class='line'>  <span class="k">hi</span> clear SpellLocal
-</span><span class='line'>  <span class="k">hi</span> SpellBad    ctermfg<span class="p">=</span><span class="m">9</span>
-</span><span class='line'>  <span class="k">hi</span> SpellCap    ctermfg<span class="p">=</span><span class="m">3</span>    cterm<span class="p">=</span><span class="nb">underline</span>
-</span><span class='line'>  <span class="k">hi</span> SpellRare   ctermfg<span class="p">=</span><span class="m">13</span>   cterm<span class="p">=</span><span class="nb">underline</span>
-</span><span class='line'>  <span class="k">hi</span> SpellLocal  cterm<span class="p">=</span>None
-</span><span class='line'><span class="k">endif</span>
-</span></code></pre></div></figure>
-
-
-<p>The most significant change, however, was that I recently purchased a hard
-copy of Drew Neill&#8217;s excellent
-<a href="http://pragprog.com/book/dnvim/practical-vim" title="Just buy it, now…">Practical Vim</a>. I
-have long been a fan of Drew&#8217;s excellent podcast, <a href="http://vimcasts.org/" title="Drew's site">Vimcasts</a>,
-and the book is every bit as impressive as the collection of those episodes,
-and more.  Reading it on my commute over the last week, I have been constantly
-amazed at the power and flexibility of this editor and Drew&#8217;s ability to clearly
-articulate how to work economically and efficiently with it.  I&#8217;m convinced
-this is an invaluable resource for anyone that currently uses Vim or wants to
-learn.</p>
-
-<p>I expect that, over time, as I become more proficient with Vim, that I will adapt
-some of these settings, but for the time being they feel very comfortable and allow
-me to focus on hacking words together (and to do the occasional bit of
-<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/" title="Scripts in Bitbucket">scripting on the side</a>)…</p>
-
-<h4>Notes</h4>
-
-<p>Image is from the cover of Drew Neill&#8217;s
-<a href="http://pragprog.com/book/dnvim/practical-vim">Practical Vim</a>, by
-<a href="http://en.wikipedia.org/wiki/Ben_Cormack">Ben Cormack</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -469,6 +439,10 @@ me to focus on hacking words together (and to do the occasional bit of
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
@@ -482,10 +456,6 @@ me to focus on hacking words together (and to do the occasional bit of
     
       <li class="post">
         <a href="/blog/2014/08/23/asp/">Building from Source</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>

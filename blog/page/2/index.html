@@ -9,8 +9,8 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="One of the real strengths of Arch is its ability to be customised. Not just in
-terms of the packages that you choose to install, but how those &hellip;">
+  <meta name="description" content="Due to a rather embarrassing episode in #archlinux a couple of weeks ago,
+where I naively shared one of the first bash scripts I had written without &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +83,132 @@ terms of the packages that you choose to install, but how those &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/09/06/reminder/">Simple Reminders</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-09-06T10:59:00+12:00" pubdate data-updated="true">Sep 6<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/alarm_clock.jpg" title="Creative Commons image" >
+Due to a rather embarrassing episode in #archlinux a couple of weeks ago,
+where I naively shared one of the first bash scripts I had written without
+first looking back over it<sup>1</sup>, and had to subsequently endure what
+felt like the ritual
+<a href="http://www.dilbert.com/strips/comic/2013-02-24/" title="Classic Dilbert strip">code mocking</a>,
+but was in fact some helpful pointers as to how I could make the script suck
+less (a <em>lot</em> less) I have been going through those older scripts and applying
+the little knowledge that I have picked up in the interim; reappraising the
+usefulness of the scripts as I go.</p>
+
+<p>One that has proved to be of some utility for many years now is a simple
+wrapper script I wrote to help manage my finances. Like many useful scripts, it
+was written quickly and has been in constant use ever since; becoming almost
+transparent it is so ingrained in my workflow.</p>
+
+<p>The script allows me to manage the lag between when a company emails me an
+invoice and when the payment is actually due. I find that companies will
+typically email their invoices to me some weeks in advance, whereupon I will
+make a mental note and then, unsurprisingly, promptly forget all about it,
+thereby opening myself up for penalties for late payment.  It didn&#8217;t take me
+long (well, in my defence, a lot less time than it took for invoices to become
+digital) to realise that there was a better way™ - a script.</p>
+
+<p>The <a href="http://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html" title="POSIX spec">at command</a>
+is purpose built for running aperiodic commands at a later time (whereas
+<a href="http://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html" title="POSIX spec">cron</a>
+is for periodic tasks). So, using at(1), once I receive an invoice, I can set a
+reminder closer to the final payment window, thereby avoiding both the late
+payment penalty—and the loss of interest were I to pay it on receipt. I just
+needed a script to make it painless to achieve.</p>
+
+<p>The main function of the script is pretty self-explanatory:</p>
+
+<figure class='code'><figcaption><span>todo </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>aread<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Time of message? [HH:MM] &quot;</span> attime
+</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Date of message? [DD.MM.YY] &quot;</span> atdate
+</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Message body? &quot;</span> message
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">timexp</span><span class="o">=</span><span class="s1">&#39;^[0-9]{2}:[0-9]{2}&#39;</span>
+</span><span class='line'>  <span class="nv">datexp</span><span class="o">=</span><span class="s1">&#39;^[0-9]{2}.[0-9]{2}.[0-9]{2}&#39;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$attime</span> <span class="o">=</span>~ <span class="nv">$timexp</span> <span class="o">&amp;&amp;</span> <span class="nv">$atdate</span> <span class="o">=</span>~ <span class="nv">$datexp</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">     </span>at <span class="s2">&quot;$attime&quot;</span> <span class="s2">&quot;$atdate&quot;</span> <span class="s">&lt;&lt; EOF</span>
+</span><span class='line'><span class="s">     printf &#39;%s\n&#39; &quot;$message&quot; | mutt -s &quot;REMINDER&quot; jasonwryan@gmail.com</span>
+</span><span class='line'><span class="s">EOF</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Incorrectly formatted values, bailing...&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>1
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>Now, an invoice arrives, I open it and fire up
+<a href="https://github.com/jasonwryan/dwm/blob/patches/patchset/Base_config_changes.patch#L85" title="patch on github">a scratchpad</a>, and follow the prompts. A couple of weeks later, the
+reminder email arrives and I login to my bank account and dispatch payment.
+You could, of course, have the script trigger some other form of notification,
+but an email works well for me.</p>
+
+<p>The rest of the script is similarly basic; just some options for listing and
+reading any queued jobs and some more rudimentary checking. The full script is
+in my
+<a href="https://bitbucket.org/jasonwryan/centurion/src/tip/Scripts/todo" title="todo script">bitbucket repo</a><sup>2</sup>.</p>
+
+<h3>Update 7/09/14</h3>
+
+<p>Not more than a couple of hours after posting this,
+<a href="http://bluewind.at/">Florian Pritz</a> pinged me in #archlinux with some great suggestions
+for improving the script. I particularly liked relying on date(1) handling the input format
+for the time and date values. He also suggested a
+<a href="http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html" title="GNU readline page">readline</a>
+wrapper called (appropriately enough)
+<a href="https://github.com/hanslub42/rlwrap" title="Github repo">rlwrap</a> and a <code>tmpfile</code> to better manage
+input validation. You can see his
+<a href="https://gist.github.com/jasonwryan/54fead5ad2b0c3b82621" title="Gist on github">full diff</a> of
+changes. In the end, I adopted the <code>date</code> suggestion but passed on <code>rlwrap</code>. Thanks for the
+great pointers, Florian.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In the interests of full disclosure, the most egregious line was
+<code>myterm=$(echo $TERM)</code> which I would hope I copied blindly from somewhere
+else, but accept full responsibility for nonetheless.</li>
+<li>Don&#8217;t poke around too much in there, I still have quite a lot of cleaning up to do…</li>
+</ol>
+
+
+<p>Creative Commons image by <a href="https://www.flickr.com/photos/h_is_for_home/3494382794/">Adelle and Justin</a>
+on Flickr.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -346,106 +472,6 @@ your key…</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/25/keepass/">CLI Password Manager</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-07-25T09:36:00+12:00" pubdate data-updated="true">Jul 25<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="/images/post_images/lock.jpg" title="Creative Commons Lock image" >
-Managing passwords is a necessary evil. You can choose a number of different strategies
-for keeping track of all of your login credentials; from using the same password for every
-site which prioritises convenience over <strike>sanity</strike>security, through to
-creating heinously complex unique passwords for every service and then balancing the relief
-of knowing your risks of being hacked have been minimised with the very real fear you will
-only remember any of them for a short period—if at all—and will shortly be locked out of
-everything.</p>
-
-<p>Fortunately, this is a solved problem. There are a number of password managers available,
-both as desktop clients and cloud services. Personally, I find the idea of storing my
-passwords in the cloud has all the fascination of bungee jumping; it&#8217;s apparently
-<a href="http://en.wikipedia.org/wiki/Bungee_jumping#Safety_and_possible_injury" title="Wikipedia page">mostly safe</a>,
-but that can be cold comfort… The first application that I used, and used happily for
-quite a long time, was
-<a href="http://www.keepassx.org/" title="Homepage for KeePassX">KeePassX</a>.</p>
-
-<p>Around the end of 2012, I started experimenting with
-<a href="http://raymontag.github.io/keepassc/" title="Homepage">KeePassC</a>, a curses-based password manager
-that is completely compatible with KeePassX and has very little in the way of dependencies.
-I have been using it solidly on my home and work laptops ever since and, after recently
-uninstalling Skype on my desktop, have switched over to it completely<sup>1</sup>.
-I&#8217;m still not entirely clear why I haven&#8217;t written about it previously.</p>
-
-<p>Written in <a href="https://www.python.org/download/releases/3.0/" title="The New Python">Python 3</a>,
-KeePassC is entirely keyboard driven (naturally enough, you can use Vim keybinds) and
-integrates seamlessly with your browser and clipboard. My experience of the
-software over the last eighteen-odd months is that it has been incredibly stable and
-the developer, Karsten-Kai, has been exceptionally responsive and helpful in the
-<a href="https://bbs.archlinux.org/viewtopic.php?id=148004" title="Arch BBS thread">forum thread</a>.</p>
-
-<p>Like most good software, there is not a lot to it. You pull up the login page, switch
-to a terminal and run <code>keepassc</code>, enter your passphrase (I use a
-<a href="http://www.yubico.com/products/yubikey-hardware/yubikey/" title="Yubico site">Yubikey</a>
-for this and it works wonderfully) and then search for your desired entry with
-<kbd>/</kbd> and then hit <kbd>c</kbd> to copy the password to your clipboard before
-switching back to the browser and you are in.</p>
-
-<p>KeePassC also has a set of simple command line options, run <code>keepassc -h</code> to see them.
-Additionally, you can set up KeePassC as
-<a href="http://raymontag.github.io/keepassc/server.html" title="Server documentation">a server</a>, I haven&#8217;t
-experimented with this as I sync my database. The only functionality that the X application
-offers in addition, as far as I can tell, is the auto-filling of your username and password
-fields bound to a keybind; undoubtedly, this is a very handy feature, but I haven&#8217;t
-really missed it at all.</p>
-
-<p>As I said, I store the database in a directory synced between all my machines<sup>2</sup> (using
-<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on the same">Syncthing</a>),
-so I have access to an up-to-date versions of my credentials everywhere. Well, almost
-everywhere. I don&#8217;t use the Android client because the mobile web is just such a
-fundamentally <a href="http://en.wikipedia.org/wiki/Mobile_security" title="Wikipedi page">insecure environment</a>
-and I see it as just being sensible, rather than any sort of inconvenience.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>Skype and KeePassX were the only two applications I used that required
-<a href="http://qt-project.org/">Qt</a>, so once Skype was gone there was no reason to keep
-KeePassX installed.</li>
-<li>And, after a nasty scare very early on with a corrupt database, I back that file up
-daily.</li>
-</ol>
-
-
-<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -463,6 +489,10 @@ daily.</li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
@@ -476,10 +506,6 @@ daily.</li>
     
       <li class="post">
         <a href="/blog/2014/08/23/asp/">Building from Source</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>

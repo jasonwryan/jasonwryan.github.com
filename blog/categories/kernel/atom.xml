@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: kernel | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.com/blog/categories/kernel/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-19T08:20:47+13:00</updated>
+  <id>http://jasonwryan.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Playing with overlayfs]]></title>
+    <link href="http://jasonwryan.com/blog/2015/01/19/overlayfs/"/>
+    <updated>2015-01-19T08:20:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2015/01/19/overlayfs</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/jello.jpg" title="Creative Commons Image" >
+Around this time last year, I posted about setting up a
+<a href="http://jasonwryan.com/blog/2014/01/20/udev/" title="Post in Jan 14">udev rule to run a script</a>
+when I plugged my USB drive containing all of my music into one of my
+laptops; the script, a
+<a href="https://gist.github.com/jasonwryan/0df98a396af89bf82eb6" title="A gist…">couple of lines of bash</a>,
+removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
+repopulates the directory with an updated set. Almost. The one flaw that has
+been an irritant of variable intensity, depending on what I felt like listening
+at any given time, is that the symlinks aren't written for directories that
+already exist on the target filesystem.</p>
+
+<p>In order that I am able to play some music if I forget the USB drive, each of
+the laptops has a subset of albums on it, depending on the size of their
+respective hard drives. If I add a new album to the USB drive, then that change won't
+get written to either of the laptops when the drive is plugged in. Not entirely
+satisfactory. I had tinkered around with
+<a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
+having <a href="http://mywiki.wooledge.org/UsingFind" title="Wooledge again, because it is so great…"><code>find(1)</code></a>
+scan deeper into the tree, or even a loop to check for the presence of directories in an array…</p>
+
+<p>It just got too hard. My rudimentary scripting skills and the spectre of recursion,
+I am sorry to admit, conspired to undermine my resolve. So, rather than concede
+unconditional surrender, I
+<a href="http://unix.stackexchange.com/q/179397/6761%20'Question%20on%20Unix%20&amp;%20Linux%20SE">asked for help</a>.
+As is almost always the case in these situations, this proved to be a particularly
+wise move; the response I received was neither what I expected, nor was it anything I
+was even remotely familiar with: so in addition to an excellent solution (one far
+better suited to what I was trying to achieve), I learned something new.</p>
+
+<p>The first comment on my question proved singularly insightful.</p>
+
+<p><blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&amp;L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote></p>
+
+<p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
+
+<p><blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote></p>
+
+<p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
+<a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
+The genealogy of these mounts has been well covered in this 2010 LWN
+<a href="http://lwn.net/Articles/396020/" title="LWN.net">article by Valerie Aurora</a>. However, it is only
+in the current kernel, 3.18, that a union mount has been accepted into the kernel tree.</p>
+
+<p>After reading the
+<a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/overlayfs.txt" title="Kernel docs">documentation for overlayfs</a>, it seemed this was <em>exactly</em> what I
+was looking for. Essentially, an overlay mount would allow me to “merge"
+the underlying tree (the Music directory on the USB drive) with an “upper”
+one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
+seamlessly</em>.</p>
+
+<p><blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote></p>
+
+<p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
+trivial:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;union mount Music when Apollo plugged in&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;low<span class="o">=</span>/media/Apollo/Music
+</span><span class='line'><span class="nv">upp</span><span class="o">=</span>/home/jason/Music
+</span><span class='line'><span class="nv">wod</span><span class="o">=</span>/home/jason/.local/tmp
+</span><span class='line'><span class="nb">export </span><span class="nv">DISPLAY</span><span class="o">=</span>:0
+</span><span class='line'><span class="nb">export </span><span class="nv">XAUTHORITY</span><span class="o">=</span>/home/jason/.Xauthority&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;overlayfs mount&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
+</span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mpc update &amp;amp;&gt;/dev/null
+</span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 &amp;amp;&amp;amp; <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>And now, when I plug in the USB drive, the contents of the drive are merged
+with my local music directory, and I can access whichever album I feel inclined
+to listen to. I can also copy files across to the local machines, knowing if I
+update the portable drive, it will no longer mean I have to forego listening to
+any newer additions by that artist in the future (without manually intervening,
+anyway).</p>
+
+<p>Overall, this is a lightweight union mount. There is neither a lot of functionality,
+nor complexity. As the
+<a href="https://github.com/torvalds/linux/commit/e9be9d5e76e34872f0c37d72e25bc27fe9e2c54c" title="Git commit">commit note</a>
+makes clear, this “simplifies the implementation and allows native performance
+in these cases.” Just note the warning about attempting to write to a mounted
+underlying filesystem, where the behaviour is described as “undefined”.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, <a href="https://flic.kr/p/5RRRXP">mulitlayered jello</a> by Frank Farm.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Managing modules with Awk]]></title>
+    <link href="http://jasonwryan.com/blog/2013/09/15/awking/"/>
+    <updated>2013-09-15T09:23:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2013/09/15/awking</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/awk.jpg" title="The Great Auk" >
+This is an addendum to my two previous posts on
+<a href="http://jasonwryan.com/blog/2013/08/03/kernels/" title="The first post">compiling kernels</a>
+and <a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="The folow up">automating the process</a>.
+In the first of those posts I wrote about a wonderful tool to track the modules
+necessary for building a custom kernel with <code>make localmodconfig</code>, graysky's
+<a href="https://github.com/graysky2/modprobed_db" title="Github repo">modprobed_db</a>. A simple
+bash script, <code>modprobed_db</code> allows you to build up an array of modules and—as
+the name suggests—<code>modprobe</code> all of them prior to compilation.</p>
+
+<p>I forked it on github and started to play around with the script (mostly because
+I am slightly <acronym title="Obsessive Compulsive Disorder">OCD</acronym> about
+constructions
+<a href="https://github.com/graysky2/modprobed_db/blob/master/common/modprobed_db#L62" title="awk pipeline">like this</a>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>modprobed_db lines 62-63 </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/modules | awk <span class="s1">&#39;{print $1}&#39;</span> | sort -k 1,1 | <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;grep -Ev <span class="s2">&quot;$(echo ${IGNORE[*]} | sed -e &#39;s/^/^(/&#39; -e &#39;s/ /|/g&#39; -e &#39;s/$/)$/&#39;)&quot;</span> <span class="se">\</span>
+</span><span class='line'>&amp;gt;/tmp/.inmem
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></div></figure></notextile></div></p>
+
+<p><a href="https://github.com/jasonwryan/modprobed_db/blob/jwr/common/modprobed_db" title="My branch">After hacking a while</a>,
+I started to realize that the venerable UNIX programme
+<a href="http://www.gnu.org/software/gawk/manual/" title="gawk manual on GNU site">Awk</a>
+ would, in many ways, be a better tool for this job. Essentially, we want to
+ manage three lists: the modules in <span class="file">/proc/modules</span>, a
+ list of modules to ignore, and the master list of all modules required prior to
+ compilation. This seems perfectly suited to Awk.</p>
+
+<p> So, in the interests of learning Awk, I decided to rewrite the required
+ functionality (or, more correctly, the subset that I required) in this
+ language. This wasn't a straightforward task for me. I got stuck a couple of
+ times and, as I work in a building full of
+ <a href="http://catalyst.net.nz" title="Catalyst website">neckbeards</a>, I thought I could ask
+ for a couple of pointers. To my surprise, no-one I asked seemed interested in
+ Awk. Typical responses were along the lines of “just use Perl.”</p>
+
+<p> Aside from not knowing any
+ <a href="http://www.perl.org/" title="Perl homepage">Perl</a>, and being unlikely to learn any
+ in the immediate future, I was bemused by the notion that none of these skilled
+ developers rated Awk as a language worth knowing. One of the #awk FAQ's
+ specifically addresses this:
+ <a href="http://awk.freeshell.org/Frequently_Asked_Questions#toc14" title="#awk FAQs">Why would anyone still use awk instead of perl?</a>
+ The quote by Tom Christiansen is worth repeating here:</p>
+
+<p> <blockquote><p>Awk is a venerable, powerful, elegant, and simple tool that everyone should know. Perl is a superset and child of awk, but has much more power that comes at expense of sacrificing some of that simplicity.</p></blockquote></p>
+
+<p>In a happy coincidence, this
+<a href="http://unix.stackexchange.com/questions/90489/compare-two-files-with-first-column-and-remove-duplicate-row-from-2nd-file-in-sh/90490#90490" title="Comparing two files">question on Unix &amp; Linux SE</a>
+showed up just as I was completing my script and it neatly illustrates (to my
+unututored eye, anyway) an example of a typical situation where Awk's strengths
+make it a better approach than Perl.</p>
+
+<p>In any event, my rewriting of <code>modprobed_db</code> in Awk<sup>1</sup> resulted in this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>awkmodules </span></figcaption>
+ <div class="highlight"><pre><code class='awk'><span class='line'><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;!</span><span class="err">/usr/bin/awk -f&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">script</span> <span class="nx">to</span> <span class="nx">manage</span> <span class="nx">modules</span> <span class="k">for</span> <span class="nx">kernel</span> <span class="nx">builds</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">BEGIN</span> <span class="p">{</span> <span class="nx">dbfile</span> <span class="o">=</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="kd">function</span> <span class="nx">red</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="kr">printf</span> <span class="s2">&quot;\033[1;31m&quot;</span> <span class="nx">s</span> <span class="s2">&quot;\033[0m &quot;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">read</span> <span class="o">in</span> <span class="nx">the</span> <span class="nx">array</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nb">FILENAME</span> <span class="o">!=</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">modlist</span><span class="p">[</span><span class="o">$</span><span class="mi">1</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="kr">next</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">check</span> <span class="k">for</span> <span class="nx">ignored</span> <span class="nx">modules</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;!</span><span class="nx">modlist</span><span class="p">[</span><span class="o">$</span><span class="mi">1</span><span class="p">]</span><span class="o">++</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span> <span class="o">&gt;&gt;</span> <span class="nx">dbfile</span>
+</span><span class='line'>  <span class="kr">close</span><span class="p">(</span><span class="nx">dbfile</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">{</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">modprobe</span> <span class="nx">modules</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="k">if</span> <span class="p">(</span><span class="nx">p</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">modload</span><span class="o">=</span><span class="s2">&quot;sudo modprobe -a $(&amp;lt;&quot;</span><span class="nx">dbfile</span><span class="s2">&quot;)&quot;</span>
+</span><span class='line'>  <span class="kr">system</span><span class="p">(</span><span class="nx">modload</span><span class="p">)</span>
+</span><span class='line'>  <span class="kr">close</span><span class="p">(</span><span class="nx">modload</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">{</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">update</span> <span class="nx">module</span> <span class="nx">count</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="k">if</span> <span class="p">(</span> <span class="kr">getline</span> <span class="err">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="nx">dbfile</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">count</span><span class="o">++</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">END</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">print</span> <span class="nx">red</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="s2">&quot;modules listed.&quot;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">vim</span><span class="err">:</span><span class="nx">set</span> <span class="nx">ts</span><span class="o">=</span><span class="mi">2</span> <span class="nx">sts</span><span class="o">=</span><span class="mi">2</span> <span class="nx">sw</span><span class="o">=</span><span class="mi">2</span> <span class="nx">et</span><span class="err">:</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Just prior to compiling a kernel, I can invoke this script with (the admittedly
+rather ungainly line):</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>awkmodules <span class="nv">p</span><span class="o">=</span>1 .config/kmod_db/ignored .config/kmod_db/modules_db /proc/modules
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>It does work, but I don't claim that it is either idiomatic or attractive. The
+use of <code>getline</code> to update the module count strikes me as especially kludgy but
+I haven't been able to think of a more correct way to handle it.</p>
+
+<p>Incidentally, the gawk manual<sup>2</sup>,
+<a href="http://www.gnu.org/software/gawk/manual/" title="GNU goodness">Gawk: Effective AWK Programming</a>
+has only just been updated<sup>3</sup> so Awk is, unlike it's homonym, clearly
+alive and well.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In my <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/awkmodules">bitbucket repo</a>.</li>
+<li>The number of variants of <code>awk</code> is as much a delight as it is perplexing…</li>
+<li>May, 2013</li>
+</ol>
+
+
+<p>Public Domain image of the Great Auk by John James Audubon, from his book
+<a href="https://en.wikipedia.org/wiki/File:PinguinusImpennus.jpg">The Birds of America</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Automating Kernel Builds]]></title>
+    <link href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/"/>
+    <updated>2013-08-24T10:30:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2013/08/24/automating-kernels</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/robot.jpg" title="I Robot" >
+I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/blog/2013/08/03/kernels/" title="Check it if you haven't...">compiling a custom kernel</a>
+using <a href="https://github.com/graysky2/modprobed_db" title="graysky's github repo">modprobed_db</a>
+and at the time I talked about automating the process, essentially so that every
+kernel update, be it the standard Arch kernel or the stripped down custom one,
+would be a simple, streamlined process. I updated that post with
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr/PKGBUILD" title="bitbucket repo">a PKGBUILD</a>,
+which was the first step. This completes that process.</p>
+
+<p>There is not a lot to it. A
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/new_kernel" title="bitbucket repo">short bash wrapper</a>
+that sets up the required files, updates the aforementioned PKGBUILD and then
+triggers <code>makepkg</code> (providing nothing else fails). All it requires is that you
+have
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr%20'You%20guessed%20it%E2%80%A6">the necessary files</a>
+in a separate directory for the script to reference and
+you are set. If anything does go wrong with the new kernel, you still have the
+previous working custom kernel <code>.tar.xz</code> you can reinstall, or you can of course
+just boot into the vanilla Arch kernel.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>new_kernel </span></figcaption>
+ <div class="highlight"><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;install new kernel&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;vers<span class="o">=</span><span class="nv">$1</span>
+</span><span class='line'><span class="nv">cyn</span><span class="o">=</span><span class="s1">$&#39;\e[1;36m&#39;</span>
+</span><span class='line'><span class="nv">ylw</span><span class="o">=</span><span class="s1">$&#39;\e[1;33m&#39;</span>
+</span><span class='line'><span class="nv">red</span><span class="o">=</span><span class="s1">$&#39;\e[1;31m&#39;</span>
+</span><span class='line'><span class="nv">end</span><span class="o">=</span><span class="s1">$&#39;\e[0m&#39;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$# </span>!<span class="o">=</span> 1 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Usage: &quot;</span><span class="k">${</span><span class="nv">0</span><span class="p">##*/</span><span class="k">}</span><span class="s2">&quot; 3.10.8&quot;</span>
+</span><span class='line'><span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;back up last dir&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;cd ~/Build
+</span><span class='line'>rm -rf linux-jwr/<span class="o">{</span>pkg,src<span class="o">}</span>
+</span><span class='line'>mv linux-jwr linux-<span class="k">${</span><span class="nv">vers</span><span class="p">%.&lt;em&gt;</span><span class="k">}</span>.<span class="k">$((${</span><span class="nv">vers</span><span class="p">##&lt;/em&gt;.</span><span class="k">}</span> <span class="o">-</span> <span class="m">1</span><span class="k">))</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;set up clean files&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;cp -r kernel_files linux-jwr &amp;amp;&amp;amp; <span class="nb">cd</span> <span class="s2">&quot;$_&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;sed -i <span class="s2">&quot;s:pkgver=[0-9].*:pkgver=${vers}:&quot;</span> PKGBUILD
+</span><span class='line'><span class="nv">newvers</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="o">=</span> <span class="s1">&#39;/pkgver=/ {print $2}&#39;</span> PKGBUILD<span class="k">)</span>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Package version updated to ${ylw}$newvers${end}&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${cyn}Updating checksums…${end}&quot;</span>
+</span><span class='line'>/usr/bin/updpkgsums&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${cyn}Starting build…${end}&quot;</span>
+</span><span class='line'>/usr/bin/time /usr/bin/makepkg -i
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;else&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${red}Checksum failed${end}&quot;</span>
+</span><span class='line'><span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span><span class='line'><span class="nb">cd</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>That's all there is to it. I see in my RSS reader that a new stable kernel is
+available, open a terminal and run the script specifying which version to use,
+for example, <code>new_kernel 3.10.9</code>.  Approximately 10 minutes later, my new kernel
+is compiled and installed and I can reboot into it. Simple.</p>
+
+<p>Undoubtedly, there is probably a cleaner way to do this, but it has worked well
+for the last couple of kernels. It will probably also require tweaking for the
+next series, but until that time, I am quite happy with it.</p>
+
+<h4>Notes</h4>
+
+<p>Flickr creative commons image
+<a href="http://www.flickr.com/photos/fringley/4244586360/">My robot</a> by fringley.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Compiling Kernels]]></title>
+    <link href="http://jasonwryan.com/blog/2013/08/03/kernels/"/>
+    <updated>2013-08-03T09:24:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2013/08/03/kernels</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/kernel.jpg" title="Kernels on Flickr" >
+While chasing edits on the Arch Wiki a couple of weeks ago, I stumbled upon
+this page:
+<a href="https://wiki.archlinux.org/index.php/Kernels/Compilation/Traditional" title="What it says on the tin…">Kernels/Compilation/Traditional</a>;
+fortuitously, it transpired. For it piqued my interest sufficiently for me to
+try my hand at compiling my own kernel, and—after half a dozen attempts at
+getting it right—I had no sooner switched to my custom built kernel as the
+default in my boot manager when 3.10.2 landed in [testing] and would not boot.
+<a href="https://bbs.archlinux.org/viewtopic.php?id=167090" title="Forum thread">At all</a>.</p>
+
+<p>I still have no idea why 3.10.2 would do nothing other than fail silently, but
+the convenience of having another kernel to switch to without needing a rescue
+image or any other panicked interventions immediately won me over. In the years
+that I have used Arch, this was my
+<a href="http://jasonwryan.com/blog/2012/07/19/breakage/" title="Post on the Myth of Breakage">first near brush</a>
+with an unbootable system<sup>1</sup> and the small amount of effort required to
+mitigate this risk with a custom or alternate kernel seems a smart investment to
+me at this point.<sup>2</sup></p>
+
+<p>The documentation on the wiki is both comprehensive and easy to follow. The
+lessons I learned between kernels zero and three or four were mostly around
+ensuring the correct modules were configured into the build. One surefire way to
+make this a tedious and laborious process, should you be so inclined, is to
+blindly enable and disable settings in <code>menuconfig</code>.</p>
+
+<p>Around about the time of the fourth failed build (well, the builds were working
+but the kernel wasn't booting or was booting with missing functionality), I
+decided to switch approaches and go down the <code>localmodconfig</code> route. This, for
+someone with my limited experience with this aspect of GNU/Linux, was in
+retrospect a decision I should have made sooner.</p>
+
+<p>First, I started with <span class="file">streamline_config.pl</span>, a helpful
+script that allows you to create a <span class="file">.config</span> file
+containing only those modules necessary to your currently running
+kernel<sup>3</sup>. This yielded a booting kernel at the first attempt. It turns
+out, though, that you still need to ensure that <em>all</em> of the modules you are
+going to need, <em>at any time in the future</em>, are loaded. I missed a couple.</p>
+
+<p>Then I discovered this script by graysky,
+<a href="https://github.com/graysky2/modprobed_db" title="In graysky2's github repo">modprobed_db</a>.
+For a newbie to kernel compilation, this is simply invaluable. It allows you to
+create a record of your used modules over time, compare it with those that are
+currently loaded and then—right before you <code>make localmodconfig</code>—load the
+remaining necessary ones. Foolproof kernel compilation. Just like that.
+Brilliant. And, naturally enough, it is in
+<a href="https://aur.archlinux.org/packages/modprobed_db/" title="AUR package">the AUR</a>.</p>
+
+<p>Run the script, create your <span class="file">.conf</span> file and database in
+<span class="file">$XDG_CONFIG_HOME/modprobed_db{,.conf}</span> and then either
+call it from a <code>cron</code> job or, if you are impatient like me, spend a frenzied 10
+minutes plugging ALL the devices you own into your machine, and you are good to
+go. Running <code>sudo modprobed_db recall</code> will load all of the required modules,
+you generate your kernel <span class="file">.config</span>, check it to make
+sure it is complete and then run <code>make</code>.</p>
+
+<p>On my laptop, I have 115 modules activated for a build, 10 of which need to be
+recalled prior to creating the <span class="file">.config</span>. When I was
+trying to debug 3.10.2, I compiled the vanilla Arch kernel using
+<a href="https://wiki.archlinux.org/index.php/Abs" title="Wiki page on Arch Build System">ABS</a>
+and it took almost exactly 60 minutes using all four threads on my i5. Building
+my own kernel is done and installed in under 10.</p>
+
+<p>I susbcribed to the <a href="https://www.kernel.org/feeds/kdist.xml" title="Kernel updates">RSS feed for kernel versions</a>
+and now, whenever a new stable kernel is posted, I <code>wget</code> it, compile it and
+boot from it. As new Arch versions appear in the repositories, they are updated
+by <code>pacman</code> and happily coexist on my <span class="file">/boot</span>; thereby
+ensuring that the likelihood of me being unable to boot my machine (other than
+through
+<acronym title="Problem Exists Between Keyboard And Chair">PEBKAC</acronym>)
+has hopefully been staved off for another five years.</p>
+
+<p>The next step would be to write a script that completely automates the process…</p>
+
+<h3>Update 7/8/13</h3>
+
+<p>After poring over PKGBUILDS in the AUR, principally graysky's
+<a href="https://aur.archlinux.org/packages/linux-ck/" title="Arch User Repository">linux-ck PKGBUILD</a>,
+and the official
+<a href="https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/linux" title="Arch SVN Package Repo">ABS PKGBUILD</a>,
+I decide to write my own to automate the above. It works well enough for me, but
+hasn't been tested more widely. You will need to ensure that you have an
+up-to-date <code>modprobed_db</code> database with all of your required modules listed and
+that you have configured <code>sudoers</code> to have this run from the PKGBUILD.</p>
+
+<p>The PKGBUILD and the attendant files are in my
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr" title="PKGBUILD and related files">bitbucket repo</a>:
+let me know if there are any issues with this approach.</p>
+
+<p><em>See also the follow up post on automating this process:</em> <a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="Newer post">Automating Kernel Builds</a></p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Other than those occassions for which I bear complete responsibility…</li>
+<li>There are, of course, other benefits such as the self-satisfied glow of geek
+accomplishment.</li>
+<li>This is located in <span class="file">scripts/kconfig/</span>.</li>
+</ol>
+
+
+<p>Creative Commons image of kernels on Flickr by
+<a href="http://www.flickr.com/photos/the_girl/56432091">Nadia Prigoda-Lee</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

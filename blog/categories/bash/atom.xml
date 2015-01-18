@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bash | jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/blog/categories/bash/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-09T23:27:29+13:00</updated>
+  <updated>2015-01-19T08:20:47+13:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,115 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Playing with overlayfs]]></title>
+    <link href="http://jasonwryan.com/blog/2015/01/19/overlayfs/"/>
+    <updated>2015-01-19T08:20:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2015/01/19/overlayfs</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/jello.jpg" title="Creative Commons Image" >
+Around this time last year, I posted about setting up a
+<a href="http://jasonwryan.com/blog/2014/01/20/udev/" title="Post in Jan 14">udev rule to run a script</a>
+when I plugged my USB drive containing all of my music into one of my
+laptops; the script, a
+<a href="https://gist.github.com/jasonwryan/0df98a396af89bf82eb6" title="A gist…">couple of lines of bash</a>,
+removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
+repopulates the directory with an updated set. Almost. The one flaw that has
+been an irritant of variable intensity, depending on what I felt like listening
+at any given time, is that the symlinks aren't written for directories that
+already exist on the target filesystem.</p>
+
+<p>In order that I am able to play some music if I forget the USB drive, each of
+the laptops has a subset of albums on it, depending on the size of their
+respective hard drives. If I add a new album to the USB drive, then that change won't
+get written to either of the laptops when the drive is plugged in. Not entirely
+satisfactory. I had tinkered around with
+<a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
+having <a href="http://mywiki.wooledge.org/UsingFind" title="Wooledge again, because it is so great…"><code>find(1)</code></a>
+scan deeper into the tree, or even a loop to check for the presence of directories in an array…</p>
+
+<p>It just got too hard. My rudimentary scripting skills and the spectre of recursion,
+I am sorry to admit, conspired to undermine my resolve. So, rather than concede
+unconditional surrender, I
+<a href="http://unix.stackexchange.com/q/179397/6761%20'Question%20on%20Unix%20&amp;%20Linux%20SE">asked for help</a>.
+As is almost always the case in these situations, this proved to be a particularly
+wise move; the response I received was neither what I expected, nor was it anything I
+was even remotely familiar with: so in addition to an excellent solution (one far
+better suited to what I was trying to achieve), I learned something new.</p>
+
+<p>The first comment on my question proved singularly insightful.</p>
+
+<p><blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&amp;L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote></p>
+
+<p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
+
+<p><blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote></p>
+
+<p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
+<a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
+The genealogy of these mounts has been well covered in this 2010 LWN
+<a href="http://lwn.net/Articles/396020/" title="LWN.net">article by Valerie Aurora</a>. However, it is only
+in the current kernel, 3.18, that a union mount has been accepted into the kernel tree.</p>
+
+<p>After reading the
+<a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/overlayfs.txt" title="Kernel docs">documentation for overlayfs</a>, it seemed this was <em>exactly</em> what I
+was looking for. Essentially, an overlay mount would allow me to “merge"
+the underlying tree (the Music directory on the USB drive) with an “upper”
+one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
+seamlessly</em>.</p>
+
+<p><blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote></p>
+
+<p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
+trivial:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;union mount Music when Apollo plugged in&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;low<span class="o">=</span>/media/Apollo/Music
+</span><span class='line'><span class="nv">upp</span><span class="o">=</span>/home/jason/Music
+</span><span class='line'><span class="nv">wod</span><span class="o">=</span>/home/jason/.local/tmp
+</span><span class='line'><span class="nb">export </span><span class="nv">DISPLAY</span><span class="o">=</span>:0
+</span><span class='line'><span class="nb">export </span><span class="nv">XAUTHORITY</span><span class="o">=</span>/home/jason/.Xauthority&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;overlayfs mount&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
+</span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mpc update &amp;amp;&gt;/dev/null
+</span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 &amp;amp;&amp;amp; <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>And now, when I plug in the USB drive, the contents of the drive are merged
+with my local music directory, and I can access whichever album I feel inclined
+to listen to. I can also copy files across to the local machines, knowing if I
+update the portable drive, it will no longer mean I have to forego listening to
+any newer additions by that artist in the future (without manually intervening,
+anyway).</p>
+
+<p>Overall, this is a lightweight union mount. There is neither a lot of functionality,
+nor complexity. As the
+<a href="https://github.com/torvalds/linux/commit/e9be9d5e76e34872f0c37d72e25bc27fe9e2c54c" title="Git commit">commit note</a>
+makes clear, this “simplifies the implementation and allows native performance
+in these cases.” Just note the warning about attempting to write to a mounted
+underlying filesystem, where the behaviour is described as “undefined”.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, <a href="https://flic.kr/p/5RRRXP">mulitlayered jello</a> by Frank Farm.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Pruning Tarsnap Archives]]></title>
@@ -510,105 +619,6 @@ boilerplate.</p>
 
 <p>Flickr Creative Commons image
 <a href="http://www.flickr.com/photos/shrapnel1/134674051/">how many cans</a> by shrapnel1</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Scripting with udev]]></title>
-    <link href="http://jasonwryan.com/blog/2014/01/20/udev/"/>
-    <updated>2014-01-20T10:02:00+13:00</updated>
-    <id>http://jasonwryan.com/blog/2014/01/20/udev</id>
-    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/usb.jpg" title="Creative Commons image" >
-One of the most satisfying aspects of running free and open source software is
-the ability to be able to continually tinker with your setup, limited only by
-your imagination and ability.  The more you do tinker, the smaller the gap
-between the former and the latter, as each small project inevitably leads you
-into a deeper understanding of various aspects of your system<sup>1</sup> and
-how you can customize that system to suit your exact requirements.</p>
-
-<p>Over the last couple of days, I have been playing with
-<a href="http://en.wikipedia.org/wiki/Udev" title="Wikipedia page">udev</a>, the kernel device
-manager, as I was attempting to run a script once a specific
-<acronym title="Universal Serial Bus">USB</acronym> drive was plugged in. It
-turns out, as is so often the case, that udev is only <em>part</em> of the
-picture…</p>
-
-<p>As both my work and personal laptops have relatively small
-<acronym title="Solid State Drives">SSDs</acronym>, I carry around
-<a href="http://alpha.libre.fm/user/jasonwryan/" title="Libre.fm profile">my music</a>
-on a 1TB external drive. As the drive only contains <span class="file">.flac</span>
-files, I wanted to automate the process of <code>rsync</code>’ing music from my desktop to
-the drive and, for the laptops, repopulating the symlinks to
-<span class="file">~/Music/</span> when the drive was plugged in.</p>
-
-<p>My first thought was a rule in <span class="file">/etc/udev/rules.d/</span>,
-using <code>RUN+=</code>. There are any number of blog posts espousing this approach and,
-as I quickly discovered, they are <em>all</em> wrong. The problem with using this key is
-that, as the <code>man</code> page makes clear, it is not designed for long running
-programs:</p>
-
-<p><blockquote><p>This can only be used for very short-running foreground tasks. Running an event process for a long period of time may block all further events for this or a dependent device.</p></p><p><p>Starting daemons or other long running processes is not appropriate for udev; the forked processes, detached or not, will be unconditionally killed after the event handling has finished.</p><footer><strong>udev manual</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/udev.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote></p>
-
-<p>The problem, as it manifest for me, was the drive would be blocked from
-mounting until <em>after</em> the script had run, meaning <code>rsync</code> or my symlinks would
-have no target.  There are various “workarounds” on the web for this, including
-using <em>two</em> scripts, one to trigger the other<sup>2</sup>. Even for me, this
-seemed like a
-<a href="http://en.wikipedia.org/wiki/Pyrrhic_victory" title="Wikipedia entry">Pyrrhic victory</a>.</p>
-
-<p>The correct way to do this, as I found once I uncovered
-<a href="https://bbs.archlinux.org/viewtopic.php?id=149419" title="Arch BBS">this thread</a>
-on the Arch boards where WonderWoofy and 65kid helpfully pieced it together, is
-to use <code>SYSTEMD_WANTS</code>.  As it is described in the manual:</p>
-
-<p><blockquote><p>THE UDEV DATABASE<br/>  The settings of device units may either be configured via unit files, or directly from the udev database (which is recommended). The following udev properties are understood by systemd:</p></p><p><p>  SYSTEMD_WANTS=<br/>  Adds dependencies of type Wants from this unit to all listed units. This may be used to activate arbitrary units, when a specific device becomes available. Note that this and the other tags are not taken into account unless the device is tagged with the "systemd" string in the udev database, because otherwise the device is not exposed as systemd unit.</p><footer><strong>man systemd.device</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/systemd.device.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote></p>
-
-<p>So, I edited <span class="file">/etc/udev/rules.d/90-usb-music.rules</span> to
-remove the <code>RUN+=</code> key, using a systemd service file instead, like so<sup>3</sup>:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SUBSYSTEMS</span><span class="o">==</span><span class="s2">&quot;usb&quot;</span>, ATTRS<span class="o">{</span>idProduct<span class="o">}==</span><span class="s2">&quot;1905&quot;</span>, <span class="nv">ACTION</span><span class="o">==</span><span class="s2">&quot;add&quot;</span>, ENV<span class="o">{</span>SYSTEMD_WANTS<span class="o">}==</span><span class="s2">&quot;upmusic.service&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>And then wrote the corresponding service file to have systemd hand off to the bash script:</p>
-
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>/usr/lib/systemd/system/upmusic.service </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>Unit<span class="o">]</span>
-</span><span class='line'><span class="nv">Description</span><span class="o">=</span>Update music links from Apollo
-</span><span class='line'><span class="nv">Requires</span><span class="o">=</span>media-Apollo.mount
-</span><span class='line'><span class="nv">After</span><span class="o">=</span>media-Apollo.mount&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">[</span>Service<span class="o">]</span>
-</span><span class='line'><span class="nv">ExecStart</span><span class="o">=</span>/home/jason/Scripts/upmusic&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">[</span>Install<span class="o">]</span>
-</span><span class='line'><span class="nv">WantedBy</span><span class="o">=</span>media-Apollo.mount
-</span></code></pre></div></figure></notextile></div></p>
-
-<p>As I mentioned in my post on my
-<a href="http://jasonwryan.com/blog/2013/10/28/dismount/" title="Unmount USB drives…">simple unmounting script</a>,
-I use a naming convention for all my USB drives. In this case, my music is stored on Apollo, and
-it is auto-mounted with
-<a href="https://wiki.archlinux.org/index.php/Udiskie" title="Arch wiki page">udiskie</a>. In the
-service file, systemd uses a hyphen instead of a forward slash, so the correct
-designation is <code>media-Apollo.mount</code>.</p>
-
-<p>Then it is just a matter of enabling the service with <code>systemctl enable upmusic</code> and,
-whenever Apollo is plugged in to either my desktop of laptop, the appropriate
-script will run and either update the files on Apollo or the symlinks on one of the
-laptops.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>This shouldn't be taken as any sort of claim of expertise or deep
-understanding of this, or any other, part of my system. See below.</li>
-<li>Which is why you should never trust anything written by bloggers…</li>
-<li>The definitive reference for udev rules remains
-<a href="http://www.reactivated.net/writing_udev_rules.html" title="Daniel Drake's page">Writing udev rules</a></li>
-</ol>
-
-
-<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/jacobgarcia/2550146/" title="Licensed CC by Jacob Garcia">Jacob Garcia</a>.</p>
 ]]></content>
   </entry>
   

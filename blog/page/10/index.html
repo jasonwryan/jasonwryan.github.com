@@ -9,10 +9,9 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I posted a couple of weeks ago about
-Building Vim and how,
-using ABS
-and makepkg it is possible to customize packages in the repositories to suit &hellip;">
+  <meta name="description" content="I have been using Google Reader
+everyday since I first discovered the service over seven years ago. It is my
+primary source of news and information &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +84,175 @@ and makepkg it is possible to customize packages in the repositories to suit &he
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/25/greader/">Replacing Google Reader</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-25T09:10:00+12:00" pubdate data-updated="true">May 25<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/commafeed.png" title="'CommaFeed Logo'" >
+I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
+everyday since I first discovered the service over seven years ago. It is my
+primary source of news and information and the announcement that Google is, on July 1 this year,
+set to <a href="http://googlereader.blogspot.ca/2013/03/powering-down-google-reader.html" title="Official announcemet on Google Blog">shut down Reader</a>
+was something considerably more than just an inconvenience for me.</p>
+
+<p>Over the years, I had looked at other <acronym title="Rich Site Summary">RSS</acronym>
+readers but, for a variety of reasons, had invariably found that the speed,
+simplicity and flexibility that Google Reader offered meant that any dalliances
+were unsatisfactory and short-lived. I resigned myself to having to settle for
+an inferior alternative, rather than moving to a genuine replacement.</p>
+
+<p>On the recommendation of <a href="https://pinboard.in/" title="Not so-social bookmarking">@pinboard</a>,
+I first signed up for a premium account at
+<a href="https://www.newsblur.com/" title="NewsBlur website">NewsBlur</a>. It is open source and,
+given the recommendation from Maciej<sup>1</sup>, I was hopeful that it would
+bridge the gap. Newsblur is a good service (especially considering the rush of
+signups in the days after the Google announcement), but it has a couple of
+critical weaknesses for me: no search (yes, you read that correctly—there is <em>no
+way to search through your feeds</em>) and, less importantly but just as annoying,
+occasionally sluggish performance.</p>
+
+<p>After a couple of weeks using NewBlur I happily stumbled across
+<a href="https://www.commafeed.com/" title="CommaFeed homepage">CommaFeed</a>, a
+Reader clone that emulates the austere minimalism of Google Reader. Apart from
+the fact that it is open source, the other aspect that attracted me to it
+was the ability to run it on Red Hat&#8217;s Platform as a Service offering,
+<a href="http://www.openshift.com/" title="Red Hat PaaS">OpenShift</a>.</p>
+
+<p>The README on the <a href="https://github.com/Athou/commafeed" title="CommaFeed repo">Github repo</a>
+explains how to set it all up. Unfortunately, due to an
+<a href="https://github.com/Athou/commafeed/issues/91" title="OpenShift fails silently">open issue</a>,
+some manual intervention is required, but it is still a very
+straightforward and painless process to get your own instance of CommaFeed up
+and running.</p>
+
+<p>Creat an OpenShift account, log in and add the JBoss 6.0 application (or
+cartridge as it is called on OpenShift) and the MySQL cartridge. Once your setup
+is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
+under your <code>My Applications</code> tab, copy down your Git repo address, which will be
+of the form:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></div></figure>
+
+
+<p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
+server:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
+</span><span class='line'><span class="nb">cd </span>commafeed
+</span><span class='line'><span class="c"># add OpenShift as a repo</span>
+</span><span class='line'>git remote add openshift -f ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.etc…
+</span><span class='line'>git merge openshift/master -s recursive -X ours
+</span><span class='line'>git push openshift master
+</span></code></pre></div></figure>
+
+
+<p>This will then trigger a series of hooks that build the application and restart
+the server. If everything goes well you will see something like:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Total <span class="nb">time</span>: 3:18.195s
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Finished at: Mon May 20 03:21:37 EDT 2013
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Final Memory: 42M/185M
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: Running .openshift/action_hooks/build
+</span><span class='line'>remote: Running .openshift/action_hooks/deploy
+</span><span class='line'>remote: <span class="nv">hot_deploy_added</span><span class="o">=</span><span class="nb">false</span>
+</span><span class='line'>remote: MySQL already running
+</span><span class='line'>remote: Found 127.12.712.712:8080 listening port
+</span><span class='line'>remote: Done
+</span><span class='line'>remote: Running .openshift/action_hooks/post_deploy
+</span><span class='line'>To ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></div></figure>
+
+
+<p>You now have CommaFeed successfully running on OpenShift. After a couple of
+minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
+and you will be able to login to your CommaFeed instance. Updating your
+CommaFeed is as simple as pulling to your local repo, merging and
+then pushing to <code>openshift master</code>.</p>
+
+<p>Importing directly from Google Reader still seems broken (I was  getting
+errors from builds late this week), but if you import from an existing <code>.opml</code>
+or <code>.xml</code> file you will see CommaFeed in all it&#8217;s glory:</p>
+
+<p><img class="left" src="/images/post_images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
+
+<p>As you can see, it is remarkably similar to the Google Reader interface; a
+clean, minimalist design that is focussed—quite rightly—on the content. There
+is an option to load your own <code>.css</code> if you want to apply some additional
+styling, but for me the base style is just about perfect.</p>
+
+<p>More impressively, in the week or so that I have been using CommaFeed, the
+developer,
+<a href="https://github.com/Athou" title="Athou on Github">Athou</a>, has been committing
+enhancements and bug fixes several times <em>a day</em>; almost every night,
+I have pushed changes to OpenShift, reloaded my browser and found a
+smoother, enhanced feed reader with additional functionality; it is
+literally growing in leaps and bounds, and is a great reminder of the power
+of open source<sup>2</sup>.</p>
+
+<p>The performance of OpenShift has also been solid; feeds are delivered
+seemingly instantaneously and, apart from the slight lag after restarting
+the application, I haven&#8217;t experienced any issues whatsoever in terms
+of availability.</p>
+
+<p>There are still a couple of areas where CommaFeed can be improved. Most
+notably, there is an open feature request for a
+<a href="https://github.com/Athou/commafeed/issues/54" title="Github Issue">mobile friendly CSS</a>
+and this is badly needed, the site is pretty much unusable on my phone. With
+any luck, some enterprising Android developer will build a CommaFeed app (for
+which I would happily pay good money)…</p>
+
+<p>In any event, if you are looking for a Google Reader replacement, try
+running CommaFeed (either on your own server or one of Red Hat&#8217;s); for
+a project that is only a couple of months old, it has covered a
+tremendous amount of ground and will undoubtedly continue to grow
+and improve.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In conjunction with his great advice about not being a
+<a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/" title="Pinboard blog">free user</a>.</li>
+<li>The <a href="http://feeds-jwr.rhcloud.com/#/feeds/help" title="About and Help page">about page</a>
+has a donate button: if you want to support an application which I have no doubt
+will soon be even better than Google Reader, you might want to use it.</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -434,124 +602,6 @@ download <code>cower</code> or <code>meat</code>, they are both <em>much</em> be
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/03/29/vim/">Building Vim</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-03-29T10:17:00+13:00" pubdate data-updated="true">Mar 29<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="/images/post_images/vim-logo.png" title="'Vim logo'" >
-Apart from a brief, but nevertheless instructive, flirtation with
-<a href="http://www.gnu.org/software/emacs/" title="Emacs homepage">Emacs</a><sup>1</sup> I have
-been a consistent <a href="http://www.vim.org/" title="Vim home">Vim</a> user over the last three
-or four years. Like most Vim users, I have made some progress over that time
-in spite of Vim&#8217;s
-<a href="http://stackoverflow.com/a/1815372/712613" title="SO answer on Vim">notorious learning curve</a>
-and have now reached the point where, belatedly, I think I understand it just enough
-to really grasp how little I actually know. It&#8217;s a milestone that speaks more to
-necessity than gratification, granted.</p>
-
-<p>In any event, as part of confronting my Vim shortcomings (no
-<a href="http://www.vimgolf.com/" title="Vim golf…">golfing</a> for me), I have been able
-to land on the features of Vim that I require to be enabled so that I am moderately
-productive (in my own, admittedly cloistered, working environment). That, you will
-probably not be surprised to read, does not include needing support for Arabic or
-Farsi to be built into Vim.</p>
-
-<p>Part of the beauty of Vim is that, unlike it&#8217;s
-<a href="http://en.wikipedia.org/wiki/Editor_war#Humor" title="…lacking a decent editor">operating system counterpart Emacs</a>,
-you can choose how much functionality you wish to enable at compile-time. You do want
-support for Farsi? Then the <code>--with-features=big</code> option is what you are looking for.
-If, on the other hand, you just want the barest of bones, editor-wise, you could opt
-for the austere minimalism that is <code>--with-features=tiny</code> and find yourself happily
-transported back in time to
-<a href="https://en.wikipedia.org/wiki/Vi" title="Wikipedia page on Vi">Bill Joy&#8217;s lab in 1976</a>.</p>
-
-<p>You can peruse all of the various features available to Vim using the <code>:help version</code>
-command.<sup>2</sup> There is also
-<a href="http://www.drchip.org/astronaut/vim/vimfeat.html" title="Vim's versions and features">this table</a>
-where the various features are listed against the respective feature flags (tiny, small,
-normal, big &amp; huge).</p>
-
-<p>After this
-<a href="https://bugs.archlinux.org/task/33019" title="Add +profile to gvim on Flyspray">bug report</a>
-late last year, the default Arch PKGBUILD ships with <code>huge</code> as the feature set. Make
-what you will of that, but for my purposes it is overkill. With all the magic of
-<a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Wiki page on ABS">ABS</a> and
-<code>makepkg</code>, however, it is simple enough to build a Vim package that is tailored
-to exactly your requirements. For me, that means this set of simplified <code>configure</code>
-options:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>  ./configure <span class="se">\</span>
-</span><span class='line'>    --prefix<span class="o">=</span>/usr <span class="se">\</span>
-</span><span class='line'>    --localstatedir<span class="o">=</span>/var/lib/vim <span class="se">\</span>
-</span><span class='line'>    --with-features<span class="o">=</span>normal <span class="se">\</span>
-</span><span class='line'>    --with-compiledby<span class="o">=</span>Arch:jwr <span class="se">\</span>
-</span><span class='line'>    --with-x<span class="o">=</span>yes <span class="se">\</span>
-</span><span class='line'>    --enable-acl <span class="se">\</span>
-</span><span class='line'>    --disable-gui <span class="se">\</span>
-</span><span class='line'>    --disable-signs <span class="se">\</span>
-</span><span class='line'>    --disable-netbeans <span class="se">\</span>
-</span><span class='line'>    --enable-multibyte
-</span></code></pre></div></figure>
-
-
-<p>With these options, I have the minimum amount of functionality I comfortably
-require (including the ability to access the system clipboard, <code>--with-x=yes</code>)
-but without the other bloat.</p>
-
-<p>In addition to these changes to the config options, I also strip out all of the
-<code>gvim</code>-related stuff from the PKGBUILD as I do not require it. Even though it
-is a split package, just building <code>vim</code> still includes options superfluous to
-my needs.  As a result, I get Vim with just the features I need, without the
-dependencies of <code>ruby</code> and <code>lua</code> and god knows what else.</p>
-
-<p>I&#8217;m not operating under any illusions about the fact that this is
-really saving a huge amount of space or, for that matter, drastically reducing the
-number of dependencies I have installed. It is partly about understanding how Vim
-works at another level while also catering for the obsessive-compulsive drive to
-micro-control what is and isn&#8217;t installed on my systems. If you want to scratch either
-of the same itches, you can see the full
-<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/vim/PKGBUILD" title="Eviscerated Vim PKGBUILD">PKGBUILD in Bitbucket</a>.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>Still visible in some of my early Arch screenshots
-<a href="http://www.flickr.com/photos/jasonwryan/3748882572/in/photostream" title="Emacs in Openbox">on Flickr</a>…</li>
-<li>The official documentation for the features is also
-<a href="http://vimdoc.sourceforge.net/htmldoc/various.html#+feature-list" title="Vim Feature list">online</a>.</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/11/">&larr; Older</a>
@@ -569,6 +619,10 @@ of the same itches, you can see the full
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
@@ -582,10 +636,6 @@ of the same itches, you can see the full
     
       <li class="post">
         <a href="/blog/2014/08/23/asp/">Building from Source</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>

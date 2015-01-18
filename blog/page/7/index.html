@@ -9,9 +9,12 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="For those people that prefer to forego the full blown
-DE and—instead of all the
-“convenience” that this sort of setup offers—piece together their &hellip;">
+  <meta name="description" content="I have
+written previously
+about
+BitTorrent Sync, the encrypted
+file syncing application that uses the bittorrent protocol to sync your data
+over &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +87,144 @@ DE and—instead of all the
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-14T09:51:00+13:00" pubdate data-updated="true">Nov 14<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/sync.png" title="Bittorrent logo" >
+I have
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on the Alpha release">written previously</a>
+about
+<a href="http://www.bittorrent.com/sync" title="Sync webpage">BitTorrent Sync</a>, the encrypted
+file syncing application that uses the bittorrent protocol to sync your data
+over your <acronym title="Local Area Network">LAN</acronym>, or over the Internet,
+using <a href="https://en.wikipedia.org/wiki/Peer_to_peer" title="Wikipedia page">P2P technology</a>.
+I have been using it since early this year as a replacement for
+dropbox.<sup>1</sup></p>
+
+<p>At the beginning of this month, BitTorrent unveiled the
+<a href="http://blog.bittorrent.com/2013/11/05/bittorrent-sync-beta-api-now-available-to-developers/" title="Sync blog announcement">Beta API</a>
+for developers (meaning you have to tell them what you plan to do in order to
+be issued a key). After some equivocation, I signed up with the rather flimsy
+excuse of “writing a shell wrapper for the command line” and found, to my
+chagrin, a key in my inbox the next morning.</p>
+
+<p>This proved to be something of an unwelcome arrival. In theory, I was excited
+about having access to a tool to query the Sync application. One of the nodes is
+on my
+<a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on setting up a torrent box">headless Raspberry Pi</a>
+and the idea of being able to issue a command from my laptop to ascertain what
+was going on in the Pi&#8217;s synced folders was (and is) a tremendously attractive
+one.</p>
+
+<p>However, now that I was in
+possession of the key, I felt morally obliged to do something with it. The
+problem with this realization was that I had no idea how to work with an
+<acronym title="Application Program Interface">API</acronym>, let alone writing
+a script to accomplish my purported goal.</p>
+
+<p>After spending some time looking at
+<a href="http://www.bittorrent.com/sync/developers/api" title="Such as it is…">the documentation</a>,
+and buoyed by the optimism of ignorance, I decided to make good on my promise.
+My first attempt sort of worked, but was hampered as much by a serious
+conceptual flaw as it was by poor implementation. I decided, in spite of any number
+of Stack Overflow posts warning expressly not to do this, to use <code>awk</code> to parse
+the <a href="http://www.json.org/" title="JSON homepage">JSON data</a><sup>2</sup>. This was what I would
+euphemistically describe as a “learning opportunity.” The result is preserved
+for posterity in my <a href="https://bitbucket.org/jasonwryan/shiv/commits/16c9dee17f097e83fb325e303d867e6fda488992?at=default" title="Bit of a trainwreck, but you have to start somewhere…">bitbucket repo</a>
+(for the completists)…</p>
+
+<p>At this point, I was fortunate that Earnestly in #archlinux introduced me to
+keenerd&#8217;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
+And by “introduced” I mean generously (and patiently) talked me through how it
+worked and how I could use it with the Sync API to achieve what I was after.
+After a while playing with it, there was the—inevitably belated—moment of
+realization: this thing is genius! It allows you to intelligently
+<em>interrogate</em> the data. Not blindly chopping at it with an increasingly complex
+series of actions in <code>awk</code><sup>3</sup>; but quite directly traversing the structure and
+extracting the desired elements.</p>
+
+<p>Now I was <em>cooking</em>. Well, more to the point, I was flailing about in a smoke
+filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
+asphyxiation. Once again, Earnestly&#8217;s patience and bash skills were put to good effect.
+The resulting script,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="In bitbucket">btstat</a>,
+is undeniably a triumph of his good ideas over my own poor execution. In other
+words, the fact that it works so well is testament to his ability, but any and
+all faults are mine alone<sup>4</sup>.</p>
+
+<p>And it does work. It only requires
+<a href="https://www.archlinux.org/packages/?sort=&amp;q=jshon" title="Arch package db">Jshon</a>
+(which you will already have installed because you use
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="My post on this great utility">aurphan, right?</a>)
+and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
+</span><span class='line'>directory2 H0p3fu11yY0uG3tTh31d3@
+</span></code></pre></div></figure>
+
+
+<p>The functionality in the script is limited at this stage to just querying the
+application; I wasn&#8217;t interested in pushing changes at this point. So you can
+access the version of the currently installed Syncapp, upload and download
+speeds, the size of synced folders and list all of their contents.</p>
+
+<p>It is a beta release, so the odd bug is to be expected. Overall, though, the API is
+a welcome addition to what is a great application. If you have an API key, add
+it to your <span class="file">sync.conf</span>,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="On bitbucket">grab the script</a>
+and give it a whirl. Undoubtedly, over the coming weeks more polished versions
+will emerge in “proper” languages, but for the time being this does exactly what
+I need.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Yes, I would much prefer to use an open source tool to accomplish the same
+thing but I haven&#8217;t found anything comparable that is this good to date…</li>
+<li>In what I imagine is a complete coincidence, the JSON logo is uncannily
+similar to the initial (and much better, I thought) Sync logo, as seen on
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/">my original post</a>.</li>
+<li>This is not intended as a slight on <code>awk</code>; which I am undoubtedly
+<a href="http://jasonwryan.com/blog/2013/09/15/awking/">fond of</a>, but rather the
+limits of my ability with that language.</li>
+<li>I am also indebted to Scott (firecat53) for testing and providing helpful
+feedback on the early versions of the script.</li>
+<li>It is worth noting that in the <code>$json</code> variable, I pass <code>curl</code> the -<code>n</code> option,
+which means it reads my credentials from <span class="file">$HOME/.netrc</span>.</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -403,116 +544,6 @@ alive and well.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/08/24/automating-kernels/">Automating Kernel Builds</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-08-24T10:30:00+12:00" pubdate data-updated="true">Aug 24<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="/images/post_images/robot.jpg" title="I Robot" >
-I posted a couple of weeks ago about
-<a href="http://jasonwryan.com/blog/2013/08/03/kernels/" title="Check it if you haven't...">compiling a custom kernel</a>
-using <a href="https://github.com/graysky2/modprobed_db" title="graysky's github repo">modprobed_db</a>
-and at the time I talked about automating the process, essentially so that every
-kernel update, be it the standard Arch kernel or the stripped down custom one,
-would be a simple, streamlined process. I updated that post with
-<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr/PKGBUILD" title="bitbucket repo">a PKGBUILD</a>,
-which was the first step. This completes that process.</p>
-
-<p>There is not a lot to it. A
-<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/new_kernel" title="bitbucket repo">short bash wrapper</a>
-that sets up the required files, updates the aforementioned PKGBUILD and then
-triggers <code>makepkg</code> (providing nothing else fails). All it requires is that you
-have
-<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr%20'You%20guessed%20it%E2%80%A6">the necessary files</a>
-in a separate directory for the script to reference and
-you are set. If anything does go wrong with the new kernel, you still have the
-previous working custom kernel <code>.tar.xz</code> you can reinstall, or you can of course
-just boot into the vanilla Arch kernel.</p>
-
-<figure class='code'><figcaption><span>new_kernel </span></figcaption>
- <div class="highlight"><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
-</span><span class='line'><span class="c"># install new kernel</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">vers</span><span class="o">=</span><span class="nv">$1</span>
-</span><span class='line'><span class="nv">cyn</span><span class="o">=</span><span class="s1">$&#39;\e[1;36m&#39;</span>
-</span><span class='line'><span class="nv">ylw</span><span class="o">=</span><span class="s1">$&#39;\e[1;33m&#39;</span>
-</span><span class='line'><span class="nv">red</span><span class="o">=</span><span class="s1">$&#39;\e[1;31m&#39;</span>
-</span><span class='line'><span class="nv">end</span><span class="o">=</span><span class="s1">$&#39;\e[0m&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$# </span>!<span class="o">=</span> 1 <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Usage: &quot;</span><span class="k">${</span><span class="nv">0</span><span class="p">##*/</span><span class="k">}</span><span class="s2">&quot; 3.10.8&quot;</span>
-</span><span class='line'>  <span class="nb">exit </span>1
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># back up last dir</span>
-</span><span class='line'><span class="nb">cd</span> ~/Build
-</span><span class='line'>rm -rf linux-jwr/<span class="o">{</span>pkg,src<span class="o">}</span>
-</span><span class='line'>mv linux-jwr linux-<span class="k">${</span><span class="nv">vers</span><span class="p">%.*</span><span class="k">}</span>.<span class="k">$((${</span><span class="nv">vers</span><span class="p">##*.</span><span class="k">}</span> <span class="o">-</span> <span class="m">1</span><span class="k">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># set up clean files</span>
-</span><span class='line'>cp -r kernel_files linux-jwr <span class="o">&amp;&amp;</span> <span class="nb">cd</span> <span class="s2">&quot;$_&quot;</span>
-</span><span class='line'>
-</span><span class='line'>sed -i <span class="s2">&quot;s:pkgver=[0-9].*:pkgver=${vers}:&quot;</span> PKGBUILD
-</span><span class='line'><span class="nv">newvers</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="o">=</span> <span class="s1">&#39;/pkgver=/ {print $2}&#39;</span> PKGBUILD<span class="k">)</span>
-</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Package version updated to ${ylw}$newvers${end}&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${cyn}Updating checksums…${end}&quot;</span>
-</span><span class='line'>/usr/bin/updpkgsums
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${cyn}Starting build…${end}&quot;</span>
-</span><span class='line'>  /usr/bin/time /usr/bin/makepkg -i
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${red}Checksum failed${end}&quot;</span>
-</span><span class='line'>  <span class="nb">exit </span>1
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'><span class="nb">cd</span>
-</span></code></pre></div></figure>
-
-
-<p>That&#8217;s all there is to it. I see in my RSS reader that a new stable kernel is
-available, open a terminal and run the script specifying which version to use,
-for example, <code>new_kernel 3.10.9</code>.  Approximately 10 minutes later, my new kernel
-is compiled and installed and I can reboot into it. Simple.</p>
-
-<p>Undoubtedly, there is probably a cleaner way to do this, but it has worked well
-for the last couple of kernels. It will probably also require tweaking for the
-next series, but until that time, I am quite happy with it.</p>
-
-<h4>Notes</h4>
-
-<p>Flickr creative commons image
-<a href="http://www.flickr.com/photos/fringley/4244586360/">My robot</a> by fringley.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -530,6 +561,10 @@ next series, but until that time, I am quite happy with it.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
@@ -543,10 +578,6 @@ next series, but until that time, I am quite happy with it.</p>
     
       <li class="post">
         <a href="/blog/2014/08/23/asp/">Building from Source</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>

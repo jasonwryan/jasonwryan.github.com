@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-09T23:27:29+13:00</updated>
+  <updated>2015-01-19T08:20:47+13:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -12,6 +12,112 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Playing with overlayfs]]></title>
+    <link href="http://jasonwryan.com/blog/2015/01/19/overlayfs/"/>
+    <updated>2015-01-19T08:20:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2015/01/19/overlayfs</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/jello.jpg" title="Creative Commons Image" >
+Around this time last year, I posted about setting up a
+<a href="http://jasonwryan.com/blog/2014/01/20/udev/" title="Post in Jan 14">udev rule to run a script</a>
+when I plugged my USB drive containing all of my music into one of my
+laptops; the script, a
+<a href="https://gist.github.com/jasonwryan/0df98a396af89bf82eb6" title="A gist…">couple of lines of bash</a>,
+removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
+repopulates the directory with an updated set. Almost. The one flaw that has
+been an irritant of variable intensity, depending on what I felt like listening
+at any given time, is that the symlinks aren&#8217;t written for directories that
+already exist on the target filesystem.</p>
+
+<p>In order that I am able to play some music if I forget the USB drive, each of
+the laptops has a subset of albums on it, depending on the size of their
+respective hard drives. If I add a new album to the USB drive, then that change won&#8217;t
+get written to either of the laptops when the drive is plugged in. Not entirely
+satisfactory. I had tinkered around with
+<a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
+having <a href="http://mywiki.wooledge.org/UsingFind" title="Wooledge again, because it is so great…"><code>find(1)</code></a>
+scan deeper into the tree, or even a loop to check for the presence of directories in an array…</p>
+
+<p>It just got too hard. My rudimentary scripting skills and the spectre of recursion,
+I am sorry to admit, conspired to undermine my resolve. So, rather than concede
+unconditional surrender, I
+<a href="http://unix.stackexchange.com/q/179397/6761%20'Question%20on%20Unix%20&amp;%20Linux%20SE">asked for help</a>.
+As is almost always the case in these situations, this proved to be a particularly
+wise move; the response I received was neither what I expected, nor was it anything I
+was even remotely familiar with: so in addition to an excellent solution (one far
+better suited to what I was trying to achieve), I learned something new.</p>
+
+<p>The first comment on my question proved singularly insightful.</p>
+
+<blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote>
+
+
+<p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
+
+<blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote>
+
+
+<p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
+<a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
+The genealogy of these mounts has been well covered in this 2010 LWN
+<a href="http://lwn.net/Articles/396020/" title="LWN.net">article by Valerie Aurora</a>. However, it is only
+in the current kernel, 3.18, that a union mount has been accepted into the kernel tree.</p>
+
+<p>After reading the
+<a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/overlayfs.txt" title="Kernel docs">documentation for overlayfs</a>, it seemed this was <em>exactly</em> what I
+was looking for. Essentially, an overlay mount would allow me to “merge&#8221;
+the underlying tree (the Music directory on the USB drive) with an “upper”
+one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
+seamlessly</em>.</p>
+
+<blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote>
+
+
+<p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
+trivial:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># union mount Music when Apollo plugged in</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">low</span><span class="o">=</span>/media/Apollo/Music
+</span><span class='line'><span class="nv">upp</span><span class="o">=</span>/home/jason/Music
+</span><span class='line'><span class="nv">wod</span><span class="o">=</span>/home/jason/.local/tmp
+</span><span class='line'><span class="nb">export </span><span class="nv">DISPLAY</span><span class="o">=</span>:0
+</span><span class='line'><span class="nb">export </span><span class="nv">XAUTHORITY</span><span class="o">=</span>/home/jason/.Xauthority
+</span><span class='line'>
+</span><span class='line'><span class="c"># overlayfs mount</span>
+</span><span class='line'>mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
+</span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>
+</span><span class='line'>mpc update &amp;&gt;/dev/null
+</span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 <span class="o">&amp;&amp;</span> <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>And now, when I plug in the USB drive, the contents of the drive are merged
+with my local music directory, and I can access whichever album I feel inclined
+to listen to. I can also copy files across to the local machines, knowing if I
+update the portable drive, it will no longer mean I have to forego listening to
+any newer additions by that artist in the future (without manually intervening,
+anyway).</p>
+
+<p>Overall, this is a lightweight union mount. There is neither a lot of functionality,
+nor complexity. As the
+<a href="https://github.com/torvalds/linux/commit/e9be9d5e76e34872f0c37d72e25bc27fe9e2c54c" title="Git commit">commit note</a>
+makes clear, this “simplifies the implementation and allows native performance
+in these cases.” Just note the warning about attempting to write to a mounted
+underlying filesystem, where the behaviour is described as “undefined”.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, <a href="https://flic.kr/p/5RRRXP">mulitlayered jello</a> by Frank Farm.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Pruning Tarsnap Archives]]></title>
@@ -1982,142 +2088,6 @@ unmount them by typing <code>dismount</code> and choosing the appropriate drive 
 
 <p>Creative Commons image, Dismount, by
 <a href="http://www.flickr.com/photos/chrisinplymouth/3659964278/">Chris</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Managing modules with Awk]]></title>
-    <link href="http://jasonwryan.com/blog/2013/09/15/awking/"/>
-    <updated>2013-09-15T09:23:00+12:00</updated>
-    <id>http://jasonwryan.com/blog/2013/09/15/awking</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/awk.jpg" title="The Great Auk" >
-This is an addendum to my two previous posts on
-<a href="http://jasonwryan.com/blog/2013/08/03/kernels/" title="The first post">compiling kernels</a>
-and <a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="The folow up">automating the process</a>.
-In the first of those posts I wrote about a wonderful tool to track the modules
-necessary for building a custom kernel with <code>make localmodconfig</code>, graysky&#8217;s
-<a href="https://github.com/graysky2/modprobed_db" title="Github repo">modprobed_db</a>. A simple
-bash script, <code>modprobed_db</code> allows you to build up an array of modules and—as
-the name suggests—<code>modprobe</code> all of them prior to compilation.</p>
-
-<p>I forked it on github and started to play around with the script (mostly because
-I am slightly <acronym title="Obsessive Compulsive Disorder">OCD</acronym> about
-constructions
-<a href="https://github.com/graysky2/modprobed_db/blob/master/common/modprobed_db#L62" title="awk pipeline">like this</a>:</p>
-
-<figure class='code'><figcaption><span>modprobed_db lines 62-63 </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/modules | awk <span class="s1">&#39;{print $1}&#39;</span> | sort -k 1,1 | <span class="se">\</span>
-</span><span class='line'>  grep -Ev <span class="s2">&quot;$(echo ${IGNORE[*]} | sed -e &#39;s/^/^(/&#39; -e &#39;s/ /|/g&#39; -e &#39;s/$/)$/&#39;)&quot;</span> <span class="se">\</span>
-</span><span class='line'>  &gt;/tmp/.inmem
-</span></code></pre></div></figure>
-
-
-<p><a href="https://github.com/jasonwryan/modprobed_db/blob/jwr/common/modprobed_db" title="My branch">After hacking a while</a>,
-I started to realize that the venerable UNIX programme
-<a href="http://www.gnu.org/software/gawk/manual/" title="gawk manual on GNU site">Awk</a>
- would, in many ways, be a better tool for this job. Essentially, we want to
- manage three lists: the modules in <span class="file">/proc/modules</span>, a
- list of modules to ignore, and the master list of all modules required prior to
- compilation. This seems perfectly suited to Awk.</p>
-
-<p> So, in the interests of learning Awk, I decided to rewrite the required
- functionality (or, more correctly, the subset that I required) in this
- language. This wasn&#8217;t a straightforward task for me. I got stuck a couple of
- times and, as I work in a building full of
- <a href="http://catalyst.net.nz" title="Catalyst website">neckbeards</a>, I thought I could ask
- for a couple of pointers. To my surprise, no-one I asked seemed interested in
- Awk. Typical responses were along the lines of “just use Perl.”</p>
-
-<p> Aside from not knowing any
- <a href="http://www.perl.org/" title="Perl homepage">Perl</a>, and being unlikely to learn any
- in the immediate future, I was bemused by the notion that none of these skilled
- developers rated Awk as a language worth knowing. One of the #awk FAQ&#8217;s
- specifically addresses this:
- <a href="http://awk.freeshell.org/Frequently_Asked_Questions#toc14" title="#awk FAQs">Why would anyone still use awk instead of perl?</a>
- The quote by Tom Christiansen is worth repeating here:</p>
-
-<p> <blockquote><p>Awk is a venerable, powerful, elegant, and simple tool that everyone should know. Perl is a superset and child of awk, but has much more power that comes at expense of sacrificing some of that simplicity.</p></blockquote></p>
-
-<p>In a happy coincidence, this
-<a href="http://unix.stackexchange.com/questions/90489/compare-two-files-with-first-column-and-remove-duplicate-row-from-2nd-file-in-sh/90490#90490" title="Comparing two files">question on Unix &amp; Linux SE</a>
-showed up just as I was completing my script and it neatly illustrates (to my
-unututored eye, anyway) an example of a typical situation where Awk&#8217;s strengths
-make it a better approach than Perl.</p>
-
-<p>In any event, my rewriting of <code>modprobed_db</code> in Awk<sup>1</sup> resulted in this:</p>
-
-<figure class='code'><figcaption><span>awkmodules </span></figcaption>
- <div class="highlight"><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
-</span><span class='line'><span class="c1"># script to manage modules for kernel builds</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">BEGIN</span> <span class="p">{</span> <span class="nx">dbfile</span> <span class="o">=</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">function</span> <span class="nx">red</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kr">printf</span> <span class="s2">&quot;\033[1;31m&quot;</span> <span class="nx">s</span> <span class="s2">&quot;\033[0m &quot;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># read in the array</span>
-</span><span class='line'><span class="nb">FILENAME</span> <span class="o">!=</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">modlist</span><span class="p">[</span><span class="o">$</span><span class="mi">1</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="kr">next</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># check for ignored modules</span>
-</span><span class='line'><span class="o">!</span><span class="nx">modlist</span><span class="p">[</span><span class="o">$</span><span class="mi">1</span><span class="p">]</span><span class="o">++</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span> <span class="o">&gt;&gt;</span> <span class="nx">dbfile</span>
-</span><span class='line'>  <span class="kr">close</span><span class="p">(</span><span class="nx">dbfile</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'><span class="c1"># modprobe modules</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nx">p</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">modload</span><span class="o">=</span><span class="s2">&quot;sudo modprobe -a $(&lt;&quot;</span><span class="nx">dbfile</span><span class="s2">&quot;)&quot;</span>
-</span><span class='line'>  <span class="kr">system</span><span class="p">(</span><span class="nx">modload</span><span class="p">)</span>
-</span><span class='line'>  <span class="kr">close</span><span class="p">(</span><span class="nx">modload</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'><span class="c1"># update module count</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span> <span class="kr">getline</span> <span class="o">&lt;</span> <span class="nx">dbfile</span> <span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">count</span><span class="o">++</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">END</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kr">print</span> <span class="nx">red</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="s2">&quot;modules listed.&quot;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># vim:set ts=2 sts=2 sw=2 et:</span>
-</span></code></pre></div></figure>
-
-
-<p>Just prior to compiling a kernel, I can invoke this script with (the admittedly
-rather ungainly line):</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>awkmodules <span class="nv">p</span><span class="o">=</span>1 .config/kmod_db/ignored .config/kmod_db/modules_db /proc/modules
-</span></code></pre></div></figure>
-
-
-<p>It does work, but I don&#8217;t claim that it is either idiomatic or attractive. The
-use of <code>getline</code> to update the module count strikes me as especially kludgy but
-I haven&#8217;t been able to think of a more correct way to handle it.</p>
-
-<p>Incidentally, the gawk manual<sup>2</sup>,
-<a href="http://www.gnu.org/software/gawk/manual/" title="GNU goodness">Gawk: Effective AWK Programming</a>
-has only just been updated<sup>3</sup> so Awk is, unlike it&#8217;s homonym, clearly
-alive and well.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>In my <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/awkmodules">bitbucket repo</a>.</li>
-<li>The number of variants of <code>awk</code> is as much a delight as it is perplexing…</li>
-<li>May, 2013</li>
-</ol>
-
-
-<p>Public Domain image of the Great Auk by John James Audubon, from his book
-<a href="https://en.wikipedia.org/wiki/File:PinguinusImpennus.jpg">The Birds of America</a>.</p>
 ]]></content>
   </entry>
   

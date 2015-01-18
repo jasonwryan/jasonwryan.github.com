@@ -9,10 +9,8 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="A couple of weeks ago, I came across these
-simple bash functions
-written by Jack Mottram of One Thing Well for managing text
-notes. The functions as &hellip;">
+  <meta name="description" content="Now that I have been using it for several months, I have become absolutely dependent upon tmux, the terminal multiplexer.
+It is both ruthlessly &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +83,73 @@ notes. The functions as &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/10/03/sessions-in-tmux/">Sessions in tmux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-10-03T20:15:00+13:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5046091307/" title="Sessions in tmux by jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4146/5046091307_39c200f1b0.jpg" width="500" height="293" alt="Sessions in tmux"/></a></p>
+
+<p>Now that I have been using it for several months, I have become absolutely dependent upon <a href="http://tmux.sourceforge.net/" target="_blank">tmux</a>, the terminal multiplexer.
+It is both ruthlessly efficient, and can be configured to match exacting requirements. One of those options is to initialize sessions with a preloaded window configuration. After reading the <a href="http://wisconsinlinux.org/tmux-manpage-from-cvs/tmux.1.txt" target="_blank">man page</a> (which, truth be told, could be a little clearer) and some experimentation, I have worked out how to set up my tmux sessions how I want them.
+I have just updated the <a href="http://wiki.archlinux.org/index.php/Tmux">Arch Wiki tmux entry</a>,
+so thought I would share it here.</p>
+
+<p>The relevant part of my config file looks like this:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># session initialization</span>
+</span><span class='line'>new  -n TTYtter /home/jason/Scripts/ttytter.pl
+</span><span class='line'>neww -n irssi /home/jason/Scripts/startirssi.sh
+</span><span class='line'>neww -n ncmpcpp/vifm ncmpcpp
+</span><span class='line'>splitw -v -p 50 -t 0 vifm
+</span><span class='line'>neww -n bash bash
+</span><span class='line'>selectw -t 1
+</span></code></pre></div></figure>
+
+
+<p>Which, when I start tmux with the attach (or a) option, gives me the following window layout:</p>
+
+<ul>
+<li>TTYtter</li>
+<li>irssi</li>
+<li>ncmpcpp/vifm &nbsp; &nbsp; # window split vertically in half, ncmpcpp on top of vifm</li>
+<li>bash</li>
+</ul>
+
+
+<p>The <code>selectw</code> option means that the default view is TTYtter.</p>
+
+<p>Simple.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -237,55 +302,6 @@ symlink to it from <span class="file">~/.notes</span>.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/05/21/browsers/">5 Alternate Browsers</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2010-05-21T15:22:00+12:00" pubdate data-updated="true">May 21<span>st</span>, 2010</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/4352140405/"><img src="/images/post_images/browser-5alt.png"/></a></p>
-
-<p>Tired of Firefox&#8217;s bloated, buggy behaviour?</p>
-
-<p>Here are five alternatives that are lighter, faster and much more fun…</p>
-
-<ul>
-<li><a href="http://www.uzbl.org/" title="Uzbl homepage">Uzbl</a>. My current browser of choice. Completely customizable, integrates well with other programs and is scriptable.</li>
-<li><a href="http://surf.suckless.org/" title="Surf on the suckless wiki">Surf</a>. From suckless.org. &#8216;Nuff said.</li>
-<li><a href="http://conkeror.org/" title="Conkeror homepage">Conkeror</a>. I used this for a long time before moving to uzbl - the emacs-like keybindings are why I gave it up…</li>
-<li><a href="http://www.vimprobable.org/" title="Home of the wonderfully named  Vimprobable">Vimprobable</a>. Gets great raps on the Arch boards. One to watch (…and a homepage that telegraphs exactly what to expect).</li>
-<li><a href="http://bbs.archlinux.org/viewtopic.php?id=95589&amp;p=1" title="dwb thread on the Arch Forums">dwb</a>. Another browser, like uzbl, to come from the Arch community. As the name suggests, built for tilers…</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/30/">&larr; Older</a>
@@ -303,6 +319,10 @@ symlink to it from <span class="file">~/.notes</span>.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
@@ -316,10 +336,6 @@ symlink to it from <span class="file">~/.notes</span>.</p>
     
       <li class="post">
         <a href="/blog/2014/08/23/asp/">Building from Source</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>

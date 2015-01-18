@@ -9,8 +9,14 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="One of the most satisfying aspects of running free and open source software is
-the ability to be able to continually tinker with your setup, limited &hellip;">
+  <meta name="description" content="Once you have your environment set up; your
+window manager
+patched
+exactly the way you want,
+same for
+your editor
+and even
+your kernel builds &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +89,124 @@ the ability to be able to continually tinker with your setup, limited &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/22/autotext/">Autotext Function</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-22T09:20:00+13:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/cans.jpg" title="Flickr CC image" ></p>
+
+<p>Once you have your environment set up; your
+<a href="http://dwm.suckless.org" title="dwm site">window manager</a>
+patched
+<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="Post on mercurial queues"><em>exactly</em> the way you want</a>,
+same for
+<a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on building Vim">your editor</a>
+and even
+<a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="Yet another post…">your kernel builds automated</a>,
+then you either start from scratch and learn a whole lot more, or you start to
+focus on the really small details. The endless polishing that is bred of a
+mania for automation and customisation and the liberating freedom of using
+software that allows, and even encourages, this approach.</p>
+
+<p>Since I started using a couple of basic functions for managing my
+<a href="http://jasonwryan.com/blog/2012/09/01/notes-updated/" title="Post on the updated functions">note taking</a>,
+I have been conscious of the way I can use this tool to make my workflow a
+little less onerous.</p>
+
+<p>One of the things I find myself doing <em>a lot</em> is reusing the same snippets of
+text; either prose in work documents, or links to relevant articles on the
+Arch Wiki and Forums. It is simple enough to add this material to my
+<span class="file">~/.notes</span>, but retrieval has always been&mdash;for the
+text I reuse frequently&mdash;unwieldy.</p>
+
+<p>How many times do you really want to open the file, search for the relevant
+excerpt, highlight it and then copy it to the system clipboard before closing
+the file and pasting it into your email or a web form? I must have logged
+several thousand before I finally decided to do something about it.</p>
+
+<p>I now have a couple of different files in <span class="file">~/.notes/</span>
+depending upon the context; the example I&#8217;ll use is the one for the Arch Forums
+kept, naturally enough, at
+<span class="file">$HOME/Sync/notes/arch</span> (I symlink to
+<span class="file">~/.notes</span> so that the directory is synched using
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on using Sync">BitTorrent Sync</a>).</p>
+
+<p>This is just a simple text file with all of the links, guidance and wisdom that
+I generously share with those people, mostly new to the community, who have yet
+to embrace the opportunity to commit the
+<a href="https://wiki.archlinux.org/index.php/Forum_Etiquette" title="On the Wiki">Forum Etiquette</a>
+to memory. The format of each file is the same and is pretty basic:</p>
+
+<blockquote><p># rules sticky<br/>https://bbs.archlinux.org/viewtopic.php?id=130309</p><p># smart questions<br/>[url=http://www.catb.org/esr/faqs/smart-questions.html]How To Ask Questions The Smart Way[/url]</p><p># arch only<br/>https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY</p></blockquote>
+
+
+<p>I use the commented title to identify the desired piece of text and then just
+copy it to the clipboard, ready to pasted into a post that will undoubtedly
+be gratefully received by the infractor:</p>
+
+<figure class='code'><figcaption><span>$HOME/.bashrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># board snippets</span>
+</span><span class='line'>bbs<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;$HOME/.notes/arch&quot;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">((</span> <span class="nv">$# </span><span class="o">==</span> 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">local </span><span class="nv">opt</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span>
+</span><span class='line'>    awk -v <span class="nv">line</span><span class="o">=</span><span class="s2">&quot;$opt&quot;</span> <span class="s1">&#39;index($0, line) { getline; print }&#39;</span> <span class="s2">&quot;$file&quot;</span> | xsel -b
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">    </span>awk <span class="s1">&#39;/^# /&#39;</span> <span class="s2">&quot;$file&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>So, on the rare occasion that I need to remind someone that on the Arch boards
+we only support Arch Linux (I know, quite the revelation…), I just open
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/tip/base.config.customizations#cl-76" title="Config in Bitbucket">a scratchpad</a>
+and enter <code>bbs only</code> and then <kbd>Shift</kbd>+<kbd>Insert</kbd> the
+text into the post and I am done. Not passing an argument just prints the
+commented titles in the file in the event that I forget what the damn thing
+is called.</p>
+
+<p>I have a similar setup for work, with a couple of files that feature longer
+pieces of text that I find myself reusing for proposals, email responses
+and other administrivia. It&#8217;s a simple enough approach, but it works well and
+does lend a certain satisfaction to the otherwise tedious business of writing
+boilerplate.</p>
+
+<h4>Notes</h4>
+
+<p>Flickr Creative Commons image
+<a href="http://www.flickr.com/photos/shrapnel1/134674051/">how many cans</a> by shrapnel1</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -315,144 +439,6 @@ protect your privacy and make you insanely popular. Try Hostsblock today!</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/11/14/api/">BitTorrent Sync&#8217;s API</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-11-14T09:51:00+13:00" pubdate data-updated="true">Nov 14<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="/images/post_images/sync.png" title="Bittorrent logo" >
-I have
-<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on the Alpha release">written previously</a>
-about
-<a href="http://www.bittorrent.com/sync" title="Sync webpage">BitTorrent Sync</a>, the encrypted
-file syncing application that uses the bittorrent protocol to sync your data
-over your <acronym title="Local Area Network">LAN</acronym>, or over the Internet,
-using <a href="https://en.wikipedia.org/wiki/Peer_to_peer" title="Wikipedia page">P2P technology</a>.
-I have been using it since early this year as a replacement for
-dropbox.<sup>1</sup></p>
-
-<p>At the beginning of this month, BitTorrent unveiled the
-<a href="http://blog.bittorrent.com/2013/11/05/bittorrent-sync-beta-api-now-available-to-developers/" title="Sync blog announcement">Beta API</a>
-for developers (meaning you have to tell them what you plan to do in order to
-be issued a key). After some equivocation, I signed up with the rather flimsy
-excuse of “writing a shell wrapper for the command line” and found, to my
-chagrin, a key in my inbox the next morning.</p>
-
-<p>This proved to be something of an unwelcome arrival. In theory, I was excited
-about having access to a tool to query the Sync application. One of the nodes is
-on my
-<a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on setting up a torrent box">headless Raspberry Pi</a>
-and the idea of being able to issue a command from my laptop to ascertain what
-was going on in the Pi&#8217;s synced folders was (and is) a tremendously attractive
-one.</p>
-
-<p>However, now that I was in
-possession of the key, I felt morally obliged to do something with it. The
-problem with this realization was that I had no idea how to work with an
-<acronym title="Application Program Interface">API</acronym>, let alone writing
-a script to accomplish my purported goal.</p>
-
-<p>After spending some time looking at
-<a href="http://www.bittorrent.com/sync/developers/api" title="Such as it is…">the documentation</a>,
-and buoyed by the optimism of ignorance, I decided to make good on my promise.
-My first attempt sort of worked, but was hampered as much by a serious
-conceptual flaw as it was by poor implementation. I decided, in spite of any number
-of Stack Overflow posts warning expressly not to do this, to use <code>awk</code> to parse
-the <a href="http://www.json.org/" title="JSON homepage">JSON data</a><sup>2</sup>. This was what I would
-euphemistically describe as a “learning opportunity.” The result is preserved
-for posterity in my <a href="https://bitbucket.org/jasonwryan/shiv/commits/16c9dee17f097e83fb325e303d867e6fda488992?at=default" title="Bit of a trainwreck, but you have to start somewhere…">bitbucket repo</a>
-(for the completists)…</p>
-
-<p>At this point, I was fortunate that Earnestly in #archlinux introduced me to
-keenerd&#8217;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
-And by “introduced” I mean generously (and patiently) talked me through how it
-worked and how I could use it with the Sync API to achieve what I was after.
-After a while playing with it, there was the—inevitably belated—moment of
-realization: this thing is genius! It allows you to intelligently
-<em>interrogate</em> the data. Not blindly chopping at it with an increasingly complex
-series of actions in <code>awk</code><sup>3</sup>; but quite directly traversing the structure and
-extracting the desired elements.</p>
-
-<p>Now I was <em>cooking</em>. Well, more to the point, I was flailing about in a smoke
-filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
-asphyxiation. Once again, Earnestly&#8217;s patience and bash skills were put to good effect.
-The resulting script,
-<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="In bitbucket">btstat</a>,
-is undeniably a triumph of his good ideas over my own poor execution. In other
-words, the fact that it works so well is testament to his ability, but any and
-all faults are mine alone<sup>4</sup>.</p>
-
-<p>And it does work. It only requires
-<a href="https://www.archlinux.org/packages/?sort=&amp;q=jshon" title="Arch package db">Jshon</a>
-(which you will already have installed because you use
-<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="My post on this great utility">aurphan, right?</a>)
-and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
-</span><span class='line'>directory2 H0p3fu11yY0uG3tTh31d3@
-</span></code></pre></div></figure>
-
-
-<p>The functionality in the script is limited at this stage to just querying the
-application; I wasn&#8217;t interested in pushing changes at this point. So you can
-access the version of the currently installed Syncapp, upload and download
-speeds, the size of synced folders and list all of their contents.</p>
-
-<p>It is a beta release, so the odd bug is to be expected. Overall, though, the API is
-a welcome addition to what is a great application. If you have an API key, add
-it to your <span class="file">sync.conf</span>,
-<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="On bitbucket">grab the script</a>
-and give it a whirl. Undoubtedly, over the coming weeks more polished versions
-will emerge in “proper” languages, but for the time being this does exactly what
-I need.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>Yes, I would much prefer to use an open source tool to accomplish the same
-thing but I haven&#8217;t found anything comparable that is this good to date…</li>
-<li>In what I imagine is a complete coincidence, the JSON logo is uncannily
-similar to the initial (and much better, I thought) Sync logo, as seen on
-<a href="http://jasonwryan.com/blog/2013/03/16/sync/">my original post</a>.</li>
-<li>This is not intended as a slight on <code>awk</code>; which I am undoubtedly
-<a href="http://jasonwryan.com/blog/2013/09/15/awking/">fond of</a>, but rather the
-limits of my ability with that language.</li>
-<li>I am also indebted to Scott (firecat53) for testing and providing helpful
-feedback on the early versions of the script.</li>
-<li>It is worth noting that in the <code>$json</code> variable, I pass <code>curl</code> the -<code>n</code> option,
-which means it reads my credentials from <span class="file">$HOME/.netrc</span>.</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; Older</a>
@@ -470,6 +456,10 @@ which means it reads my credentials from <span class="file">$HOME/.netrc</span>.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
@@ -483,10 +473,6 @@ which means it reads my credentials from <span class="file">$HOME/.netrc</span>.
     
       <li class="post">
         <a href="/blog/2014/08/23/asp/">Building from Source</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>

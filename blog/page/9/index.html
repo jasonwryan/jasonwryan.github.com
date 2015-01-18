@@ -9,11 +9,8 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="I was fortunate enough to be given a
-Raspberry Pi earlier this year
-and, naturally enough, have been running
-Arch ARM on it over the
-last several &hellip;">
+  <meta name="description" content="With the torrent of recent revelations about the enthusiasm with which
+the governments of most of the first world have been systematically and &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +83,127 @@ last several &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/20/gnupg/">Encrypting Mutt</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-20T09:36:00+12:00" pubdate data-updated="true">Jul 20<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/key-board.jpg" title="Encrypted mail" >
+With the torrent of recent revelations about the enthusiasm with which
+the governments of most of the first world have been systematically and
+unlawfully violating the privacy of their citizens by intercepting their digital
+communications, I thought it worth adding to the posts I have written about
+<a href="http://jasonwryan.com/blog/categories/mutt/" title="Posts on mutt">Mutt</a>—that most
+peerless of email clients—specifically how, combined with
+<a href="http://gnupg.org/" title="GPG home page">GnuPG</a>, you can encrypt all of your mail and
+ensure that the only person reading it is the intended recipient.</p>
+
+<p>The definitive guide for this setup remains Justin Miller&#8217;s venerable page,
+<a href="http://codesorcery.net/old/mutt/mutt-gnupg-howto" title="The title says it all, really…">Everything You Need To Know To Start Using GnuPG with Mutt</a>,
+last edited in 2001 and <em>still</em> the authoritative source. The setup I will
+describe differs only insofar as it covers how to use multiple keys associated
+with different mail accounts. Mutt gives you the flexibility sign or encrypt all
+of the email in your work account with one key, and your personal email with
+another.</p>
+
+<p>Once you have set up your GPG keys<sup>1</sup>, the first step is to configure
+Mutt to use your keys. You can include these directives in your
+<span class="file">muttrc</span> but, in the interests of readability, I prefer
+to split them out into <span class="file">gpg.rc</span> and source them from
+<span class="file">muttrc</span>. The settings are self-explanatory, those most
+relevant to this post control how mutt handles your mail with respect to
+encryption or just signing<sup>2</sup>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">pgp_use_gpg_agent</span> <span class="o">=</span> yes
+</span><span class='line'><span class="nb">set </span><span class="nv">pgp_sign_as</span> <span class="o">=</span> 43A5CE95
+</span><span class='line'><span class="nb">set </span><span class="nv">pgp_timeout</span> <span class="o">=</span> 3600
+</span><span class='line'><span class="nb">set </span><span class="nv">crypt_autosign</span> <span class="o">=</span> yes
+</span><span class='line'><span class="nb">set </span><span class="nv">crypt_replyencrypt</span> <span class="o">=</span> yes
+</span></code></pre></div></figure>
+
+
+<p>This sets my work key as the primary key and a couple of other sane (for me)
+defaults. All of these options are described in <code>muttrc(5)</code>.
+You can see my complete file in my
+<a href="https://bitbucket.org/jasonwryan/shiv/src/default/.mutt/gpg.rc" title="mutt config files">bitbucket repo</a>.</p>
+
+<p>The rest of the recipe is in <span class="file">muttrc</span>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">source</span> ~/.mutt/gpg.rc            <span class="c"># use GPG</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># gpg key</span>
+</span><span class='line'>send-hook <span class="s2">&quot;~f @catalyst.net.nz&quot;</span>  <span class="nb">set </span><span class="nv">pgp_sign_as</span><span class="o">=</span>43A5CE95
+</span><span class='line'>send-hook <span class="s2">&quot;~f @jasonwryan.com&quot;</span>   <span class="nb">set </span><span class="nv">pgp_sign_as</span><span class="o">=</span>B1BD4E40
+</span><span class='line'>
+</span><span class='line'><span class="c"># key binds</span>
+</span><span class='line'><span class="nb">bind </span>compose p  pgp-menu
+</span><span class='line'>macro compose Y pfy <span class="s2">&quot;send mail without GPG&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Sourcing the <span class="file">gpg.rc</span> reads all the relevant options
+and then a series of <code>send-hooks</code> allow you to use specific keys for each of
+your accounts.</p>
+
+<p>Now, when you receive encrypted mail, if your key agent is running, Mutt will
+decrypt your mail on the fly. Otherwise you will be prompted for your key
+phrase. Similarly, when you send email, it will by default be signed by the key
+associated with that account, and you can encrypt individual mail by bringing up
+the GPG menu in the compose screen by hitting <kbd>p</kbd>.</p>
+
+<p>And for those friends and acquaintances you correspond with for whom
+encryption is the equivalent of white powder spilling from an envelope, you can
+always elect to send without any GPG by selecting <kbd>Y</kbd> to send the
+email.</p>
+
+<p>These and a number of other interesting tips and macros are on the
+<a href="http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG" title="Using GPG">Mutt Wiki</a>
+and are worth following up once you have the basics working. Like so much of
+this sort of software, it takes a little longer to set up <em>exactly</em> the way that
+you want it, but once you are done, it is good for decades…</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>A good introduction to this procedure is detailed in the
+<a href="https://wiki.archlinux.org/index.php/GPG">Arch Wiki article</a>.</li>
+<li>This assumes that you do want to distinguish between the two; you could, of
+course, just encrypt <em>everything</em>—assuming that your correspondents were
+willing and able to decrypt it…</li>
+</ol>
+
+
+<p>Creative Commons image by <a href="http://www.flickr.com/photos/54450095@N05/8229504229/">Intel Free Press</a> on Flickr.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -343,175 +461,6 @@ the more motivated among you will find them without difficulty.</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/25/greader/">Replacing Google Reader</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-25T09:10:00+12:00" pubdate data-updated="true">May 25<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="/images/post_images/commafeed.png" title="'CommaFeed Logo'" >
-I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
-everyday since I first discovered the service over seven years ago. It is my
-primary source of news and information and the announcement that Google is, on July 1 this year,
-set to <a href="http://googlereader.blogspot.ca/2013/03/powering-down-google-reader.html" title="Official announcemet on Google Blog">shut down Reader</a>
-was something considerably more than just an inconvenience for me.</p>
-
-<p>Over the years, I had looked at other <acronym title="Rich Site Summary">RSS</acronym>
-readers but, for a variety of reasons, had invariably found that the speed,
-simplicity and flexibility that Google Reader offered meant that any dalliances
-were unsatisfactory and short-lived. I resigned myself to having to settle for
-an inferior alternative, rather than moving to a genuine replacement.</p>
-
-<p>On the recommendation of <a href="https://pinboard.in/" title="Not so-social bookmarking">@pinboard</a>,
-I first signed up for a premium account at
-<a href="https://www.newsblur.com/" title="NewsBlur website">NewsBlur</a>. It is open source and,
-given the recommendation from Maciej<sup>1</sup>, I was hopeful that it would
-bridge the gap. Newsblur is a good service (especially considering the rush of
-signups in the days after the Google announcement), but it has a couple of
-critical weaknesses for me: no search (yes, you read that correctly—there is <em>no
-way to search through your feeds</em>) and, less importantly but just as annoying,
-occasionally sluggish performance.</p>
-
-<p>After a couple of weeks using NewBlur I happily stumbled across
-<a href="https://www.commafeed.com/" title="CommaFeed homepage">CommaFeed</a>, a
-Reader clone that emulates the austere minimalism of Google Reader. Apart from
-the fact that it is open source, the other aspect that attracted me to it
-was the ability to run it on Red Hat&#8217;s Platform as a Service offering,
-<a href="http://www.openshift.com/" title="Red Hat PaaS">OpenShift</a>.</p>
-
-<p>The README on the <a href="https://github.com/Athou/commafeed" title="CommaFeed repo">Github repo</a>
-explains how to set it all up. Unfortunately, due to an
-<a href="https://github.com/Athou/commafeed/issues/91" title="OpenShift fails silently">open issue</a>,
-some manual intervention is required, but it is still a very
-straightforward and painless process to get your own instance of CommaFeed up
-and running.</p>
-
-<p>Creat an OpenShift account, log in and add the JBoss 6.0 application (or
-cartridge as it is called on OpenShift) and the MySQL cartridge. Once your setup
-is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
-under your <code>My Applications</code> tab, copy down your Git repo address, which will be
-of the form:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
-</span></code></pre></div></figure>
-
-
-<p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
-server:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
-</span><span class='line'><span class="nb">cd </span>commafeed
-</span><span class='line'><span class="c"># add OpenShift as a repo</span>
-</span><span class='line'>git remote add openshift -f ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.etc…
-</span><span class='line'>git merge openshift/master -s recursive -X ours
-</span><span class='line'>git push openshift master
-</span></code></pre></div></figure>
-
-
-<p>This will then trigger a series of hooks that build the application and restart
-the server. If everything goes well you will see something like:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Total <span class="nb">time</span>: 3:18.195s
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Finished at: Mon May 20 03:21:37 EDT 2013
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Final Memory: 42M/185M
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
-</span><span class='line'>remote: Running .openshift/action_hooks/build
-</span><span class='line'>remote: Running .openshift/action_hooks/deploy
-</span><span class='line'>remote: <span class="nv">hot_deploy_added</span><span class="o">=</span><span class="nb">false</span>
-</span><span class='line'>remote: MySQL already running
-</span><span class='line'>remote: Found 127.12.712.712:8080 listening port
-</span><span class='line'>remote: Done
-</span><span class='line'>remote: Running .openshift/action_hooks/post_deploy
-</span><span class='line'>To ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
-</span></code></pre></div></figure>
-
-
-<p>You now have CommaFeed successfully running on OpenShift. After a couple of
-minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
-and you will be able to login to your CommaFeed instance. Updating your
-CommaFeed is as simple as pulling to your local repo, merging and
-then pushing to <code>openshift master</code>.</p>
-
-<p>Importing directly from Google Reader still seems broken (I was  getting
-errors from builds late this week), but if you import from an existing <code>.opml</code>
-or <code>.xml</code> file you will see CommaFeed in all it&#8217;s glory:</p>
-
-<p><img class="left" src="/images/post_images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
-
-<p>As you can see, it is remarkably similar to the Google Reader interface; a
-clean, minimalist design that is focussed—quite rightly—on the content. There
-is an option to load your own <code>.css</code> if you want to apply some additional
-styling, but for me the base style is just about perfect.</p>
-
-<p>More impressively, in the week or so that I have been using CommaFeed, the
-developer,
-<a href="https://github.com/Athou" title="Athou on Github">Athou</a>, has been committing
-enhancements and bug fixes several times <em>a day</em>; almost every night,
-I have pushed changes to OpenShift, reloaded my browser and found a
-smoother, enhanced feed reader with additional functionality; it is
-literally growing in leaps and bounds, and is a great reminder of the power
-of open source<sup>2</sup>.</p>
-
-<p>The performance of OpenShift has also been solid; feeds are delivered
-seemingly instantaneously and, apart from the slight lag after restarting
-the application, I haven&#8217;t experienced any issues whatsoever in terms
-of availability.</p>
-
-<p>There are still a couple of areas where CommaFeed can be improved. Most
-notably, there is an open feature request for a
-<a href="https://github.com/Athou/commafeed/issues/54" title="Github Issue">mobile friendly CSS</a>
-and this is badly needed, the site is pretty much unusable on my phone. With
-any luck, some enterprising Android developer will build a CommaFeed app (for
-which I would happily pay good money)…</p>
-
-<p>In any event, if you are looking for a Google Reader replacement, try
-running CommaFeed (either on your own server or one of Red Hat&#8217;s); for
-a project that is only a couple of months old, it has covered a
-tremendous amount of ground and will undoubtedly continue to grow
-and improve.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>In conjunction with his great advice about not being a
-<a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/" title="Pinboard blog">free user</a>.</li>
-<li>The <a href="http://feeds-jwr.rhcloud.com/#/feeds/help" title="About and Help page">about page</a>
-has a donate button: if you want to support an application which I have no doubt
-will soon be even better than Google Reader, you might want to use it.</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/10/">&larr; Older</a>
@@ -529,6 +478,10 @@ will soon be even better than Google Reader, you might want to use it.</li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
@@ -542,10 +495,6 @@ will soon be even better than Google Reader, you might want to use it.</li>
     
       <li class="post">
         <a href="/blog/2014/08/23/asp/">Building from Source</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>

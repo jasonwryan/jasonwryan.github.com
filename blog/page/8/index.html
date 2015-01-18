@@ -9,8 +9,10 @@
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="One of the almost inevitable consequences of using Arch Linux for any length of
-time is that you will find yourself, if you weren&#8217;t already, &hellip;">
+  <meta name="description" content="I posted a couple of weeks ago about
+compiling a custom kernel
+using modprobed_db
+and at the time I talked about automating the process, essentially &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,6 +85,116 @@ time is that you will find yourself, if you weren&#8217;t already, &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/08/24/automating-kernels/">Automating Kernel Builds</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-24T10:30:00+12:00" pubdate data-updated="true">Aug 24<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/robot.jpg" title="I Robot" >
+I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/blog/2013/08/03/kernels/" title="Check it if you haven't...">compiling a custom kernel</a>
+using <a href="https://github.com/graysky2/modprobed_db" title="graysky's github repo">modprobed_db</a>
+and at the time I talked about automating the process, essentially so that every
+kernel update, be it the standard Arch kernel or the stripped down custom one,
+would be a simple, streamlined process. I updated that post with
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr/PKGBUILD" title="bitbucket repo">a PKGBUILD</a>,
+which was the first step. This completes that process.</p>
+
+<p>There is not a lot to it. A
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/new_kernel" title="bitbucket repo">short bash wrapper</a>
+that sets up the required files, updates the aforementioned PKGBUILD and then
+triggers <code>makepkg</code> (providing nothing else fails). All it requires is that you
+have
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr%20'You%20guessed%20it%E2%80%A6">the necessary files</a>
+in a separate directory for the script to reference and
+you are set. If anything does go wrong with the new kernel, you still have the
+previous working custom kernel <code>.tar.xz</code> you can reinstall, or you can of course
+just boot into the vanilla Arch kernel.</p>
+
+<figure class='code'><figcaption><span>new_kernel </span></figcaption>
+ <div class="highlight"><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># install new kernel</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">vers</span><span class="o">=</span><span class="nv">$1</span>
+</span><span class='line'><span class="nv">cyn</span><span class="o">=</span><span class="s1">$&#39;\e[1;36m&#39;</span>
+</span><span class='line'><span class="nv">ylw</span><span class="o">=</span><span class="s1">$&#39;\e[1;33m&#39;</span>
+</span><span class='line'><span class="nv">red</span><span class="o">=</span><span class="s1">$&#39;\e[1;31m&#39;</span>
+</span><span class='line'><span class="nv">end</span><span class="o">=</span><span class="s1">$&#39;\e[0m&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$# </span>!<span class="o">=</span> 1 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Usage: &quot;</span><span class="k">${</span><span class="nv">0</span><span class="p">##*/</span><span class="k">}</span><span class="s2">&quot; 3.10.8&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># back up last dir</span>
+</span><span class='line'><span class="nb">cd</span> ~/Build
+</span><span class='line'>rm -rf linux-jwr/<span class="o">{</span>pkg,src<span class="o">}</span>
+</span><span class='line'>mv linux-jwr linux-<span class="k">${</span><span class="nv">vers</span><span class="p">%.*</span><span class="k">}</span>.<span class="k">$((${</span><span class="nv">vers</span><span class="p">##*.</span><span class="k">}</span> <span class="o">-</span> <span class="m">1</span><span class="k">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># set up clean files</span>
+</span><span class='line'>cp -r kernel_files linux-jwr <span class="o">&amp;&amp;</span> <span class="nb">cd</span> <span class="s2">&quot;$_&quot;</span>
+</span><span class='line'>
+</span><span class='line'>sed -i <span class="s2">&quot;s:pkgver=[0-9].*:pkgver=${vers}:&quot;</span> PKGBUILD
+</span><span class='line'><span class="nv">newvers</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="o">=</span> <span class="s1">&#39;/pkgver=/ {print $2}&#39;</span> PKGBUILD<span class="k">)</span>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Package version updated to ${ylw}$newvers${end}&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${cyn}Updating checksums…${end}&quot;</span>
+</span><span class='line'>/usr/bin/updpkgsums
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${cyn}Starting build…${end}&quot;</span>
+</span><span class='line'>  /usr/bin/time /usr/bin/makepkg -i
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${red}Checksum failed${end}&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'><span class="nb">cd</span>
+</span></code></pre></div></figure>
+
+
+<p>That&#8217;s all there is to it. I see in my RSS reader that a new stable kernel is
+available, open a terminal and run the script specifying which version to use,
+for example, <code>new_kernel 3.10.9</code>.  Approximately 10 minutes later, my new kernel
+is compiled and installed and I can reboot into it. Simple.</p>
+
+<p>Undoubtedly, there is probably a cleaner way to do this, but it has worked well
+for the last couple of kernels. It will probably also require tweaking for the
+next series, but until that time, I am quite happy with it.</p>
+
+<h4>Notes</h4>
+
+<p>Flickr creative commons image
+<a href="http://www.flickr.com/photos/fringley/4244586360/">My robot</a> by fringley.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -360,127 +472,6 @@ accomplishment.</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/07/20/gnupg/">Encrypting Mutt</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-07-20T09:36:00+12:00" pubdate data-updated="true">Jul 20<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="/images/post_images/key-board.jpg" title="Encrypted mail" >
-With the torrent of recent revelations about the enthusiasm with which
-the governments of most of the first world have been systematically and
-unlawfully violating the privacy of their citizens by intercepting their digital
-communications, I thought it worth adding to the posts I have written about
-<a href="http://jasonwryan.com/blog/categories/mutt/" title="Posts on mutt">Mutt</a>—that most
-peerless of email clients—specifically how, combined with
-<a href="http://gnupg.org/" title="GPG home page">GnuPG</a>, you can encrypt all of your mail and
-ensure that the only person reading it is the intended recipient.</p>
-
-<p>The definitive guide for this setup remains Justin Miller&#8217;s venerable page,
-<a href="http://codesorcery.net/old/mutt/mutt-gnupg-howto" title="The title says it all, really…">Everything You Need To Know To Start Using GnuPG with Mutt</a>,
-last edited in 2001 and <em>still</em> the authoritative source. The setup I will
-describe differs only insofar as it covers how to use multiple keys associated
-with different mail accounts. Mutt gives you the flexibility sign or encrypt all
-of the email in your work account with one key, and your personal email with
-another.</p>
-
-<p>Once you have set up your GPG keys<sup>1</sup>, the first step is to configure
-Mutt to use your keys. You can include these directives in your
-<span class="file">muttrc</span> but, in the interests of readability, I prefer
-to split them out into <span class="file">gpg.rc</span> and source them from
-<span class="file">muttrc</span>. The settings are self-explanatory, those most
-relevant to this post control how mutt handles your mail with respect to
-encryption or just signing<sup>2</sup>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">pgp_use_gpg_agent</span> <span class="o">=</span> yes
-</span><span class='line'><span class="nb">set </span><span class="nv">pgp_sign_as</span> <span class="o">=</span> 43A5CE95
-</span><span class='line'><span class="nb">set </span><span class="nv">pgp_timeout</span> <span class="o">=</span> 3600
-</span><span class='line'><span class="nb">set </span><span class="nv">crypt_autosign</span> <span class="o">=</span> yes
-</span><span class='line'><span class="nb">set </span><span class="nv">crypt_replyencrypt</span> <span class="o">=</span> yes
-</span></code></pre></div></figure>
-
-
-<p>This sets my work key as the primary key and a couple of other sane (for me)
-defaults. All of these options are described in <code>muttrc(5)</code>.
-You can see my complete file in my
-<a href="https://bitbucket.org/jasonwryan/shiv/src/default/.mutt/gpg.rc" title="mutt config files">bitbucket repo</a>.</p>
-
-<p>The rest of the recipe is in <span class="file">muttrc</span>:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">source</span> ~/.mutt/gpg.rc            <span class="c"># use GPG</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># gpg key</span>
-</span><span class='line'>send-hook <span class="s2">&quot;~f @catalyst.net.nz&quot;</span>  <span class="nb">set </span><span class="nv">pgp_sign_as</span><span class="o">=</span>43A5CE95
-</span><span class='line'>send-hook <span class="s2">&quot;~f @jasonwryan.com&quot;</span>   <span class="nb">set </span><span class="nv">pgp_sign_as</span><span class="o">=</span>B1BD4E40
-</span><span class='line'>
-</span><span class='line'><span class="c"># key binds</span>
-</span><span class='line'><span class="nb">bind </span>compose p  pgp-menu
-</span><span class='line'>macro compose Y pfy <span class="s2">&quot;send mail without GPG&quot;</span>
-</span></code></pre></div></figure>
-
-
-<p>Sourcing the <span class="file">gpg.rc</span> reads all the relevant options
-and then a series of <code>send-hooks</code> allow you to use specific keys for each of
-your accounts.</p>
-
-<p>Now, when you receive encrypted mail, if your key agent is running, Mutt will
-decrypt your mail on the fly. Otherwise you will be prompted for your key
-phrase. Similarly, when you send email, it will by default be signed by the key
-associated with that account, and you can encrypt individual mail by bringing up
-the GPG menu in the compose screen by hitting <kbd>p</kbd>.</p>
-
-<p>And for those friends and acquaintances you correspond with for whom
-encryption is the equivalent of white powder spilling from an envelope, you can
-always elect to send without any GPG by selecting <kbd>Y</kbd> to send the
-email.</p>
-
-<p>These and a number of other interesting tips and macros are on the
-<a href="http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG" title="Using GPG">Mutt Wiki</a>
-and are worth following up once you have the basics working. Like so much of
-this sort of software, it takes a little longer to set up <em>exactly</em> the way that
-you want it, but once you are done, it is good for decades…</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>A good introduction to this procedure is detailed in the
-<a href="https://wiki.archlinux.org/index.php/GPG">Arch Wiki article</a>.</li>
-<li>This assumes that you do want to distinguish between the two; you could, of
-course, just encrypt <em>everything</em>—assuming that your correspondents were
-willing and able to decrypt it…</li>
-</ol>
-
-
-<p>Creative Commons image by <a href="http://www.flickr.com/photos/54450095@N05/8229504229/">Intel Free Press</a> on Flickr.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/9/">&larr; Older</a>
@@ -498,6 +489,10 @@ willing and able to decrypt it…</li>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
       </li>
     
@@ -511,10 +506,6 @@ willing and able to decrypt it…</li>
     
       <li class="post">
         <a href="/blog/2014/08/23/asp/">Building from Source</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/02/password/">pass{,word} manager</a>
       </li>
     
   </ul>
