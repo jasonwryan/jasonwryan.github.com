@@ -3,7 +3,7 @@ layout: post
 title: "Automating Kernel Builds"
 date: 2013-08-24 10:30
 comments: true
-categories: [archlinux, bash, hack]
+categories: [archlinux, bash, hack, kernel]
 ---
 {% img left /images/post_images/robot.jpg I Robot %}
 I posted a couple of weeks ago about 
