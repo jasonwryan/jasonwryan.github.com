@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="Now that I have been using it for several months, I have become absolutely dependent upon tmux, the terminal multiplexer.
+It is both ruthlessly &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/29/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/10/03/sessions-in-tmux/">Sessions in tmux</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-10-03T20:15:00+13:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2010</span></span> <span class='time'>8:15 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5046091307/" title="Sessions in tmux by jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4146/5046091307_39c200f1b0.jpg" width="500" height="293" alt="Sessions in tmux"/></a></p>
+
+<p>Now that I have been using it for several months, I have become absolutely dependent upon <a href="http://tmux.sourceforge.net/" target="_blank">tmux</a>, the terminal multiplexer.
+It is both ruthlessly efficient, and can be configured to match exacting requirements. One of those options is to initialize sessions with a preloaded window configuration. After reading the <a href="http://wisconsinlinux.org/tmux-manpage-from-cvs/tmux.1.txt" target="_blank">man page</a> (which, truth be told, could be a little clearer) and some experimentation, I have worked out how to set up my tmux sessions how I want them.
+I have just updated the <a href="http://wiki.archlinux.org/index.php/Tmux">Arch Wiki tmux entry</a>,
+so thought I would share it here.</p>
+
+<p>The relevant part of my config file looks like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># session initialization</span>
+</span><span class='line'>new  -n TTYtter /home/jason/Scripts/ttytter.pl
+</span><span class='line'>neww -n irssi /home/jason/Scripts/startirssi.sh
+</span><span class='line'>neww -n ncmpcpp/vifm ncmpcpp
+</span><span class='line'>splitw -v -p 50 -t 0 vifm
+</span><span class='line'>neww -n bash bash
+</span><span class='line'>selectw -t 1
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which, when I start tmux with the attach (or a) option, gives me the following window layout:</p>
+
+<ul>
+<li>TTYtter</li>
+<li>irssi</li>
+<li>ncmpcpp/vifm &nbsp; &nbsp; # window split vertically in half, ncmpcpp on top of vifm</li>
+<li>bash</li>
+</ul>
+
+
+<p>The <code>selectw</code> option means that the default view is TTYtter.</p>
+
+<p>Simple.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/09/28/command-line-notes/">Command Line Notes</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-09-28T17:56:00+13:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>5:56 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="/images/post_images/cli-notes-1.png" alt="image" /></p>
+
+<p>A couple of weeks ago, I came across these
+<a href="http://lifehacker.com/5592047/turn-your-command-line-into-a-fast-and-simple-note+taking-tool">simple bash functions</a>
+written by Jack Mottram of <a href="http://onethingwell.org/" title="One Thing Well">One Thing Well</a> for managing text
+notes.</p>
+
+<p>The functions as described in the article are so:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>n<span class="o">()</span> <span class="o">{</span> <span class="nv">$EDITOR</span> ~/notes/<span class="s2">&quot;$*&quot;</span>.txt <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>nls<span class="o">()</span> <span class="o">{</span> ls -c ~/notes/ | grep <span class="s2">&quot;$*&quot;</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Unfortunately, the second function – for retrieving the list of files in
+the notes directory has two significant shortcomings — it uses <code>ls</code><sup>1</sup>
+and it will only list files in the top level directory. If you are an
+inverterate note taker, this plainly won’t scale.</p>
+
+<p>My first attempt at hacking a solution yielded this little beauty:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -Cu --noreport ~/.notes | awk <span class="s1">&#39;{print $2,$3}&#39;</span> | tr -d <span class="o">[</span>:digit:<span class="o">]</span> | sed <span class="s1">&#39;s/]//&#39;</span><span class="se">\ </span>
+</span><span class='line'>| cut -d<span class="s2">&quot;.&quot;</span> -f1 ; <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which removes <code>ls</code> from the function and allows nested directories, but
+is needlessly complex and, with four pipes, hideously <del>inefficient</del>
+inelegant.</p>
+
+<p>After reading up on Awk, particularly
+<a href="http://www.grymoire.com/Unix/Awk.html">Bruce Barnett’s primer</a>,
+I arrived at something marginally longer but relying solely on the
+awesome power of awk to make the various transformations I was seeking…</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls<span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if (NF==1) print $1; \</span>
+</span><span class='line'><span class="s1">else if (NF==2) print $2; else if (NF==3) print &quot;  &quot;$3 }&#39;</span> ; <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>An added advantage is that it is scalable irrespective of how deep the
+directories go. I’m sure that with some more awk-foo I could write a
+more effective set of conditionals, but this seemed a pretty good start
+for a simple note taking utility.</p>
+
+<h3>Updated 3/11/10</h3>
+
+<p>To remove a little of the visual clutter, I amended the awk script to
+strip the <code>.txt</code> extensions from the output.<sup>2</sup></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nls <span class="o">()</span> <span class="o">{</span> tree -CR --noreport ~/.notes | awk <span class="s1">&#39;{ if ((NR &gt; 1) gsub(/.txt/,&quot;&quot;)); \</span>
+</span><span class='line'><span class="s1">if (NF==1) print $1; else if (NF==2) print $2; else if (NF==3) printf &quot;  %s\n&quot;, $3 }&#39;</span> ;<span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And if you really want this to work well, create your <span class="file">.notes</span> directory
+in a <a href="http://dropbox.com/" title="File synching utility">dropbox folder</a> and
+symlink to it from <span class="file">~/.notes</span>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>See <a href="http://mywiki.wooledge.org/ParsingLs" title="THE Bash Wiki">Parsing ls on Wooledge Wiki</a>.</p></li>
+<li><p>Obligatory “after” screenshot:</p></li>
+</ol>
+
+
+<p><img src="/images/post_images/cli-notes-2.png" title="'Screenshot of editing text'" ></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/08/06/mailers/">5 Alternate Mail Clients</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-08-06T17:03:00+12:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>5:03 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/462324481/lightbox/"><img src="/images/post_images/mail-5alts.png"/></a></p>
+
+<p>Rather than just download <a href="http://www.mozillamessaging.com/en-US/thunderbird/" title="Thunderbird homepage">Thunderbird</a>, you can always install something a little more interesting that will a) provide hours of fun setting up and configuring so that it works <em>exactly</em> the way you want it to, and b) will free you of the rodent…</p></p>
+
+<ul>
+<li><a href="http://www.mutt.org/" title="mutt homepage">Mutt</a> - a small but very powerful text-based mail client for Unix operating systems. Eminently extensible and configurable. mutt + imap + gmail ftw!</li>
+<li><a href="http://www.washington.edu/alpine/" title="Alpine homepage">Alpine</a> - based on the Pine® Message System. Not as intimidating for the novice as mutt…</li>
+<li><a href="http://sup.rubyforge.org/" title="sup homepage">Sup</a> - a console-based email client for people with a lot of email. “The goal of Sup is to become the email client of choice for nerds everywhere”</li>
+<li><a href="http://notmuchmail.org/">Notmuch</a> - an answer to Sup. Still in the early stages of development, there are two user interfaces available for it, one for <a href="http://www.vim.org/" title="THE text editor...">vim</a> and one for those poor benighted souls still using emacs…</li>
+<li><a href="http://www.courier-mta.org/cone/cone00index.html" title="Cone homepage">Cone</a> - a screen-oriented E-mail/News reader and writer. Cone contains an experimental implementation of a new remote mail access protocol, <a href="http://en.wikipedia.org/wiki/Simple_Mail_Access_Protocol" title="Wikipedia page">SMAP</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/30">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/28">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

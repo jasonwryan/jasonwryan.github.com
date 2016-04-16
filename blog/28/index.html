@@ -1,0 +1,669 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="Invariably, an Ubuntu
+upgrade only ever brings me pain in one area: the framebuffer. Granted,
+most Ubuntu users probably don’t care about the &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/28/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/10/21/console-fonts-in-ubuntu/">Console Fonts in Ubuntu</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-10-21T20:38:00+13:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2010</span></span> <span class='time'>8:38 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="/images/post_images/ubuntu-fonts.png" alt="image" /></p>
+
+<p>Invariably, an <a href="http://www.ubuntu.com/" title="Ubuntu homepage">Ubuntu</a>
+upgrade only ever brings me pain in one area: the framebuffer. Granted,
+most Ubuntu users probably don’t care about the resolution of their
+framebuffer because they probably rarely venture there.</p>
+
+<p>For me, however, having the correct resolution and a decent font is
+important. Not because I spend a huge amount of time there (I don’t),
+but because in the past I have been forced to — and quickly learned that
+if the resolution is off, it makes it <em>very</em> difficult to work with.</p>
+
+<p>So the recent, otherwise completely successful, upgrade to Maverick
+Meerkat once again left me with an almost useless console. Fortunately,
+the hack for forcing a 1680x1050 resolution worked<sup>1</sup>, so it was just a
+matter of getting
+<a href="http://fractal.csie.org/~eric/wiki/Terminus_font" title="Terminus homepage">Terminus</a>
+to stick as the default console font.</p>
+
+<p>This was one instance where Google failed me. There doesn’t seem to be
+any authoritative guide to setting your console font permanently. I
+edited <span class="file">/etc/default/console-setup</span>
+and added Terminus as the font, like so:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">CODESET</span><span class="o">=</span><span class="s2">&quot;Lat15&quot;</span>
+</span><span class='line'><span class="nv">FONTFACE</span><span class="o">=</span><span class="s2">&quot;Terminus&quot;</span>
+</span><span class='line'><span class="nv">FONTSIZE</span><span class="o">=</span><span class="s2">&quot;16&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Issuing, from the console:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo setupcon -v
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>would change the font to Terminus for that session but a reboot soon
+reverted it to the default fixed (which, given
+<a href="https://wiki.ubuntu.com/Ubuntu%20Font%20Family">Ubuntu have been working on their fonts</a>, is
+spectacularly ugly).</p>
+
+<p>I finally asked in #ubuntu and was pointed in the right direction:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo dpkg-reconfigure console-setup
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And <em>now</em> I have a workable framebuffer.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Hack to force higher framebuffer resolution in <span class="file">/etc/default/grub</span></li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">GRUB_GFXPAYLOAD_LINUX</span><span class="o">=</span>1680x1050
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/10/07/vimprobable/">Vimprobable</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-10-07T16:23:00+13:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>4:23 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/5055695051/" title="Vimprobable on Flickr"><img src="/images/post_images/vimprobable.png" title="Hacked Vimprobable2" alt="image" /></a></p>
+
+<p>After just posting details of <a href="http://jasonwryan.com/blog/2010/10/04/the-setup/">my setup</a>,
+I have made a reasonably significant (and it goes almost without saying, unplanned)
+change: after <a href="http://www.uzbl.org/">uzbl</a> began unaccountably maxxing
+out my CPU, I decided to give <a href="http://www.vimprobable.org/">Vimprobable</a>
+a go.</p>
+
+<p>I covered it briefly in my review of <a href="http://jasonwryan.com/blog/2010/05/21/5-alternate-browsers/">5 alternate browsers</a> and liked the
+idea of another vim-based browsing experience.</p>
+
+<p>There are two versions of Vimprobable; the differences, as described on
+the website:</p>
+
+<blockquote><p>Both versions are actively maintained. The first version can only be
+customised by editing config.h before compiling. It is pretty stable
+and very usable. Version 2 has grown fairly stable already as well,
+but it’s still seeing bigger changes, of course. It aims at allowing
+more customisation, for example through :set and :map commands.</p></blockquote>
+
+<p>I downloaded the tarball for
+<a href="http://aur.archlinux.org/packages.php?ID=33779" title="Arch User Repository: Vimprobable2">Vimprobable2 from the AUR</a>,
+extracted the files and built the package.</p>
+
+<p>Customization occurs in 3 files<sup>1</sup>: the first two,
+<span class="file">config.h</span> and <span class="file">keymap.h</span>
+both require you to recompile after editing, which is a trivial task
+given the size of the programme.</p>
+
+<p>Vimprobable2 also features a third configuration option that doesn’t
+require compiling after changes, <span class="file">vimprobablerc</span>.
+Should you wish to use it, you will need to create this file in
+<span class="file">~/.config/vimprobable/</span>.
+Helpfully, there is a man page for all of the options in this file, to
+read it issue:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>man vimprobablerc
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Despite it’s spartan appearance, Vimprobable is a full-featured browser
+— with the advantage of being driven solely from the keyboard. It
+handles bookmarks (and the tagging thereof, which is impressive and
+handy), multiple search engines, cookies, history, etc…</p>
+
+<p>I have made a number of changes to the defaults, including moving some
+of the keybindings to be closer to uzbl’s (habit, really). The other
+area where I made some minor changes was to the hinting style. Hinting
+is just the way Vimprobable (and other browsers like uzbl and
+<a href="http://conkeror.org/">Conkeror</a>) follow links; the default is, to put
+it mildly, garish<sup>2</sup>, so I hacked around in <span class="file">hinting.js</span>
+to make it more attractive.</p>
+
+<p>If you are interested, my vimprobable files are in
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/vimprobable2-git/">bitbucket</a>,
+including the modified hinting.js.</p>
+
+<h3>Update</h3>
+
+<p>I think this is a keeper. I installed
+<a href="http://tools.suckless.org/tabbed" title="suckless' tabbed">tabbed</a> and now
+open Vimprobable in tabbed for tab management. A quick addition to my
+keybinds in <a href="http://dwm.suckless.org/" title="dynamic window manager">dwm</a> and
+I have a minimalist and powerful browser…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>Of course, you are not limited to these files; the beauty of free
+and open-source software is that you can change any of it…</p></li>
+<li><p>To support this claim, I searched google for an image of the default
+Vimprobable hinting style, and I could only find this
+<a href="http://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/103/10387/10387f2.jpg">screenshot of conkeror</a>,
+which will give you an idea…</p></li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/10/04/the-setup/">The Setup</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-10-04T17:23:00+13:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>5:23 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.flickr.com/photos/jasonwryan/4522790892/" title="Arch Linux and dwm"><img src="/images/post_images/setup.png" alt="image" /></a></p>
+
+<p>Inspired by <a href="http://usesthis.com/">The Setup</a><sup>1</sup>, I decided to document
+the free (as in <a href="http://www.gnu.org/philosophy/free-sw.html">freedom</a>)
+and open source software tools I use daily.</p>
+
+<p>I made the move to using open-source about four years ago. At the time
+it was mostly a practical decision — the Pentium 4 laptop that I was
+using with XP on it had slowed to a crawl and I wasn’t keen to replace
+it, so I installed Ubuntu (Hardy Heron) on it and haven’t looked back.</p>
+
+<p>That same machine, incidentally, is still happily churning away, but it
+now runs a lightweight <a href="http://www.debian.org/releases/stable/">Debian Stable</a>.</p>
+
+<h3>Desktop</h3>
+
+<p>My primary home machine is a one I had built from spec two to three
+years ago. It was always intended to be a long-term investment, with
+sufficient power and storage to last for the better part of a decade.</p>
+
+<p>Centurion is an
+<a href="http://www.asus.com/Product.aspx?P_ID=cXoprTXLaShErTzI&amp;content=specifications">Asus P5E-V motherboard</a>
+with an
+<a href="http://www.intel.com/products/processor/core2quad/index.htm">Intel Core 2 Quad 6600 2.4GHz CPU</a> and
+4GB of DDR2 RAM. The sound card is an
+<a href="http://www.m-audio.com/products/en_us/Audiophile2496.html">M-Audio Audiophile 2496</a> and the
+graphics card is a
+<a href="http://www.nvidia.com/object/product_geforce_9600gt_us.html">1GB nVidia GeForce 9600GT</a>
+driving an LG 22” flat panel 1680x1050 display.</p>
+
+<h4>Software</h4>
+
+<p>I dual boot this machine, switching between the current
+<a href="http://www.ubuntu.com">Ubuntu</a> (10.04) and <a href="http://archlinux.org">Arch Linux</a>.</p>
+
+<p>There are two 1TB Seagate drives in a <a href="http://en.wikipedia.org/wiki/RAID">RAID1 array</a>,
+and a 500GB Seagate which has Arch on it as well as a couple of virtual machines.
+I back up the RAID array frequently, using <a href="http://www.samba.org/rsync/">rsync</a>, as it
+holds my <span class="file">/home</span> but don’t worry about the 500GB drive
+as I figure it is simple to reinstall Arch or a virtual machine…</p>
+
+<p>I try to use the same software across all of my machines to simplify my
+working habits, however I am experiencing some tension between Ubuntu
+and Arch insofar as Arch is a rolling release and you very quickly get
+used to the most recent builds…</p>
+
+<p>Applications specific to the Ubuntu box include:</p>
+
+<ul>
+<li><p><a href="http://www.getfirefox.net/">Firefox</a>: I also have
+<a href="http://www.google.com/chrome">Chrome</a> installed on this machine, but
+stick with the ‘fox for <a href="http://getfirebug.com/">Firebug</a> and other
+extensions</p></li>
+<li><p><a href="http://www.mozillamessaging.com/en-US/thunderbird/">Thunderbird</a>: with
+the <a href="http://enigmail.mozdev.org/home/index.php.html">Enigmail</a>
+extension. One of those areas of tension - it’s just a matter of time
+before I move to <code>mutt</code> (see EeePC)</p></li>
+<li><p><a href="http://wiki.slimdevices.com/index.php/SlimServer">Squeezeserver</a>: I
+have a Logitech Squeezebox to serve my music and it runs off this great
+open source software</p></li>
+<li><p><a href="http://www.virtualbox.org/">Virtualbox</a> (OS): for running virtual
+machines - currently <a href="http://www.slackware.com/">Slackware</a> and
+<a href="http://www.freebsd.org/">FreeBSD</a>.</p></li>
+</ul>
+
+
+<h3>EeePC 901</h3>
+
+<p>Archer is a 901 I bought two years ago – the
+<a href="http://eeepc.asus.com/au/product901-spec.html">Linux model with the 4/16GB SSD</a>, and I
+absolutely love it. I put a second GB of RAM into it and another 16GB SD
+Card (for /music) and it does everything that I need. The
+<a href="http://www.intel.com/products/processor/atom/index.htm">Atom 1.6GHz processor</a>
+handles compiling relatively smartly and the screen and keyboard, while
+small (9” at 1024x600) are not uncomfortable to use for protracted
+sessions. It is also <em>deathly quiet</em>. The only other addition is a
+second 6 cell battery so I can safely count on 8-10 hours out of it.</p>
+
+<p>One of the reasons that it works so efficiently is that it is an
+<em>extremely</em> minimal Arch Linux setup.</p>
+
+<h4>Software</h4>
+
+<p>Applications specific to this machine are:</p>
+
+<ul>
+<li><a href="http://dwm.suckless.org" title="dwm page on suckless">dwm</a>: <em>the</em>
+suckless window manager. With added functionality of some patches:
+init-pertag, cycle and push: see <a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/Build/dwm/5.8.2-2.diff">the patchset for
+details</a></li>
+<li><a href="http://tools.suckless.org/dmenu/">dmenu</a>: application launcher,
+again from suckless.org</li>
+<li><p><a href="http://www.mutt.org/">mutt</a>: the best email client I have used -
+requires some setup, but –if you want your mail client to run
+exactly as you would like– then this one repays the investment in
+spades. Mutt is just a MUA, the rest of the email cycle is handled
+by:</p>
+
+<ul>
+<li><a href="http://github.com/jgoerzen/offlineimap/wiki">offlineimap</a>: to
+fetch mail</li>
+<li><a href="http://msmtp.sourceforge.net/">msmtp</a>: to send mail</li>
+<li><a href="http://www.gnupg.org/">GnuPG</a>: for signing and encryption</li>
+<li><a href="http://abook.sourceforge.net/">abook</a>: address book</li>
+<li><a href="http://linuxcommand.org/man_pages/urlview1.html">urlview</a> and
+<a href="http://lynx.browser.org/">lynx</a>: open urls from mutt</li>
+</ul>
+</li>
+<li><p><del><a href="http://www.uzbl.org/">uzbl</a>: a lightweight webkit browser that is
+infintely extensible and
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/tip/.config/uzbl/config">configurable</a></del>^2^</p></li>
+<li><a href="http://www.vimprobable.org/">Vimprobable</a> in
+<a href="http://tools.suckless.org/tabbed">tabbed</a>: another lightweight
+webkit browser that can be
+<a href="http://www.flickr.com/photos/jasonwryan/5063510130/" title="Screenshot on Flickr">customized</a>
+to your heart’s desire…</li>
+<li>A host of small programs that make life easy:
+
+<ul>
+<li><a href="https://derf.homelinux.org/projects/feh/">feh</a>: image viewer</li>
+<li><a href="http://www.nongnu.org/autocutsel/">autocutsel</a>: synchronize
+clipboards</li>
+<li><a href="http://sites.google.com/site/gotmor/dzen">dzen</a> and
+<a href="http://conky.sourceforge.net/">conky</a>: to print system stats to
+dwm’s status bar</li>
+<li><a href="http://surfraw.alioth.debian.org/">surfraw</a>: command line
+search client</li>
+<li><a href="http://www.ibiblio.org/pub/X11/contrib/utilities/unclutter-8.README">unclutter</a>:
+hides the mouse cursor (don’t really need a mouse with this
+setup)</li>
+<li><a href="http://www.xfree86.org/4.2.0/xmodmap.1.html">xmodmap</a>: map Caps
+Lock to Escape</li>
+</ul>
+</li>
+</ul>
+
+
+<h4>Common tools</h4>
+
+<p>Applications and utilities that I use across all of my machines include:</p>
+
+<ul>
+<li><p><a href="http://software.schmorp.de/pkg/rxvt-unicode.html">Urxvt</a>: I would’nt
+dream of using another terminal… Run as a daemon, with these
+applications:</p>
+
+<ul>
+<li>  <a href="http://tmux.sourceforge.net/">tmux</a>: for local and remote terminal
+  sessions</li>
+<li>  <a href="http://www.vim.org/">Vim</a>: with a <a href="http://jasonwryan.com/blog/2010/09/28/command-line-notes/">simple notes function</a>
+  in my .bashrc</li>
+<li>  <a href="http://vifm.sourceforge.net/">Vifm</a>: Vi-like file manager – for
+  when I am not using
+  <a href="http://www.gnu.org/software/coreutils/">coreutils</a></li>
+<li>  <a href="http://www.floodgap.com/software/ttytter/">TTYtter</a>: fantastic
+  Twitter client: if it could integrate Identi.ca into a single feed,
+  it would be perfect…</li>
+<li>  <a href="http://irssi.org/">irssi</a>: for IRC</li>
+<li>  <a href="http://www.mplayerhq.hu/design7/news.html">Mplayer</a>: for movies</li>
+<li>  <a href="http://mpd.wikia.com/wiki/Music_Player_Daemon_Wiki">MPD</a> and
+  <a href="http://unkart.ovh.org/ncmpcpp/">ncmpcpp</a>: music player daemon and
+  ncurses player</li>
+<li>  <a href="http://code.google.com/p/mpdscribble/">mpdscribble</a>: for scrobbling
+  to Libre.fm and Last.fm</li>
+<li>  <a href="http://libtorrent.rakshasa.no/">rtorrent</a>: run inside tmux for
+remote sessions. Genius.</li>
+</ul>
+</li>
+<li><p><a href="http://www.dropbox.com/">Dropbox</a>: the daemon is closed source, but
+this is the best tool I have found for synching across machines. If the
+Ubuntu One devs ever focus on other Linux distros, I’d move across.</p></li>
+<li><a href="http://www.truecrypt.org/">Truecrypt</a>: a TC volume in Dropbox and you
+are set</li>
+<li><a href="http://www.skype.com/intl/en/home">Skype</a>.</li>
+</ul>
+
+
+<h4>Other Utilities</h4>
+
+<p>I use <a href="http://mercurial.selenic.com/">mercurial</a> and
+<a href="https://bitbucket.org/jasonwryan/">bitbucket</a> to share my dotfiles
+between Arch machines (one of my work boxes is also running Arch). I
+have two <a href="http://www.linksysbycisco.com/EU/en/products/WRT54GL">Linksys WRT54GL routers</a>, both
+running <a href="http://www.polarcloud.com/tomato">Tomato</a>, to handle my routing
+and wireless networking (thanks to
+<a href="http://twitter.com/jethrocarr" title="Jethro on Twitter">@jethrocarr</a> for
+solving that puzzle). For LAN file sharing I use
+<a href="http://nfs.sourceforge.net/">NFS</a> and I use
+<a href="http://www.openssh.com/">OpenSSH</a> to access my machines remotely. I
+have a third generation <a href="http://guides.macrumors.com/iPod_(3G">iPod</a>)
+and I run <a href="http://www.rockbox.org/">Rockbox</a> on it.</p>
+
+<p>You can see screenshot of these machines on
+<a href="http://www.flickr.com/photos/jasonwryan">flickr</a>.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p>…and the fact that, apart from RMS, it is pretty much MacBookPros
+all the way down.</p></li>
+<li><p>Updated 9/10/10 - <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/" title="My post on changing to Vimprobable">moved to Vimprobable</a>
+after some issues with uzbl.</p></li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/29">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/27">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
