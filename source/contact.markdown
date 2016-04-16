@@ -33,12 +33,6 @@ or find me on IRC in #freenode
 * [Professional connections](http://www.linkedin.com/in/jasonwryan) on LinkedIn
 
 
-## Bitcoin ##
-If you enjoy these posts and would like to spring for a coffee, you are welcome to do so using 
-[bitcoin](http://bitcoin.org/en/ 'Open source P2P money'):
-[13VFRYdzMJX33H8kiqVkB56MhkKsvFKX5a](bitcoin:13VFRYdzMJX33H8kiqVkB56MhkKsvFKX5a)
-
-
 ## Old Blog ##
 You can also find all of my old posts on public sector communications
 on the Wayback Machine's archive of the 
