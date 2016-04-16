@@ -20,13 +20,14 @@ There seems to be quite a bit of it about, because in &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2012/08/04/systemd">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2012/08/04/systemd/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -67,9 +68,8 @@ There seems to be quite a bit of it about, because in &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -96,14 +96,7 @@ There seems to be quite a bit of it about, because in &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2012-08-04T09:32:00+12:00" pubdate data-updated="true">Aug 4<span>th</span>, 2012</time>
+<time class='entry-date' datetime='2012-08-04T09:32:00+12:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>9:32 am</span></time>
         
       </p>
     
@@ -118,11 +111,11 @@ There seems to be quite a bit of it about, because in conjunction with the move 
 overarching shifts in the other distributions—the other major change making its way through
 the Arch community is the move to
 <a href="http://freedesktop.org/wiki/Software/systemd" title="Project page">systemd</a>. This change, however, has
-been more controversial because it marks a shift away from Arch&#8217;s central configuration
+been more controversial because it marks a shift away from Arch&rsquo;s central configuration
 file, <a href="https://wiki.archlinux.org/index.php/Rc.conf" title="Arch wiki entry on rc.conf">/etc/rc.conf</a>;
 a move that has disconcerted a number of people.</p>
 
-<p>I&#8217;m not going to get into whether or not this move is consistent with
+<p>I&rsquo;m not going to get into whether or not this move is consistent with
 <a href="https://wiki.archlinux.org/index.php/The_Arch_Way" title="Wiki entry">The Arch Way</a>, because that has
 been thrashed over extensively on the
 <a href="http://mailman.archlinux.org/pipermail/arch-dev-public/2012-July/023283.html" title="ML thread on rc.conf">mailing</a>
@@ -139,7 +132,7 @@ both knows what he is doing and is acting in the best interests of Arch.</p>
 I stripped out all of the redundant options in <span class="file">/etc/rc.conf</span>
 and took the ten minutes or so to read about and then create the new files. I then spent some
 time reading up on systemd, principally
-<a href="http://0pointer.de/blog/projects/systemd-for-admins-1.html" title="One of TWELVE…">Lennart Poettering&#8217;s series of posts</a>,
+<a href="http://0pointer.de/blog/projects/systemd-for-admins-1.html" title="One of TWELVE…">Lennart Poettering&rsquo;s series of posts</a>,
 the <a href="https://wiki.archlinux.org/index.php/Systemd" title="Good, but needing some structure">Arch wiki entry</a>
 and the many and various
 <a href="http://0pointer.de/public/systemd-man/" title="One for everything">manual pages</a>.</p>
@@ -153,8 +146,9 @@ return to. Essentially, this is how I tackled it.</p>
 and cross checking entries in my <span class="file">/etc/rc.conf</span>. Then
 it was just a matter of installing systemd:<sup>1</sup></p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S systemd systemd-sysvcompat systemd-arch-units
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo pacman -S systemd systemd-sysvcompat systemd-arch-units
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The only outstanding file to be created was <span class="file">/etc/timezone</span>, the
@@ -165,17 +159,21 @@ managing units. Repeatedly typing <code>systemctl enable foo.service</code> is a
 error prone, so I hacked up a
 <a href="https://bitbucket.org/jasonwryan/centurion/src/default/Scripts/sysd" title="sysd - *so* much easier">wrapper script</a>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sysd <span class="nb">enable </span>acpid
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sysd <span class="nb">enable </span>acpid
 </span><span class='line'>sysd <span class="nb">enable </span>lvm
 </span><span class='line'>etc…
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>I also activated some additional gettys, as I like to log into a tmux session in TTY2 when
-I don&#8217;t need or want to start <code>X</code>:</p>
+I don&rsquo;t need or want to start <code>X</code>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty2.service
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ln -sf /usr/lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty2.service
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>And I misguidedly wrote a couple of custom service files that turned out to be
@@ -192,7 +190,7 @@ now been added to the
 <a href="https://wiki.archlinux.org/index.php/Systemd" title="Archwiki systemd page">systemd wiki page</a>.</p>
 
 <p>Overall, though: no real drama, just a blur of text<sup>2</sup> and then the
-login prompt. While I haven&#8217;t seen a dramatic decrease in boot time,
+login prompt. While I haven&rsquo;t seen a dramatic decrease in boot time,
 booting does <em>feel</em> a bit snappier and two of my three machines shutdown
 markedly more quickly. Consider me sold.</p>
 
@@ -200,9 +198,9 @@ markedly more quickly. Consider me sold.</p>
 hanging on to a completely eviscerated <span class="file">/etc/rc.conf</span>. The
 Arch community has been told that the intention is to
 <a href="https://bbs.archlinux.org/viewtopic.php?pid=1133957#p1133957" title="BBS post by tomegun">support the rc.conf format forever</a>;
-I can&#8217;t help but think this is a mistake. In the same way that
+I can&rsquo;t help but think this is a mistake. In the same way that
 <a href="https://wiki.archlinux.org/index.php/Pacman#Partial_upgrades_are_unsupported" title="Pacman entry on Arch Wiki">partial upgrades are unsupported</a>,
-I think that systemd is Arch&#8217;s inevitable future and the community should be encouraged to accept that, <code>Syu</code> and
+I think that systemd is Arch&rsquo;s inevitable future and the community should be encouraged to accept that, <code>Syu</code> and
 move on…</p>
 
 <p>Having said that, I appreciate the consideration shown by the developers in wanting to assure
@@ -217,7 +215,7 @@ comment about the long term support for initscripts. As comments are hosted on
 a third-party paltform, I thought that it should be included in the body of the
 post.</p>
 
-<blockquote><p>Just a clarification: regarding the (probably very unwise) promise of &#8220;supporting <span="file">rc.conf</span> forever&#8221;, the intended meaning was that initscripts will support the syntax, not that initscripts themselves will always stay around (nor that systemd will gain support for the syntax in case initscripts is dropped).</p><p>At the moment systemd <strong>does</strong> support <span class="file">rc.conf</span> (when installed in conjunction with initscripts), but this is meant as a transitional measure only, and will likely go away eventually (though probably not soon).</p></blockquote>
+<blockquote><p>Just a clarification: regarding the (probably very unwise) promise of "supporting <span="file">rc.conf</span> forever", the intended meaning was that initscripts will support the syntax, not that initscripts themselves will always stay around (nor that systemd will gain support for the syntax in case initscripts is dropped).</p><p>At the moment systemd <strong>does</strong> support <span class="file">rc.conf</span> (when installed in conjunction with initscripts), but this is meant as a transitional measure only, and will likely go away eventually (though probably not soon).</p><footer><strong>Tom Gunderson</strong></footer></blockquote>
 
 
 <h4>Notes</h4>
@@ -246,14 +244,7 @@ boot so you can see that everything starts correctly…</li>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2012-08-04T09:32:00+12:00" pubdate data-updated="true">Aug 4<span>th</span>, 2012</time>
+<time class='entry-date' datetime='2012-08-04T09:32:00+12:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>9:32 am</span></time>
       
 
 <span class="categories">
@@ -402,7 +393,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -420,7 +411,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

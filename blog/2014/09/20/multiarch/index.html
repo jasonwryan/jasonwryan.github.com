@@ -21,13 +21,14 @@ the repository of user contributed PKGBUILDs that &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2014/09/20/multiarch">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2014/09/20/multiarch/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -68,9 +69,8 @@ the repository of user contributed PKGBUILDs that &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -97,14 +97,7 @@ the repository of user contributed PKGBUILDs that &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-09-20T09:16:00+12:00" pubdate data-updated="true">Sep 20<span>th</span>, 2014</time>
+<time class='entry-date' datetime='2014-09-20T09:16:00+12:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:16 am</span></time>
         
       </p>
     
@@ -120,7 +113,7 @@ for Arch by some magnitude. Given that PKGBUILDs are just shell scripts, the bar
 to entry is relatively low, and investing the small amount of effort required to clear
 that barrier will not only give you a much better understanding of how packaging works
 in Arch, but will scratch your own itch for a particular package and hopefully assuage
-someone else&#8217;s similar desire at the same time.</p>
+someone else&rsquo;s similar desire at the same time.</p>
 
 <p>Now that I have a
 <a href="http://www.raspberrypi.org/" title="Raspberry Pi site">Raspberry Pi</a><sup>1</sup>, I am
@@ -146,7 +139,7 @@ AUR as
 architectures, including ARM (both v6 and v7). Initially, when I wrote the
 PKGBUILD, I would <code>updpkgsums</code> on my x86_64 machine, build the package and
 then, on the Pi, have to regenerate the integrity checks. This was manageable
-enough for my own use across two architectures, but wasn&#8217;t really going to
+enough for my own use across two architectures, but wasn&rsquo;t really going to
 work for people using other architectures (especially if they are using
 <a href="http://jasonwryan.com/blog/2013/04/09/helpers/" title="My post on Yaourt">AUR helpers</a>).</p>
 
@@ -157,7 +150,21 @@ anything similarly tedious. Managing multiple architectures in the PKGBUILD
 itself is not particularly problematic, a case statement is sufficient:</p>
 
 <figure class='code'><figcaption><span>PKGBUILD </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="s2">&quot;$CARCH&quot;</span> in
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="s2">&quot;$CARCH&quot;</span> in
 </span><span class='line'>    armv6h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv6&quot;</span>
 </span><span class='line'>            sha1sums+<span class="o">=(</span><span class="s1">&#39;a94e5d00cec32956eb27bc12dbbc4964b68913f9&#39;</span><span class="o">)</span>
 </span><span class='line'>           ;;
@@ -171,7 +178,7 @@ itself is not particularly problematic, a case statement is sufficient:</p>
 </span><span class='line'>            sha1sums+<span class="o">=(</span><span class="s1">&#39;035730c09ca5383c90fdd9898baf66b90acdef24&#39;</span><span class="o">)</span>
 </span><span class='line'>           ;;
 </span><span class='line'><span class="k">esac</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The real challenge, for me, was to be able to script the replacement of each of
@@ -182,18 +189,46 @@ Syncthing is accompanied by a text file containing all of the sha1sums, each on
 its own line in a conveniently ordered format, like so:</p>
 
 <figure class='code'><figcaption><span>sha1sums.txt.asc </span></figcaption>
- <div class="highlight"><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
 </span><span class='line'>035730c09ca5383c90fdd9898baf66b90acdef24    syncthing-linux-amd64-v0.9.16.tar.gz
 </span><span class='line'>d743b64204f0ac7884e4b42d9b1865b2436f5ecb    syncthing-linux-armv5-v0.9.16.tar.gz
 </span><span class='line'>…
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>&#8217;s
+<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>&rsquo;s
 <a href="https://www.gnu.org/software/gawk/manual/html_node/Switch-Statement.html" title="Gawk manual">switch statement</a>,
 and an admittedly rather convoluted <code>printf</code> incantation.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'>    <span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'>    <span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">armv6</span><span class="o">/</span><span class="err">:</span>
 </span><span class='line'>        <span class="nx">arm6</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
 </span><span class='line'>        <span class="k">break</span>
@@ -217,7 +252,7 @@ and an admittedly rather convoluted <code>printf</code> incantation.</p>
 </span><span class='line'>         <span class="s2">&quot;esac\n&quot;</span><span class="p">,</span>
 </span><span class='line'>         <span class="nx">arm6</span><span class="p">,</span> <span class="nx">arm7</span><span class="p">,</span> <span class="nx">i386</span><span class="p">,</span> <span class="nx">x86</span>
 </span><span class='line'><span class="p">}</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The remaining step was to update the PKGBUILD with the new sha1sums. Fortunately,
@@ -225,7 +260,17 @@ and an admittedly rather convoluted <code>printf</code> incantation.</p>
 for this in his <code>updpkgsums</code> utility; I had only to adapt it slightly:</p>
 
 <figure class='code'><figcaption><span>excerpt from updpkgsums </span></figcaption>
- <div class="highlight"><pre><code class='awk'><span class='line'><span class="p">{</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'><span class="p">{</span>
 </span><span class='line'>  <span class="nx">rm</span> <span class="s2">&quot;$buildfile&quot;</span>
 </span><span class='line'>  <span class="nx">exec</span> <span class="nx">awk</span> <span class="o">-</span><span class="nx">v</span> <span class="nx">newsums</span><span class="o">=</span><span class="s2">&quot;$newsums&quot;</span> <span class="s1">&#39;</span>
 </span><span class='line'><span class="s1">    /^case/,/^esac$/ {</span>
@@ -235,11 +280,11 @@ for this in his <code>updpkgsums</code> utility; I had only to adapt it slightly
 </span><span class='line'><span class="s1">      END { if (!w) print newsums }</span>
 </span><span class='line'><span class="s1">  &#39;</span> <span class="o">&gt;</span> <span class="s2">&quot;$buildfile&quot;</span>
 </span><span class='line'><span class="p">}</span> <span class="o">&lt;</span> <span class="s2">&quot;$buildfile&quot;</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Combining these two tasks means that I have a script that, when run, will download
-the current Syncthing release&#8217;s <span class="file">sha1sum.txt.asc</span>
+the current Syncthing release&rsquo;s <span class="file">sha1sum.txt.asc</span>
 file, extract the relevant sums into the replacement case statement and then
 write it into the PKGBUILD. I can then run <code>makepkg -ci &amp;&amp; mkaurball</code>, upload
 the new tarball to the AUR and the two other people that are using the PKGBUILD
@@ -271,14 +316,7 @@ shiny, new version of Syncthing. You can see the full version of the script in
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-09-20T09:16:00+12:00" pubdate data-updated="true">Sep 20<span>th</span>, 2014</time>
+<time class='entry-date' datetime='2014-09-20T09:16:00+12:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:16 am</span></time>
       
 
 <span class="categories">
@@ -427,7 +465,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -445,7 +483,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: backup | jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/blog/categories/backup/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-19T08:20:47+13:00</updated>
+  <updated>2016-04-16T15:02:34+12:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -34,10 +34,10 @@ which has held up pretty well over that time.</p>
 make more regular backups, was that pruning the archives was a relatively
 tedious business. Given that Tarsnap
 <a href="http://www.tarsnap.com/efficiency.html" title="Tarsnap efficiency page">de-duplicates data</a>,
-there isn't much mileage in keeping around older archives because, if you do
-have to retrieve a file, you don't want to have to search through a large
+there isn&rsquo;t much mileage in keeping around older archives because, if you do
+have to retrieve a file, you don&rsquo;t want to have to search through a large
 number of archives to find it; so there is a balance between making use of
-Tarsnap's efficient functionality, and not creating a rod for your back if your
+Tarsnap&rsquo;s efficient functionality, and not creating a rod for your back if your
 use case is occasionally retrieving single—or small groups of—files, rather
 than large dumps.</p>
 
@@ -52,67 +52,112 @@ the number to keep is set to.</p>
 
 <p>The bulk of the code is simple enough:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>snapclean </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><figcaption><span>snapclean </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;generate list&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;tarsnap --list-archives &gt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;tarsnap <span class="p">&amp;</span>ndash<span class="p">;</span>list-archives &gt; <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;sort by descending date, format is: host-ddmmyy_hh:mm&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;<span class="o">{</span>
-</span><span class='line'>  rm <span class="s2">&quot;$tmpfile&quot;</span> &amp;amp;&amp;amp; sort -k 1.11,1.10 -k 1.8,1.9 -k 1.7,1.6 &gt; <span class="s2">&quot;$tmpfile&quot;</span>
-</span><span class='line'><span class="o">}</span> &amp;lt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>  rm <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> sort -k 1.11,1.10 -k 1.8,1.9 -k 1.7,1.6 &gt; <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'><span class="o">}</span> <span class="p">&amp;</span>lt<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;populate the list&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;mapfile -t archives &amp;lt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;mapfile -t archives <span class="p">&amp;</span>lt<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;print the full list&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;printf <span class="s2">&quot;%s\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Current archives${end}:&quot;</span> <span class="s2">&quot;${archives[@]#*-}&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;printf <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">cyn</span><span class="k">}</span>Current archives<span class="k">${</span><span class="nv">end</span><span class="k">}</span>:<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">archives</span><span class="p">[@]#*-</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;identify oldest archives&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;remove<span class="o">=</span><span class="k">$((</span> <span class="k">${#</span><span class="nv">archives</span><span class="p">[@]</span><span class="k">}</span> <span class="o">-</span> keep <span class="k">))</span>
-</span><span class='line'><span class="nv">targets</span><span class="o">=(</span> <span class="k">$(</span>head -n <span class="s2">&quot;$remove&quot;</span> <span class="s2">&quot;$tmpfile&quot;</span><span class="k">)</span> <span class="o">)</span>&lt;/p&gt;
+</span><span class='line'><span class="nv">targets</span><span class="o">=(</span> <span class="k">$(</span>head -n <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$remove</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span><span class="k">)</span> <span class="o">)</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;if there is at least one to remove&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">((</span> <span class="k">${#</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span> &gt;<span class="o">=</span> 1 <span class="o">))</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${red}Archives to delete${end}:&quot;</span>
-</span><span class='line'>  <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${targets[@]#*-}&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;if <span class="o">((</span> <span class="k">${#</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span> &gt;<span class="o">=</span> <span class="m">1</span> <span class="o">))</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">red</span><span class="k">}</span>Archives to delete<span class="k">${</span><span class="nv">end</span><span class="k">}</span>:<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">targets</span><span class="p">[@]#*-</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="nb">read</span> -p <span class="s2">&quot;Proceed with deletion? [${red}Y${end}/N] &quot;</span> YN&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;  <span class="nb">read</span> -p <span class="p">&amp;</span>ldquo<span class="p">;</span>Proceed with deletion? <span class="o">[</span><span class="k">${</span><span class="nv">red</span><span class="k">}</span>Y<span class="k">${</span><span class="nv">end</span><span class="k">}</span>/N<span class="o">]</span> <span class="p">&amp;</span>rdquo<span class="p">;</span> YN&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$YN</span> <span class="o">==</span> Y <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$YN</span> <span class="o">==</span> Y <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    <span class="k">for</span> archive in <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;;</span> <span class="k">do</span>
+</span><span class='line'>      tarsnap -d <span class="p">&amp;</span>ndash<span class="p">;</span>no-print-stats -f <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$archive</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>    <span class="k">done</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">yel</span><span class="k">}</span>Archives successfully deleted<span class="p">&amp;</span>hellip<span class="p">;</span><span class="k">${</span><span class="nv">end</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;for archive in <span class="s2">&quot;${targets[@]}&quot;</span>; <span class="k">do</span>
-</span><span class='line'><span class="k">  </span>tarsnap -d --no-print-stats -f <span class="s2">&quot;$archive&quot;</span>
-</span><span class='line'><span class="k">done</span> &amp;amp;&amp;amp; <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Archives successfully deleted...${end}&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Remaining archives:${end}&quot;</span>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Remaining archives:${end}&quot;</span>
 </span><span class='line'>tarsnap --list-archives
 </span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="k">else</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Operation aborted${end}&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>
+</span><span class='line'>&lt;p&gt;  <span class="k">else</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">yel</span><span class="k">}</span>Operation aborted<span class="k">${</span><span class="nv">end</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>  <span class="k">fi</span>
 </span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Nothing to do&quot;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Nothing to <span class="k">do</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
 </span><span class='line'>  <span class="nb">exit </span>0
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>You can see the rest of the script in
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snapclean" title="snapclean in bitbucket">my bitbucket repo</a>.  It even comes <a href="/images/post_images/snapclean.png" title="Screenshot of snapclean">with colour</a>.</p>
 
 <p>Once every couple of weeks, I run the script, review the archives marked for
-deletion and then blow them away. Easy. If you aren't using Tarsnap, you
+deletion and then blow them away. Easy. If you aren&rsquo;t using Tarsnap, you
 really should check it out; it is an excellent service and—for the almost
 ridiculously small investment—you get rock solid, encrypted peace of
 mind. Why would you not do that?</p>
@@ -130,8 +175,8 @@ professional, I am no longer able to fulfil my own expectations of regularly
 pushing these posts out.</p>
 
 <p>I will endeavour to, from time to time when I find something that I genuinely
-think is worth sharing, make an effort to write about it, but I can't see that
-happening all that often.  I'd like to thank all the people that have read
+think is worth sharing, make an effort to write about it, but I can&rsquo;t see that
+happening all that often.  I&rsquo;d like to thank all the people that have read
 these posts; especially those of you that have commented. With every post, I
 always looked forward to people telling me where I got something wrong or how I
 could have approached a problem differently or more effectively<sup>2</sup>; I
@@ -143,7 +188,7 @@ generous enough to share them.</p>
 <ol>
 <li>The frequency with which this happens is, admittedly, low; but not
 low enough to confidently abandon a service like this…</li>
-<li>Leaving a complimentary note is just as welcome, don't get me wrong…</li>
+<li>Leaving a complimentary note is just as welcome, don&rsquo;t get me wrong…</li>
 </ol>
 
 ]]></content>
@@ -166,7 +211,7 @@ entirely clear at the time, was clarified soon after and was crushingly disappoi
 the programme was closed source.</p>
 
 <p>Due to a combination of inertia (it was installed on all my devices and working well) and
-the lack of an alternative that didn't involve installing and running a
+the lack of an alternative that didn&rsquo;t involve installing and running a
 <a href="https://en.wikipedia.org/wiki/Lamp_stack" title="Wikipedia page">LAMP stack</a> just to sync
 my files, I have persisted with it; even writing a
 <a href="http://jasonwryan.com/blog/2013/11/14/api/" title="Post on said script">simple Awk script</a>
@@ -177,7 +222,7 @@ For the last twelve months I have been pretty happy with it.</p>
 <a href="https://play.google.com/store/apps/details?id=com.bittorrent.sync" title="On Google Play">Android App</a>
 <em>chews</em> through your battery if it is left on (which sort of defeats the purpose, but I
 learned to live with it), the syncing can take a little while to pick up changes, and
-nodes that don't see much action may flake out completely after a while.</p>
+nodes that don&rsquo;t see much action may flake out completely after a while.</p>
 
 <p>Then, a few weeks ago I read about <a href="https://github.com/jewel/clearskies" title="On Github">clearskies</a>,
 an open source implementation of this concept. Sadly, it is still a proof of
@@ -187,7 +232,7 @@ with <a href="https://twitter.com/csantosb" title="His profile on Twitter">cayet
 at <a href="http://syncthing.net/" title="Syncthing homepage">Syncthing</a>. Described thus (cue
 <a href="http://www.youtube.com/watch?v=7YaGwI7GjlA" title="G.F. Handel on Youtube">background music</a>):</p>
 
-<p><blockquote><p>Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it's transmitted over the Internet.</p></blockquote></p>
+<p><blockquote><p>Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it&rsquo;s transmitted over the Internet.</p></blockquote></p>
 
 <p>Written in <a href="http://golang.org/" title="Go language site">Go</a>, Syncthing is still in
 early development, but judging by the
@@ -199,8 +244,8 @@ and have Syncthing set up and running nicely. It is simple, elegant and
 works wonderfully; <em>for what it does</em>.</p>
 
 <p>Which is to say that it is not all of the things that either of its
-predecessors are: it isn't intended to distribute files, or to host images or
-simple websites. It doesn't include versioning or have a built-in editor. It is
+predecessors are: it isn&rsquo;t intended to distribute files, or to host images or
+simple websites. It doesn&rsquo;t include versioning or have a built-in editor. It is
 for securely syncing your files independent of any third parties. And there is no
 Android app, so your battery is safe<sup>1</sup>.</p>
 
@@ -211,7 +256,7 @@ that once I understood how the configuration worked, editing the config file at
 simpler.  When setting up, you will also do a lot of stopping and starting of
 <code>syncthing</code>; if you use the service file that comes with the
 <a href="https://aur.archlinux.org/packages/syncthing/" title="Arch User Repo">AUR package</a>,
-that won't work so well from the web interface… Run it from the command line
+that won&rsquo;t work so well from the web interface… Run it from the command line
 with one of the <code>STTRACE</code> variables to debug and then, once it is running to
 your liking, hand it off to systemd<sup>2</sup>.</p>
 
@@ -231,20 +276,20 @@ the nodes are started. Nodes still, from time-to-time, flake out, particularly
 if one of them is rebooted. Restarting the offending node is usually sufficient
 to bring the cluster back into sync.</p>
 
-<p>That isn't to say that there aren't any issues with it. The documentation is in
+<p>That isn&rsquo;t to say that there aren&rsquo;t any issues with it. The documentation is in
 need of some work; your best bet at the moment is a combination of the rather
 terse <code>--help</code> message and reading the source. There are also some hidden gems
 in the Github commits; for example, details on using
 <span class="file">.stignore</span> files, a very handy feature, are buried in
 an earlier
-<a href="https://github.com/calmh/syncthing/commit/986b15573a66f95beae53b10371ba50ab147124a" title="Github commit">commit to README.md</a> that didn't survive the move of the documentation to the
+<a href="https://github.com/calmh/syncthing/commit/986b15573a66f95beae53b10371ba50ab147124a" title="Github commit">commit to README.md</a> that didn&rsquo;t survive the move of the documentation to the
 forum.</p>
 
 <p>The only other significant issue I have encountered is that getting all of the
 nodes across the cluster to connect to each other at the same time seems to be
 inexplicably difficult. It may just be my setup, but more often than not, nodes
 (on the LAN) will timeout while trying to connect to at least one of their peers.
-This isn't a huge issue as you only really need one chained connection to bring
+This isn&rsquo;t a huge issue as you only really need one chained connection to bring
 all the data up to date, but it does cause a something of a minor
 <acronym title="Obsessive Compulsive Disorder">OCD</acronym> flare up.</p>
 
@@ -298,7 +343,7 @@ about having access to a tool to query the Sync application. One of the nodes is
 on my
 <a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on setting up a torrent box">headless Raspberry Pi</a>
 and the idea of being able to issue a command from my laptop to ascertain what
-was going on in the Pi's synced folders was (and is) a tremendously attractive
+was going on in the Pi&rsquo;s synced folders was (and is) a tremendously attractive
 one.</p>
 
 <p>However, now that I was in
@@ -319,7 +364,7 @@ for posterity in my <a href="https://bitbucket.org/jasonwryan/shiv/commits/16c9d
 (for the completists)…</p>
 
 <p>At this point, I was fortunate that Earnestly in #archlinux introduced me to
-keenerd's purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
+keenerd&rsquo;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
 And by “introduced” I mean generously (and patiently) talked me through how it
 worked and how I could use it with the Sync API to achieve what I was after.
 After a while playing with it, there was the—inevitably belated—moment of
@@ -330,7 +375,7 @@ extracting the desired elements.</p>
 
 <p>Now I was <em>cooking</em>. Well, more to the point, I was flailing about in a smoke
 filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
-asphyxiation. Once again, Earnestly's patience and bash skills were put to good effect.
+asphyxiation. Once again, Earnestly&rsquo;s patience and bash skills were put to good effect.
 The resulting script,
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="In bitbucket">btstat</a>,
 is undeniably a triumph of his good ideas over my own poor execution. In other
@@ -343,12 +388,14 @@ all faults are mine alone<sup>4</sup>.</p>
 <a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="My post on this great utility">aurphan, right?</a>)
 and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
 </span><span class='line'>directory2 H0p3fu11yY0uG3tTh31d3@
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The functionality in the script is limited at this stage to just querying the
-application; I wasn't interested in pushing changes at this point. So you can
+application; I wasn&rsquo;t interested in pushing changes at this point. So you can
 access the version of the currently installed Syncapp, upload and download
 speeds, the size of synced folders and list all of their contents.</p>
 
@@ -364,7 +411,7 @@ I need.</p>
 
 <ol>
 <li>Yes, I would much prefer to use an open source tool to accomplish the same
-thing but I haven't found anything comparable that is this good to date…</li>
+thing but I haven&rsquo;t found anything comparable that is this good to date…</li>
 <li>In what I imagine is a complete coincidence, the JSON logo is uncannily
 similar to the initial (and much better, I thought) Sync logo, as seen on
 <a href="http://jasonwryan.com/blog/2013/03/16/sync/">my original post</a>.</li>
@@ -422,13 +469,15 @@ secret and select or create the shared folder and your files will be synched. Do
 
 <p>On a headless machine, there is a config file that you can create:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --dump-sample-config &gt; syncapp.conf
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>syncapp <span class="p">&amp;</span>ndash<span class="p">;</span>dump-sample-config &gt; syncapp.conf
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Edit it to suit your requirements, and then start <code>syncapp</code> with that configuration:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --config /path/to/syncapp.conf
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>syncapp <span class="p">&amp;</span>ndash<span class="p">;</span>config /path/to/syncapp.conf
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>and you are away, happily synching.</p>
 
@@ -457,7 +506,7 @@ does—like versioning—that Sync can/will not do. Dropbox also allows you to h
 public files and folders, meaning that you can
 <a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on using dropbox to host dotfiles">setup a basic webpage</a>
 or <a href="https://www.dropbox.com/sh/t6ko1rbl9edy8p4/OkwVLtY5fO" title="My Top 10 Albums">share a photo album</a>.
-Sync clearly isn't designed for this.</p>
+Sync clearly isn&rsquo;t designed for this.</p>
 
 <p>However, in some other respects, like architectures
 for example, Sync is already a better choice. The ARMv6 port means that I am able
@@ -475,13 +524,13 @@ is not promising) people using the application now should know under what terms
 they are using it.</p>
 
 <p>In the absence of any definitive licensing, I can only assume that the application
-is covered by BitTorrent's
+is covered by BitTorrent&rsquo;s
 <a href="http://www.bittorrent.com/legal/eula" title="Licensing agreement on BitTorrent site">default EULA</a>.
 That ambiguity means that I am happy to participate in the
-trial and provide feedback, but I won't be using the app for any remotely
+trial and provide feedback, but I won&rsquo;t be using the app for any remotely
 sensitive data and I am unlikely to do so until that issue is clarified.</p>
 
-<p>I'll install <a href="http://sparkleshare.org/" title="Sparkleshare site">Sparkleshare</a>
+<p>I&rsquo;ll install <a href="http://sparkleshare.org/" title="Sparkleshare site">Sparkleshare</a>
 and give that a shot instead…</p>
 
 <h4>Notes</h4>
@@ -520,10 +569,13 @@ did not seem worth the effort.</p>
 <p>First, on my local desktop, I created the keypair called, inventively,
 rsync:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
 </span><span class='line'>mv rsync ~/.ssh &amp;amp;&amp;amp; chmod 600 ~/.ssh/rsync
 </span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>This keypair was created <em>without a passphrase</em> so that the script could
 be successfully called from <code>cron</code>. To slightly increase the security
@@ -531,43 +583,56 @@ around a key without a passphrase, I used the from option in
 authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
 machine(s), like so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>192.168.1.10*<span class="p">&amp;</span>rdquo<span class="p">;</span> ssh-rsa AAAAB3Nza<span class="p">&amp;</span>hellip<span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
 </span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
 the SSH command:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.ssh/config </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>Host backups
+<p><figure class='code'><figcaption><span>.ssh/config </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Host backups
 </span><span class='line'>   Hostname 192.168.1.200
 </span><span class='line'>   Port 0000
 </span><span class='line'>   User jason
-</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></td></tr></table></div></figure></p>
 
 <p>And I was done. Everynight at 10pm, all of my data will be backed up to
 the server. The rsync command in the script:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;Backup to remote server over SSH&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;--log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
-</span><span class='line'>-e ssh /home/jason /etc backups:Backups/Centurion
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt;rsync -azP <span class="p">&amp;</span>ndash<span class="p">;</span>delete <span class="p">&amp;</span>ndash<span class="p">;</span>exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span>log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
+</span><span class='line'>    -e ssh /home/jason /etc backups:Backups/Centurion
+</span></code></pre></td></tr></table></div></figure></p>
 
 <h5>Notes</h5>
 

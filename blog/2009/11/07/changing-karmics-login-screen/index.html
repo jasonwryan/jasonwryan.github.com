@@ -19,13 +19,14 @@ accelerate boot time. This has made for a faster boot, but a side effect &hellip
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2009/11/07/changing-karmics-login-screen">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2009/11/07/changing-karmics-login-screen/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -66,9 +67,8 @@ accelerate boot time. This has made for a faster boot, but a side effect &hellip
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -95,14 +95,7 @@ accelerate boot time. This has made for a faster boot, but a side effect &hellip
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2009-11-07T18:46:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2009</time>
+<time class='entry-date' datetime='2009-11-07T18:46:00+13:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>6:46 pm</span></time>
         
       </p>
     
@@ -121,14 +114,16 @@ at <code>/usr/share/images/xsplash</code>.</p>
 
 <p>Before doing anything rash, make a copy of the directory:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp -r /usr/share/images/xsplash ~/xsplash-backup
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then delete all of the images that begin with <code>bg_</code>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo rm /usr/share/images/xsplash/bg_*
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo rm /usr/share/images/xsplash/bg_*
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Use the gimp to create a background image for your desktop and save it into
@@ -142,16 +137,19 @@ background. This is all controlled in
 
 <p>Again, make a copy:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc <span class="se">\</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo cp /usr/share/themes/HumanLogin/gtk-2.0/gtkrc <span class="se">\</span>
 </span><span class='line'>/usr/share/themes/HumanLogin/gtk-2.0/gtkrc-backup
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then open the file and edit the relevant lines of code at the beginning of the
 file:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo vim /usr/share/themes/HumanLogin/gtk-2.0/gtkrc
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p><img src="/images/post_images/karmic-text.png" title="'Screenshot of editing text'" ></p>
@@ -177,14 +175,7 @@ desktop. Feel free to experiment, you can’t really break anything…</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2009-11-07T18:46:00+13:00" pubdate data-updated="true">Nov 7<span>th</span>, 2009</time>
+<time class='entry-date' datetime='2009-11-07T18:46:00+13:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>6:46 pm</span></time>
       
 
 <span class="categories">
@@ -333,7 +324,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -351,7 +342,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

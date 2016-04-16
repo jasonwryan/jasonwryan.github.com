@@ -4,7 +4,7 @@
   <title><![CDATA[Category: browser | jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/blog/categories/browser/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-19T08:20:47+13:00</updated>
+  <updated>2016-04-16T15:02:34+12:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -44,7 +44,7 @@ prepared to pay for.</p>
 realisation that the music I had bought in iTunes was stuck in there. The
 combined intellectual effort globally expended trying to legitimately route
 around broken copyright law would have comfortably powered another golden age
-of the sciences; it's not entirely implausible to think that the only reason we
+of the sciences; it&rsquo;s not entirely implausible to think that the only reason we
 still have to deal with cancer is the malignant legacy of
 <a href="https://en.wikipedia.org/wiki/Sonny_Bono_Copyright_Term_Extension_Act" title="Sonny's gift…">Sonny Bono</a><sup>2</sup>.</p>
 
@@ -56,46 +56,55 @@ authentication set up and your passphrase loaded in
 <a href="https://wiki.archlinux.org/index.php/SSH_Keys#Keychain" title="Arch wiki, for a change">keychain</a>,
 or something similar.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;SSH_HOST<span class="o">=</span><span class="s2">&quot;jason@XXX.XXX.XXX.XXX -p XXX -i $HOME/.ssh/box1&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;SSH_HOST<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>&lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;&amp;#x6d;&amp;#x61;&amp;#x69;&amp;#x6c;&amp;#116;&amp;#111;&amp;#58;&amp;#106;&amp;#x61;&amp;#x73;&amp;#111;&amp;#110;&amp;#64;&amp;#88;&amp;#88;&amp;#88;&amp;#x2e;&amp;#88;&amp;#88;&amp;#x58;&amp;#46;&amp;#88;&amp;#x58;&amp;#x58;&amp;#46;&amp;#x58;&amp;#x58;&amp;#x58;&quot;</span>&gt;<span class="p">&amp;</span><span class="c">#x6a;&amp;#97;&amp;#115;&amp;#111;&amp;#x6e;&amp;#x40;&amp;#88;&amp;#x58;&amp;#x58;&amp;#46;&amp;#88;&amp;#88;&amp;#88;&amp;#46;&amp;#x58;&amp;#88;&amp;#88;&amp;#x2e;&amp;#88;&amp;#x58;&amp;#x58;&lt;/a&gt; -p XXX -i $HOME/.ssh/box1&amp;rdquo;&lt;/p&gt;</span>
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;up<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;up<span class="o">(){</span>
+</span><span class='line'>    ssh -f -N -D <span class="m">8080</span> -M -S /tmp/ssh_tunnel_%h.sock -o <span class="nv">ExitOnForwardFailure</span><span class="o">=</span>yes <span class="nv">$SSH_HOST</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>ssh tunnel started successfully<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">||</span> <span class="se">\</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>ssh tunnel failed to start<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;ssh -f -N -D 8080 -M -S /tmp/ssh_tunnel_%h.sock -o <span class="nv">ExitOnForwardFailure</span><span class="o">=</span>yes <span class="nv">$SSH_HOST</span> &amp;amp;&amp;amp; <span class="se">\</span>
-</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel started successfully&quot;</span> <span class="o">||</span> <span class="se">\</span>
-</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel failed to start&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>&lt;p&gt;down<span class="o">(){</span>
+</span><span class='line'>    ssh -S /tmp/ssh_tunnel_%h.sock -O <span class="nb">exit</span> <span class="nv">$SSH_HOST</span>
+</span><span class='line'><span class="o">}</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;down<span class="o">(){</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;ssh -S /tmp/ssh_tunnel_%h.sock -O <span class="nb">exit</span> <span class="nv">$SSH_HOST</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> up <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;up &amp;amp;&amp;amp; chromium --proxy-server<span class="o">=</span><span class="s2">&quot;socks://127.0.0.1:8080&quot;</span> &amp;amp;
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> down <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;down
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;else&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail…&quot;</span>
-</span><span class='line'><span class="nb">exit </span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> up <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    up <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> chromium <span class="p">&amp;</span>ndash<span class="p">;</span>proxy-server<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>socks://127.0.0.1:8080<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>amp<span class="p">;</span>
+</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> down <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    down
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Fail…<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>    <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Over the last couple of weeks, though, while I have been setting up and
 <a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on Syncthing">playing with Syncthing</a>,
@@ -140,7 +149,7 @@ by Lawrence Whitmore.</p>
     <link href="http://jasonwryan.com/blog/2013/05/25/greader/"/>
     <updated>2013-05-25T09:10:00+12:00</updated>
     <id>http://jasonwryan.com/blog/2013/05/25/greader</id>
-    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/commafeed.png" title="'CommaFeed Logo'" >
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/commafeed.png" title="&lsquo;CommaFeed Logo&rsquo;" >
 I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
 everyday since I first discovered the service over seven years ago. It is my
 primary source of news and information and the announcement that Google is, on July 1 this year,
@@ -167,7 +176,7 @@ occasionally sluggish performance.</p>
 <a href="https://www.commafeed.com/" title="CommaFeed homepage">CommaFeed</a>, a
 Reader clone that emulates the austere minimalism of Google Reader. Apart from
 the fact that it is open source, the other aspect that attracted me to it
-was the ability to run it on Red Hat's Platform as a Service offering,
+was the ability to run it on Red Hat&rsquo;s Platform as a Service offering,
 <a href="http://www.openshift.com/" title="Red Hat PaaS">OpenShift</a>.</p>
 
 <p>The README on the <a href="https://github.com/Athou/commafeed" title="CommaFeed repo">Github repo</a>
@@ -183,13 +192,22 @@ is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
 under your <code>My Applications</code> tab, copy down your Git repo address, which will be
 of the form:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
 server:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git clone &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;https://github.com/Athou/commafeed.git&quot;</span>&gt;https://github.com/Athou/commafeed.git&lt;/a&gt;
 </span><span class='line'><span class="nb">cd </span>commafeed&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;add OpenShift as a repo&lt;/h1&gt;
@@ -197,18 +215,33 @@ server:</p>
 </span><span class='line'>&lt;p&gt;git remote add openshift -f ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.etc…
 </span><span class='line'>git merge openshift/master -s recursive -X ours
 </span><span class='line'>git push openshift master
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>This will then trigger a series of hooks that build the application and restart
 the server. If everything goes well you will see something like:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> <span class="p">&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;</span>
 </span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> <span class="p">&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;</span>
 </span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Total <span class="nb">time</span>: 3:18.195s
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Finished at: Mon May 20 03:21:37 EDT 2013
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Finished at: Mon May <span class="m">20</span> 03:21:37 EDT 2013
 </span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Final Memory: 42M/185M
-</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> <span class="p">&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;&amp;</span>mdash<span class="p">;</span>
 </span><span class='line'>remote: Running .openshift/action_hooks/build
 </span><span class='line'>remote: Running .openshift/action_hooks/deploy
 </span><span class='line'>remote: <span class="nv">hot_deploy_added</span><span class="o">=</span><span class="nb">false</span>
@@ -217,7 +250,7 @@ the server. If everything goes well you will see something like:</p>
 </span><span class='line'>remote: Done
 </span><span class='line'>remote: Running .openshift/action_hooks/post_deploy
 </span><span class='line'>To ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>You now have CommaFeed successfully running on OpenShift. After a couple of
 minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
@@ -227,9 +260,9 @@ then pushing to <code>openshift master</code>.</p>
 
 <p>Importing directly from Google Reader still seems broken (I was  getting
 errors from builds late this week), but if you import from an existing <code>.opml</code>
-or <code>.xml</code> file you will see CommaFeed in all it's glory:</p>
+or <code>.xml</code> file you will see CommaFeed in all it&rsquo;s glory:</p>
 
-<p><img class="left" src="/images/post_images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
+<p><img class="left" src="/images/post_images/commafeed_screen.png" title="&lsquo;ComaFeed screenshot&rsquo;" ></p>
 
 <p>As you can see, it is remarkably similar to the Google Reader interface; a
 clean, minimalist design that is focussed—quite rightly—on the content. There
@@ -247,7 +280,7 @@ of open source<sup>2</sup>.</p>
 
 <p>The performance of OpenShift has also been solid; feeds are delivered
 seemingly instantaneously and, apart from the slight lag after restarting
-the application, I haven't experienced any issues whatsoever in terms
+the application, I haven&rsquo;t experienced any issues whatsoever in terms
 of availability.</p>
 
 <p>There are still a couple of areas where CommaFeed can be improved. Most
@@ -258,7 +291,7 @@ any luck, some enterprising Android developer will build a CommaFeed app (for
 which I would happily pay good money)…</p>
 
 <p>In any event, if you are looking for a Google Reader replacement, try
-running CommaFeed (either on your own server or one of Red Hat's); for
+running CommaFeed (either on your own server or one of Red Hat&rsquo;s); for
 a project that is only a couple of months old, it has covered a
 tremendous amount of ground and will undoubtedly continue to grow
 and improve.</p>
@@ -281,7 +314,7 @@ will soon be even better than Google Reader, you might want to use it.</li>
     <link href="http://jasonwryan.com/blog/2012/11/20/vimprobable/"/>
     <updated>2012-11-20T18:58:00+13:00</updated>
     <id>http://jasonwryan.com/blog/2012/11/20/vimprobable</id>
-    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/vimprobable-logo.png" title="'Vimprobable logo'" >
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/vimprobable-logo.png" title="&lsquo;Vimprobable logo&rsquo;" >
 I have written about <a href="http://vimprobable.org" title="Vimprobable homepage">Vimprobable</a>
 a couple of times over the last two years<sup>1</sup>,
 it is one of those projects that, for a variety of reasons, I have picked up
@@ -289,7 +322,7 @@ and stuck with.  Like <a href="http://dwm.suckless.org" title="dwm homepage">dwm
 <a href="http://vim.org" title="Vim homepage">Vim</a> and
 <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>,
 it is an essential part of my working environment and is installed on all of my
-machines, where it is my default browser. It's simplicity, power and
+machines, where it is my default browser. It&rsquo;s simplicity, power and
 configurability are why, despite looking at a few other similar projects, I
 have stuck with Vimprobable since first installing it.</p>
 
@@ -298,10 +331,10 @@ I wanted to have another crack at making a decent screencast. Sadly,
 this is not it.  I can say that making a <em>good</em> screencast is not a simple
 accomplishment; there are so many elements that require significant attention. I
 spent a good many hours this time around playing with custom Xorg modelines,
-<code>ffmpeg</code>'s arcane encoding options and, to be frank, the final product is just not worth
+<code>ffmpeg</code>&rsquo;s arcane encoding options and, to be frank, the final product is just not worth
 all that effort.</p>
 
-<p>I'm going to stick with plain text from now on. It requires little more from me
+<p>I&rsquo;m going to stick with plain text from now on. It requires little more from me
 than a passing acquaintance with the subject matter, some loosely held and
 <a href="http://jasonwryan.com/blog/2012/08/18/trolls/" title="Trolling Arch Linux">firmly expressed opinions</a>
 and my unbridled confidence in the fact that anyone who
@@ -362,9 +395,11 @@ you can do it all from the keyboard.</p>
 <kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
 return to normal mode:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
 </span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Then, it is just a matter of identifying the text that you wish to copy
 (in the photo above I was copying a script to launch <code>tabbed</code>), and
@@ -409,37 +444,50 @@ in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
 <p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
 <psan class="file">/tmp</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&amp;lt;/tmp/tabbed.xid)&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">$(</span>tabbed -d &gt;/tmp/tabbed.xid<span class="k">)</span><span class="p">;</span> vimprobable2 -e <span class="k">$(</span><span class="p">&amp;</span>lt<span class="p">;</span>/tmp/tabbed.xid<span class="k">)</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Then it is just a matter of setting up other applications to pass links
 to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
 <span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> %s
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> %s
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The workaround for Urxvtc was a little trickier. I finally got there
 with some help from
 <a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
 In my <span class="file">~/.Xdefaults</span> I have:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>! <span class="p">&amp;</span>ndash<span class="p">;</span> Clickable urls <span class="p">&amp;</span>ndash<span class="p">;</span> !
 </span><span class='line'>URxvt.perl-ext-common: default,matcher
 </span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
 </span><span class='line'>URxvt.matcher.button: 1
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;Script to open Vimprobable instances in tabbed&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;exec vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt;exec vimprobable2 -e <span class="k">$(</span><span class="p">&amp;</span>lt<span class="p">;</span>/tmp/tabbed.xid<span class="k">)</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$1</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Now whenever I open a link in an application or by clicking a link in
 the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
@@ -517,9 +565,11 @@ It was just a matter then of adding some intuitive keybinds – as the <kbd>M</k
 and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
 <a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN    <span class="p">&lt;</span><span class="k">br</span>/<span class="p">&gt;</span>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN    <span class="p">&lt;</span><span class="k">br</span>/<span class="p">&gt;</span>
 </span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
 
@@ -527,8 +577,9 @@ and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
 
 <p>Gilles has edited and updated his answer with a slight change:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sh -c <span class="p">&amp;</span>lsquo<span class="p">;</span><span class="nb">printf</span> %s <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$0</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">|</span> xsel<span class="p">&amp;</span>rsquo<span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>This prevents a new line being appended.</p>
 ]]></content>

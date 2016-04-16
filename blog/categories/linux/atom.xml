@@ -4,7 +4,7 @@
   <title><![CDATA[Category: linux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-19T08:20:47+13:00</updated>
+  <updated>2016-04-16T15:02:34+12:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -51,8 +51,33 @@ prefer to work at the top of the console.</p>
 it was a trivial exercize to restore this functionality to my bash shell
 in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
+<p><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
 </span><span class='line'>
 </span><span class='line'>&lt;h1>for vi mode&lt;/h1>
 </span><span class='line'>
@@ -63,20 +88,20 @@ in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the re
 </span><span class='line'>
 </span><span class='line'>&lt;h1>these are for vi-command mode&lt;/h1>
 </span><span class='line'>
-</span><span class='line'>&lt;p>"\e[A": history-search-backward            # arrow up
-</span><span class='line'>"\e[B": history-search-forward             # arrow down
-</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
+</span><span class='line'>&lt;p>&ldquo;\e[A&rdquo;: history-search-backward            # arrow up
+</span><span class='line'>&ldquo;\e[B&rdquo;: history-search-forward             # arrow down
+</span><span class='line'>&ldquo;\ep&rdquo;: yank-last-arg                       # bind to Alt-p
 </span><span class='line'>Control-l: clear-screen&lt;/p>
 </span><span class='line'>
 </span><span class='line'>&lt;p>set keymap vi-insert&lt;/p>
 </span><span class='line'>
 </span><span class='line'>&lt;h1>these are for vi-insert mode&lt;/h1>
 </span><span class='line'>
-</span><span class='line'>&lt;p>"\e[A": history-search-backward
-</span><span class='line'>"\e[B": history-search-forward
-</span><span class='line'>"\ep": yank-last-arg
+</span><span class='line'>&lt;p>&ldquo;\e[A&rdquo;: history-search-backward
+</span><span class='line'>&ldquo;\e[B&rdquo;: history-search-forward
+</span><span class='line'>&ldquo;\ep&rdquo;: yank-last-arg
 </span><span class='line'>Control-l: clear-screen
-</span><span class='line'>$endif</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>$endif</span></code></pre></td></tr></table></div></figure></p>
 
 <p>There is an extensive list of
 <a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
@@ -105,38 +130,52 @@ anyway—I thought I’d patch in colour support.</p>
 <p>This is a straightforward two-step process. First, build the current
 version of libtorrent, 0.12.9:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz&quot;</span>&gt;http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz&lt;/a&gt;
 </span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
 </span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
-</span><span class='line'>./configure &amp;amp;&amp;amp; make
+</span><span class='line'>./configure <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make
 </span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Once libtorrent is successfully built and installed, you can begin the
 rtorrent build:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz&quot;</span>&gt;http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz&lt;/a&gt;
 </span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
 </span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Then, if you want colour support, you need the patch. I used the version
 in the
 <a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
 but you can also grab a copy from a paste site:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;http://paste.geekosphere.org/twy7&quot;</span>&gt;http://paste.geekosphere.org/twy7&lt;/a&gt;
 </span><span class='line'>mv canvas_colour.patch src/
 </span><span class='line'>patch -uNp1 -i canvas_colour.patch
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The patch should apply cleanly. Then specify where libtorrent is
 installed to ensure that it is linked during the rtorrent build:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>./configure <span class="p">&amp;</span>ndash<span class="p">;</span><span class="nv">libdir</span><span class="o">=</span>/usr/local/lib
 </span><span class='line'>make
 </span><span class='line'>sudo checkinstall
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Once again, this should compile cleanly and you will now have rtorrent
 with colour and magnet link support installed in
@@ -177,10 +216,13 @@ did not seem worth the effort.</p>
 <p>First, on my local desktop, I created the keypair called, inventively,
 rsync:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
 </span><span class='line'>mv rsync ~/.ssh &amp;amp;&amp;amp; chmod 600 ~/.ssh/rsync
 </span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>This keypair was created <em>without a passphrase</em> so that the script could
 be successfully called from <code>cron</code>. To slightly increase the security
@@ -188,43 +230,56 @@ around a key without a passphrase, I used the from option in
 authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
 machine(s), like so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>192.168.1.10*<span class="p">&amp;</span>rdquo<span class="p">;</span> ssh-rsa AAAAB3Nza<span class="p">&amp;</span>hellip<span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>crontab -e
 </span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
 the SSH command:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.ssh/config </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>Host backups
+<p><figure class='code'><figcaption><span>.ssh/config </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Host backups
 </span><span class='line'>   Hostname 192.168.1.200
 </span><span class='line'>   Port 0000
 </span><span class='line'>   User jason
-</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></td></tr></table></div></figure></p>
 
 <p>And I was done. Everynight at 10pm, all of my data will be backed up to
 the server. The rsync command in the script:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;Backup to remote server over SSH&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;--log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
-</span><span class='line'>-e ssh /home/jason /etc backups:Backups/Centurion
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt;rsync -azP <span class="p">&amp;</span>ndash<span class="p">;</span>delete <span class="p">&amp;</span>ndash<span class="p">;</span>exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span>log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
+</span><span class='line'>    -e ssh /home/jason /etc backups:Backups/Centurion
+</span></code></pre></td></tr></table></div></figure></p>
 
 <h5>Notes</h5>
 
@@ -282,57 +337,72 @@ I’ll set up a
 <a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
 automate the task.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;Backup to remote server over NFS&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>     <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>You must run this as root. Terminating.<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>     <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
-</span><span class='line'> <span class="nb">exit </span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
-</span><span class='line'> mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">fi</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>     <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Sentinel mounted.<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'>     <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Mounting Sentinel.<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>     mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
+</span><span class='line'> <span class="k">fi</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;sync directories&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt; <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Starting sync<span class="p">&amp;</span>hellip<span class="p">;&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt; rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>&lt;p&gt; rsync -azP <span class="p">&amp;</span>ndash<span class="p">;</span>delete <span class="p">&amp;</span>ndash<span class="p">;</span>exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\</span>
+</span><span class='line'>     <span class="p">&amp;</span>ndash<span class="p">;</span>log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
+</span><span class='line'>     /home/jason /etc /media/Sentinel/Backups/Centurion&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
-</span><span class='line'> /home/jason /etc /media/Sentinel/Backups/Centurion
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
-</span><span class='line'> umount /media/Sentinel
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt; <span class="k">fi</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt; <span class="k">if</span> <span class="o">[</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$?</span><span class="p">&amp;</span>rdquo<span class="p">;</span> -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>     <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Synched successfully<span class="p">;</span> now unmounting.<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>     umount /media/Sentinel
+</span><span class='line'> <span class="k">else</span>
+</span><span class='line'>     <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Fail!<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'> <span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <h5>Notes</h5>
 
@@ -369,20 +439,26 @@ on my Arch machines, I wanted to make it work with
 <a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
 Enter a simple shell script:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$HOME</span>/Dropbox/irssi/<span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;echo <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;done
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$dir</span><span class="p">&amp;</span>rdquo<span class="p">;</span> &gt;/dev/null 2&gt;<span class="p">&amp;</span>1<span class="p">;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="nb">echo</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>IRC: You have been pinged<span class="p">&amp;</span>hellip<span class="p">;&amp;</span>rdquo<span class="p">;</span> <span class="p">|</span> dzen2 -p 3
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>I have included this in my <span class="file">$HOME/.xinitrc</span>
 so that it runs in the background after login. Whenever the metadata

@@ -20,13 +20,14 @@ I thought that it was time to stop procrastinating and do something about &helli
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2012/07/09/syslinux">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2012/07/09/syslinux/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -67,9 +68,8 @@ I thought that it was time to stop procrastinating and do something about &helli
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -96,14 +96,7 @@ I thought that it was time to stop procrastinating and do something about &helli
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2012-07-09T13:51:00+12:00" pubdate data-updated="true">Jul 9<span>th</span>, 2012</time>
+<time class='entry-date' datetime='2012-07-09T13:51:00+12:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>1:51 pm</span></time>
         
       </p>
     
@@ -115,18 +108,18 @@ With the announcement late last month that
 <a href="http://lists.gnu.org/archive/html/grub-devel/2012-06/msg00093.html" title="Grub ML announcement">Grub 2.00 has been released</a>
 I thought that it was time to stop procrastinating and do something about moving away from
 <a href="http://www.gnu.org/software/grub/grub-legacy.html" title="Gnu Page for Grub Legacy">Grub Legacy</a>,
-which is no longer actively developed. Not that there is anything wrong with Grub Legacy&#8217;s
+which is no longer actively developed. Not that there is anything wrong with Grub Legacy&rsquo;s
 functionality; it has always done whatever I asked of it (admittedly, not a lot) and done so
 without complaint.</p>
 
 <p>I have used Grub2 before, when I was running Ubuntu on my home desktop, and it is the bootloader
-on my Debian Squeeze server. I can&#8217;t, however, say that I have ever really understood—or
+on my Debian Squeeze server. I can&rsquo;t, however, say that I have ever really understood—or
 appreciated—its mutliple file, “need to reconfigure after making any changes” type of
 complexity. So, I thought that I would give
 <a href="http://www.syslinux.org/wiki/index.php/The_Syslinux_Project" title="Syslinux Wiki">Syslinux</a>
 a shot.</p>
 
-<p>Syslinux isn&#8217;t a single bootloader, rather it is a collection of lightweight bootloaders,
+<p>Syslinux isn&rsquo;t a single bootloader, rather it is a collection of lightweight bootloaders,
 with <a href="http://www.syslinux.org/wiki/index.php/EXTLINUX" title="Extlinux page on Syslinux Wiki">Extlinux</a>
 responsible for booting ext2, ext3, ext4 and btrfs filesystems. As the
 <a href="https://wiki.archlinux.org/index.php/Syslinux" title="The FINE Wiki">Arch Wiki Syslinux page</a>
@@ -135,12 +128,13 @@ notes, since Syslinux 4, Extlinux has been merged with Syslinux.</p>
 <p>Installing Syslinux is <em>ridiculously</em> easy. It is literally a five step process. First,
 install the package:</p>
 
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -S syslinux</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>pacman -S syslinux</span></code></pre></td></tr></table></div></figure>
 
 
 <p>After installing <code>syslinux</code> pacman will helpfully tell you what to do next:</p>
 
-<blockquote><p>==> If you want to use syslinux as your bootloader<br/>==> edit /boot/syslinux/syslinux.cfg and run<br/>==>   # /usr/sbin/syslinux-install_update -i -a -m<br/>==> to install it.</p></blockquote>
+<blockquote><p>==> If you want to use syslinux as your bootloader<br/>==> edit /boot/syslinux/syslinux.cfg and run<br/>==>   # /usr/sbin/syslinux-install_update -i -a -m<br/>==> to install it.</p><footer><strong>pacman says</strong></footer></blockquote>
 
 
 <p>Arch user <a href="http://pyther.net/" title="Matthew's website">Matthew Gyurgyik</a> has written an
@@ -150,13 +144,13 @@ ingenious script, <code>syslinux-install_update</code> that automates the proces
 with my desktop, there is a RAID array present, and if so passes the install command the
 <code>--raid</code> flag:</p>
 
-<blockquote><p>RAID mode.  If boot fails, tell the BIOS to boot the next device in the boot sequence (usually the next  hard<br/>disk) instead of stopping with an error message.  This is useful for RAID-1 booting.</p></blockquote>
+<blockquote><p>RAID mode.  If boot fails, tell the BIOS to boot the next device in the boot sequence (usually the next  hard<br/>disk) instead of stopping with an error message.  This is useful for RAID-1 booting.</p><footer><strong>man syslinux</strong></footer></blockquote>
 
 
 <p>After running the script, you should receive a message advising you that Syslinux
 has been sucessfully installed on both drives:</p>
 
-<blockquote><p>Detected RAID on /boot - installing Syslinux with &#8211;raid<br/>Syslinux install successful<br/>Boot Flag Set - /dev/sda1<br/>Boot Flag Set - /dev/sdb1<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sda<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sdb</p></blockquote>
+<blockquote><p>Detected RAID on /boot - installing Syslinux with --raid<br/>Syslinux install successful<br/>Boot Flag Set - /dev/sda1<br/>Boot Flag Set - /dev/sdb1<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sda<br/>Installed MBR (/usr/lib/syslinux/mbr.bin) to /dev/sdb</p></blockquote>
 
 
 <p>If you are moving from Grub Legacy, configuring Syslinux is similarly painless.
@@ -165,25 +159,35 @@ the defaults and the prompt entries.</p>
 
 <p>I set up my defaults to be essentially invisible:</p>
 
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'># General settings
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># General settings
 </span><span class='line'>DEFAULT Arch
 </span><span class='line'>PROMPT 0
-</span><span class='line'>TIMEOUT 0</span></code></pre></div></figure>
+</span><span class='line'>TIMEOUT 0</span></code></pre></td></tr></table></div></figure>
 
 
 <p>And then copy across the relevant lines from my <span class="file">/boot/grub/menu.lst</span>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>grep <span class="nv">root</span><span class="o">=</span> /boot/grub/menu.lst &gt;&gt; /boot/syslinux/syslinux.cfg
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>grep <span class="nv">root</span><span class="o">=</span> /boot/grub/menu.lst &gt;&gt; /boot/syslinux/syslinux.cfg
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then it is just a matter of adding the relevant entries under LABEL:</p>
 
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>LABEL Arch
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>LABEL Arch
 </span><span class='line'>   MENU LABEL Arch Linux
 </span><span class='line'>   LINUX ../vmlinuz-linux
 </span><span class='line'>   APPEND root=/dev/mapper/vgroup-lvroot cryptdevice=/dev/md1:vgroup ro
-</span><span class='line'>   INITRD ../initramfs-linux.img</span></code></pre></div></figure>
+</span><span class='line'>   INITRD ../initramfs-linux.img</span></code></pre></td></tr></table></div></figure>
 
 
 <p>You then add entries for Fallback, and any other images that you may wish to
@@ -191,8 +195,10 @@ boot from.</p>
 
 <p>And that, in their entirety, is steps two and three. You then move to steps four and five:</p>
 
-<figure class='code'><div class="highlight"><pre><code class=''><span class='line'>pacman -Rsn grub
-</span><span class='line'>shutdown -r now</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>pacman -Rsn grub
+</span><span class='line'>shutdown -r now</span></code></pre></td></tr></table></div></figure>
 
 
 <p>And you reboot with Syslinux. Done.</p>
@@ -228,14 +234,7 @@ Labels to boot. Brilliant.</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2012-07-09T13:51:00+12:00" pubdate data-updated="true">Jul 9<span>th</span>, 2012</time>
+<time class='entry-date' datetime='2012-07-09T13:51:00+12:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>1:51 pm</span></time>
       
 
 <span class="categories">
@@ -384,7 +383,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -402,7 +401,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

@@ -21,13 +21,14 @@ settled on &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2014/04/05/calendar">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2014/04/05/calendar/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -68,9 +69,8 @@ settled on &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -97,14 +97,7 @@ settled on &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-04-05T09:48:00+13:00" pubdate data-updated="true">Apr 5<span>th</span>, 2014</time>
+<time class='entry-date' datetime='2014-04-05T09:48:00+13:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:48 am</span></time>
         
       </p>
     
@@ -128,9 +121,9 @@ doing so is more likely to induce a seizure than a punctual appearance at an
 important meeting. To get around this, I had been using a basic Awk script that
 would parse the most important parts of the message and print them out. This was
 working well enough until I started to receive invitations from people using
-OSX. For some god-unknown reason, Apple&#8217;s “interpretation” of the
+OSX. For some god-unknown reason, Apple&rsquo;s “interpretation” of the
 standard<sup>2</sup> is different enough to those sent from Evolution and
-Thunderbird that my script wouldn&#8217;t successfully print some of the data (just
+Thunderbird that my script wouldn&rsquo;t successfully print some of the data (just
 the start and end times of the meeting, nothing too important).</p>
 
 <p>I started to try and expand the capability of the script and then realized that
@@ -142,7 +135,7 @@ In a further delightful coincidence, the original author of the script,
 ex-colleague who, in 2004, first got me interested in Linux (thank you, Martyn).
 Armed with this script and entries in <span class="file">$HOME/.mutt/{mailcap,muttrc}</span>
 now, whenever I open a calendar invitation, the pertinent details are printed
-out perfectly legibly. It&#8217;s a small step, but an important one.</p>
+out perfectly legibly. It&rsquo;s a small step, but an important one.</p>
 
 <p>Next I started playing around with
 <a href="http://lostpackets.de/khal/" title="khal homepage">khal</a>, a command line calendaring
@@ -170,22 +163,33 @@ functions of adding, editing or deleting events.</p>
 excited about is the ability to add events from the command line, as per the
 example in the documentation:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>khal --new 25.10. 16:00 18:00 Another Event :: with Alice and Bob
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>khal --new 25.10. 16:00 18:00 Another Event :: with Alice and Bob
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>I just needed to figure out a way to extract the relevant fields from the iCal
 file and pass them to khal. My first attempt is unashamedly ugly, both in
-conception and execution. However, I don&#8217;t know Perl (and at this stage of my
+conception and execution. However, I don&rsquo;t know Perl (and at this stage of my
 life
 <a href="https://twitter.com/jasonwryan/status/204660063669989376" title="Sad, but true…">I have run out of time to learn it</a>),
 and it actually works. I
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/ical_filter.pl" title="In my bitbucket repo">modified</a>
-Martyn&#8217;s script to write to a temp file and then, for iCal events I want to
+Martyn&rsquo;s script to write to a temp file and then, for iCal events I want to
 import to khal, I bound a key sequence in Mutt to a simple Awk
 script<sup>5</sup>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
 </span><span class='line'><span class="c1"># read from ical_filter.pl and then send ical invitation details </span>
 </span><span class='line'><span class="c1"># in mutt to khal</span>
 </span><span class='line'>
@@ -195,15 +199,17 @@ script<sup>5</sup>:</p>
 </span><span class='line'><span class="sr">/^Dtend/</span>     <span class="p">{</span> <span class="nx">time_nd</span> <span class="o">=</span> <span class="o">$</span><span class="mi">4</span> <span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="nx">END</span>          <span class="p">{</span> <span class="kr">print</span>  <span class="nx">date_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_nd</span><span class="s2">&quot; &quot;</span><span class="nx">summ</span> <span class="p">}</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>In <span class="file">$HOME/.mutt/muttrc</span>, I have
 <kbd>Ctrl</kbd><kbd>k</kbd> in pager view trigger the script like so:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># save iCal to khal</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># save iCal to khal</span>
 </span><span class='line'>macro pager <span class="se">\C</span>k  <span class="s2">&quot;!/usr/bin/khal --new $(~/Scripts/mutt2khal ~/.mutt/temp/caldata)&quot;</span> <span class="s2">&quot;Saving Calendar event&quot;</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Neither elegant nor imaginative, I know; but for a first attempt, it gets the
@@ -247,14 +253,7 @@ Needless to say, patches are welcomed.</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-04-05T09:48:00+13:00" pubdate data-updated="true">Apr 5<span>th</span>, 2014</time>
+<time class='entry-date' datetime='2014-04-05T09:48:00+13:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:48 am</span></time>
       
 
 <span class="categories">
@@ -403,7 +402,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -421,7 +420,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

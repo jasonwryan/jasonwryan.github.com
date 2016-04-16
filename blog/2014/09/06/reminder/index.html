@@ -19,13 +19,14 @@ where I naively shared one of the first bash scripts I had written without &hell
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2014/09/06/reminder">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2014/09/06/reminder/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -66,9 +67,8 @@ where I naively shared one of the first bash scripts I had written without &hell
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -95,14 +95,7 @@ where I naively shared one of the first bash scripts I had written without &hell
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-09-06T10:59:00+12:00" pubdate data-updated="true">Sep 6<span>th</span>, 2014</time>
+<time class='entry-date' datetime='2014-09-06T10:59:00+12:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>10:59 am</span></time>
         
       </p>
     
@@ -129,7 +122,7 @@ transparent it is so ingrained in my workflow.</p>
 invoice and when the payment is actually due. I find that companies will
 typically email their invoices to me some weeks in advance, whereupon I will
 make a mental note and then, unsurprisingly, promptly forget all about it,
-thereby opening myself up for penalties for late payment.  It didn&#8217;t take me
+thereby opening myself up for penalties for late payment.  It didn&rsquo;t take me
 long (well, in my defence, a lot less time than it took for invoices to become
 digital) to realise that there was a better way™ - a script.</p>
 
@@ -144,7 +137,23 @@ needed a script to make it painless to achieve.</p>
 <p>The main function of the script is pretty self-explanatory:</p>
 
 <figure class='code'><figcaption><span>todo </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>aread<span class="o">()</span> <span class="o">{</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>aread<span class="o">()</span> <span class="o">{</span>
 </span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Time of message? [HH:MM] &quot;</span> attime
 </span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Date of message? [DD.MM.YY] &quot;</span> atdate
 </span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Message body? &quot;</span> message
@@ -160,7 +169,7 @@ needed a script to make it painless to achieve.</p>
 </span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Incorrectly formatted values, bailing...&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>1
 </span><span class='line'>  <span class="k">fi</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Now, an invoice arrives, I open it and fire up
@@ -194,7 +203,7 @@ great pointers, Florian.</p>
 <li>In the interests of full disclosure, the most egregious line was
 <code>myterm=$(echo $TERM)</code> which I would hope I copied blindly from somewhere
 else, but accept full responsibility for nonetheless.</li>
-<li>Don&#8217;t poke around too much in there, I still have quite a lot of cleaning up to do…</li>
+<li>Don&rsquo;t poke around too much in there, I still have quite a lot of cleaning up to do…</li>
 </ol>
 
 
@@ -215,14 +224,7 @@ on Flickr.</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-09-06T10:59:00+12:00" pubdate data-updated="true">Sep 6<span>th</span>, 2014</time>
+<time class='entry-date' datetime='2014-09-06T10:59:00+12:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>10:59 am</span></time>
       
 
 <span class="categories">
@@ -371,7 +373,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -389,7 +391,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

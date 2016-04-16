@@ -21,13 +21,14 @@ standard Unix &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2014/08/02/password">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2014/08/02/password/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -68,9 +69,8 @@ standard Unix &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -97,14 +97,7 @@ standard Unix &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-08-02T09:28:00+12:00" pubdate data-updated="true">Aug 2<span>nd</span>, 2014</time>
+<time class='entry-date' datetime='2014-08-02T09:28:00+12:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2014</span></span> <span class='time'>9:28 am</span></time>
         
       </p>
     
@@ -125,7 +118,7 @@ or interesting for some other tangential reason.</p>
 it is a 600 line bash script that uses
 <a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard" title="Wikpedia entry">GPG encryption</a>
 and some other standard tools and scripts to organize and manage your password
-files. I had never heard of it but, based on Cayetano and Bigby&#8217;s
+files. I had never heard of it but, based on Cayetano and Bigby&rsquo;s
 recommendations, I thought it would be worth a look.</p>
 
 <p>On of the reasons that I had not come across it before was that, after using
@@ -134,7 +127,7 @@ assumed that I would need to continue to use that database format; so when I
 was looking for an alternative,
 <a href="http://raymontag.github.io/keepassc/" title="KeePassC homepage">KeePassC</a>
 was a natural fit (and a fine application). The question of migrating my data
-hadn&#8217;t even occurred to me…</p>
+hadn&rsquo;t even occurred to me…</p>
 
 <p>It turns out that the migration process to pass is extraordinarily well catered
 for: there are
@@ -153,9 +146,9 @@ environment variable to place the top level pass directory in an alternate
 location. This way, instead of initializing a git repository, I could have the
 store synced by
 <a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="My post on Syncthing">Syncthing</a>.
-The git idea is a good one, but I&#8217;m not particularly interested in version
+The git idea is a good one, but I&rsquo;m not particularly interested in version
 controlling these directories, and I have no intention, encrypted or not, of
-pushing them to someone else&#8217;s server.</p>
+pushing them to someone else&rsquo;s server.</p>
 
 <p>That constitutes the basic setup. It took a grand total of five minutes. The
 real strength of pass, however, is in its integration with two other fantastic
@@ -165,14 +158,14 @@ tools:
 Together with pass, these constitute a secure, convenient and effortless
 workflow for managing your passwords. With your GPG key loaded into keychain,
 you are only prompted for your master passphrase once<sup>1</sup> and with
-Chris Down&#8217;s excellent
+Chris Down&rsquo;s excellent
 <a href="http://git.zx2c4.com/password-store/tree/contrib/dmenu/passmenu" title="In the pass repo">passmenu script</a>,
 you can use dmenu to sort through your password files, <kbd>Tab</kbd> complete
 the one you are looking for and have it copied to your clipboard with a couple
 of keystrokes.</p>
 
-<p>After using Chris&#8217; script for a couple of days, I made a few alterations to
-suit my setup: removed the <code>xdotool</code> stuff (as I don&#8217;t need it), included dmenu
+<p>After using Chris' script for a couple of days, I made a few alterations to
+suit my setup: removed the <code>xdotool</code> stuff (as I don&rsquo;t need it), included dmenu
 formatting options to match my
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/dwm-status" title="In my bitbucket repo">dwm statusbar</a>
 and, most significantly, changed the way that the files are printed in dmenu to
@@ -180,7 +173,34 @@ remove the visual clutter of the parent directories, ie., print <span class="fil
 as opposed to <span class="file">internet/archwiki</span>:</p>
 
 <figure class='code'><figcaption><span>dpass </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
 </span><span class='line'><span class="c"># based on: https://github.com/cdown/passmenu</span>
 </span><span class='line'>
 </span><span class='line'><span class="nb">shopt</span> -s nullglob globstar
@@ -207,7 +227,7 @@ as opposed to <span class="file">internet/archwiki</span>:</p>
 </span><span class='line'>    <span class="k">fi  </span>
 </span><span class='line'><span class="k">  done</span>
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>It does introduce some more complexity into the script, but it makes it a lot
@@ -224,7 +244,7 @@ for the main shells, and even one for
 <p>While I have no complaints at all with KeePassC, I have found this pass setup to
 be a lot less intrusive to use, it seamlessly integrates with my workflow,
 and the passwords themselves are much simpler to manage. Short of someone else
-popping up in the comments with another compelling proposition, I&#8217;m content
+popping up in the comments with another compelling proposition, I&rsquo;m content
 with the way this has worked out. Many thanks to Cayetano Santos and Bigby
 James for the push.</p>
 
@@ -257,14 +277,7 @@ your key…</li>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-08-02T09:28:00+12:00" pubdate data-updated="true">Aug 2<span>nd</span>, 2014</time>
+<time class='entry-date' datetime='2014-08-02T09:28:00+12:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2014</span></span> <span class='time'>9:28 am</span></time>
       
 
 <span class="categories">
@@ -413,7 +426,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -431,7 +444,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

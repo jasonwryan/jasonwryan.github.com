@@ -20,13 +20,14 @@ primary source of news and information &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2013/05/25/greader">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2013/05/25/greader/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -67,9 +68,8 @@ primary source of news and information &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -96,14 +96,7 @@ primary source of news and information &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2013-05-25T09:10:00+12:00" pubdate data-updated="true">May 25<span>th</span>, 2013</time>
+<time class='entry-date' datetime='2013-05-25T09:10:00+12:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>9:10 am</span></time>
         
       </p>
     
@@ -137,7 +130,7 @@ occasionally sluggish performance.</p>
 <a href="https://www.commafeed.com/" title="CommaFeed homepage">CommaFeed</a>, a
 Reader clone that emulates the austere minimalism of Google Reader. Apart from
 the fact that it is open source, the other aspect that attracted me to it
-was the ability to run it on Red Hat&#8217;s Platform as a Service offering,
+was the ability to run it on Red Hat&rsquo;s Platform as a Service offering,
 <a href="http://www.openshift.com/" title="Red Hat PaaS">OpenShift</a>.</p>
 
 <p>The README on the <a href="https://github.com/Athou/commafeed" title="CommaFeed repo">Github repo</a>
@@ -153,26 +146,48 @@ is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
 under your <code>My Applications</code> tab, copy down your Git repo address, which will be
 of the form:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
 server:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
 </span><span class='line'><span class="nb">cd </span>commafeed
 </span><span class='line'><span class="c"># add OpenShift as a repo</span>
 </span><span class='line'>git remote add openshift -f ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.etc…
 </span><span class='line'>git merge openshift/master -s recursive -X ours
 </span><span class='line'>git push openshift master
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>This will then trigger a series of hooks that build the application and restart
 the server. If everything goes well you will see something like:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
 </span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
 </span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
 </span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Total <span class="nb">time</span>: 3:18.195s
@@ -187,7 +202,7 @@ the server. If everything goes well you will see something like:</p>
 </span><span class='line'>remote: Done
 </span><span class='line'>remote: Running .openshift/action_hooks/post_deploy
 </span><span class='line'>To ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>You now have CommaFeed successfully running on OpenShift. After a couple of
@@ -198,7 +213,7 @@ then pushing to <code>openshift master</code>.</p>
 
 <p>Importing directly from Google Reader still seems broken (I was  getting
 errors from builds late this week), but if you import from an existing <code>.opml</code>
-or <code>.xml</code> file you will see CommaFeed in all it&#8217;s glory:</p>
+or <code>.xml</code> file you will see CommaFeed in all it&rsquo;s glory:</p>
 
 <p><img class="left" src="/images/post_images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
 
@@ -218,7 +233,7 @@ of open source<sup>2</sup>.</p>
 
 <p>The performance of OpenShift has also been solid; feeds are delivered
 seemingly instantaneously and, apart from the slight lag after restarting
-the application, I haven&#8217;t experienced any issues whatsoever in terms
+the application, I haven&rsquo;t experienced any issues whatsoever in terms
 of availability.</p>
 
 <p>There are still a couple of areas where CommaFeed can be improved. Most
@@ -229,7 +244,7 @@ any luck, some enterprising Android developer will build a CommaFeed app (for
 which I would happily pay good money)…</p>
 
 <p>In any event, if you are looking for a Google Reader replacement, try
-running CommaFeed (either on your own server or one of Red Hat&#8217;s); for
+running CommaFeed (either on your own server or one of Red Hat&rsquo;s); for
 a project that is only a couple of months old, it has covered a
 tremendous amount of ground and will undoubtedly continue to grow
 and improve.</p>
@@ -259,14 +274,7 @@ will soon be even better than Google Reader, you might want to use it.</li>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2013-05-25T09:10:00+12:00" pubdate data-updated="true">May 25<span>th</span>, 2013</time>
+<time class='entry-date' datetime='2013-05-25T09:10:00+12:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>9:10 am</span></time>
       
 
 <span class="categories">
@@ -415,7 +423,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -433,7 +441,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

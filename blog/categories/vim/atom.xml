@@ -4,7 +4,7 @@
   <title><![CDATA[Category: vim | jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/blog/categories/vim/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-19T08:20:47+13:00</updated>
+  <updated>2016-04-16T15:02:34+12:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -23,17 +23,17 @@
 <a href="http://www.gnu.org/software/emacs/" title="GNU Emacs page">Emacs</a> is more than
 <a href="http://en.uncyclopedia.co/wiki/Emacs" title="Uncyclopedia entry">just an editor</a>);
 it is for all intents and purposes a universal design pattern. The concept of using
-Vim's modes and keybinds extends from
+Vim&rsquo;s modes and keybinds extends from
 <a href="http://jasonwryan.com/blog/2011/12/01/readline/" title="Post on readline">the shell</a>
 through to <a href="http://jasonwryan.com/blog/2009/12/28/changing-keybinds-in-vifm/" title="Post on Vifm">file managers</a>
 and <a href="http://jasonwryan.com/blog/2012/11/20/vimprobable/" title="Vimprobable screencast">browsers</a>.
 If you so choose (and I <em>do</em>), then a significant amount of your interactions with your
-operating system are mediated by Vim's design principles. This is undeniably a
+operating system are mediated by Vim&rsquo;s design principles. This is undeniably a
 good thing™ as it goes some way to standardising your command interface (whether at the
 command line or in a <acronym title="Graphic User Interface">GUI</acronym>).</p>
 
 <p>To that end, I have been spending more time working with Vim and trying to
-improve both my understanding of it's capabilities, the environment in which I
+improve both my understanding of it&rsquo;s capabilities, the environment in which I
 use it and how I can optimise both of those conditions to not necessarily just
 be more productive, but to minimise friction in my work flows.</p>
 
@@ -58,24 +58,39 @@ one has really grown on me (see the screenshot on the right).</p>
 <p>I <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/.vim/colors/mirowriter.vim" title="Bitbucket repo">adapted my colour scheme</a> for it, added a line to my <span class="file">~/.vimrc</span>
 to enable it for specific document types, and have not looked back.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'>autocmd <span class="nb">BufRead</span> <span class="p">&lt;</span><span class="k">em</span><span class="p">&gt;</span>.markdown<span class="p">,&lt;</span>/<span class="k">em</span><span class="p">&gt;</span>tex <span class="k">call</span> DistractFree#DistractFreeToggle<span class="p">()</span> <span class="p">|</span> <span class="k">wincmd</span> <span class="k">w</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>autocmd <span class="nb">BufRead</span> <span class="p">&lt;</span><span class="k">em</span><span class="p">&gt;</span>.markdown<span class="p">,&lt;</span>/<span class="k">em</span><span class="p">&gt;</span>tex <span class="k">call</span> DistractFree#DistractFreeToggle<span class="p">()</span> <span class="p">|</span> <span class="k">wincmd</span> <span class="k">w</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The final piece was to set up spell checking  to work properly. As well as
 using English, I wanted to share my personal whitelist of words between all of
 my machines, so I define a location in <span class="file">~/.vimrc</span>
 as well:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">spelllang</span><span class="p">=</span>en_gb                               <span class="c">&quot; real English spelling</span>
-</span><span class='line'><span class="k">set</span> <span class="nb">dictionary</span><span class="p">+=</span><span class="sr">/usr/</span>share<span class="sr">/dict/</span>words             <span class="c">&quot; use standard dictionary</span>
-</span><span class='line'><span class="k">set</span> <span class="nb">spellfile</span><span class="p">=</span>$HOME<span class="sr">/Sync/</span><span class="k">vim</span><span class="sr">/spell/</span><span class="k">en</span>.utf<span class="m">-8</span>.add   <span class="c">&quot; my whitelist</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">spelllang</span><span class="p">=</span>en_gb                               &amp;ldquo; real English spelling
+</span><span class='line'><span class="k">set</span> <span class="nb">dictionary</span><span class="p">+=</span><span class="sr">/usr/</span>share<span class="sr">/dict/</span>words             &amp;rdquo; use standard <span class="nb">dictionary</span>
+</span><span class='line'><span class="k">set</span> <span class="nb">spellfile</span><span class="p">=</span>$HOME<span class="sr">/Sync/</span><span class="k">vim</span><span class="sr">/spell/</span><span class="k">en</span>.utf<span class="m">-8</span>.add   &amp;ldquo; my whitelist
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Then it is just a matter of ensuring that misspelled or other flagged words (like those
 that should be capitalised) are highlighted correctly. This required a couple of lines in
 my colour schemes:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="c">&quot; Spell checking  ---</span>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>&amp;ldquo; Spell checking  &amp;mdash;
 </span><span class='line'><span class="k">if</span> <span class="k">version</span> <span class="p">&gt;=</span> <span class="m">700</span>
 </span><span class='line'>  <span class="k">hi</span> clear SpellBad
 </span><span class='line'>  <span class="k">hi</span> clear SpellCap
@@ -86,16 +101,16 @@ my colour schemes:</p>
 </span><span class='line'>  <span class="k">hi</span> SpellRare   ctermfg<span class="p">=</span><span class="m">13</span>   cterm<span class="p">=</span><span class="nb">underline</span>
 </span><span class='line'>  <span class="k">hi</span> SpellLocal  cterm<span class="p">=</span>None
 </span><span class='line'><span class="k">endif</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The most significant change, however, was that I recently purchased a hard
-copy of Drew Neill's excellent
+copy of Drew Neill&rsquo;s excellent
 <a href="http://pragprog.com/book/dnvim/practical-vim" title="Just buy it, now…">Practical Vim</a>. I
-have long been a fan of Drew's excellent podcast, <a href="http://vimcasts.org/" title="Drew's site">Vimcasts</a>,
+have long been a fan of Drew&rsquo;s excellent podcast, <a href="http://vimcasts.org/" title="Drew's site">Vimcasts</a>,
 and the book is every bit as impressive as the collection of those episodes,
 and more.  Reading it on my commute over the last week, I have been constantly
-amazed at the power and flexibility of this editor and Drew's ability to clearly
-articulate how to work economically and efficiently with it.  I'm convinced
+amazed at the power and flexibility of this editor and Drew&rsquo;s ability to clearly
+articulate how to work economically and efficiently with it.  I&rsquo;m convinced
 this is an invaluable resource for anyone that currently uses Vim or wants to
 learn.</p>
 
@@ -106,7 +121,7 @@ me to focus on hacking words together (and to do the occasional bit of
 
 <h4>Notes</h4>
 
-<p>Image is from the cover of Drew Neill's
+<p>Image is from the cover of Drew Neill&rsquo;s
 <a href="http://pragprog.com/book/dnvim/practical-vim">Practical Vim</a>, by
 <a href="http://en.wikipedia.org/wiki/Ben_Cormack">Ben Cormack</a>.</p>
 ]]></content>
@@ -117,15 +132,15 @@ me to focus on hacking words together (and to do the occasional bit of
     <link href="http://jasonwryan.com/blog/2013/03/29/vim/"/>
     <updated>2013-03-29T10:17:00+13:00</updated>
     <id>http://jasonwryan.com/blog/2013/03/29/vim</id>
-    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/vim-logo.png" title="'Vim logo'" >
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/vim-logo.png" title="&lsquo;Vim logo&rsquo;" >
 Apart from a brief, but nevertheless instructive, flirtation with
 <a href="http://www.gnu.org/software/emacs/" title="Emacs homepage">Emacs</a><sup>1</sup> I have
 been a consistent <a href="http://www.vim.org/" title="Vim home">Vim</a> user over the last three
 or four years. Like most Vim users, I have made some progress over that time
-in spite of Vim's
+in spite of Vim&rsquo;s
 <a href="http://stackoverflow.com/a/1815372/712613" title="SO answer on Vim">notorious learning curve</a>
 and have now reached the point where, belatedly, I think I understand it just enough
-to really grasp how little I actually know. It's a milestone that speaks more to
+to really grasp how little I actually know. It&rsquo;s a milestone that speaks more to
 necessity than gratification, granted.</p>
 
 <p>In any event, as part of confronting my Vim shortcomings (no
@@ -135,14 +150,14 @@ productive (in my own, admittedly cloistered, working environment). That, you wi
 probably not be surprised to read, does not include needing support for Arabic or
 Farsi to be built into Vim.</p>
 
-<p>Part of the beauty of Vim is that, unlike it's
+<p>Part of the beauty of Vim is that, unlike it&rsquo;s
 <a href="http://en.wikipedia.org/wiki/Editor_war#Humor" title="…lacking a decent editor">operating system counterpart Emacs</a>,
 you can choose how much functionality you wish to enable at compile-time. You do want
 support for Farsi? Then the <code>--with-features=big</code> option is what you are looking for.
 If, on the other hand, you just want the barest of bones, editor-wise, you could opt
 for the austere minimalism that is <code>--with-features=tiny</code> and find yourself happily
 transported back in time to
-<a href="https://en.wikipedia.org/wiki/Vi" title="Wikipedia page on Vi">Bill Joy's lab in 1976</a>.</p>
+<a href="https://en.wikipedia.org/wiki/Vi" title="Wikipedia page on Vi">Bill Joy&rsquo;s lab in 1976</a>.</p>
 
 <p>You can peruse all of the various features available to Vim using the <code>:help version</code>
 command.<sup>2</sup> There is also
@@ -159,22 +174,29 @@ what you will of that, but for my purposes it is overkill. With all the magic of
 to exactly your requirements. For me, that means this set of simplified <code>configure</code>
 options:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>  ./configure <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;--prefix<span class="o">=</span>/usr <span class="se">\</span>
-</span><span class='line'>--localstatedir<span class="o">=</span>/var/lib/vim <span class="se">\</span>
-</span><span class='line'>--with-features<span class="o">=</span>normal <span class="se">\</span>
-</span><span class='line'>--with-compiledby<span class="o">=</span>Arch:jwr <span class="se">\</span>
-</span><span class='line'>--with-x<span class="o">=</span>yes <span class="se">\</span>
-</span><span class='line'>--enable-acl <span class="se">\</span>
-</span><span class='line'>--disable-gui <span class="se">\</span>
-</span><span class='line'>--disable-signs <span class="se">\</span>
-</span><span class='line'>--disable-netbeans <span class="se">\</span>
-</span><span class='line'>--enable-multibyte
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>  ./configure <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span><span class="nv">prefix</span><span class="o">=</span>/usr <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span><span class="nv">localstatedir</span><span class="o">=</span>/var/lib/vim <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span>with-features<span class="o">=</span>normal <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span>with-compiledby<span class="o">=</span>Arch:jwr <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span>with-x<span class="o">=</span>yes <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span><span class="nb">enable</span>-acl <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span>disable-gui <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span>disable-signs <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span>disable-netbeans <span class="se">\</span>
+</span><span class='line'>    <span class="p">&amp;</span>ndash<span class="p">;</span><span class="nb">enable</span>-multibyte
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>With these options, I have the minimum amount of functionality I comfortably
 require (including the ability to access the system clipboard, <code>--with-x=yes</code>)
@@ -186,11 +208,11 @@ is a split package, just building <code>vim</code> still includes options superf
 my needs.  As a result, I get Vim with just the features I need, without the
 dependencies of <code>ruby</code> and <code>lua</code> and god knows what else.</p>
 
-<p>I'm not operating under any illusions about the fact that this is
+<p>I&rsquo;m not operating under any illusions about the fact that this is
 really saving a huge amount of space or, for that matter, drastically reducing the
 number of dependencies I have installed. It is partly about understanding how Vim
 works at another level while also catering for the obsessive-compulsive drive to
-micro-control what is and isn't installed on my systems. If you want to scratch either
+micro-control what is and isn&rsquo;t installed on my systems. If you want to scratch either
 of the same itches, you can see the full
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/vim/PKGBUILD" title="Eviscerated Vim PKGBUILD">PKGBUILD in Bitbucket</a>.</p>
 
@@ -244,8 +266,33 @@ prefer to work at the top of the console.</p>
 it was a trivial exercize to restore this functionality to my bash shell
 in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
-<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
+<p><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
 </span><span class='line'>
 </span><span class='line'>&lt;h1>for vi mode&lt;/h1>
 </span><span class='line'>
@@ -256,20 +303,20 @@ in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the re
 </span><span class='line'>
 </span><span class='line'>&lt;h1>these are for vi-command mode&lt;/h1>
 </span><span class='line'>
-</span><span class='line'>&lt;p>"\e[A": history-search-backward            # arrow up
-</span><span class='line'>"\e[B": history-search-forward             # arrow down
-</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
+</span><span class='line'>&lt;p>&ldquo;\e[A&rdquo;: history-search-backward            # arrow up
+</span><span class='line'>&ldquo;\e[B&rdquo;: history-search-forward             # arrow down
+</span><span class='line'>&ldquo;\ep&rdquo;: yank-last-arg                       # bind to Alt-p
 </span><span class='line'>Control-l: clear-screen&lt;/p>
 </span><span class='line'>
 </span><span class='line'>&lt;p>set keymap vi-insert&lt;/p>
 </span><span class='line'>
 </span><span class='line'>&lt;h1>these are for vi-insert mode&lt;/h1>
 </span><span class='line'>
-</span><span class='line'>&lt;p>"\e[A": history-search-backward
-</span><span class='line'>"\e[B": history-search-forward
-</span><span class='line'>"\ep": yank-last-arg
+</span><span class='line'>&lt;p>&ldquo;\e[A&rdquo;: history-search-backward
+</span><span class='line'>&ldquo;\e[B&rdquo;: history-search-forward
+</span><span class='line'>&ldquo;\ep&rdquo;: yank-last-arg
 </span><span class='line'>Control-l: clear-screen
-</span><span class='line'>$endif</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>$endif</span></code></pre></td></tr></table></div></figure></p>
 
 <p>There is an extensive list of
 <a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
@@ -305,10 +352,13 @@ running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux
 <p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
 colours, gave me the default:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> &amp;amp;&amp;amp; tput colors
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> &amp;amp;&amp;amp; tput colors
 </span><span class='line'>linux
 </span><span class='line'>8
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Which, under my current configuration of Vim, rendered colours like so:</p>
 
@@ -319,26 +369,35 @@ colours, gave me the default:</p>
 <p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
 colours:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Then I had to rewrite my colourscheme to change all of the references to
 the terminal colour numbers to colour <em>names</em>, as apparently that is
 what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
 </span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
 </span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
 </span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>…to the more literal:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
 </span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
 </span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
 </span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Once I had made the necessary changes, I saved this new colourscheme as
 <span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
@@ -355,46 +414,68 @@ to the console. Fortunately,
 <a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
 made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;Linux console colors <span class="o">(</span>jwr dark<span class="o">)</span>&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$TERM</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">=</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>linux<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P0000000<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#black</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P83d3d3d<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P18c4665<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkred</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P9bf4d80<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#red</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P2287373<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkgreen</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PA53a6a6<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#green</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P37c7c99<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#brown</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PB9e9ecb<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#yellow</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P4395573<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkblue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PC477ab3<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#blue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P55e468c<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkmagenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PD7e62b3<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#magenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P631658c<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkcyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PE6096bf<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#cyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P7899ca1<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#lightgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PFc0c0c0<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#white</span>
 </span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Then it was just a case of setting the relevant colourscheme in my
 <span class="file">.vimrc</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;amp;<span class="nb">t_Co</span> &amp;<span class="k">lt</span>; <span class="m">256</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
-</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">else</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miromiro
-</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">endif</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;amp;<span class="nb">t_Co</span> &amp;<span class="k">lt</span>; <span class="m">256</span>
+</span><span class='line'>    <span class="k">colorscheme</span> miro8   &amp;ldquo; colourscheme <span class="k">for</span> the <span class="m">8</span> colour linux <span class="nb">term</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>    <span class="k">colorscheme</span> miromiro
+</span><span class='line'><span class="k">endif</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>And you can see
 <a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>

@@ -20,13 +20,14 @@ Vim-like keybinds and can be run completely without the rodent. Over the last co
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -67,9 +68,8 @@ Vim-like keybinds and can be run completely without the rodent. Over the last co
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -96,14 +96,7 @@ Vim-like keybinds and can be run completely without the rodent. Over the last co
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2011-06-26T14:08:00+12:00" pubdate data-updated="true">Jun 26<span>th</span>, 2011</time>
+<time class='entry-date' datetime='2011-06-26T14:08:00+12:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>2:08 pm</span></time>
         
       </p>
     
@@ -137,9 +130,11 @@ you can do it all from the keyboard.</p>
 <kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
 return to normal mode:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
 </span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then, it is just a matter of identifying the text that you wish to copy
@@ -185,16 +180,18 @@ in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
 <p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
 <psan class="file">/tmp</span>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&lt;/tmp/tabbed.xid)&quot;</span>
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&lt;/tmp/tabbed.xid)&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then it is just a matter of setting up other applications to pass links
 to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
 <span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> %s
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> %s
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The workaround for Urxvtc was a little trickier. I finally got there
@@ -202,19 +199,26 @@ with some help from
 <a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
 In my <span class="file">~/.Xdefaults</span> I have:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
 </span><span class='line'>URxvt.perl-ext-common: default,matcher
 </span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
 </span><span class='line'>URxvt.matcher.button: 1
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
 </span><span class='line'><span class="c"># Script to open Vimprobable instances in tabbed</span>
 </span><span class='line'><span class="nb">exec </span>vimprobable2 -e <span class="k">$(</span>&lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Now whenever I open a link in an application or by clicking a link in
@@ -235,14 +239,7 @@ it is passed to Vimprobable in <code>tabbed</code>.</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2011-06-26T14:08:00+12:00" pubdate data-updated="true">Jun 26<span>th</span>, 2011</time>
+<time class='entry-date' datetime='2011-06-26T14:08:00+12:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>2:08 pm</span></time>
       
 
 <span class="categories">
@@ -391,7 +388,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -409,7 +406,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

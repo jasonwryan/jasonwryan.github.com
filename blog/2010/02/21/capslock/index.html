@@ -19,13 +19,14 @@ it continues to appear on just about every English-language keyboard, &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2010/02/21/capslock">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2010/02/21/capslock/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -66,9 +67,8 @@ it continues to appear on just about every English-language keyboard, &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -95,14 +95,7 @@ it continues to appear on just about every English-language keyboard, &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2010-02-21T16:11:00+13:00" pubdate data-updated="true">Feb 21<span>st</span>, 2010</time>
+<time class='entry-date' datetime='2010-02-21T16:11:00+13:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2010</span></span> <span class='time'>4:11 pm</span></time>
         
       </p>
     
@@ -123,14 +116,16 @@ actually useful, <kbd>Esc</kbd>.</p>
 
 <p>First, create the <code>mapkey</code> file in your home directory:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>xmodmap -pke &gt; ~/.xmodmap.mapkey
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>xmodmap -pke &gt; ~/.xmodmap.mapkey
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then open the file and edit it:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vim ~/.xmodmap.mapkey
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>vim ~/.xmodmap.mapkey
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Look for the <kbd>CapsLock</kbd> key, on my machine it is 66 (you can use
@@ -141,8 +136,9 @@ everything after <code>keycode 66 =</code></p>
 <p>will render it useless, which may suit your style. I change the entry to make
 it another <kbd>Escape</kbd> key:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>keycode <span class="nv">66</span> <span class="o">=</span> Escape NoSymbol Escape NoSymbol Escape
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>keycode <span class="nv">66</span> <span class="o">=</span> Escape NoSymbol Escape NoSymbol Escape
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Log out and when you log back in, you have a useful key.</p>
@@ -150,7 +146,7 @@ it another <kbd>Escape</kbd> key:</p>
 <h3>Updated for 10.04</h3>
 
 <p>The above hack was for 9.10 and earlier versions of Ubuntu.
-I have no idea why, but it (alone) doesn&#8217;t work in Lucid Lynx.
+I have no idea why, but it (alone) doesn&rsquo;t work in Lucid Lynx.
 You need a couple of extra steps:</p>
 
 <p>Open <code>System &gt; Preferences &gt; Startup Applications</code>  and add
@@ -162,8 +158,9 @@ two new items:</p>
 </ul>
 
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>xmodmap ~/.xmodmap.mapkeys
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>xmodmap ~/.xmodmap.mapkeys
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Now, whenever you login the script(s) will run and your <kbd>CapsLock</kbd> will map
@@ -183,14 +180,7 @@ to something actually useful, like <kbd>Escape</kbd>.</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2010-02-21T16:11:00+13:00" pubdate data-updated="true">Feb 21<span>st</span>, 2010</time>
+<time class='entry-date' datetime='2010-02-21T16:11:00+13:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2010</span></span> <span class='time'>4:11 pm</span></time>
       
 
 <span class="categories">
@@ -339,7 +329,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -357,7 +347,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

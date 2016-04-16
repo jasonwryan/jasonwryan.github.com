@@ -21,13 +21,14 @@ uses. When you &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2011/06/10/setting-tmux-statusbar-if-in-x/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -68,9 +69,8 @@ uses. When you &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -97,14 +97,7 @@ uses. When you &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2011-06-10T22:56:00+12:00" pubdate data-updated="true">Jun 10<span>th</span>, 2011</time>
+<time class='entry-date' datetime='2011-06-10T22:56:00+12:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>10:56 pm</span></time>
         
       </p>
     
@@ -123,9 +116,11 @@ and then working up from there. There is a section
 <a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
 that has always puzzled me, and so I decided to get to the bottom of it.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># show some useful stats but only when tmux is started</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># show some useful stats but only when tmux is started</span>
 </span><span class='line'><span class="c"># outside of Xorg, otherwise dwm statusbar shows these already </span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>It is a great idea. If you are running tmux in X, then you have
@@ -148,22 +143,30 @@ source-file option in <span class="file">.tmux.conf</span> to call the relevant 
 depending if X was running or not. I just adapted Thayer’s code, like
 so:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Statusbar starting in X or not</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Statusbar starting in X or not</span>
 </span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
 </span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>And then created those files with the desired statusbar options. So, for
 example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
 loaded:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Statusbar if tmux run in console</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Statusbar if tmux run in console</span>
 </span><span class='line'><span class="c"># information normally in dwm bar</span>
 </span><span class='line'><span class="nb">set</span> -g status-right-length 50
 </span><span class='line'><span class="nb">set</span> -g status-left-length 50
 </span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
@@ -198,14 +201,7 @@ loaded:</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2011-06-10T22:56:00+12:00" pubdate data-updated="true">Jun 10<span>th</span>, 2011</time>
+<time class='entry-date' datetime='2011-06-10T22:56:00+12:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>10:56 pm</span></time>
       
 
 <span class="categories">
@@ -354,7 +350,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -372,7 +368,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: kernel | jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/blog/categories/kernel/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-19T08:20:47+13:00</updated>
+  <updated>2016-04-16T15:02:34+12:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -27,12 +27,12 @@ laptops; the script, a
 removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
 repopulates the directory with an updated set. Almost. The one flaw that has
 been an irritant of variable intensity, depending on what I felt like listening
-at any given time, is that the symlinks aren't written for directories that
+at any given time, is that the symlinks aren&rsquo;t written for directories that
 already exist on the target filesystem.</p>
 
 <p>In order that I am able to play some music if I forget the USB drive, each of
 the laptops has a subset of albums on it, depending on the size of their
-respective hard drives. If I add a new album to the USB drive, then that change won't
+respective hard drives. If I add a new album to the USB drive, then that change won&rsquo;t
 get written to either of the laptops when the drive is plugged in. Not entirely
 satisfactory. I had tinkered around with
 <a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
@@ -50,11 +50,11 @@ better suited to what I was trying to achieve), I learned something new.</p>
 
 <p>The first comment on my question proved singularly insightful.</p>
 
-<p><blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&amp;L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote></p>
+<p><blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&amp;L <a href="https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397">https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397</a></strong></footer></blockquote></p>
 
 <p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
 
-<p><blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote></p>
+<p><blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p><footer><strong><a href="https://en.wikipedia.org/wiki/Union_filesystem">https://en.wikipedia.org/wiki/Union_filesystem</a></strong></footer></blockquote></p>
 
 <p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
 <a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
@@ -69,12 +69,35 @@ the underlying tree (the Music directory on the USB drive) with an “upper”
 one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
 seamlessly</em>.</p>
 
-<p><blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote></p>
+<p><blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p><footer><strong>Kernel docs</strong></footer></blockquote></p>
 
 <p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
 trivial:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
 </span><span class='line'>
@@ -88,19 +111,16 @@ trivial:</p>
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;overlayfs mount&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
+</span><span class='line'>&lt;p&gt;mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$low</span><span class="p">&amp;</span>rdquo<span class="p">;</span>,upperdir<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$upp</span><span class="p">&amp;</span>rdquo<span class="p">;</span>,workdir<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$wod</span><span class="p">&amp;</span>rdquo<span class="p">;</span> overlay <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$upp</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
 </span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;mpc update &amp;amp;&gt;/dev/null
+</span><span class='line'>&lt;p&gt;mpc update <span class="p">&amp;</span>amp<span class="p">;</span>&gt;/dev/null
 </span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 &amp;amp;&amp;amp; <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$status1</span><span class="p">&amp;</span>rdquo<span class="p">;</span> -eq <span class="m">0</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$status2</span><span class="p">&amp;</span>rdquo<span class="p">;</span> -eq <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>^fg<span class="o">(</span><span class="c">#BF85CC)%s\n&amp;rdquo; &amp;ldquo;Music directory updated&amp;rdquo; | dzen2 -p 3</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>And now, when I plug in the USB drive, the contents of the drive are merged
 with my local music directory, and I can access whichever album I feel inclined
@@ -132,7 +152,7 @@ This is an addendum to my two previous posts on
 <a href="http://jasonwryan.com/blog/2013/08/03/kernels/" title="The first post">compiling kernels</a>
 and <a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="The folow up">automating the process</a>.
 In the first of those posts I wrote about a wonderful tool to track the modules
-necessary for building a custom kernel with <code>make localmodconfig</code>, graysky's
+necessary for building a custom kernel with <code>make localmodconfig</code>, graysky&rsquo;s
 <a href="https://github.com/graysky2/modprobed_db" title="Github repo">modprobed_db</a>. A simple
 bash script, <code>modprobed_db</code> allows you to build up an array of modules and—as
 the name suggests—<code>modprobe</code> all of them prior to compilation.</p>
@@ -142,15 +162,14 @@ I am slightly <acronym title="Obsessive Compulsive Disorder">OCD</acronym> about
 constructions
 <a href="https://github.com/graysky2/modprobed_db/blob/master/common/modprobed_db#L62" title="awk pipeline">like this</a>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>modprobed_db lines 62-63 </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/modules | awk <span class="s1">&#39;{print $1}&#39;</span> | sort -k 1,1 | <span class="se">\&lt;</span>/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;grep -Ev <span class="s2">&quot;$(echo ${IGNORE[*]} | sed -e &#39;s/^/^(/&#39; -e &#39;s/ /|/g&#39; -e &#39;s/$/)$/&#39;)&quot;</span> <span class="se">\</span>
-</span><span class='line'>&amp;gt;/tmp/.inmem
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><figcaption><span>modprobed_db lines 62-63 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat /proc/modules <span class="p">|</span> awk <span class="p">&amp;</span>lsquo<span class="p">;</span><span class="o">{</span>print <span class="nv">$1</span><span class="o">}</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">|</span> sort -k 1,1 <span class="p">|</span> <span class="se">\</span>
+</span><span class='line'>    grep -Ev <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">$(</span><span class="nb">echo</span> <span class="k">${</span><span class="nv">IGNORE</span><span class="p">[*]</span><span class="k">}</span> <span class="p">|</span> sed -e <span class="p">&amp;</span>rsquo<span class="p">;</span>s/^/^<span class="o">(</span>/<span class="p">&amp;</span>lsquo<span class="p">;</span> -e <span class="p">&amp;</span>rsquo<span class="p">;</span>s/ /<span class="p">|</span>/g<span class="p">&amp;</span>rsquo<span class="p">;</span> -e <span class="p">&amp;</span>rsquo<span class="p">;</span>s/<span class="nv">$/</span><span class="k">)</span><span class="nv">$/</span><span class="p">&amp;</span>lsquo<span class="p">;</span><span class="o">)</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="se">\</span>
+</span><span class='line'>    &gt;/tmp/.inmem
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p><a href="https://github.com/jasonwryan/modprobed_db/blob/jwr/common/modprobed_db" title="My branch">After hacking a while</a>,
 I started to realize that the venerable UNIX programme
@@ -162,7 +181,7 @@ I started to realize that the venerable UNIX programme
 
 <p> So, in the interests of learning Awk, I decided to rewrite the required
  functionality (or, more correctly, the subset that I required) in this
- language. This wasn't a straightforward task for me. I got stuck a couple of
+ language. This wasn&rsquo;t a straightforward task for me. I got stuck a couple of
  times and, as I work in a building full of
  <a href="http://catalyst.net.nz" title="Catalyst website">neckbeards</a>, I thought I could ask
  for a couple of pointers. To my surprise, no-one I asked seemed interested in
@@ -171,7 +190,7 @@ I started to realize that the venerable UNIX programme
 <p> Aside from not knowing any
  <a href="http://www.perl.org/" title="Perl homepage">Perl</a>, and being unlikely to learn any
  in the immediate future, I was bemused by the notion that none of these skilled
- developers rated Awk as a language worth knowing. One of the #awk FAQ's
+ developers rated Awk as a language worth knowing. One of the #awk FAQ&rsquo;s
  specifically addresses this:
  <a href="http://awk.freeshell.org/Frequently_Asked_Questions#toc14" title="#awk FAQs">Why would anyone still use awk instead of perl?</a>
  The quote by Tom Christiansen is worth repeating here:</p>
@@ -181,13 +200,65 @@ I started to realize that the venerable UNIX programme
 <p>In a happy coincidence, this
 <a href="http://unix.stackexchange.com/questions/90489/compare-two-files-with-first-column-and-remove-duplicate-row-from-2nd-file-in-sh/90490#90490" title="Comparing two files">question on Unix &amp; Linux SE</a>
 showed up just as I was completing my script and it neatly illustrates (to my
-unututored eye, anyway) an example of a typical situation where Awk's strengths
+unututored eye, anyway) an example of a typical situation where Awk&rsquo;s strengths
 make it a better approach than Perl.</p>
 
 <p>In any event, my rewriting of <code>modprobed_db</code> in Awk<sup>1</sup> resulted in this:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>awkmodules </span></figcaption>
- <div class="highlight"><pre><code class='awk'><span class='line'><span class="o">&lt;</span><span class="err">/p&gt;</span>
+<p><figure class='code'><figcaption><span>awkmodules </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'><span class="o">&lt;</span><span class="err">/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;!</span><span class="err">/usr/bin/awk -f&lt;/h1&gt;</span>
 </span><span class='line'>
@@ -195,12 +266,9 @@ make it a better approach than Perl.</p>
 </span><span class='line'>
 </span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">BEGIN</span> <span class="p">{</span> <span class="nx">dbfile</span> <span class="o">=</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="kd">function</span> <span class="nx">red</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="kr">printf</span> <span class="s2">&quot;\033[1;31m&quot;</span> <span class="nx">s</span> <span class="s2">&quot;\033[0m &quot;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="kd">function</span> <span class="nx">red</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">printf</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="err">\</span><span class="mi">033</span><span class="p">[</span><span class="mi">1</span><span class="p">;</span><span class="mi">31</span><span class="nx">m</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span> <span class="nx">s</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="err">\</span><span class="mi">033</span><span class="p">[</span><span class="mi">0</span><span class="nx">m</span> <span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">read</span> <span class="o">in</span> <span class="nx">the</span> <span class="nx">array</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
 </span><span class='line'>
@@ -220,7 +288,7 @@ make it a better approach than Perl.</p>
 </span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">modprobe</span> <span class="nx">modules</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="k">if</span> <span class="p">(</span><span class="nx">p</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">modload</span><span class="o">=</span><span class="s2">&quot;sudo modprobe -a $(&amp;lt;&quot;</span><span class="nx">dbfile</span><span class="s2">&quot;)&quot;</span>
+</span><span class='line'>  <span class="nx">modload</span><span class="o">=</span><span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">sudo</span> <span class="nx">modprobe</span> <span class="o">-</span><span class="nx">a</span> <span class="o">$</span><span class="p">(</span><span class="err">&amp;</span><span class="nx">lt</span><span class="p">;</span><span class="err">&quot;</span><span class="nx">dbfile</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;)</span><span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span>
 </span><span class='line'>  <span class="kr">system</span><span class="p">(</span><span class="nx">modload</span><span class="p">)</span>
 </span><span class='line'>  <span class="kr">close</span><span class="p">(</span><span class="nx">modload</span><span class="p">)</span>
 </span><span class='line'>  <span class="p">}</span>
@@ -236,27 +304,28 @@ make it a better approach than Perl.</p>
 </span><span class='line'><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">END</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kr">print</span> <span class="nx">red</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="s2">&quot;modules listed.&quot;</span>
+</span><span class='line'>  <span class="kr">print</span> <span class="nx">red</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">modules</span> <span class="nx">listed</span><span class="p">.</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">vim</span><span class="err">:</span><span class="nx">set</span> <span class="nx">ts</span><span class="o">=</span><span class="mi">2</span> <span class="nx">sts</span><span class="o">=</span><span class="mi">2</span> <span class="nx">sw</span><span class="o">=</span><span class="mi">2</span> <span class="nx">et</span><span class="err">:</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Just prior to compiling a kernel, I can invoke this script with (the admittedly
 rather ungainly line):</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>awkmodules <span class="nv">p</span><span class="o">=</span>1 .config/kmod_db/ignored .config/kmod_db/modules_db /proc/modules
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>awkmodules <span class="nv">p</span><span class="o">=</span>1 .config/kmod_db/ignored .config/kmod_db/modules_db /proc/modules
+</span></code></pre></td></tr></table></div></figure></p>
 
-<p>It does work, but I don't claim that it is either idiomatic or attractive. The
+<p>It does work, but I don&rsquo;t claim that it is either idiomatic or attractive. The
 use of <code>getline</code> to update the module count strikes me as especially kludgy but
-I haven't been able to think of a more correct way to handle it.</p>
+I haven&rsquo;t been able to think of a more correct way to handle it.</p>
 
 <p>Incidentally, the gawk manual<sup>2</sup>,
 <a href="http://www.gnu.org/software/gawk/manual/" title="GNU goodness">Gawk: Effective AWK Programming</a>
-has only just been updated<sup>3</sup> so Awk is, unlike it's homonym, clearly
+has only just been updated<sup>3</sup> so Awk is, unlike it&rsquo;s homonym, clearly
 alive and well.</p>
 
 <h4>Notes</h4>
@@ -299,26 +368,65 @@ you are set. If anything does go wrong with the new kernel, you still have the
 previous working custom kernel <code>.tar.xz</code> you can reinstall, or you can of course
 just boot into the vanilla Arch kernel.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>new_kernel </span></figcaption>
- <div class="highlight"><pre><code class='bash'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><figcaption><span>new_kernel </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;install new kernel&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;vers<span class="o">=</span><span class="nv">$1</span>
-</span><span class='line'><span class="nv">cyn</span><span class="o">=</span><span class="s1">$&#39;\e[1;36m&#39;</span>
-</span><span class='line'><span class="nv">ylw</span><span class="o">=</span><span class="s1">$&#39;\e[1;33m&#39;</span>
-</span><span class='line'><span class="nv">red</span><span class="o">=</span><span class="s1">$&#39;\e[1;31m&#39;</span>
-</span><span class='line'><span class="nv">end</span><span class="o">=</span><span class="s1">$&#39;\e[0m&#39;</span>&lt;/p&gt;
+</span><span class='line'><span class="nv">cyn</span><span class="o">=</span><span class="nv">$&amp;</span>lsquo<span class="p">;</span><span class="se">\e</span><span class="o">[</span>1<span class="p">;</span>36m<span class="p">&amp;</span>rsquo<span class="p">;</span>
+</span><span class='line'><span class="nv">ylw</span><span class="o">=</span><span class="nv">$&amp;</span>lsquo<span class="p">;</span><span class="se">\e</span><span class="o">[</span>1<span class="p">;</span>33m<span class="p">&amp;</span>rsquo<span class="p">;</span>
+</span><span class='line'><span class="nv">red</span><span class="o">=</span><span class="nv">$&amp;</span>lsquo<span class="p">;</span><span class="se">\e</span><span class="o">[</span>1<span class="p">;</span>31m<span class="p">&amp;</span>rsquo<span class="p">;</span>
+</span><span class='line'><span class="nv">end</span><span class="o">=</span><span class="nv">$&amp;</span>lsquo<span class="p">;</span><span class="se">\e</span><span class="o">[</span>0m<span class="p">&amp;</span>rsquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$# </span>!<span class="o">=</span> 1 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Usage: &quot;</span><span class="k">${</span><span class="nv">0</span><span class="p">##*/</span><span class="k">}</span><span class="s2">&quot; 3.10.8&quot;</span>
-</span><span class='line'><span class="nb">exit </span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$# </span>!<span class="o">=</span> <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Usage: <span class="p">&amp;</span>rdquo<span class="p">;</span><span class="k">${</span><span class="nv">0</span><span class="p">##*/</span><span class="k">}</span><span class="p">&amp;</span>ldquo<span class="p">;</span> 3.10.8<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>    <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;back up last dir&lt;/h1&gt;
 </span><span class='line'>
@@ -328,32 +436,26 @@ just boot into the vanilla Arch kernel.</p>
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;set up clean files&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;cp -r kernel_files linux-jwr &amp;amp;&amp;amp; <span class="nb">cd</span> <span class="s2">&quot;$_&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;cp -r kernel_files linux-jwr <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="nb">cd</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$_</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;sed -i <span class="s2">&quot;s:pkgver=[0-9].*:pkgver=${vers}:&quot;</span> PKGBUILD
-</span><span class='line'><span class="nv">newvers</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="o">=</span> <span class="s1">&#39;/pkgver=/ {print $2}&#39;</span> PKGBUILD<span class="k">)</span>
-</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Package version updated to ${ylw}$newvers${end}&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;sed -i <span class="p">&amp;</span>ldquo<span class="p">;</span>s:pkgver<span class="o">=[</span>0-9<span class="o">]</span>.*:pkgver<span class="o">=</span><span class="k">${</span><span class="nv">vers</span><span class="k">}</span>:<span class="p">&amp;</span>rdquo<span class="p">;</span> PKGBUILD
+</span><span class='line'><span class="nv">newvers</span><span class="o">=</span><span class="k">$(</span>awk -F<span class="o">=</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>/pkgver<span class="o">=</span>/ <span class="o">{</span>print <span class="nv">$2</span><span class="o">}</span><span class="p">&amp;</span>rsquo<span class="p">;</span> PKGBUILD<span class="k">)</span>
+</span><span class='line'><span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Package version updated to <span class="k">${</span><span class="nv">ylw</span><span class="k">}</span><span class="nv">$newvers</span><span class="k">${</span><span class="nv">end</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${cyn}Updating checksums…${end}&quot;</span>
+</span><span class='line'>&lt;p&gt;printf <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">cyn</span><span class="k">}</span>Updating checksums…<span class="k">${</span><span class="nv">end</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
 </span><span class='line'>/usr/bin/updpkgsums&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${cyn}Starting build…${end}&quot;</span>
-</span><span class='line'>/usr/bin/time /usr/bin/makepkg -i
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;else&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${red}Checksum failed${end}&quot;</span>
-</span><span class='line'><span class="nb">exit </span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$?</span> -eq <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">cyn</span><span class="k">}</span>Starting build…<span class="k">${</span><span class="nv">end</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>    /usr/bin/time /usr/bin/makepkg -i
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">red</span><span class="k">}</span>Checksum failed<span class="k">${</span><span class="nv">end</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>    <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
 </span><span class='line'><span class="nb">cd</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
-<p>That's all there is to it. I see in my RSS reader that a new stable kernel is
+<p>That&rsquo;s all there is to it. I see in my RSS reader that a new stable kernel is
 available, open a terminal and run the script specifying which version to use,
 for example, <code>new_kernel 3.10.9</code>.  Approximately 10 minutes later, my new kernel
 is compiled and installed and I can reboot into it. Simple.</p>
@@ -400,7 +502,7 @@ make this a tedious and laborious process, should you be so inclined, is to
 blindly enable and disable settings in <code>menuconfig</code>.</p>
 
 <p>Around about the time of the fourth failed build (well, the builds were working
-but the kernel wasn't booting or was booting with missing functionality), I
+but the kernel wasn&rsquo;t booting or was booting with missing functionality), I
 decided to switch approaches and go down the <code>localmodconfig</code> route. This, for
 someone with my limited experience with this aspect of GNU/Linux, was in
 retrospect a decision I should have made sooner.</p>
@@ -449,12 +551,12 @@ has hopefully been staved off for another five years.</p>
 
 <h3>Update 7/8/13</h3>
 
-<p>After poring over PKGBUILDS in the AUR, principally graysky's
+<p>After poring over PKGBUILDS in the AUR, principally graysky&rsquo;s
 <a href="https://aur.archlinux.org/packages/linux-ck/" title="Arch User Repository">linux-ck PKGBUILD</a>,
 and the official
 <a href="https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/linux" title="Arch SVN Package Repo">ABS PKGBUILD</a>,
 I decide to write my own to automate the above. It works well enough for me, but
-hasn't been tested more widely. You will need to ensure that you have an
+hasn&rsquo;t been tested more widely. You will need to ensure that you have an
 up-to-date <code>modprobed_db</code> database with all of your required modules listed and
 that you have configured <code>sudoers</code> to have this run from the PKGBUILD.</p>
 

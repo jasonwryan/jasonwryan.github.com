@@ -21,13 +21,14 @@ and makepkg it is possible to customize packages in the repositories to suit &he
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2013/05/18/pkgbuilds">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2013/05/18/pkgbuilds/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -68,9 +69,8 @@ and makepkg it is possible to customize packages in the repositories to suit &he
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -97,14 +97,7 @@ and makepkg it is possible to customize packages in the repositories to suit &he
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2013-05-18T10:10:00+12:00" pubdate data-updated="true">May 18<span>th</span>, 2013</time>
+<time class='entry-date' datetime='2013-05-18T10:10:00+12:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>10:10 am</span></time>
         
       </p>
     
@@ -118,7 +111,7 @@ using <a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Build Syste
 and <code>makepkg</code> it is possible to customize packages in the repositories to suit your
 individual requirements, in that case with a specific feature set.</p>
 
-<p>One of Arch&#8217;s real strengths is in the flexibility that <code>makepkg</code> and PKGBUILDs provide
+<p>One of Arch&rsquo;s real strengths is in the flexibility that <code>makepkg</code> and PKGBUILDs provide
 the community; the ability to adapt official packages—or unofficial ones in the
 <a href="https://aur.archlinux.org/" title="Arch User Repository">AUR</a>—as you see fit. As PKGBUILDs
 are just shell scripts, the entry level to start playing around with them is quite
@@ -137,7 +130,30 @@ adding <code>libxft</code> as a dependency, sourcing the patch from the suckless
 hash for it), and then in the <code>build</code> function ensuring that the patch is applied and the
 Makefile updated with the new library:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='diff'><span class='line'><span class="gd">--- PKGBUILD   2013-05-18 09:33:07.156328812 +1200</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gd">--- PKGBUILD   2013-05-18 09:33:07.156328812 +1200</span>
 </span><span class='line'><span class="gi">+++ PKGBUILD   2012-11-14 09:25:15.915335588 +1300</span>
 </span><span class='line'><span class="gu">@@ -11,16 +6,22 @@</span>
 </span><span class='line'> pkgdesc=&quot;A generic menu for X&quot;
@@ -160,7 +176,7 @@ Makefile updated with the new library:</p>
 </span><span class='line'><span class="gi">+  sed -i &#39;s:-I/usr/local/include/freetype2:-I/usr/include/freetype2:&#39; config.mk</span>
 </span><span class='line'><span class="gi">+</span>
 </span><span class='line'>   make \
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Running <code>makepkg -i</code> will build and install dmenu with Xft support. This is the most
@@ -176,11 +192,50 @@ my laptop just to be able to send emails…</p>
 
 <p>In this case, I modified the PKGBUILD to completely remove the <code>libgnome-keyring</code> dependency
 and to only build the <code>msmtp</code> documentation in <code>.pdf</code> and <code>.html</code> if <code>texlive-core</code> was
-already installed on the machine. Unfortunately, I wasn&#8217;t able to test for the presence of
+already installed on the machine. Unfortunately, I wasn&rsquo;t able to test for the presence of
 <code>texlive-core</code> with the standard utilities like <code>type</code> or <code>which</code>, so—as it is installed
 on all my boxes—I went with <code>expac</code> (<code>pacman -Q</code> would also work):</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='diff'><span class='line'><span class="gd">--- PKGBUILD    2013-05-18 09:32:07.393095131 +1200</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+</pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gd">--- PKGBUILD    2013-05-18 09:32:07.393095131 +1200</span>
 </span><span class='line'><span class="gi">+++ PKGBUILD    2013-05-18 09:31:55.449986364 +1200</span>
 </span><span class='line'><span class="gu">@@ -1,7 +1,8 @@</span>
 </span><span class='line'> arch=(&#39;i686&#39; &#39;x86_64&#39;)
@@ -219,10 +274,10 @@ on all my boxes—I went with <code>expac</code> (<code>pacman -Q</code> would a
 </span><span class='line'><span class="gi">+  fi</span>
 </span><span class='line'>
 </span><span class='line'> # Installing example configs and scripts to /usr/share/doc/msmtp
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>It isn&#8217;t necessarily an attractive solution, but it works for me…
+<p>It isn&rsquo;t necessarily an attractive solution, but it works for me…
 On the subject of unattractive solutions, as of pacman 4.1, released
 last month, the packaging standards for
 <a href="https://wiki.archlinux.org/index.php/VCS_PKGBUILD_Guidelines" title="Arch Wiki page">VCS PKGBUILDs</a>
@@ -235,25 +290,32 @@ standards and provides people with a meaningful version number.</p>
 <p>By default, the version number for these projects from their git repos
 is not that helpful:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git describe --always
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git describe --always
 </span><span class='line'>4861046
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>After looking through the git logs, and playing around with <code>awk</code> to filter
 the results, I came up with this:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pkgver<span class="o">()</span> <span class="o">{</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pkgver<span class="o">()</span> <span class="o">{</span>
 </span><span class='line'>  <span class="nb">cd</span> <span class="s2">&quot;$_gitname&quot;</span>
 </span><span class='line'>  <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;$(awk &#39;/^ / {print $2}&#39; &lt;(git log --grep=version -1))_\</span>
 </span><span class='line'><span class="s2">  $(git describe --always)&quot;</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>This prints a more, for me anyway, intelligble package version: <code>vimprobable2-git
 1.2.1_c5936cc-1</code> that relates back to the last stable release and appends the
-current commit. I&#8217;m sure that this could be improved upon; suggestions are
+current commit. I&rsquo;m sure that this could be improved upon; suggestions are
 welcome.</p>
 
 <p>The other change to note in all of these PKGBUILDs is the inclusion of the
@@ -262,8 +324,9 @@ repositories to the—imaginatively titled—<code>modified</code> group, I can 
 to <code>/etc/pacman.conf</code> that prevents those packages from being overwritten on
 upgrade<sup>3</sup>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">IgnoreGroup</span> <span class="o">=</span> modified
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">IgnoreGroup</span> <span class="o">=</span> modified
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Issuing <code>pacman -Syu</code>, or running <code>checkupdates</code> from a <code>cron</code> job, will
@@ -300,14 +363,7 @@ Cutting Wood">Wells P. Wilson</a></p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2013-05-18T10:10:00+12:00" pubdate data-updated="true">May 18<span>th</span>, 2013</time>
+<time class='entry-date' datetime='2013-05-18T10:10:00+12:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>10:10 am</span></time>
       
 
 <span class="categories">
@@ -456,7 +512,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -474,7 +530,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

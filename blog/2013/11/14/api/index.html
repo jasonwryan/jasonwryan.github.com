@@ -23,13 +23,14 @@ over &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2013/11/14/api">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2013/11/14/api/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -70,9 +71,8 @@ over &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -99,14 +99,7 @@ over &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2013-11-14T09:51:00+13:00" pubdate data-updated="true">Nov 14<span>th</span>, 2013</time>
+<time class='entry-date' datetime='2013-11-14T09:51:00+13:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>9:51 am</span></time>
         
       </p>
     
@@ -136,7 +129,7 @@ about having access to a tool to query the Sync application. One of the nodes is
 on my
 <a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on setting up a torrent box">headless Raspberry Pi</a>
 and the idea of being able to issue a command from my laptop to ascertain what
-was going on in the Pi&#8217;s synced folders was (and is) a tremendously attractive
+was going on in the Pi&rsquo;s synced folders was (and is) a tremendously attractive
 one.</p>
 
 <p>However, now that I was in
@@ -157,7 +150,7 @@ for posterity in my <a href="https://bitbucket.org/jasonwryan/shiv/commits/16c9d
 (for the completists)…</p>
 
 <p>At this point, I was fortunate that Earnestly in #archlinux introduced me to
-keenerd&#8217;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
+keenerd&rsquo;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
 And by “introduced” I mean generously (and patiently) talked me through how it
 worked and how I could use it with the Sync API to achieve what I was after.
 After a while playing with it, there was the—inevitably belated—moment of
@@ -168,7 +161,7 @@ extracting the desired elements.</p>
 
 <p>Now I was <em>cooking</em>. Well, more to the point, I was flailing about in a smoke
 filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
-asphyxiation. Once again, Earnestly&#8217;s patience and bash skills were put to good effect.
+asphyxiation. Once again, Earnestly&rsquo;s patience and bash skills were put to good effect.
 The resulting script,
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="In bitbucket">btstat</a>,
 is undeniably a triumph of his good ideas over my own poor execution. In other
@@ -181,13 +174,15 @@ all faults are mine alone<sup>4</sup>.</p>
 <a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="My post on this great utility">aurphan, right?</a>)
 and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
 </span><span class='line'>directory2 H0p3fu11yY0uG3tTh31d3@
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The functionality in the script is limited at this stage to just querying the
-application; I wasn&#8217;t interested in pushing changes at this point. So you can
+application; I wasn&rsquo;t interested in pushing changes at this point. So you can
 access the version of the currently installed Syncapp, upload and download
 speeds, the size of synced folders and list all of their contents.</p>
 
@@ -203,7 +198,7 @@ I need.</p>
 
 <ol>
 <li>Yes, I would much prefer to use an open source tool to accomplish the same
-thing but I haven&#8217;t found anything comparable that is this good to date…</li>
+thing but I haven&rsquo;t found anything comparable that is this good to date…</li>
 <li>In what I imagine is a complete coincidence, the JSON logo is uncannily
 similar to the initial (and much better, I thought) Sync logo, as seen on
 <a href="http://jasonwryan.com/blog/2013/03/16/sync/">my original post</a>.</li>
@@ -231,14 +226,7 @@ which means it reads my credentials from <span class="file">$HOME/.netrc</span>.
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2013-11-14T09:51:00+13:00" pubdate data-updated="true">Nov 14<span>th</span>, 2013</time>
+<time class='entry-date' datetime='2013-11-14T09:51:00+13:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>9:51 am</span></time>
       
 
 <span class="categories">
@@ -387,7 +375,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -405,7 +393,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

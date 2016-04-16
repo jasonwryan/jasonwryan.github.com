@@ -20,13 +20,14 @@ correct 16 colours in the console. Not in a terminal &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2011/04/06/vim-colours-in-the-console">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2011/04/06/vim-colours-in-the-console/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -67,9 +68,8 @@ correct 16 colours in the console. Not in a terminal &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -96,14 +96,7 @@ correct 16 colours in the console. Not in a terminal &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2011-04-06T21:19:00+12:00" pubdate data-updated="true">Apr 6<span>th</span>, 2011</time>
+<time class='entry-date' datetime='2011-04-06T21:19:00+12:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>9:19 pm</span></time>
         
       </p>
     
@@ -133,10 +126,13 @@ running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux
 <p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
 colours, gave me the default:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> <span class="o">&amp;&amp;</span> tput colors
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> <span class="o">&amp;&amp;</span> tput colors
 </span><span class='line'>linux
 </span><span class='line'>8
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Which, under my current configuration of Vim, rendered colours like so:</p>
@@ -148,28 +144,37 @@ colours, gave me the default:</p>
 <p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
 colours:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then I had to rewrite my colourscheme to change all of the references to
 the terminal colour numbers to colour <em>names</em>, as apparently that is
 what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
 </span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
 </span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
 </span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>…to the more literal:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
 </span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
 </span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
 </span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Once I had made the necessary changes, I saved this new colourscheme as
@@ -187,7 +192,27 @@ to the console. Fortunately,
 <a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
 made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># Linux console colors (jwr dark) </span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Linux console colors (jwr dark) </span>
 </span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
 </span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
 </span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
@@ -207,18 +232,23 @@ made this a trivial exercise. With the following lines in my <span class="file">
 </span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
 </span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then it was just a case of setting the relevant colourscheme in my
 <span class="file">.vimrc</span>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;<span class="nb">t_Co</span> <span class="p">&lt;</span> <span class="m">256</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;<span class="nb">t_Co</span> <span class="p">&lt;</span> <span class="m">256</span>
 </span><span class='line'>    <span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
 </span><span class='line'><span class="k">else</span>
 </span><span class='line'>    <span class="k">colorscheme</span> miromiro
 </span><span class='line'><span class="k">endif</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>And you can see
@@ -247,14 +277,7 @@ of the finished product on Flickr.</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2011-04-06T21:19:00+12:00" pubdate data-updated="true">Apr 6<span>th</span>, 2011</time>
+<time class='entry-date' datetime='2011-04-06T21:19:00+12:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>9:19 pm</span></time>
       
 
 <span class="categories">
@@ -403,7 +426,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -421,7 +444,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: archlinux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/blog/categories/archlinux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-19T08:20:47+13:00</updated>
+  <updated>2016-04-16T15:02:34+12:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -27,12 +27,12 @@ laptops; the script, a
 removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
 repopulates the directory with an updated set. Almost. The one flaw that has
 been an irritant of variable intensity, depending on what I felt like listening
-at any given time, is that the symlinks aren't written for directories that
+at any given time, is that the symlinks aren&rsquo;t written for directories that
 already exist on the target filesystem.</p>
 
 <p>In order that I am able to play some music if I forget the USB drive, each of
 the laptops has a subset of albums on it, depending on the size of their
-respective hard drives. If I add a new album to the USB drive, then that change won't
+respective hard drives. If I add a new album to the USB drive, then that change won&rsquo;t
 get written to either of the laptops when the drive is plugged in. Not entirely
 satisfactory. I had tinkered around with
 <a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
@@ -50,11 +50,11 @@ better suited to what I was trying to achieve), I learned something new.</p>
 
 <p>The first comment on my question proved singularly insightful.</p>
 
-<p><blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&amp;L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote></p>
+<p><blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&amp;L <a href="https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397">https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397</a></strong></footer></blockquote></p>
 
 <p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
 
-<p><blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote></p>
+<p><blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p><footer><strong><a href="https://en.wikipedia.org/wiki/Union_filesystem">https://en.wikipedia.org/wiki/Union_filesystem</a></strong></footer></blockquote></p>
 
 <p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
 <a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
@@ -69,12 +69,35 @@ the underlying tree (the Music directory on the USB drive) with an “upper”
 one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
 seamlessly</em>.</p>
 
-<p><blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote></p>
+<p><blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p><footer><strong>Kernel docs</strong></footer></blockquote></p>
 
 <p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
 trivial:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
 </span><span class='line'>
@@ -88,19 +111,16 @@ trivial:</p>
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;overlayfs mount&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
+</span><span class='line'>&lt;p&gt;mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$low</span><span class="p">&amp;</span>rdquo<span class="p">;</span>,upperdir<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$upp</span><span class="p">&amp;</span>rdquo<span class="p">;</span>,workdir<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$wod</span><span class="p">&amp;</span>rdquo<span class="p">;</span> overlay <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$upp</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
 </span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;mpc update &amp;amp;&gt;/dev/null
+</span><span class='line'>&lt;p&gt;mpc update <span class="p">&amp;</span>amp<span class="p">;</span>&gt;/dev/null
 </span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 &amp;amp;&amp;amp; <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$status1</span><span class="p">&amp;</span>rdquo<span class="p">;</span> -eq <span class="m">0</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$status2</span><span class="p">&amp;</span>rdquo<span class="p">;</span> -eq <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>^fg<span class="o">(</span><span class="c">#BF85CC)%s\n&amp;rdquo; &amp;ldquo;Music directory updated&amp;rdquo; | dzen2 -p 3</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>And now, when I plug in the USB drive, the contents of the drive are merged
 with my local music directory, and I can access whichever album I feel inclined
@@ -143,10 +163,10 @@ which has held up pretty well over that time.</p>
 make more regular backups, was that pruning the archives was a relatively
 tedious business. Given that Tarsnap
 <a href="http://www.tarsnap.com/efficiency.html" title="Tarsnap efficiency page">de-duplicates data</a>,
-there isn't much mileage in keeping around older archives because, if you do
-have to retrieve a file, you don't want to have to search through a large
+there isn&rsquo;t much mileage in keeping around older archives because, if you do
+have to retrieve a file, you don&rsquo;t want to have to search through a large
 number of archives to find it; so there is a balance between making use of
-Tarsnap's efficient functionality, and not creating a rod for your back if your
+Tarsnap&rsquo;s efficient functionality, and not creating a rod for your back if your
 use case is occasionally retrieving single—or small groups of—files, rather
 than large dumps.</p>
 
@@ -161,67 +181,112 @@ the number to keep is set to.</p>
 
 <p>The bulk of the code is simple enough:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>snapclean </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><figcaption><span>snapclean </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;generate list&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;tarsnap --list-archives &gt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;tarsnap <span class="p">&amp;</span>ndash<span class="p">;</span>list-archives &gt; <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;sort by descending date, format is: host-ddmmyy_hh:mm&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;<span class="o">{</span>
-</span><span class='line'>  rm <span class="s2">&quot;$tmpfile&quot;</span> &amp;amp;&amp;amp; sort -k 1.11,1.10 -k 1.8,1.9 -k 1.7,1.6 &gt; <span class="s2">&quot;$tmpfile&quot;</span>
-</span><span class='line'><span class="o">}</span> &amp;lt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>  rm <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> sort -k 1.11,1.10 -k 1.8,1.9 -k 1.7,1.6 &gt; <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'><span class="o">}</span> <span class="p">&amp;</span>lt<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;populate the list&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;mapfile -t archives &amp;lt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;mapfile -t archives <span class="p">&amp;</span>lt<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;print the full list&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;printf <span class="s2">&quot;%s\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Current archives${end}:&quot;</span> <span class="s2">&quot;${archives[@]#*-}&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;printf <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">cyn</span><span class="k">}</span>Current archives<span class="k">${</span><span class="nv">end</span><span class="k">}</span>:<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">archives</span><span class="p">[@]#*-</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;identify oldest archives&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;remove<span class="o">=</span><span class="k">$((</span> <span class="k">${#</span><span class="nv">archives</span><span class="p">[@]</span><span class="k">}</span> <span class="o">-</span> keep <span class="k">))</span>
-</span><span class='line'><span class="nv">targets</span><span class="o">=(</span> <span class="k">$(</span>head -n <span class="s2">&quot;$remove&quot;</span> <span class="s2">&quot;$tmpfile&quot;</span><span class="k">)</span> <span class="o">)</span>&lt;/p&gt;
+</span><span class='line'><span class="nv">targets</span><span class="o">=(</span> <span class="k">$(</span>head -n <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$remove</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$tmpfile</span><span class="p">&amp;</span>rdquo<span class="p">;</span><span class="k">)</span> <span class="o">)</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;if there is at least one to remove&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">((</span> <span class="k">${#</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span> &gt;<span class="o">=</span> 1 <span class="o">))</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${red}Archives to delete${end}:&quot;</span>
-</span><span class='line'>  <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${targets[@]#*-}&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;if <span class="o">((</span> <span class="k">${#</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span> &gt;<span class="o">=</span> <span class="m">1</span> <span class="o">))</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">red</span><span class="k">}</span>Archives to delete<span class="k">${</span><span class="nv">end</span><span class="k">}</span>:<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">targets</span><span class="p">[@]#*-</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="nb">read</span> -p <span class="s2">&quot;Proceed with deletion? [${red}Y${end}/N] &quot;</span> YN&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;  <span class="nb">read</span> -p <span class="p">&amp;</span>ldquo<span class="p">;</span>Proceed with deletion? <span class="o">[</span><span class="k">${</span><span class="nv">red</span><span class="k">}</span>Y<span class="k">${</span><span class="nv">end</span><span class="k">}</span>/N<span class="o">]</span> <span class="p">&amp;</span>rdquo<span class="p">;</span> YN&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$YN</span> <span class="o">==</span> Y <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$YN</span> <span class="o">==</span> Y <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    <span class="k">for</span> archive in <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;;</span> <span class="k">do</span>
+</span><span class='line'>      tarsnap -d <span class="p">&amp;</span>ndash<span class="p">;</span>no-print-stats -f <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$archive</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>    <span class="k">done</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">yel</span><span class="k">}</span>Archives successfully deleted<span class="p">&amp;</span>hellip<span class="p">;</span><span class="k">${</span><span class="nv">end</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;for archive in <span class="s2">&quot;${targets[@]}&quot;</span>; <span class="k">do</span>
-</span><span class='line'><span class="k">  </span>tarsnap -d --no-print-stats -f <span class="s2">&quot;$archive&quot;</span>
-</span><span class='line'><span class="k">done</span> &amp;amp;&amp;amp; <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Archives successfully deleted...${end}&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Remaining archives:${end}&quot;</span>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Remaining archives:${end}&quot;</span>
 </span><span class='line'>tarsnap --list-archives
 </span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="k">else</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Operation aborted${end}&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>
+</span><span class='line'>&lt;p&gt;  <span class="k">else</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">yel</span><span class="k">}</span>Operation aborted<span class="k">${</span><span class="nv">end</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>  <span class="k">fi</span>
 </span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Nothing to do&quot;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Nothing to <span class="k">do</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
 </span><span class='line'>  <span class="nb">exit </span>0
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>You can see the rest of the script in
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snapclean" title="snapclean in bitbucket">my bitbucket repo</a>.  It even comes <a href="/images/post_images/snapclean.png" title="Screenshot of snapclean">with colour</a>.</p>
 
 <p>Once every couple of weeks, I run the script, review the archives marked for
-deletion and then blow them away. Easy. If you aren't using Tarsnap, you
+deletion and then blow them away. Easy. If you aren&rsquo;t using Tarsnap, you
 really should check it out; it is an excellent service and—for the almost
 ridiculously small investment—you get rock solid, encrypted peace of
 mind. Why would you not do that?</p>
@@ -239,8 +304,8 @@ professional, I am no longer able to fulfil my own expectations of regularly
 pushing these posts out.</p>
 
 <p>I will endeavour to, from time to time when I find something that I genuinely
-think is worth sharing, make an effort to write about it, but I can't see that
-happening all that often.  I'd like to thank all the people that have read
+think is worth sharing, make an effort to write about it, but I can&rsquo;t see that
+happening all that often.  I&rsquo;d like to thank all the people that have read
 these posts; especially those of you that have commented. With every post, I
 always looked forward to people telling me where I got something wrong or how I
 could have approached a problem differently or more effectively<sup>2</sup>; I
@@ -252,7 +317,7 @@ generous enough to share them.</p>
 <ol>
 <li>The frequency with which this happens is, admittedly, low; but not
 low enough to confidently abandon a service like this…</li>
-<li>Leaving a complimentary note is just as welcome, don't get me wrong…</li>
+<li>Leaving a complimentary note is just as welcome, don&rsquo;t get me wrong…</li>
 </ol>
 
 ]]></content>
@@ -272,7 +337,7 @@ for Arch by some magnitude. Given that PKGBUILDs are just shell scripts, the bar
 to entry is relatively low, and investing the small amount of effort required to clear
 that barrier will not only give you a much better understanding of how packaging works
 in Arch, but will scratch your own itch for a particular package and hopefully assuage
-someone else's similar desire at the same time.</p>
+someone else&rsquo;s similar desire at the same time.</p>
 
 <p>Now that I have a
 <a href="http://www.raspberrypi.org/" title="Raspberry Pi site">Raspberry Pi</a><sup>1</sup>, I am
@@ -298,7 +363,7 @@ AUR as
 architectures, including ARM (both v6 and v7). Initially, when I wrote the
 PKGBUILD, I would <code>updpkgsums</code> on my x86_64 machine, build the package and
 then, on the Pi, have to regenerate the integrity checks. This was manageable
-enough for my own use across two architectures, but wasn't really going to
+enough for my own use across two architectures, but wasn&rsquo;t really going to
 work for people using other architectures (especially if they are using
 <a href="http://jasonwryan.com/blog/2013/04/09/helpers/" title="My post on Yaourt">AUR helpers</a>).</p>
 
@@ -308,25 +373,36 @@ work across the four architectures—without having to manually copy and paste o
 anything similarly tedious. Managing multiple architectures in the PKGBUILD
 itself is not particularly problematic, a case statement is sufficient:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>PKGBUILD </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="s2">&quot;$CARCH&quot;</span> in&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;armv6h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv6&quot;</span>
-</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;a94e5d00cec32956eb27bc12dbbc4964b68913f9&#39;</span><span class="o">)</span>
-</span><span class='line'>       ;;
-</span><span class='line'>armv7h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv7&quot;</span>
-</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;9b782abf95668a906bfe76ad5ceb4cda17ec2289&#39;</span><span class="o">)</span>
-</span><span class='line'>       ;;
-</span><span class='line'>i686<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;386&quot;</span>
-</span><span class='line'>      sha1sums+<span class="o">=(</span><span class="s1">&#39;b2e1961594a931201799246f5cf61cb1e1700ff9&#39;</span><span class="o">)</span>
-</span><span class='line'>       ;;
-</span><span class='line'>x86_64<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;amd64&quot;</span>
-</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;035730c09ca5383c90fdd9898baf66b90acdef24&#39;</span><span class="o">)</span>
-</span><span class='line'>       ;;
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;esac
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><figcaption><span>PKGBUILD </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$CARCH</span><span class="p">&amp;</span>rdquo<span class="p">;</span> in
+</span><span class='line'>    armv6h<span class="o">)</span> &lt;em&gt;pkgarch<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>armv6<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>            sha1sums+<span class="o">=(</span><span class="p">&amp;</span>lsquo<span class="p">;</span>a94e5d00cec32956eb27bc12dbbc4964b68913f9<span class="p">&amp;</span>rsquo<span class="p">;</span><span class="o">)</span>
+</span><span class='line'>           <span class="p">;;</span>
+</span><span class='line'>    armv7h<span class="o">)</span> &lt;/em&gt;pkgarch<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>armv7<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>            sha1sums+<span class="o">=(</span><span class="p">&amp;</span>lsquo<span class="p">;</span>9b782abf95668a906bfe76ad5ceb4cda17ec2289<span class="p">&amp;</span>rsquo<span class="p">;</span><span class="o">)</span>
+</span><span class='line'>           <span class="p">;;</span>
+</span><span class='line'>    i686<span class="o">)</span> &lt;em&gt;pkgarch<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>386<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>          sha1sums+<span class="o">=(</span><span class="p">&amp;</span>lsquo<span class="p">;</span>b2e1961594a931201799246f5cf61cb1e1700ff9<span class="p">&amp;</span>rsquo<span class="p">;</span><span class="o">)</span>
+</span><span class='line'>           <span class="p">;;</span>
+</span><span class='line'>    x86_64<span class="o">)</span> &lt;/em&gt;pkgarch<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>amd64<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>            sha1sums+<span class="o">=(</span><span class="p">&amp;</span>lsquo<span class="p">;</span>035730c09ca5383c90fdd9898baf66b90acdef24<span class="p">&amp;</span>rsquo<span class="p">;</span><span class="o">)</span>
+</span><span class='line'>           <span class="p">;;</span>
+</span><span class='line'><span class="k">esac</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The real challenge, for me, was to be able to script the replacement of each of
 the respective
@@ -335,72 +411,100 @@ and then to update the PKGBUILD with the new arrays.  Each release of
 Syncthing is accompanied by a text file containing all of the sha1sums, each on
 its own line in a conveniently ordered format, like so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>sha1sums.txt.asc </span></figcaption>
- <div class="highlight"><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
+<p><figure class='code'><figcaption><span>sha1sums.txt.asc </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
 </span><span class='line'>035730c09ca5383c90fdd9898baf66b90acdef24    syncthing-linux-amd64-v0.9.16.tar.gz
 </span><span class='line'>d743b64204f0ac7884e4b42d9b1865b2436f5ecb    syncthing-linux-armv5-v0.9.16.tar.gz
 </span><span class='line'>…
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
-<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>'s
+<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>&rsquo;s
 <a href="https://www.gnu.org/software/gawk/manual/html_node/Switch-Statement.html" title="Gawk manual">switch statement</a>,
 and an admittedly rather convoluted <code>printf</code> incantation.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">armv6</span><span class="o">/</span><span class="err">:</span>
-</span><span class='line'>    <span class="nx">arm6</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
-</span><span class='line'>    <span class="k">break</span>
-</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">armv7</span><span class="o">/</span><span class="err">:</span>
-</span><span class='line'>    <span class="nx">arm7</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
-</span><span class='line'>    <span class="k">break</span>
-</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="mi">386</span><span class="o">/</span><span class="err">:</span>
-</span><span class='line'>    <span class="nx">i386</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
-</span><span class='line'>    <span class="k">break</span>
-</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="nx">amd64</span><span class="o">/</span><span class="err">:</span>
-</span><span class='line'>    <span class="nx">x86</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
-</span><span class='line'>    <span class="k">break</span>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'>    <span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">armv6</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>        <span class="nx">arm6</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">armv7</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>        <span class="nx">arm7</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="mi">386</span><span class="o">/</span><span class="err">:</span>                                                                     <span class="o">&lt;</span><span class="nx">br</span><span class="o">/&gt;</span>
+</span><span class='line'>        <span class="nx">i386</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="nx">amd64</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>        <span class="nx">x86</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="p">}</span>
 </span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>  <span class="p">}</span>
 </span><span class='line'><span class="nx">END</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kr">printf</span> <span class="s2">&quot;case \&quot;$CARCH\&quot; in\n\t&quot;</span><span class="err">\</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span>     <span class="s2">&quot;armv6h) _pkgarch=\&quot;armv6\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
-</span><span class='line'>     <span class="s2">&quot;armv7h) _pkgarch=\&quot;armv7\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
-</span><span class='line'>     <span class="s2">&quot;i686) _pkgarch=\&quot;386\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
-</span><span class='line'>     <span class="s2">&quot;x86_64) _pkgarch=\&quot;amd64\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n&quot;</span><span class="err">\</span>
-</span><span class='line'>     <span class="s2">&quot;esac\n&quot;</span><span class="p">,</span>
-</span><span class='line'>     <span class="nx">arm6</span><span class="p">,</span> <span class="nx">arm7</span><span class="p">,</span> <span class="nx">i386</span><span class="p">,</span> <span class="nx">x86</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>  <span class="kr">printf</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">case</span> <span class="err">\&amp;</span><span class="nx">rdquo</span><span class="p">;</span><span class="o">$</span><span class="nx">CARCH</span><span class="err">\&amp;</span><span class="nx">ldquo</span><span class="p">;</span> <span class="o">in</span><span class="err">\</span><span class="nx">n</span><span class="err">\</span><span class="nx">t</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span><span class="err">\</span>
+</span><span class='line'>         <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">armv6h</span><span class="p">)</span> <span class="o">&lt;</span><span class="nx">em</span><span class="o">&gt;</span><span class="nx">pkgarch</span><span class="o">=</span><span class="err">\</span><span class="s2">&quot;armv6\&amp;rdquo;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>         <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">armv7h</span><span class="p">)</span> <span class="o">&lt;</span><span class="err">/em&gt;pkgarch=\&quot;armv7\&amp;rdquo;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;\</span>
+</span><span class='line'>         <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">i686</span><span class="p">)</span> <span class="o">&lt;</span><span class="nx">em</span><span class="o">&gt;</span><span class="nx">pkgarch</span><span class="o">=</span><span class="err">\</span><span class="s2">&quot;386\&amp;rdquo;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>         <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">x86_64</span><span class="p">)</span> <span class="o">&lt;</span><span class="err">/em&gt;pkgarch=\&quot;amd64\&amp;rdquo;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n&quot;\</span>
+</span><span class='line'>         <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">esac</span><span class="err">\</span><span class="nx">n</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span>
+</span><span class='line'>         <span class="nx">arm6</span><span class="p">,</span> <span class="nx">arm7</span><span class="p">,</span> <span class="nx">i386</span><span class="p">,</span> <span class="nx">x86</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The remaining step was to update the PKGBUILD with the new sha1sums. Fortunately,
 <a href="http://blog.falconindy.com/" title="Dave's blog">Dave Reisner</a> had already written the code
 for this in his <code>updpkgsums</code> utility; I had only to adapt it slightly:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>excerpt from updpkgsums </span></figcaption>
- <div class="highlight"><pre><code class='awk'><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="nx">rm</span> <span class="s2">&quot;$buildfile&quot;</span>
-</span><span class='line'>  <span class="nx">exec</span> <span class="nx">awk</span> <span class="o">-</span><span class="nx">v</span> <span class="nx">newsums</span><span class="o">=</span><span class="s2">&quot;$newsums&quot;</span> <span class="s1">&#39;&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">&lt;pre&gt;&lt;code&gt;/^case/,/^esac$/ {</span>
-</span><span class='line'><span class="s1">  if (!w) { print newsums; w++ }</span>
-</span><span class='line'><span class="s1">    next</span>
-</span><span class='line'><span class="s1">  }; 1</span>
-</span><span class='line'><span class="s1">  END { if (!w) print newsums }</span>
-</span><span class='line'><span class="s1">&lt;/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">&lt;p&gt;  &#39;</span> <span class="o">&gt;</span> <span class="s2">&quot;$buildfile&quot;</span>
-</span><span class='line'><span class="p">}</span> <span class="err">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="s2">&quot;$buildfile&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><figcaption><span>excerpt from updpkgsums </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">rm</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="o">$</span><span class="nx">buildfile</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'>  <span class="nx">exec</span> <span class="nx">awk</span> <span class="o">-</span><span class="nx">v</span> <span class="nx">newsums</span><span class="o">=</span><span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="o">$</span><span class="nx">newsums</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span> <span class="err">&amp;</span><span class="nx">lsquo</span><span class="p">;</span>
+</span><span class='line'>    <span class="sr">/^case/</span><span class="p">,</span><span class="sr">/^esac$/</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">w</span><span class="p">)</span> <span class="p">{</span> <span class="kr">print</span> <span class="nx">newsums</span><span class="p">;</span> <span class="nx">w</span><span class="o">++</span> <span class="p">}</span>
+</span><span class='line'>        <span class="kr">next</span>
+</span><span class='line'>      <span class="p">};</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="nx">END</span> <span class="p">{</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">w</span><span class="p">)</span> <span class="kr">print</span> <span class="nx">newsums</span> <span class="p">}</span>
+</span><span class='line'>  <span class="err">&amp;</span><span class="nx">rsquo</span><span class="p">;</span> <span class="o">&gt;</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="o">$</span><span class="nx">buildfile</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span> <span class="err">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="o">$</span><span class="nx">buildfile</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Combining these two tasks means that I have a script that, when run, will download
-the current Syncthing release's <span class="file">sha1sum.txt.asc</span>
+the current Syncthing release&rsquo;s <span class="file">sha1sum.txt.asc</span>
 file, extract the relevant sums into the replacement case statement and then
 write it into the PKGBUILD. I can then run <code>makepkg -ci &amp;&amp; mkaurball</code>, upload
 the new tarball to the AUR and the two other people that are using the PKGBUILD
@@ -445,7 +549,7 @@ transparent it is so ingrained in my workflow.</p>
 invoice and when the payment is actually due. I find that companies will
 typically email their invoices to me some weeks in advance, whereupon I will
 make a mental note and then, unsurprisingly, promptly forget all about it,
-thereby opening myself up for penalties for late payment.  It didn't take me
+thereby opening myself up for penalties for late payment.  It didn&rsquo;t take me
 long (well, in my defence, a lot less time than it took for invoices to become
 digital) to realise that there was a better way™ - a script.</p>
 
@@ -459,30 +563,40 @@ needed a script to make it painless to achieve.</p>
 
 <p>The main function of the script is pretty self-explanatory:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>todo </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>aread<span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Time of message? [HH:MM] &quot;</span> attime
-</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Date of message? [DD.MM.YY] &quot;</span> atdate
-</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Message body? &quot;</span> message&lt;/p&gt;
+<p><figure class='code'><figcaption><span>todo </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>aread<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nb">read</span> -p <span class="p">&amp;</span>ldquo<span class="p">;</span>Time of message? <span class="o">[</span>HH:MM<span class="o">]</span> <span class="p">&amp;</span>rdquo<span class="p">;</span> attime
+</span><span class='line'>  <span class="nb">read</span> -p <span class="p">&amp;</span>ldquo<span class="p">;</span>Date of message? <span class="o">[</span>DD.MM.YY<span class="o">]</span> <span class="p">&amp;</span>rdquo<span class="p">;</span> atdate
+</span><span class='line'>  <span class="nb">read</span> -p <span class="p">&amp;</span>ldquo<span class="p">;</span>Message body? <span class="p">&amp;</span>rdquo<span class="p">;</span> message&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="nv">timexp</span><span class="o">=</span><span class="s1">&#39;&lt;sup&gt;[0-9]{2}:[0-9]{2}&#39;</span>&lt;/sup&gt;
-</span><span class='line'>  <span class="nv">datexp</span><span class="o">=</span><span class="s1">&#39;&lt;sup&gt;[0-9]{2}.[0-9]{2}.[0-9]{2}&#39;</span>&lt;/sup&gt;&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;  <span class="nv">timexp</span><span class="o">=</span><span class="p">&amp;</span>lsquo<span class="p">;</span>^<span class="o">[</span>0-9<span class="o">]{</span>2<span class="o">}</span>:<span class="o">[</span>0-9<span class="o">]{</span>2<span class="o">}</span><span class="p">&amp;</span>rsquo<span class="p">;</span>
+</span><span class='line'>  <span class="nv">datexp</span><span class="o">=</span><span class="p">&amp;</span>lsquo<span class="p">;</span>^<span class="o">[</span>0-9<span class="o">]{</span>2<span class="o">}</span>.<span class="o">[</span>0-9<span class="o">]{</span>2<span class="o">}</span>.<span class="o">[</span>0-9<span class="o">]{</span>2<span class="o">}</span><span class="p">&amp;</span>rsquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$attime</span> <span class="o">=</span>~ <span class="nv">$timexp</span> &amp;amp;&amp;amp; <span class="nv">$atdate</span> <span class="o">=</span>~ <span class="nv">$datexp</span> <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; at <span class="s2">&quot;$attime&quot;</span> <span class="s2">&quot;$atdate&quot;</span> &amp;lt;&amp;lt; EOF
-</span><span class='line'> <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;$message&quot;</span> | mutt -s <span class="s2">&quot;REMINDER&quot;</span> jasonwryan@gmail.com
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;EOF
-</span><span class='line'>  <span class="k">else</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Incorrectly formatted values, bailing...&quot;</span> &amp;amp;&amp;amp; <span class="nb">exit </span>1
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>&lt;br/&gt;
+</span><span class='line'>&lt;p&gt;  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$attime</span> <span class="o">=</span>~ <span class="nv">$timexp</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="nv">$atdate</span> <span class="o">=</span>~ <span class="nv">$datexp</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>     at <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$attime</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$atdate</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span> EOF
+</span><span class='line'>     <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$message</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="p">|</span> mutt -s <span class="p">&amp;</span>ldquo<span class="p">;</span>REMINDER<span class="p">&amp;</span>rdquo<span class="p">;</span> &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;&amp;#109;&amp;#x61;&amp;#x69;&amp;#x6c;&amp;#x74;&amp;#111;&amp;#x3a;&amp;#106;&amp;#x61;&amp;#x73;&amp;#111;&amp;#x6e;&amp;#x77;&amp;#x72;&amp;#121;&amp;#x61;&amp;#x6e;&amp;#64;&amp;#103;&amp;#109;&amp;#x61;&amp;#x69;&amp;#x6c;&amp;#46;&amp;#x63;&amp;#x6f;&amp;#x6d;&quot;</span>&gt;<span class="p">&amp;</span><span class="c">#x6a;&amp;#97;&amp;#115;&amp;#111;&amp;#110;&amp;#x77;&amp;#x72;&amp;#x79;&amp;#97;&amp;#110;&amp;#64;&amp;#103;&amp;#x6d;&amp;#97;&amp;#105;&amp;#108;&amp;#x2e;&amp;#99;&amp;#x6f;&amp;#109;&lt;/a&gt;</span>
+</span><span class='line'>EOF
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>     <span class="nb">printf</span> <span class="p">&amp;</span>lsquo<span class="p">;</span>%s<span class="se">\n</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>Incorrectly formatted values, bailing<span class="p">&amp;</span>hellip<span class="p">;&amp;</span>rdquo<span class="p">;</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="nb">exit </span>1
+</span><span class='line'>  <span class="k">fi</span>&lt;br/&gt;
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Now, an invoice arrives, I open it and fire up
 <a href="https://github.com/jasonwryan/dwm/blob/patches/patchset/Base_config_changes.patch#L85" title="patch on github">a scratchpad</a>, and follow the prompts. A couple of weeks later, the
@@ -515,7 +629,7 @@ great pointers, Florian.</p>
 <li>In the interests of full disclosure, the most egregious line was
 <code>myterm=$(echo $TERM)</code> which I would hope I copied blindly from somewhere
 else, but accept full responsibility for nonetheless.</li>
-<li>Don't poke around too much in there, I still have quite a lot of cleaning up to do…</li>
+<li>Don&rsquo;t poke around too much in there, I still have quite a lot of cleaning up to do…</li>
 </ol>
 
 
@@ -550,10 +664,10 @@ easily acquire, compile and install any of the packages on your system:</p>
 wrote a
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/abpkg" title="In my bitbucket repo">simple script</a>
 to check for and download updates when required to help simplify the process
-and have been generally content with that approach. That isn't to say that
-elements of this process couldn't be improved. One of the small niggles is that
+and have been generally content with that approach. That isn&rsquo;t to say that
+elements of this process couldn&rsquo;t be improved. One of the small niggles is that
 the ABS only syncs once a day so there is almost always—for me down here in
-.nz, anyway—at least a full day's wait between the package hitting the local
+.nz, anyway—at least a full day&rsquo;s wait between the package hitting the local
 mirror and the updated ABS version arriving. The other issue is that you
 download and sync the entire tree…</p>
 

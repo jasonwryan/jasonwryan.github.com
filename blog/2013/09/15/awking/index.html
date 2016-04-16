@@ -21,13 +21,14 @@ In the first of those posts I wrote about a wonderful &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2013/09/15/awking">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2013/09/15/awking/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -68,9 +69,8 @@ In the first of those posts I wrote about a wonderful &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -97,14 +97,7 @@ In the first of those posts I wrote about a wonderful &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2013-09-15T09:23:00+12:00" pubdate data-updated="true">Sep 15<span>th</span>, 2013</time>
+<time class='entry-date' datetime='2013-09-15T09:23:00+12:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>9:23 am</span></time>
         
       </p>
     
@@ -116,7 +109,7 @@ This is an addendum to my two previous posts on
 <a href="http://jasonwryan.com/blog/2013/08/03/kernels/" title="The first post">compiling kernels</a>
 and <a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="The folow up">automating the process</a>.
 In the first of those posts I wrote about a wonderful tool to track the modules
-necessary for building a custom kernel with <code>make localmodconfig</code>, graysky&#8217;s
+necessary for building a custom kernel with <code>make localmodconfig</code>, graysky&rsquo;s
 <a href="https://github.com/graysky2/modprobed_db" title="Github repo">modprobed_db</a>. A simple
 bash script, <code>modprobed_db</code> allows you to build up an array of modules and—as
 the name suggests—<code>modprobe</code> all of them prior to compilation.</p>
@@ -127,10 +120,13 @@ constructions
 <a href="https://github.com/graysky2/modprobed_db/blob/master/common/modprobed_db#L62" title="awk pipeline">like this</a>:</p>
 
 <figure class='code'><figcaption><span>modprobed_db lines 62-63 </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/modules | awk <span class="s1">&#39;{print $1}&#39;</span> | sort -k 1,1 | <span class="se">\</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat /proc/modules | awk <span class="s1">&#39;{print $1}&#39;</span> | sort -k 1,1 | <span class="se">\</span>
 </span><span class='line'>  grep -Ev <span class="s2">&quot;$(echo ${IGNORE[*]} | sed -e &#39;s/^/^(/&#39; -e &#39;s/ /|/g&#39; -e &#39;s/$/)$/&#39;)&quot;</span> <span class="se">\</span>
 </span><span class='line'>  &gt;/tmp/.inmem
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p><a href="https://github.com/jasonwryan/modprobed_db/blob/jwr/common/modprobed_db" title="My branch">After hacking a while</a>,
@@ -143,7 +139,7 @@ I started to realize that the venerable UNIX programme
 
 <p> So, in the interests of learning Awk, I decided to rewrite the required
  functionality (or, more correctly, the subset that I required) in this
- language. This wasn&#8217;t a straightforward task for me. I got stuck a couple of
+ language. This wasn&rsquo;t a straightforward task for me. I got stuck a couple of
  times and, as I work in a building full of
  <a href="http://catalyst.net.nz" title="Catalyst website">neckbeards</a>, I thought I could ask
  for a couple of pointers. To my surprise, no-one I asked seemed interested in
@@ -152,7 +148,7 @@ I started to realize that the venerable UNIX programme
 <p> Aside from not knowing any
  <a href="http://www.perl.org/" title="Perl homepage">Perl</a>, and being unlikely to learn any
  in the immediate future, I was bemused by the notion that none of these skilled
- developers rated Awk as a language worth knowing. One of the #awk FAQ&#8217;s
+ developers rated Awk as a language worth knowing. One of the #awk FAQ&rsquo;s
  specifically addresses this:
  <a href="http://awk.freeshell.org/Frequently_Asked_Questions#toc14" title="#awk FAQs">Why would anyone still use awk instead of perl?</a>
  The quote by Tom Christiansen is worth repeating here:</p>
@@ -162,13 +158,54 @@ I started to realize that the venerable UNIX programme
 <p>In a happy coincidence, this
 <a href="http://unix.stackexchange.com/questions/90489/compare-two-files-with-first-column-and-remove-duplicate-row-from-2nd-file-in-sh/90490#90490" title="Comparing two files">question on Unix &amp; Linux SE</a>
 showed up just as I was completing my script and it neatly illustrates (to my
-unututored eye, anyway) an example of a typical situation where Awk&#8217;s strengths
+unututored eye, anyway) an example of a typical situation where Awk&rsquo;s strengths
 make it a better approach than Perl.</p>
 
 <p>In any event, my rewriting of <code>modprobed_db</code> in Awk<sup>1</sup> resulted in this:</p>
 
 <figure class='code'><figcaption><span>awkmodules </span></figcaption>
- <div class="highlight"><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
 </span><span class='line'><span class="c1"># script to manage modules for kernel builds</span>
 </span><span class='line'>
 </span><span class='line'><span class="nx">BEGIN</span> <span class="p">{</span> <span class="nx">dbfile</span> <span class="o">=</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">}</span>
@@ -209,23 +246,24 @@ make it a better approach than Perl.</p>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="c1"># vim:set ts=2 sts=2 sw=2 et:</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Just prior to compiling a kernel, I can invoke this script with (the admittedly
 rather ungainly line):</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>awkmodules <span class="nv">p</span><span class="o">=</span>1 .config/kmod_db/ignored .config/kmod_db/modules_db /proc/modules
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>awkmodules <span class="nv">p</span><span class="o">=</span>1 .config/kmod_db/ignored .config/kmod_db/modules_db /proc/modules
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>It does work, but I don&#8217;t claim that it is either idiomatic or attractive. The
+<p>It does work, but I don&rsquo;t claim that it is either idiomatic or attractive. The
 use of <code>getline</code> to update the module count strikes me as especially kludgy but
-I haven&#8217;t been able to think of a more correct way to handle it.</p>
+I haven&rsquo;t been able to think of a more correct way to handle it.</p>
 
 <p>Incidentally, the gawk manual<sup>2</sup>,
 <a href="http://www.gnu.org/software/gawk/manual/" title="GNU goodness">Gawk: Effective AWK Programming</a>
-has only just been updated<sup>3</sup> so Awk is, unlike it&#8217;s homonym, clearly
+has only just been updated<sup>3</sup> so Awk is, unlike it&rsquo;s homonym, clearly
 alive and well.</p>
 
 <h4>Notes</h4>
@@ -254,14 +292,7 @@ alive and well.</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2013-09-15T09:23:00+12:00" pubdate data-updated="true">Sep 15<span>th</span>, 2013</time>
+<time class='entry-date' datetime='2013-09-15T09:23:00+12:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>9:23 am</span></time>
       
 
 <span class="categories">
@@ -410,7 +441,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -428,7 +459,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

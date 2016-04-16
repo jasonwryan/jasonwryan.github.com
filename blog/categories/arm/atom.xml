@@ -4,7 +4,7 @@
   <title><![CDATA[Category: arm | jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/blog/categories/arm/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-19T08:20:47+13:00</updated>
+  <updated>2016-04-16T15:02:34+12:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -27,7 +27,7 @@ for Arch by some magnitude. Given that PKGBUILDs are just shell scripts, the bar
 to entry is relatively low, and investing the small amount of effort required to clear
 that barrier will not only give you a much better understanding of how packaging works
 in Arch, but will scratch your own itch for a particular package and hopefully assuage
-someone else's similar desire at the same time.</p>
+someone else&rsquo;s similar desire at the same time.</p>
 
 <p>Now that I have a
 <a href="http://www.raspberrypi.org/" title="Raspberry Pi site">Raspberry Pi</a><sup>1</sup>, I am
@@ -53,7 +53,7 @@ AUR as
 architectures, including ARM (both v6 and v7). Initially, when I wrote the
 PKGBUILD, I would <code>updpkgsums</code> on my x86_64 machine, build the package and
 then, on the Pi, have to regenerate the integrity checks. This was manageable
-enough for my own use across two architectures, but wasn't really going to
+enough for my own use across two architectures, but wasn&rsquo;t really going to
 work for people using other architectures (especially if they are using
 <a href="http://jasonwryan.com/blog/2013/04/09/helpers/" title="My post on Yaourt">AUR helpers</a>).</p>
 
@@ -63,25 +63,36 @@ work across the four architectures—without having to manually copy and paste o
 anything similarly tedious. Managing multiple architectures in the PKGBUILD
 itself is not particularly problematic, a case statement is sufficient:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>PKGBUILD </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="s2">&quot;$CARCH&quot;</span> in&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;armv6h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv6&quot;</span>
-</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;a94e5d00cec32956eb27bc12dbbc4964b68913f9&#39;</span><span class="o">)</span>
-</span><span class='line'>       ;;
-</span><span class='line'>armv7h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv7&quot;</span>
-</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;9b782abf95668a906bfe76ad5ceb4cda17ec2289&#39;</span><span class="o">)</span>
-</span><span class='line'>       ;;
-</span><span class='line'>i686<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;386&quot;</span>
-</span><span class='line'>      sha1sums+<span class="o">=(</span><span class="s1">&#39;b2e1961594a931201799246f5cf61cb1e1700ff9&#39;</span><span class="o">)</span>
-</span><span class='line'>       ;;
-</span><span class='line'>x86_64<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;amd64&quot;</span>
-</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;035730c09ca5383c90fdd9898baf66b90acdef24&#39;</span><span class="o">)</span>
-</span><span class='line'>       ;;
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;esac
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><figcaption><span>PKGBUILD </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$CARCH</span><span class="p">&amp;</span>rdquo<span class="p">;</span> in
+</span><span class='line'>    armv6h<span class="o">)</span> &lt;em&gt;pkgarch<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>armv6<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>            sha1sums+<span class="o">=(</span><span class="p">&amp;</span>lsquo<span class="p">;</span>a94e5d00cec32956eb27bc12dbbc4964b68913f9<span class="p">&amp;</span>rsquo<span class="p">;</span><span class="o">)</span>
+</span><span class='line'>           <span class="p">;;</span>
+</span><span class='line'>    armv7h<span class="o">)</span> &lt;/em&gt;pkgarch<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>armv7<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>            sha1sums+<span class="o">=(</span><span class="p">&amp;</span>lsquo<span class="p">;</span>9b782abf95668a906bfe76ad5ceb4cda17ec2289<span class="p">&amp;</span>rsquo<span class="p">;</span><span class="o">)</span>
+</span><span class='line'>           <span class="p">;;</span>
+</span><span class='line'>    i686<span class="o">)</span> &lt;em&gt;pkgarch<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>386<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>          sha1sums+<span class="o">=(</span><span class="p">&amp;</span>lsquo<span class="p">;</span>b2e1961594a931201799246f5cf61cb1e1700ff9<span class="p">&amp;</span>rsquo<span class="p">;</span><span class="o">)</span>
+</span><span class='line'>           <span class="p">;;</span>
+</span><span class='line'>    x86_64<span class="o">)</span> &lt;/em&gt;pkgarch<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>amd64<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'>            sha1sums+<span class="o">=(</span><span class="p">&amp;</span>lsquo<span class="p">;</span>035730c09ca5383c90fdd9898baf66b90acdef24<span class="p">&amp;</span>rsquo<span class="p">;</span><span class="o">)</span>
+</span><span class='line'>           <span class="p">;;</span>
+</span><span class='line'><span class="k">esac</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The real challenge, for me, was to be able to script the replacement of each of
 the respective
@@ -90,72 +101,100 @@ and then to update the PKGBUILD with the new arrays.  Each release of
 Syncthing is accompanied by a text file containing all of the sha1sums, each on
 its own line in a conveniently ordered format, like so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>sha1sums.txt.asc </span></figcaption>
- <div class="highlight"><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
+<p><figure class='code'><figcaption><span>sha1sums.txt.asc </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
 </span><span class='line'>035730c09ca5383c90fdd9898baf66b90acdef24    syncthing-linux-amd64-v0.9.16.tar.gz
 </span><span class='line'>d743b64204f0ac7884e4b42d9b1865b2436f5ecb    syncthing-linux-armv5-v0.9.16.tar.gz
 </span><span class='line'>…
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
-<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>'s
+<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>&rsquo;s
 <a href="https://www.gnu.org/software/gawk/manual/html_node/Switch-Statement.html" title="Gawk manual">switch statement</a>,
 and an admittedly rather convoluted <code>printf</code> incantation.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">armv6</span><span class="o">/</span><span class="err">:</span>
-</span><span class='line'>    <span class="nx">arm6</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
-</span><span class='line'>    <span class="k">break</span>
-</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">armv7</span><span class="o">/</span><span class="err">:</span>
-</span><span class='line'>    <span class="nx">arm7</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
-</span><span class='line'>    <span class="k">break</span>
-</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="mi">386</span><span class="o">/</span><span class="err">:</span>
-</span><span class='line'>    <span class="nx">i386</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
-</span><span class='line'>    <span class="k">break</span>
-</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="nx">amd64</span><span class="o">/</span><span class="err">:</span>
-</span><span class='line'>    <span class="nx">x86</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
-</span><span class='line'>    <span class="k">break</span>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'>    <span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">armv6</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>        <span class="nx">arm6</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">armv7</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>        <span class="nx">arm7</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="mi">386</span><span class="o">/</span><span class="err">:</span>                                                                     <span class="o">&lt;</span><span class="nx">br</span><span class="o">/&gt;</span>
+</span><span class='line'>        <span class="nx">i386</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="nx">amd64</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>        <span class="nx">x86</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="p">}</span>
 </span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>  <span class="p">}</span>
 </span><span class='line'><span class="nx">END</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kr">printf</span> <span class="s2">&quot;case \&quot;$CARCH\&quot; in\n\t&quot;</span><span class="err">\</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span>     <span class="s2">&quot;armv6h) _pkgarch=\&quot;armv6\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
-</span><span class='line'>     <span class="s2">&quot;armv7h) _pkgarch=\&quot;armv7\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
-</span><span class='line'>     <span class="s2">&quot;i686) _pkgarch=\&quot;386\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
-</span><span class='line'>     <span class="s2">&quot;x86_64) _pkgarch=\&quot;amd64\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n&quot;</span><span class="err">\</span>
-</span><span class='line'>     <span class="s2">&quot;esac\n&quot;</span><span class="p">,</span>
-</span><span class='line'>     <span class="nx">arm6</span><span class="p">,</span> <span class="nx">arm7</span><span class="p">,</span> <span class="nx">i386</span><span class="p">,</span> <span class="nx">x86</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>  <span class="kr">printf</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">case</span> <span class="err">\&amp;</span><span class="nx">rdquo</span><span class="p">;</span><span class="o">$</span><span class="nx">CARCH</span><span class="err">\&amp;</span><span class="nx">ldquo</span><span class="p">;</span> <span class="o">in</span><span class="err">\</span><span class="nx">n</span><span class="err">\</span><span class="nx">t</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span><span class="err">\</span>
+</span><span class='line'>         <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">armv6h</span><span class="p">)</span> <span class="o">&lt;</span><span class="nx">em</span><span class="o">&gt;</span><span class="nx">pkgarch</span><span class="o">=</span><span class="err">\</span><span class="s2">&quot;armv6\&amp;rdquo;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>         <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">armv7h</span><span class="p">)</span> <span class="o">&lt;</span><span class="err">/em&gt;pkgarch=\&quot;armv7\&amp;rdquo;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;\</span>
+</span><span class='line'>         <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">i686</span><span class="p">)</span> <span class="o">&lt;</span><span class="nx">em</span><span class="o">&gt;</span><span class="nx">pkgarch</span><span class="o">=</span><span class="err">\</span><span class="s2">&quot;386\&amp;rdquo;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>         <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">x86_64</span><span class="p">)</span> <span class="o">&lt;</span><span class="err">/em&gt;pkgarch=\&quot;amd64\&amp;rdquo;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n&quot;\</span>
+</span><span class='line'>         <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">esac</span><span class="err">\</span><span class="nx">n</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span>
+</span><span class='line'>         <span class="nx">arm6</span><span class="p">,</span> <span class="nx">arm7</span><span class="p">,</span> <span class="nx">i386</span><span class="p">,</span> <span class="nx">x86</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The remaining step was to update the PKGBUILD with the new sha1sums. Fortunately,
 <a href="http://blog.falconindy.com/" title="Dave's blog">Dave Reisner</a> had already written the code
 for this in his <code>updpkgsums</code> utility; I had only to adapt it slightly:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>excerpt from updpkgsums </span></figcaption>
- <div class="highlight"><pre><code class='awk'><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="nx">rm</span> <span class="s2">&quot;$buildfile&quot;</span>
-</span><span class='line'>  <span class="nx">exec</span> <span class="nx">awk</span> <span class="o">-</span><span class="nx">v</span> <span class="nx">newsums</span><span class="o">=</span><span class="s2">&quot;$newsums&quot;</span> <span class="s1">&#39;&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">&lt;pre&gt;&lt;code&gt;/^case/,/^esac$/ {</span>
-</span><span class='line'><span class="s1">  if (!w) { print newsums; w++ }</span>
-</span><span class='line'><span class="s1">    next</span>
-</span><span class='line'><span class="s1">  }; 1</span>
-</span><span class='line'><span class="s1">  END { if (!w) print newsums }</span>
-</span><span class='line'><span class="s1">&lt;/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">&lt;p&gt;  &#39;</span> <span class="o">&gt;</span> <span class="s2">&quot;$buildfile&quot;</span>
-</span><span class='line'><span class="p">}</span> <span class="err">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="s2">&quot;$buildfile&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><figcaption><span>excerpt from updpkgsums </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">rm</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="o">$</span><span class="nx">buildfile</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'>  <span class="nx">exec</span> <span class="nx">awk</span> <span class="o">-</span><span class="nx">v</span> <span class="nx">newsums</span><span class="o">=</span><span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="o">$</span><span class="nx">newsums</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span> <span class="err">&amp;</span><span class="nx">lsquo</span><span class="p">;</span>
+</span><span class='line'>    <span class="sr">/^case/</span><span class="p">,</span><span class="sr">/^esac$/</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">w</span><span class="p">)</span> <span class="p">{</span> <span class="kr">print</span> <span class="nx">newsums</span><span class="p">;</span> <span class="nx">w</span><span class="o">++</span> <span class="p">}</span>
+</span><span class='line'>        <span class="kr">next</span>
+</span><span class='line'>      <span class="p">};</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="nx">END</span> <span class="p">{</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">w</span><span class="p">)</span> <span class="kr">print</span> <span class="nx">newsums</span> <span class="p">}</span>
+</span><span class='line'>  <span class="err">&amp;</span><span class="nx">rsquo</span><span class="p">;</span> <span class="o">&gt;</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="o">$</span><span class="nx">buildfile</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span> <span class="err">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="err">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="o">$</span><span class="nx">buildfile</span><span class="err">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Combining these two tasks means that I have a script that, when run, will download
-the current Syncthing release's <span class="file">sha1sum.txt.asc</span>
+the current Syncthing release&rsquo;s <span class="file">sha1sum.txt.asc</span>
 file, extract the relevant sums into the replacement case statement and then
 write it into the PKGBUILD. I can then run <code>makepkg -ci &amp;&amp; mkaurball</code>, upload
 the new tarball to the AUR and the two other people that are using the PKGBUILD
@@ -193,9 +232,9 @@ notoriously security conscious sysadmins that run networks in hotels and
 other public places.</p>
 
 <p>Setting it up was straightforward enough, the wiki is typically clear and thorough; the only
-bottleneck in the process was waiting for the Pi's tiny chip to chug through the creation of
+bottleneck in the process was waiting for the Pi&rsquo;s tiny chip to chug through the creation of
 <a href="https://wiki.archlinux.org/index.php/Create_a_Public_Key_Infrastructure_Using_the_easy-rsa_Scripts" title="Wiki page on the easy-rsa scripts">public keys</a>. Once it was done, and I had tested that it was
-indeed working as intended, a more vexing issue presented itself. The service wouldn't come
+indeed working as intended, a more vexing issue presented itself. The service wouldn&rsquo;t come
 up after rebooting. Not a deal breaker, I could always just <acronym title="Secure Shell">SSH</acronym>
 in and manually bring the server up, but that sort of defeats the purpose of being able to
 have the thing running reliably.</p>
@@ -211,9 +250,9 @@ half a century ago.</p>
 
 <p>There are a variety of fixes floating around, the most amusing being
 <a href="http://archlinuxarm.org/forum/viewtopic.php?f=31&amp;t=6037#p34228" title="Yes, really…">a wrapper for init</a>.
-Suffice to say, this wasn't an option for me. Looking at the problem logically, it occurred to me
+Suffice to say, this wasn&rsquo;t an option for me. Looking at the problem logically, it occurred to me
 that the issue was actually a trivial one: the correct sequencing of different services
-post boot. Isn't this, I asked myself, one of the issues
+post boot. Isn&rsquo;t this, I asked myself, one of the issues
 <a href="http://www.freedesktop.org/wiki/Software/systemd/" title="At freedesktop.org">systemd</a> was supposed
 to address?</p>
 
@@ -243,13 +282,15 @@ as well as <code>systemd-resolved.service</code>. Reboot and the network is up s
 
 <p>Compounding my heresy, I then switched out NTP for
 <a href="http://man7.org/linux/man-pages/man8/systemd-timesyncd.8.html" title="Man page">systemd-timesyncd</a>
-and the Pi's clock was now reset with the same alacrity. The final piece, ensuring
+and the Pi&rsquo;s clock was now reset with the same alacrity. The final piece, ensuring
 that the openvpn service waited for this to happen, was to add two lines to the
 service file:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">After</span><span class="o">=</span>network-online.target
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">After</span><span class="o">=</span>network-online.target
 </span><span class='line'><span class="nv">Wants</span><span class="o">=</span>network-online.target
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>That is all there is to it. Reboot and the network comes up, the clock is reset and then
 the OpenVPN server starts. Like magic. The sort of heathen magic that threatens to
@@ -260,7 +301,7 @@ sap and impurify all of our
 
 <ol>
 <li>No, Virginia, I did <a href="http://boycottsystemd.org/">not make that up</a>…
-And I don't really understand how you can slap a philosophy in the face, but then
+And I don&rsquo;t really understand how you can slap a philosophy in the face, but then
 rationality is anathema to zealots; irrespective of which chimæra they
 prostrate before.</li>
 </ol>
@@ -305,43 +346,52 @@ via <span class="file">/etc/fstab</span>; depending on the size of your
 and thankless task. So if you intend to do more of this, or do it regularly,
 set up
 <a href="http://archlinuxarm.org/developers/distcc-cross-compiling" title="Arch ARM instructions">cross-compiling</a>;
-you won't regret the initial investment.</p>
+you won&rsquo;t regret the initial investment.</p>
 
 <p><code>rtorrent</code> is in the ARM repos, but I wanted to patch in colour, so I wrote
 <a href="https://gist.github.com/jasonwryan/5794623" title="Gist of the thing…">a PKGBUILD</a>,
 based on the package in [community] and
-<a href="https://aur.archlinux.org/packages.php?ID=31956" title="Arch User Repository">ashren's AUR package</a>.
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="Arch User Repository">ashren&rsquo;s AUR package</a>.
 Once you have rtorrent installed and working, the rest is straightforward.</p>
 
 <p>The default config for w3m is perfectly functional, but can be easily customized
 further. The key to this setup is being able to find a torrent and then easily
-add it to rtorrent's queue.  To do this, I modified the hack that I wrote up
+add it to rtorrent&rsquo;s queue.  To do this, I modified the hack that I wrote up
 <a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Post on yanking URLs in w3m">a couple years back</a>.
-Essentially, you use w3m's external link function to trigger a script to grab
+Essentially, you use w3m&rsquo;s external link function to trigger a script to grab
 the magnet link. Like so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/.w3m/config </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>extbrowser /home/jason/Scripts/magnets %s
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><figcaption><span>~/.w3m/config </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>extbrowser /home/jason/Scripts/magnets %s
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>and the script from the
 <a href="http://wiki.rtorrent.org/MagnetUri#Handling_.22magnet:.22_URIs_via_a_bash_script" title="Script for magnet links">rtorrent wiki</a>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/Scripts/magnets </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><figcaption><span>~/Scripts/magnets </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;cd <span class="nv">$HOME</span>/Downloads/Queue/watch/    <span class="c"># set your watch directory here</span>
-</span><span class='line'><span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span>~ <span class="nv">xt</span><span class="o">=</span>urn:btih:<span class="o">([</span>&lt;sup&gt;&amp;amp;/<span class="o">]</span>+<span class="o">)</span>&lt;/sup&gt; <span class="o">]]</span> <span class="o">||</span> <span class="nb">exit</span>;
-</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;d10:magnet-uri${#1}:${1}e&quot;</span> &gt; <span class="s2">&quot;meta-${BASH_REMATCH[1]}.torrent&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'><span class="o">[[</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$1</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">=</span>~ <span class="nv">xt</span><span class="o">=</span>urn:btih:<span class="o">([</span>^<span class="p">&amp;</span>amp<span class="p">;</span>/<span class="o">]</span>+<span class="o">)</span> <span class="o">]]</span> <span class="o">||</span> <span class="nb">exit</span><span class="p">;</span>
+</span><span class='line'><span class="nb">echo</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>d10:magnet-uri<span class="k">${#</span><span class="nv">1</span><span class="k">}</span>:<span class="k">${</span><span class="nv">1</span><span class="k">}</span>e<span class="p">&amp;</span>rdquo<span class="p">;</span> &gt; <span class="p">&amp;</span>ldquo<span class="p">;</span>meta-<span class="k">${</span><span class="nv">BASH_REMATCH</span><span class="p">[1]</span><span class="k">}</span>.torrent<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Remapping the w3m key to trigger the script to make it more Vim-like:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/.w3m/keymap </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>keymap Y EXTERN_LINK
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><figcaption><span>~/.w3m/keymap </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>keymap Y EXTERN_LINK
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>And now hitting <kbd>Shift</kbd><kbd>y</kbd> over a magnet link adds it to your
 queue.</p>
@@ -352,7 +402,7 @@ a <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="My post on Sync">
 shared directory as <span class="file">~/Downloads</span>. All files are synched
 to my desktop as they are downloaded to the Pi. Simple.</p>
 
-<p><img src="/images/post_images/rtorrent-2.png" title="'Screenshot of rtorrent in action…'" ></p>
+<p><img src="/images/post_images/rtorrent-2.png" title="&lsquo;Screenshot of rtorrent in action…&rsquo;" ></p>
 
 <p>As I mentioned above, you could also use a VPN and, with a service
 file, have it connect on boot if you wished to further protect your privacy.</p>
@@ -360,7 +410,7 @@ file, have it connect on boot if you wished to further protect your privacy.</p>
 <h4>Notes</h4>
 
 <ol>
-<li>This is not to say that I am now using it to it's full potential; quite the
+<li>This is not to say that I am now using it to it&rsquo;s full potential; quite the
 opposite. Recommendations or suggestions gratefully received.</li>
 <li>Discovery is <em>your</em> business; what you choose to download and share may be the
 business of copyright holders…</li>

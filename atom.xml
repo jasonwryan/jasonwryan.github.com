@@ -4,7 +4,7 @@
   <title><![CDATA[jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-19T08:20:47+13:00</updated>
+  <updated>2016-04-16T15:02:34+12:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -27,12 +27,12 @@ laptops; the script, a
 removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
 repopulates the directory with an updated set. Almost. The one flaw that has
 been an irritant of variable intensity, depending on what I felt like listening
-at any given time, is that the symlinks aren&#8217;t written for directories that
+at any given time, is that the symlinks aren&rsquo;t written for directories that
 already exist on the target filesystem.</p>
 
 <p>In order that I am able to play some music if I forget the USB drive, each of
 the laptops has a subset of albums on it, depending on the size of their
-respective hard drives. If I add a new album to the USB drive, then that change won&#8217;t
+respective hard drives. If I add a new album to the USB drive, then that change won&rsquo;t
 get written to either of the laptops when the drive is plugged in. Not entirely
 satisfactory. I had tinkered around with
 <a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
@@ -55,7 +55,7 @@ better suited to what I was trying to achieve), I learned something new.</p>
 
 <p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
 
-<blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote>
+<blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p><footer><strong>https://en.wikipedia.org/wiki/Union_filesystem</strong></footer></blockquote>
 
 
 <p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
@@ -66,18 +66,37 @@ in the current kernel, 3.18, that a union mount has been accepted into the kerne
 
 <p>After reading the
 <a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/overlayfs.txt" title="Kernel docs">documentation for overlayfs</a>, it seemed this was <em>exactly</em> what I
-was looking for. Essentially, an overlay mount would allow me to “merge&#8221;
+was looking for. Essentially, an overlay mount would allow me to “merge"
 the underlying tree (the Music directory on the USB drive) with an “upper”
 one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
 seamlessly</em>.</p>
 
-<blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote>
+<blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p><footer><strong>Kernel docs</strong></footer></blockquote>
 
 
 <p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
 trivial:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
 </span><span class='line'><span class="c"># union mount Music when Apollo plugged in</span>
 </span><span class='line'>
 </span><span class='line'><span class="nv">low</span><span class="o">=</span>/media/Apollo/Music
@@ -96,7 +115,7 @@ trivial:</p>
 </span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 <span class="o">&amp;&amp;</span> <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
 </span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>And now, when I plug in the USB drive, the contents of the drive are merged
@@ -140,10 +159,10 @@ which has held up pretty well over that time.</p>
 make more regular backups, was that pruning the archives was a relatively
 tedious business. Given that Tarsnap
 <a href="http://www.tarsnap.com/efficiency.html" title="Tarsnap efficiency page">de-duplicates data</a>,
-there isn&#8217;t much mileage in keeping around older archives because, if you do
-have to retrieve a file, you don&#8217;t want to have to search through a large
+there isn&rsquo;t much mileage in keeping around older archives because, if you do
+have to retrieve a file, you don&rsquo;t want to have to search through a large
 number of archives to find it; so there is a balance between making use of
-Tarsnap&#8217;s efficient functionality, and not creating a rod for your back if your
+Tarsnap&rsquo;s efficient functionality, and not creating a rod for your back if your
 use case is occasionally retrieving single—or small groups of—files, rather
 than large dumps.</p>
 
@@ -159,7 +178,46 @@ the number to keep is set to.</p>
 <p>The bulk of the code is simple enough:</p>
 
 <figure class='code'><figcaption><span>snapclean </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># generate list</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># generate list</span>
 </span><span class='line'>tarsnap --list-archives &gt; <span class="s2">&quot;$tmpfile&quot;</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># sort by descending date, format is: host-ddmmyy_hh:mm</span>
@@ -198,14 +256,14 @@ the number to keep is set to.</p>
 </span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Nothing to do&quot;</span>
 </span><span class='line'>  <span class="nb">exit </span>0
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>You can see the rest of the script in
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snapclean" title="snapclean in bitbucket">my bitbucket repo</a>.  It even comes <a href="http://jasonwryan.com/images/post_images/snapclean.png" title="Screenshot of snapclean">with colour</a>.</p>
 
 <p>Once every couple of weeks, I run the script, review the archives marked for
-deletion and then blow them away. Easy. If you aren&#8217;t using Tarsnap, you
+deletion and then blow them away. Easy. If you aren&rsquo;t using Tarsnap, you
 really should check it out; it is an excellent service and—for the almost
 ridiculously small investment—you get rock solid, encrypted peace of
 mind. Why would you not do that?</p>
@@ -223,8 +281,8 @@ professional, I am no longer able to fulfil my own expectations of regularly
 pushing these posts out.</p>
 
 <p>I will endeavour to, from time to time when I find something that I genuinely
-think is worth sharing, make an effort to write about it, but I can&#8217;t see that
-happening all that often.  I&#8217;d like to thank all the people that have read
+think is worth sharing, make an effort to write about it, but I can&rsquo;t see that
+happening all that often.  I&rsquo;d like to thank all the people that have read
 these posts; especially those of you that have commented. With every post, I
 always looked forward to people telling me where I got something wrong or how I
 could have approached a problem differently or more effectively<sup>2</sup>; I
@@ -236,7 +294,7 @@ generous enough to share them.</p>
 <ol>
 <li>The frequency with which this happens is, admittedly, low; but not
 low enough to confidently abandon a service like this…</li>
-<li>Leaving a complimentary note is just as welcome, don&#8217;t get me wrong…</li>
+<li>Leaving a complimentary note is just as welcome, don&rsquo;t get me wrong…</li>
 </ol>
 
 ]]></content>
@@ -256,7 +314,7 @@ for Arch by some magnitude. Given that PKGBUILDs are just shell scripts, the bar
 to entry is relatively low, and investing the small amount of effort required to clear
 that barrier will not only give you a much better understanding of how packaging works
 in Arch, but will scratch your own itch for a particular package and hopefully assuage
-someone else&#8217;s similar desire at the same time.</p>
+someone else&rsquo;s similar desire at the same time.</p>
 
 <p>Now that I have a
 <a href="http://www.raspberrypi.org/" title="Raspberry Pi site">Raspberry Pi</a><sup>1</sup>, I am
@@ -282,7 +340,7 @@ AUR as
 architectures, including ARM (both v6 and v7). Initially, when I wrote the
 PKGBUILD, I would <code>updpkgsums</code> on my x86_64 machine, build the package and
 then, on the Pi, have to regenerate the integrity checks. This was manageable
-enough for my own use across two architectures, but wasn&#8217;t really going to
+enough for my own use across two architectures, but wasn&rsquo;t really going to
 work for people using other architectures (especially if they are using
 <a href="http://jasonwryan.com/blog/2013/04/09/helpers/" title="My post on Yaourt">AUR helpers</a>).</p>
 
@@ -293,7 +351,21 @@ anything similarly tedious. Managing multiple architectures in the PKGBUILD
 itself is not particularly problematic, a case statement is sufficient:</p>
 
 <figure class='code'><figcaption><span>PKGBUILD </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="s2">&quot;$CARCH&quot;</span> in
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="s2">&quot;$CARCH&quot;</span> in
 </span><span class='line'>    armv6h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv6&quot;</span>
 </span><span class='line'>            sha1sums+<span class="o">=(</span><span class="s1">&#39;a94e5d00cec32956eb27bc12dbbc4964b68913f9&#39;</span><span class="o">)</span>
 </span><span class='line'>           ;;
@@ -307,7 +379,7 @@ itself is not particularly problematic, a case statement is sufficient:</p>
 </span><span class='line'>            sha1sums+<span class="o">=(</span><span class="s1">&#39;035730c09ca5383c90fdd9898baf66b90acdef24&#39;</span><span class="o">)</span>
 </span><span class='line'>           ;;
 </span><span class='line'><span class="k">esac</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The real challenge, for me, was to be able to script the replacement of each of
@@ -318,18 +390,46 @@ Syncthing is accompanied by a text file containing all of the sha1sums, each on
 its own line in a conveniently ordered format, like so:</p>
 
 <figure class='code'><figcaption><span>sha1sums.txt.asc </span></figcaption>
- <div class="highlight"><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
 </span><span class='line'>035730c09ca5383c90fdd9898baf66b90acdef24    syncthing-linux-amd64-v0.9.16.tar.gz
 </span><span class='line'>d743b64204f0ac7884e4b42d9b1865b2436f5ecb    syncthing-linux-armv5-v0.9.16.tar.gz
 </span><span class='line'>…
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>&#8217;s
+<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>&rsquo;s
 <a href="https://www.gnu.org/software/gawk/manual/html_node/Switch-Statement.html" title="Gawk manual">switch statement</a>,
 and an admittedly rather convoluted <code>printf</code> incantation.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'>    <span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'>    <span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">armv6</span><span class="o">/</span><span class="err">:</span>
 </span><span class='line'>        <span class="nx">arm6</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
 </span><span class='line'>        <span class="k">break</span>
@@ -353,7 +453,7 @@ and an admittedly rather convoluted <code>printf</code> incantation.</p>
 </span><span class='line'>         <span class="s2">&quot;esac\n&quot;</span><span class="p">,</span>
 </span><span class='line'>         <span class="nx">arm6</span><span class="p">,</span> <span class="nx">arm7</span><span class="p">,</span> <span class="nx">i386</span><span class="p">,</span> <span class="nx">x86</span>
 </span><span class='line'><span class="p">}</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The remaining step was to update the PKGBUILD with the new sha1sums. Fortunately,
@@ -361,7 +461,17 @@ and an admittedly rather convoluted <code>printf</code> incantation.</p>
 for this in his <code>updpkgsums</code> utility; I had only to adapt it slightly:</p>
 
 <figure class='code'><figcaption><span>excerpt from updpkgsums </span></figcaption>
- <div class="highlight"><pre><code class='awk'><span class='line'><span class="p">{</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'><span class="p">{</span>
 </span><span class='line'>  <span class="nx">rm</span> <span class="s2">&quot;$buildfile&quot;</span>
 </span><span class='line'>  <span class="nx">exec</span> <span class="nx">awk</span> <span class="o">-</span><span class="nx">v</span> <span class="nx">newsums</span><span class="o">=</span><span class="s2">&quot;$newsums&quot;</span> <span class="s1">&#39;</span>
 </span><span class='line'><span class="s1">    /^case/,/^esac$/ {</span>
@@ -371,11 +481,11 @@ for this in his <code>updpkgsums</code> utility; I had only to adapt it slightly
 </span><span class='line'><span class="s1">      END { if (!w) print newsums }</span>
 </span><span class='line'><span class="s1">  &#39;</span> <span class="o">&gt;</span> <span class="s2">&quot;$buildfile&quot;</span>
 </span><span class='line'><span class="p">}</span> <span class="o">&lt;</span> <span class="s2">&quot;$buildfile&quot;</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Combining these two tasks means that I have a script that, when run, will download
-the current Syncthing release&#8217;s <span class="file">sha1sum.txt.asc</span>
+the current Syncthing release&rsquo;s <span class="file">sha1sum.txt.asc</span>
 file, extract the relevant sums into the replacement case statement and then
 write it into the PKGBUILD. I can then run <code>makepkg -ci &amp;&amp; mkaurball</code>, upload
 the new tarball to the AUR and the two other people that are using the PKGBUILD
@@ -420,7 +530,7 @@ transparent it is so ingrained in my workflow.</p>
 invoice and when the payment is actually due. I find that companies will
 typically email their invoices to me some weeks in advance, whereupon I will
 make a mental note and then, unsurprisingly, promptly forget all about it,
-thereby opening myself up for penalties for late payment.  It didn&#8217;t take me
+thereby opening myself up for penalties for late payment.  It didn&rsquo;t take me
 long (well, in my defence, a lot less time than it took for invoices to become
 digital) to realise that there was a better way™ - a script.</p>
 
@@ -435,7 +545,23 @@ needed a script to make it painless to achieve.</p>
 <p>The main function of the script is pretty self-explanatory:</p>
 
 <figure class='code'><figcaption><span>todo </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>aread<span class="o">()</span> <span class="o">{</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>aread<span class="o">()</span> <span class="o">{</span>
 </span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Time of message? [HH:MM] &quot;</span> attime
 </span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Date of message? [DD.MM.YY] &quot;</span> atdate
 </span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Message body? &quot;</span> message
@@ -451,7 +577,7 @@ needed a script to make it painless to achieve.</p>
 </span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Incorrectly formatted values, bailing...&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>1
 </span><span class='line'>  <span class="k">fi</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Now, an invoice arrives, I open it and fire up
@@ -485,7 +611,7 @@ great pointers, Florian.</p>
 <li>In the interests of full disclosure, the most egregious line was
 <code>myterm=$(echo $TERM)</code> which I would hope I copied blindly from somewhere
 else, but accept full responsibility for nonetheless.</li>
-<li>Don&#8217;t poke around too much in there, I still have quite a lot of cleaning up to do…</li>
+<li>Don&rsquo;t poke around too much in there, I still have quite a lot of cleaning up to do…</li>
 </ol>
 
 
@@ -521,10 +647,10 @@ easily acquire, compile and install any of the packages on your system:</p>
 wrote a
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/abpkg" title="In my bitbucket repo">simple script</a>
 to check for and download updates when required to help simplify the process
-and have been generally content with that approach. That isn&#8217;t to say that
-elements of this process couldn&#8217;t be improved. One of the small niggles is that
+and have been generally content with that approach. That isn&rsquo;t to say that
+elements of this process couldn&rsquo;t be improved. One of the small niggles is that
 the ABS only syncs once a day so there is almost always—for me down here in
-.nz, anyway—at least a full day&#8217;s wait between the package hitting the local
+.nz, anyway—at least a full day&rsquo;s wait between the package hitting the local
 mirror and the updated ABS version arriving. The other issue is that you
 download and sync the entire tree…</p>
 
@@ -582,7 +708,7 @@ or interesting for some other tangential reason.</p>
 it is a 600 line bash script that uses
 <a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard" title="Wikpedia entry">GPG encryption</a>
 and some other standard tools and scripts to organize and manage your password
-files. I had never heard of it but, based on Cayetano and Bigby&#8217;s
+files. I had never heard of it but, based on Cayetano and Bigby&rsquo;s
 recommendations, I thought it would be worth a look.</p>
 
 <p>On of the reasons that I had not come across it before was that, after using
@@ -591,7 +717,7 @@ assumed that I would need to continue to use that database format; so when I
 was looking for an alternative,
 <a href="http://raymontag.github.io/keepassc/" title="KeePassC homepage">KeePassC</a>
 was a natural fit (and a fine application). The question of migrating my data
-hadn&#8217;t even occurred to me…</p>
+hadn&rsquo;t even occurred to me…</p>
 
 <p>It turns out that the migration process to pass is extraordinarily well catered
 for: there are
@@ -610,9 +736,9 @@ environment variable to place the top level pass directory in an alternate
 location. This way, instead of initializing a git repository, I could have the
 store synced by
 <a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="My post on Syncthing">Syncthing</a>.
-The git idea is a good one, but I&#8217;m not particularly interested in version
+The git idea is a good one, but I&rsquo;m not particularly interested in version
 controlling these directories, and I have no intention, encrypted or not, of
-pushing them to someone else&#8217;s server.</p>
+pushing them to someone else&rsquo;s server.</p>
 
 <p>That constitutes the basic setup. It took a grand total of five minutes. The
 real strength of pass, however, is in its integration with two other fantastic
@@ -622,14 +748,14 @@ tools:
 Together with pass, these constitute a secure, convenient and effortless
 workflow for managing your passwords. With your GPG key loaded into keychain,
 you are only prompted for your master passphrase once<sup>1</sup> and with
-Chris Down&#8217;s excellent
+Chris Down&rsquo;s excellent
 <a href="http://git.zx2c4.com/password-store/tree/contrib/dmenu/passmenu" title="In the pass repo">passmenu script</a>,
 you can use dmenu to sort through your password files, <kbd>Tab</kbd> complete
 the one you are looking for and have it copied to your clipboard with a couple
 of keystrokes.</p>
 
-<p>After using Chris&#8217; script for a couple of days, I made a few alterations to
-suit my setup: removed the <code>xdotool</code> stuff (as I don&#8217;t need it), included dmenu
+<p>After using Chris' script for a couple of days, I made a few alterations to
+suit my setup: removed the <code>xdotool</code> stuff (as I don&rsquo;t need it), included dmenu
 formatting options to match my
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/dwm-status" title="In my bitbucket repo">dwm statusbar</a>
 and, most significantly, changed the way that the files are printed in dmenu to
@@ -637,7 +763,34 @@ remove the visual clutter of the parent directories, ie., print <span class="fil
 as opposed to <span class="file">internet/archwiki</span>:</p>
 
 <figure class='code'><figcaption><span>dpass </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
 </span><span class='line'><span class="c"># based on: https://github.com/cdown/passmenu</span>
 </span><span class='line'>
 </span><span class='line'><span class="nb">shopt</span> -s nullglob globstar
@@ -664,7 +817,7 @@ as opposed to <span class="file">internet/archwiki</span>:</p>
 </span><span class='line'>    <span class="k">fi  </span>
 </span><span class='line'><span class="k">  done</span>
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>It does introduce some more complexity into the script, but it makes it a lot
@@ -681,7 +834,7 @@ for the main shells, and even one for
 <p>While I have no complaints at all with KeePassC, I have found this pass setup to
 be a lot less intrusive to use, it seamlessly integrates with my workflow,
 and the passwords themselves are much simpler to manage. Short of someone else
-popping up in the comments with another compelling proposition, I&#8217;m content
+popping up in the comments with another compelling proposition, I&rsquo;m content
 with the way this has worked out. Many thanks to Cayetano Santos and Bigby
 James for the push.</p>
 
@@ -718,7 +871,7 @@ everything.</p>
 
 <p>Fortunately, this is a solved problem. There are a number of password managers available,
 both as desktop clients and cloud services. Personally, I find the idea of storing my
-passwords in the cloud has all the fascination of bungee jumping; it&#8217;s apparently
+passwords in the cloud has all the fascination of bungee jumping; it&rsquo;s apparently
 <a href="http://en.wikipedia.org/wiki/Bungee_jumping#Safety_and_possible_injury" title="Wikipedia page">mostly safe</a>,
 but that can be cold comfort… The first application that I used, and used happily for
 quite a long time, was
@@ -729,7 +882,7 @@ quite a long time, was
 that is completely compatible with KeePassX and has very little in the way of dependencies.
 I have been using it solidly on my home and work laptops ever since and, after recently
 uninstalling Skype on my desktop, have switched over to it completely<sup>1</sup>.
-I&#8217;m still not entirely clear why I haven&#8217;t written about it previously.</p>
+I&rsquo;m still not entirely clear why I haven&rsquo;t written about it previously.</p>
 
 <p>Written in <a href="https://www.python.org/download/releases/3.0/" title="The New Python">Python 3</a>,
 KeePassC is entirely keyboard driven (naturally enough, you can use Vim keybinds) and
@@ -747,16 +900,16 @@ switching back to the browser and you are in.</p>
 
 <p>KeePassC also has a set of simple command line options, run <code>keepassc -h</code> to see them.
 Additionally, you can set up KeePassC as
-<a href="http://raymontag.github.io/keepassc/server.html" title="Server documentation">a server</a>, I haven&#8217;t
+<a href="http://raymontag.github.io/keepassc/server.html" title="Server documentation">a server</a>, I haven&rsquo;t
 experimented with this as I sync my database. The only functionality that the X application
 offers in addition, as far as I can tell, is the auto-filling of your username and password
-fields bound to a keybind; undoubtedly, this is a very handy feature, but I haven&#8217;t
+fields bound to a keybind; undoubtedly, this is a very handy feature, but I haven&rsquo;t
 really missed it at all.</p>
 
 <p>As I said, I store the database in a directory synced between all my machines<sup>2</sup> (using
 <a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on the same">Syncthing</a>),
 so I have access to an up-to-date versions of my credentials everywhere. Well, almost
-everywhere. I don&#8217;t use the Android client because the mobile web is just such a
+everywhere. I don&rsquo;t use the Android client because the mobile web is just such a
 fundamentally <a href="http://en.wikipedia.org/wiki/Mobile_security" title="Wikipedi page">insecure environment</a>
 and I see it as just being sensible, rather than any sort of inconvenience.</p>
 
@@ -803,7 +956,7 @@ prompts.</p>
 <p>There is also the added advantage that these scripts are useful outside the
 installation process itself; they can be used for system maintenance and, in
 the rare event that your recent bout of experimentation at 2am after a few
-drinks doesn&#8217;t pan out the way you anticipated, repair.</p>
+drinks doesn&rsquo;t pan out the way you anticipated, repair.</p>
 
 <p>One of the other responses to the new approach, however, has been the steady
 proliferation of “helpful” install scripts. These are essentially bash scripts
@@ -830,7 +983,7 @@ good comes from these things, I tell you; none.</p>
 
 <p>Why not? Because, in the guise of being helpful, you are effectively depriving
 people of the single most important part of using Arch: building it themselves.
-It&#8217;s like inviting someone to a restaurant for an amazing <em>haute cuisine</em> meal,
+It&rsquo;s like inviting someone to a restaurant for an amazing <em>haute cuisine</em> meal,
 sitting them down across the table from you and then them watching as the
 staff bring out a mouth-watering array of dishes, each of which you
 ostentatiously savour before vomiting it all back into their mouth.</p>
@@ -840,7 +993,7 @@ sheltered experience I imagine it is small) who would
 <a href="http://en.wikipedia.org/wiki/Emetophilia" title="Wikipedia: SFW">relish this scenario</a>,
 but for most it would qualify as a pretty disappointing date.</p>
 
-<p>Then, after the technicolour <em>table d&#8217;hôte</em>, there is the matter of the
+<p>Then, after the technicolour <em>table d'hôte</em>, there is the matter of the
 clean up. Recently, we had someone show up on the
 <a href="http://bbs.archlinux.org" title="Community forums">Arch boards</a> who had
 “installed Arch” but who did not understand how to edit a text file;
@@ -854,7 +1007,7 @@ does nothing to advance the interests of Arch.</p>
 <p>If you want to write something like this to improve your scripting skills,
 by all means proceed. If you want to contribute to Arch, then pick a
 project to contribute to, some bugs to squash, wiki edits, whatever; just
-don&#8217;t publish another one of these idiotic scripts, because you aren&#8217;t
+don&rsquo;t publish another one of these idiotic scripts, because you aren&rsquo;t
 doing anyone any favours, quite the contrary.</p>
 
 <h4>Notes</h4>
@@ -882,9 +1035,9 @@ notoriously security conscious sysadmins that run networks in hotels and
 other public places.</p>
 
 <p>Setting it up was straightforward enough, the wiki is typically clear and thorough; the only
-bottleneck in the process was waiting for the Pi&#8217;s tiny chip to chug through the creation of
+bottleneck in the process was waiting for the Pi&rsquo;s tiny chip to chug through the creation of
 <a href="https://wiki.archlinux.org/index.php/Create_a_Public_Key_Infrastructure_Using_the_easy-rsa_Scripts" title="Wiki page on the easy-rsa scripts">public keys</a>. Once it was done, and I had tested that it was
-indeed working as intended, a more vexing issue presented itself. The service wouldn&#8217;t come
+indeed working as intended, a more vexing issue presented itself. The service wouldn&rsquo;t come
 up after rebooting. Not a deal breaker, I could always just <acronym title="Secure Shell">SSH</acronym>
 in and manually bring the server up, but that sort of defeats the purpose of being able to
 have the thing running reliably.</p>
@@ -900,9 +1053,9 @@ half a century ago.</p>
 
 <p>There are a variety of fixes floating around, the most amusing being
 <a href="http://archlinuxarm.org/forum/viewtopic.php?f=31&amp;t=6037#p34228" title="Yes, really…">a wrapper for init</a>.
-Suffice to say, this wasn&#8217;t an option for me. Looking at the problem logically, it occurred to me
+Suffice to say, this wasn&rsquo;t an option for me. Looking at the problem logically, it occurred to me
 that the issue was actually a trivial one: the correct sequencing of different services
-post boot. Isn&#8217;t this, I asked myself, one of the issues
+post boot. Isn&rsquo;t this, I asked myself, one of the issues
 <a href="http://www.freedesktop.org/wiki/Software/systemd/" title="At freedesktop.org">systemd</a> was supposed
 to address?</p>
 
@@ -932,14 +1085,17 @@ as well as <code>systemd-resolved.service</code>. Reboot and the network is up s
 
 <p>Compounding my heresy, I then switched out NTP for
 <a href="http://man7.org/linux/man-pages/man8/systemd-timesyncd.8.html" title="Man page">systemd-timesyncd</a>
-and the Pi&#8217;s clock was now reset with the same alacrity. The final piece, ensuring
+and the Pi&rsquo;s clock was now reset with the same alacrity. The final piece, ensuring
 that the openvpn service waited for this to happen, was to add two lines to the
 service file:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>
 </span><span class='line'><span class="nv">After</span><span class="o">=</span>network-online.target
 </span><span class='line'><span class="nv">Wants</span><span class="o">=</span>network-online.target
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>That is all there is to it. Reboot and the network comes up, the clock is reset and then
@@ -951,7 +1107,7 @@ sap and impurify all of our
 
 <ol>
 <li>No, Virginia, I did <a href="http://boycottsystemd.org/">not make that up</a>…
-And I don&#8217;t really understand how you can slap a philosophy in the face, but then
+And I don&rsquo;t really understand how you can slap a philosophy in the face, but then
 rationality is anathema to zealots; irrespective of which chimæra they
 prostrate before.</li>
 </ol>
@@ -969,17 +1125,17 @@ prostrate before.</li>
 <a href="http://www.gnu.org/software/emacs/" title="GNU Emacs page">Emacs</a> is more than
 <a href="http://en.uncyclopedia.co/wiki/Emacs" title="Uncyclopedia entry">just an editor</a>);
 it is for all intents and purposes a universal design pattern. The concept of using
-Vim&#8217;s modes and keybinds extends from
+Vim&rsquo;s modes and keybinds extends from
 <a href="http://jasonwryan.com/blog/2011/12/01/readline/" title="Post on readline">the shell</a>
 through to <a href="http://jasonwryan.com/blog/2009/12/28/changing-keybinds-in-vifm/" title="Post on Vifm">file managers</a>
 and <a href="http://jasonwryan.com/blog/2012/11/20/vimprobable/" title="Vimprobable screencast">browsers</a>.
 If you so choose (and I <em>do</em>), then a significant amount of your interactions with your
-operating system are mediated by Vim&#8217;s design principles. This is undeniably a
+operating system are mediated by Vim&rsquo;s design principles. This is undeniably a
 good thing™ as it goes some way to standardising your command interface (whether at the
 command line or in a <acronym title="Graphic User Interface">GUI</acronym>).</p>
 
 <p>To that end, I have been spending more time working with Vim and trying to
-improve both my understanding of it&#8217;s capabilities, the environment in which I
+improve both my understanding of it&rsquo;s capabilities, the environment in which I
 use it and how I can optimise both of those conditions to not necessarily just
 be more productive, but to minimise friction in my work flows.</p>
 
@@ -1004,8 +1160,9 @@ one has really grown on me (see the screenshot on the right).</p>
 <p>I <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/.vim/colors/mirowriter.vim" title="Bitbucket repo">adapted my colour scheme</a> for it, added a line to my <span class="file">~/.vimrc</span>
 to enable it for specific document types, and have not looked back.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'>autocmd <span class="nb">BufRead</span> *.markdown<span class="p">,</span>*tex <span class="k">call</span> DistractFree#DistractFreeToggle<span class="p">()</span> <span class="p">|</span> <span class="k">wincmd</span> <span class="k">w</span>
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>autocmd <span class="nb">BufRead</span> *.markdown<span class="p">,</span>*tex <span class="k">call</span> DistractFree#DistractFreeToggle<span class="p">()</span> <span class="p">|</span> <span class="k">wincmd</span> <span class="k">w</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The final piece was to set up spell checking  to work properly. As well as
@@ -1013,17 +1170,31 @@ using English, I wanted to share my personal whitelist of words between all of
 my machines, so I define a location in <span class="file">~/.vimrc</span>
 as well:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">spelllang</span><span class="p">=</span>en_gb                               <span class="c">&quot; real English spelling</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">spelllang</span><span class="p">=</span>en_gb                               <span class="c">&quot; real English spelling</span>
 </span><span class='line'><span class="k">set</span> <span class="nb">dictionary</span><span class="p">+=</span><span class="sr">/usr/</span>share<span class="sr">/dict/</span>words             <span class="c">&quot; use standard dictionary</span>
 </span><span class='line'><span class="k">set</span> <span class="nb">spellfile</span><span class="p">=</span>$HOME<span class="sr">/Sync/</span><span class="k">vim</span><span class="sr">/spell/</span><span class="k">en</span>.utf<span class="m">-8</span>.add   <span class="c">&quot; my whitelist</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Then it is just a matter of ensuring that misspelled or other flagged words (like those
 that should be capitalised) are highlighted correctly. This required a couple of lines in
 my colour schemes:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="c">&quot; Spell checking  --- </span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="c">&quot; Spell checking  --- </span>
 </span><span class='line'><span class="k">if</span> <span class="k">version</span> <span class="p">&gt;=</span> <span class="m">700</span>
 </span><span class='line'>  <span class="k">hi</span> clear SpellBad
 </span><span class='line'>  <span class="k">hi</span> clear SpellCap
@@ -1034,17 +1205,17 @@ my colour schemes:</p>
 </span><span class='line'>  <span class="k">hi</span> SpellRare   ctermfg<span class="p">=</span><span class="m">13</span>   cterm<span class="p">=</span><span class="nb">underline</span>
 </span><span class='line'>  <span class="k">hi</span> SpellLocal  cterm<span class="p">=</span>None
 </span><span class='line'><span class="k">endif</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The most significant change, however, was that I recently purchased a hard
-copy of Drew Neill&#8217;s excellent
+copy of Drew Neill&rsquo;s excellent
 <a href="http://pragprog.com/book/dnvim/practical-vim" title="Just buy it, now…">Practical Vim</a>. I
-have long been a fan of Drew&#8217;s excellent podcast, <a href="http://vimcasts.org/" title="Drew's site">Vimcasts</a>,
+have long been a fan of Drew&rsquo;s excellent podcast, <a href="http://vimcasts.org/" title="Drew's site">Vimcasts</a>,
 and the book is every bit as impressive as the collection of those episodes,
 and more.  Reading it on my commute over the last week, I have been constantly
-amazed at the power and flexibility of this editor and Drew&#8217;s ability to clearly
-articulate how to work economically and efficiently with it.  I&#8217;m convinced
+amazed at the power and flexibility of this editor and Drew&rsquo;s ability to clearly
+articulate how to work economically and efficiently with it.  I&rsquo;m convinced
 this is an invaluable resource for anyone that currently uses Vim or wants to
 learn.</p>
 
@@ -1055,7 +1226,7 @@ me to focus on hacking words together (and to do the occasional bit of
 
 <h4>Notes</h4>
 
-<p>Image is from the cover of Drew Neill&#8217;s
+<p>Image is from the cover of Drew Neill&rsquo;s
 <a href="http://pragprog.com/book/dnvim/practical-vim">Practical Vim</a>, by
 <a href="http://en.wikipedia.org/wiki/Ben_Cormack">Ben Cormack</a>.</p>
 ]]></content>
@@ -1092,7 +1263,7 @@ prepared to pay for.</p>
 realisation that the music I had bought in iTunes was stuck in there. The
 combined intellectual effort globally expended trying to legitimately route
 around broken copyright law would have comfortably powered another golden age
-of the sciences; it&#8217;s not entirely implausible to think that the only reason we
+of the sciences; it&rsquo;s not entirely implausible to think that the only reason we
 still have to deal with cancer is the malignant legacy of
 <a href="https://en.wikipedia.org/wiki/Sonny_Bono_Copyright_Term_Extension_Act" title="Sonny's gift…">Sonny Bono</a><sup>2</sup>.</p>
 
@@ -1104,7 +1275,29 @@ authentication set up and your passphrase loaded in
 <a href="https://wiki.archlinux.org/index.php/SSH_Keys#Keychain" title="Arch wiki, for a change">keychain</a>,
 or something similar.</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
 </span><span class='line'>
 </span><span class='line'><span class="nv">SSH_HOST</span><span class="o">=</span><span class="s2">&quot;jason@XXX.XXX.XXX.XXX -p XXX -i $HOME/.ssh/box1&quot;</span>
 </span><span class='line'>
@@ -1126,7 +1319,7 @@ or something similar.</p>
 </span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail…&quot;</span>
 </span><span class='line'>    <span class="nb">exit </span>1
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Over the last couple of weeks, though, while I have been setting up and
@@ -1184,7 +1377,7 @@ entirely clear at the time, was clarified soon after and was crushingly disappoi
 the programme was closed source.</p>
 
 <p>Due to a combination of inertia (it was installed on all my devices and working well) and
-the lack of an alternative that didn&#8217;t involve installing and running a
+the lack of an alternative that didn&rsquo;t involve installing and running a
 <a href="https://en.wikipedia.org/wiki/Lamp_stack" title="Wikipedia page">LAMP stack</a> just to sync
 my files, I have persisted with it; even writing a
 <a href="http://jasonwryan.com/blog/2013/11/14/api/" title="Post on said script">simple Awk script</a>
@@ -1195,7 +1388,7 @@ For the last twelve months I have been pretty happy with it.</p>
 <a href="https://play.google.com/store/apps/details?id=com.bittorrent.sync" title="On Google Play">Android App</a>
 <em>chews</em> through your battery if it is left on (which sort of defeats the purpose, but I
 learned to live with it), the syncing can take a little while to pick up changes, and
-nodes that don&#8217;t see much action may flake out completely after a while.</p>
+nodes that don&rsquo;t see much action may flake out completely after a while.</p>
 
 <p>Then, a few weeks ago I read about <a href="https://github.com/jewel/clearskies" title="On Github">clearskies</a>,
 an open source implementation of this concept. Sadly, it is still a proof of
@@ -1205,7 +1398,7 @@ with <a href="https://twitter.com/csantosb" title="His profile on Twitter">cayet
 at <a href="http://syncthing.net/" title="Syncthing homepage">Syncthing</a>. Described thus (cue
 <a href="http://www.youtube.com/watch?v=7YaGwI7GjlA" title="G.F. Handel on Youtube">background music</a>):</p>
 
-<blockquote><p>Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it&#8217;s transmitted over the Internet.</p></blockquote>
+<blockquote><p>Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it's transmitted over the Internet.</p></blockquote>
 
 
 <p>Written in <a href="http://golang.org/" title="Go language site">Go</a>, Syncthing is still in
@@ -1218,8 +1411,8 @@ and have Syncthing set up and running nicely. It is simple, elegant and
 works wonderfully; <em>for what it does</em>.</p>
 
 <p>Which is to say that it is not all of the things that either of its
-predecessors are: it isn&#8217;t intended to distribute files, or to host images or
-simple websites. It doesn&#8217;t include versioning or have a built-in editor. It is
+predecessors are: it isn&rsquo;t intended to distribute files, or to host images or
+simple websites. It doesn&rsquo;t include versioning or have a built-in editor. It is
 for securely syncing your files independent of any third parties. And there is no
 Android app, so your battery is safe<sup>1</sup>.</p>
 
@@ -1230,7 +1423,7 @@ that once I understood how the configuration worked, editing the config file at
 simpler.  When setting up, you will also do a lot of stopping and starting of
 <code>syncthing</code>; if you use the service file that comes with the
 <a href="https://aur.archlinux.org/packages/syncthing/" title="Arch User Repo">AUR package</a>,
-that won&#8217;t work so well from the web interface… Run it from the command line
+that won&rsquo;t work so well from the web interface… Run it from the command line
 with one of the <code>STTRACE</code> variables to debug and then, once it is running to
 your liking, hand it off to systemd<sup>2</sup>.</p>
 
@@ -1250,20 +1443,20 @@ the nodes are started. Nodes still, from time-to-time, flake out, particularly
 if one of them is rebooted. Restarting the offending node is usually sufficient
 to bring the cluster back into sync.</p>
 
-<p>That isn&#8217;t to say that there aren&#8217;t any issues with it. The documentation is in
+<p>That isn&rsquo;t to say that there aren&rsquo;t any issues with it. The documentation is in
 need of some work; your best bet at the moment is a combination of the rather
 terse <code>--help</code> message and reading the source. There are also some hidden gems
 in the Github commits; for example, details on using
 <span class="file">.stignore</span> files, a very handy feature, are buried in
 an earlier
-<a href="https://github.com/calmh/syncthing/commit/986b15573a66f95beae53b10371ba50ab147124a" title="Github commit">commit to README.md</a> that didn&#8217;t survive the move of the documentation to the
+<a href="https://github.com/calmh/syncthing/commit/986b15573a66f95beae53b10371ba50ab147124a" title="Github commit">commit to README.md</a> that didn&rsquo;t survive the move of the documentation to the
 forum.</p>
 
 <p>The only other significant issue I have encountered is that getting all of the
 nodes across the cluster to connect to each other at the same time seems to be
 inexplicably difficult. It may just be my setup, but more often than not, nodes
 (on the LAN) will timeout while trying to connect to at least one of their peers.
-This isn&#8217;t a huge issue as you only really need one chained connection to bring
+This isn&rsquo;t a huge issue as you only really need one chained connection to bring
 all the data up to date, but it does cause a something of a minor
 <acronym title="Obsessive Compulsive Disorder">OCD</acronym> flare up.</p>
 
@@ -1303,11 +1496,11 @@ experiences of online communities elsewhere, especially in the free and open
 software world. Stack Overflow is going on six years old now and has grown to
 be a truly formidable<sup>1</sup> resource for programmers, <em>dilettantes</em>—the
 category to which I clearly belong—and, apparently, people wanting their
-homework done for them. This isn&#8217;t the first time this question has been raised
-there, and I am sure it won&#8217;t be the last.</p>
+homework done for them. This isn&rsquo;t the first time this question has been raised
+there, and I am sure it won&rsquo;t be the last.</p>
 
-<p>I don&#8217;t spend <a href="http://stackoverflow.com/users/712613/jasonwryan" title="My SO profile">much time on SO</a>,
-mostly because I am not a programmer and so I don&#8217;t have much to contribute there, but also because
+<p>I don&rsquo;t spend <a href="http://stackoverflow.com/users/712613/jasonwryan" title="My SO profile">much time on SO</a>,
+mostly because I am not a programmer and so I don&rsquo;t have much to contribute there, but also because
 I <a href="http://unix.stackexchange.com/users/6761/jasonwryan" title="U&amp;L profile">am active on Unix &amp; Linux</a><sup>2</sup>,
 one of the clones that has emerged out of the metastasizing StackExchange
 empire. I do, however, subscribe to quite a few of the <acronym title="Really Simple Syndication">RSS</acronym>
@@ -1319,7 +1512,7 @@ see the site as negative, or unfriendly, or elitist. This is perfectly natural: 
 community attempting to defend itself from
 <a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on the scourge">help vampires</a>.</p>
 
-<p>What was also quite predictable, given StackExchange&#8217;s response to this “problem” which was the
+<p>What was also quite predictable, given StackExchange&rsquo;s response to this “problem” which was the
 2012 <a href="http://blog.stackoverflow.com/2012/07/kicking-off-the-summer-of-love/" title="SE Blog post">Summer of Love</a>
 campaign where they wanted to make SO a more friendly place, was that this would only
 exacerbate the issue. My experience of the site over that time is that the signal to noise has
@@ -1337,10 +1530,10 @@ who are willing and able to actively contribute, I think is important to ensure 
 are clearly articulated standards<sup>3</sup> and that they are maintained by the
 community at large.</p>
 
-<p>I don&#8217;t see any scope for increasing the community&#8217;s tolerance for vampirism or the sort
+<p>I don&rsquo;t see any scope for increasing the community&rsquo;s tolerance for vampirism or the sort
 of self-entitlement that has a sad habit of appearing from time-to-time:</p>
 
-<blockquote> As for the Arch team and their lacking resources, let&#8217;s take your point at face value.  Now, we&#8217;ve known what the problem is for almost four hours and no fix has been issued.</blockquote>
+<blockquote> As for the Arch team and their lacking resources, let's take your point at face value.  Now, we've known what the problem is for almost four hours and no fix has been issued.</blockquote>
 
 
 <p>There is some sort of “problem” that “we” have known about for <em>four hours</em> and
@@ -1352,7 +1545,7 @@ universe is this sort of petulance considered acceptable? The only reasonable re
 to this sort of whining is to close the thread and ban the infractor and their progeny, who
 will no doubt suffer from the same sort of genetic deficiencies, <em>in perpetuam</em>…</p>
 
-<p>Clearly articulating, and enforcing, minimum standards of behaviour doesn&#8217;t
+<p>Clearly articulating, and enforcing, minimum standards of behaviour doesn&rsquo;t
 make your community hostile or unfriendly; it establishes boundaries for people
 that supports respectful collaboration and the effective ability of that
 community to self-moderate.  People new to the community who take the time to
@@ -1364,7 +1557,7 @@ of engagement of those that do contribute and wish to continue doing so.</p>
 <h4>Notes</h4>
 
 <ol>
-<li>“Fear” and it&#8217;s synonyms appear with remarkable frequency in that thread and the accompanying one on
+<li>“Fear” and it&rsquo;s synonyms appear with remarkable frequency in that thread and the accompanying one on
 <a href="https://news.ycombinator.com/item?id=7650799">Hacker News</a>.</li>
 <li>I have written about U&amp;L <a href="http://jasonwryan.com/blog/2011/05/28/quoras-quandary/">previously</a>.</li>
 <li>The <a href="https://wiki.archlinux.org/index.php/Forum_Etiquette">Forum Etiquette</a>, for example.</li>
@@ -1405,7 +1598,7 @@ thought I should take a look for myself.</p>
 <p>There are packages in the AUR for
 <a href="https://aur.archlinux.org/packages/python2-vdirsyncer/" title="Grab it">vdirsyncer-git</a> and
 <a href="https://aur.archlinux.org/packages/python2-argvard/" title="Same deal…">python2-argvard</a>
-so you will just need to grab the khal branch that uses <code>vdirsyncer</code> as it&#8217;s
+so you will just need to grab the khal branch that uses <code>vdirsyncer</code> as it&rsquo;s
 syncing engine. I have thrown up a
 <a href="https://gist.github.com/jasonwryan/10949540" title="Nothing too flash…">PKGBUILD gist</a>,
 or—as we are only talking about a couple of simple scripts—you could install the
@@ -1413,10 +1606,13 @@ complete set using
 <a href="http://www.pip-installer.org/en/latest/" title="Official documentation">pip</a>, the
 Python package manager; in which case it would be a straightforward:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S python2-pip
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo pacman -S python2-pip
 </span><span class='line'>pip2 install --user git+https://github.com/geier/khal.git@vdir
 </span><span class='line'>pip2 install --user vdirsyncer
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>…and then remember to make sure that <span class="file">$HOME/.local/bin</span>
@@ -1444,7 +1640,7 @@ a <code>cron</code> job to sync my work calendar every two hours and it was done
 with vdirsycner. It runs on a similar model to
 <a href="http://offlineimap.org/" title="Home page">OfflineIMAP</a>, in that it synchronises a
 remote and local repository. There are a couple of nice touches: it will read
-your credentials from <span class="file">$HOME/.netrc</span> so you don&#8217;t have
+your credentials from <span class="file">$HOME/.netrc</span> so you don&rsquo;t have
 to worry about sensitive information in plain text in yet another file, and there
 is a <code>VDIRSYNCER_CONFIG</code> variable, so you can place the config file wherever it
 suits.</p>
@@ -1477,9 +1673,9 @@ doing so is more likely to induce a seizure than a punctual appearance at an
 important meeting. To get around this, I had been using a basic Awk script that
 would parse the most important parts of the message and print them out. This was
 working well enough until I started to receive invitations from people using
-OSX. For some god-unknown reason, Apple&#8217;s “interpretation” of the
+OSX. For some god-unknown reason, Apple&rsquo;s “interpretation” of the
 standard<sup>2</sup> is different enough to those sent from Evolution and
-Thunderbird that my script wouldn&#8217;t successfully print some of the data (just
+Thunderbird that my script wouldn&rsquo;t successfully print some of the data (just
 the start and end times of the meeting, nothing too important).</p>
 
 <p>I started to try and expand the capability of the script and then realized that
@@ -1491,7 +1687,7 @@ In a further delightful coincidence, the original author of the script,
 ex-colleague who, in 2004, first got me interested in Linux (thank you, Martyn).
 Armed with this script and entries in <span class="file">$HOME/.mutt/{mailcap,muttrc}</span>
 now, whenever I open a calendar invitation, the pertinent details are printed
-out perfectly legibly. It&#8217;s a small step, but an important one.</p>
+out perfectly legibly. It&rsquo;s a small step, but an important one.</p>
 
 <p>Next I started playing around with
 <a href="http://lostpackets.de/khal/" title="khal homepage">khal</a>, a command line calendaring
@@ -1519,22 +1715,33 @@ functions of adding, editing or deleting events.</p>
 excited about is the ability to add events from the command line, as per the
 example in the documentation:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>khal --new 25.10. 16:00 18:00 Another Event :: with Alice and Bob
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>khal --new 25.10. 16:00 18:00 Another Event :: with Alice and Bob
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>I just needed to figure out a way to extract the relevant fields from the iCal
 file and pass them to khal. My first attempt is unashamedly ugly, both in
-conception and execution. However, I don&#8217;t know Perl (and at this stage of my
+conception and execution. However, I don&rsquo;t know Perl (and at this stage of my
 life
 <a href="https://twitter.com/jasonwryan/status/204660063669989376" title="Sad, but true…">I have run out of time to learn it</a>),
 and it actually works. I
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/ical_filter.pl" title="In my bitbucket repo">modified</a>
-Martyn&#8217;s script to write to a temp file and then, for iCal events I want to
+Martyn&rsquo;s script to write to a temp file and then, for iCal events I want to
 import to khal, I bound a key sequence in Mutt to a simple Awk
 script<sup>5</sup>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
 </span><span class='line'><span class="c1"># read from ical_filter.pl and then send ical invitation details </span>
 </span><span class='line'><span class="c1"># in mutt to khal</span>
 </span><span class='line'>
@@ -1544,15 +1751,17 @@ script<sup>5</sup>:</p>
 </span><span class='line'><span class="sr">/^Dtend/</span>     <span class="p">{</span> <span class="nx">time_nd</span> <span class="o">=</span> <span class="o">$</span><span class="mi">4</span> <span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="nx">END</span>          <span class="p">{</span> <span class="kr">print</span>  <span class="nx">date_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_nd</span><span class="s2">&quot; &quot;</span><span class="nx">summ</span> <span class="p">}</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>In <span class="file">$HOME/.mutt/muttrc</span>, I have
 <kbd>Ctrl</kbd><kbd>k</kbd> in pager view trigger the script like so:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># save iCal to khal</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># save iCal to khal</span>
 </span><span class='line'>macro pager <span class="se">\C</span>k  <span class="s2">&quot;!/usr/bin/khal --new $(~/Scripts/mutt2khal ~/.mutt/temp/caldata)&quot;</span> <span class="s2">&quot;Saving Calendar event&quot;</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Neither elegant nor imaginative, I know; but for a first attempt, it gets the
@@ -1621,7 +1830,7 @@ the file and pasting it into your email or a web form? I must have logged
 several thousand before I finally decided to do something about it.</p>
 
 <p>I now have a couple of different files in <span class="file">~/.notes/</span>
-depending upon the context; the example I&#8217;ll use is the one for the Arch Forums
+depending upon the context; the example I&rsquo;ll use is the one for the Arch Forums
 kept, naturally enough, at
 <span class="file">$HOME/Sync/notes/arch</span> (I symlink to
 <span class="file">~/.notes</span> so that the directory is synched using
@@ -1641,7 +1850,17 @@ copy it to the clipboard, ready to pasted into a post that will undoubtedly
 be gratefully received by the infractor:</p>
 
 <figure class='code'><figcaption><span>$HOME/.bashrc </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># board snippets</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># board snippets</span>
 </span><span class='line'>bbs<span class="o">()</span> <span class="o">{</span>
 </span><span class='line'>  <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;$HOME/.notes/arch&quot;</span>
 </span><span class='line'>  <span class="k">if</span> <span class="o">((</span> <span class="nv">$# </span><span class="o">==</span> 1 <span class="o">))</span>; <span class="k">then</span>
@@ -1651,7 +1870,7 @@ be gratefully received by the infractor:</p>
 </span><span class='line'><span class="k">    </span>awk <span class="s1">&#39;/^# /&#39;</span> <span class="s2">&quot;$file&quot;</span>
 </span><span class='line'>  <span class="k">fi</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>So, on the rare occasion that I need to remind someone that on the Arch boards
@@ -1664,7 +1883,7 @@ is called.</p>
 
 <p>I have a similar setup for work, with a couple of files that feature longer
 pieces of text that I find myself reusing for proposals, email responses
-and other administrivia. It&#8217;s a simple enough approach, but it works well and
+and other administrivia. It&rsquo;s a simple enough approach, but it works well and
 does lend a certain satisfaction to the otherwise tedious business of writing
 boilerplate.</p>
 
@@ -1724,20 +1943,31 @@ seemed like a
 on the Arch boards where WonderWoofy and 65kid helpfully pieced it together, is
 to use <code>SYSTEMD_WANTS</code>.  As it is described in the manual:</p>
 
-<blockquote><p>THE UDEV DATABASE<br/>  The settings of device units may either be configured via unit files, or directly from the udev database (which is recommended). The following udev properties are understood by systemd:</p><p>  SYSTEMD_WANTS=<br/>  Adds dependencies of type Wants from this unit to all listed units. This may be used to activate arbitrary units, when a specific device becomes available. Note that this and the other tags are not taken into account unless the device is tagged with the &#8220;systemd&#8221; string in the udev database, because otherwise the device is not exposed as systemd unit.</p><footer><strong>man systemd.device</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/systemd.device.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
+<blockquote><p>THE UDEV DATABASE<br/>  The settings of device units may either be configured via unit files, or directly from the udev database (which is recommended). The following udev properties are understood by systemd:</p><p>  SYSTEMD_WANTS=<br/>  Adds dependencies of type Wants from this unit to all listed units. This may be used to activate arbitrary units, when a specific device becomes available. Note that this and the other tags are not taken into account unless the device is tagged with the "systemd" string in the udev database, because otherwise the device is not exposed as systemd unit.</p><footer><strong>man systemd.device</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/systemd.device.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
 
 
 <p>So, I edited <span class="file">/etc/udev/rules.d/90-usb-music.rules</span> to
 remove the <code>RUN+=</code> key, using a systemd service file instead, like so<sup>3</sup>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SUBSYSTEMS</span><span class="o">==</span><span class="s2">&quot;usb&quot;</span>, ATTRS<span class="o">{</span>idProduct<span class="o">}==</span><span class="s2">&quot;1905&quot;</span>, <span class="nv">ACTION</span><span class="o">==</span><span class="s2">&quot;add&quot;</span>, ENV<span class="o">{</span>SYSTEMD_WANTS<span class="o">}==</span><span class="s2">&quot;upmusic.service&quot;</span>
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">SUBSYSTEMS</span><span class="o">==</span><span class="s2">&quot;usb&quot;</span>, ATTRS<span class="o">{</span>idProduct<span class="o">}==</span><span class="s2">&quot;1905&quot;</span>, <span class="nv">ACTION</span><span class="o">==</span><span class="s2">&quot;add&quot;</span>, ENV<span class="o">{</span>SYSTEMD_WANTS<span class="o">}==</span><span class="s2">&quot;upmusic.service&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>And then wrote the corresponding service file to have systemd hand off to the bash script:</p>
 
 <figure class='code'><figcaption><span>/usr/lib/systemd/system/upmusic.service </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>Unit<span class="o">]</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>Unit<span class="o">]</span>
 </span><span class='line'><span class="nv">Description</span><span class="o">=</span>Update music links from Apollo
 </span><span class='line'><span class="nv">Requires</span><span class="o">=</span>media-Apollo.mount
 </span><span class='line'><span class="nv">After</span><span class="o">=</span>media-Apollo.mount
@@ -1747,7 +1977,7 @@ remove the <code>RUN+=</code> key, using a systemd service file instead, like so
 </span><span class='line'>
 </span><span class='line'><span class="o">[</span>Install<span class="o">]</span>
 </span><span class='line'><span class="nv">WantedBy</span><span class="o">=</span>media-Apollo.mount
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>As I mentioned in my post on my
@@ -1766,7 +1996,7 @@ laptops.</p>
 <h4>Notes</h4>
 
 <ol>
-<li>This shouldn&#8217;t be taken as any sort of claim of expertise or deep
+<li>This shouldn&rsquo;t be taken as any sort of claim of expertise or deep
 understanding of this, or any other, part of my system. See below.</li>
 <li>Which is why you should never trust anything written by bloggers…</li>
 <li>The definitive reference for udev rules remains
@@ -1794,7 +2024,7 @@ worship of the most pernicious of all cults, consumerism.</p>
 deliberate and seemingly ineluctable effort by a relatively small number of
 global interests to turn most of the Internet into something more like cable
 television. As someone who has not lived with a television for decades
-precisely because I don&#8217;t want to live in a
+precisely because I don&rsquo;t want to live in a
 <a href="http://en.wikipedia.org/wiki/Operant_conditioning_chamber" title="Wikipedia page">Skinner box</a>
 that is solely designed to condition me to compliantly purchase more product,
 I find this rankly offensive (in the sense of morally repugnant as well as a
@@ -1811,7 +2041,7 @@ this Christmas was better ad blocking.</p>
 <a href="https://aur.archlinux.org/packages/blocklist-to-privoxy/?ID=63431" title="AUR page">blocklist-to-privoxy</a>
 but I was still experiencing a lot of ads sneaking through (particularly local
 ones) and some unintended side effects of using Privoxy for this job, so I
-decide to give Jake VanderKolk&#8217;s
+decide to give Jake VanderKolk&rsquo;s
 <a href="http://gaenserich.github.io/hostsblock/" title="Homepage for Hostsblock">Hostsblock</a>
 a shot.</p>
 
@@ -1819,9 +2049,9 @@ a shot.</p>
 <a href="https://aur.archlinux.org/packages/kwakd/" title="AUR page">kwakd</a> for serving blank
 <acronym title="HyperText Markup Language">HTML</acronym> in place of ads and
 <a href="https://aur.archlinux.org/packages.php?ID=58976" title="AUR package">hostsblock</a> to
-write to my <span class="file">/etc/hosts</span>. I didn&#8217;t see the need for
+write to my <span class="file">/etc/hosts</span>. I didn&rsquo;t see the need for
 <a href="https://wiki.archlinux.org/index.php/Dnsmasq" title="Arch Wiki page">dnsmasq</a> and,
-after a week or so or using it haven&#8217;t seen the need to revisit that decision.</p>
+after a week or so or using it haven&rsquo;t seen the need to revisit that decision.</p>
 
 <p>Suffice to say, it is working brilliantly. Where once web pages were festooned
 with garish advertisements promising me ripped abdominals, tropical holidays and the
@@ -1880,7 +2110,7 @@ about having access to a tool to query the Sync application. One of the nodes is
 on my
 <a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on setting up a torrent box">headless Raspberry Pi</a>
 and the idea of being able to issue a command from my laptop to ascertain what
-was going on in the Pi&#8217;s synced folders was (and is) a tremendously attractive
+was going on in the Pi&rsquo;s synced folders was (and is) a tremendously attractive
 one.</p>
 
 <p>However, now that I was in
@@ -1901,7 +2131,7 @@ for posterity in my <a href="https://bitbucket.org/jasonwryan/shiv/commits/16c9d
 (for the completists)…</p>
 
 <p>At this point, I was fortunate that Earnestly in #archlinux introduced me to
-keenerd&#8217;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
+keenerd&rsquo;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
 And by “introduced” I mean generously (and patiently) talked me through how it
 worked and how I could use it with the Sync API to achieve what I was after.
 After a while playing with it, there was the—inevitably belated—moment of
@@ -1912,7 +2142,7 @@ extracting the desired elements.</p>
 
 <p>Now I was <em>cooking</em>. Well, more to the point, I was flailing about in a smoke
 filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
-asphyxiation. Once again, Earnestly&#8217;s patience and bash skills were put to good effect.
+asphyxiation. Once again, Earnestly&rsquo;s patience and bash skills were put to good effect.
 The resulting script,
 <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="In bitbucket">btstat</a>,
 is undeniably a triumph of his good ideas over my own poor execution. In other
@@ -1925,13 +2155,15 @@ all faults are mine alone<sup>4</sup>.</p>
 <a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="My post on this great utility">aurphan, right?</a>)
 and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
 </span><span class='line'>directory2 H0p3fu11yY0uG3tTh31d3@
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The functionality in the script is limited at this stage to just querying the
-application; I wasn&#8217;t interested in pushing changes at this point. So you can
+application; I wasn&rsquo;t interested in pushing changes at this point. So you can
 access the version of the currently installed Syncapp, upload and download
 speeds, the size of synced folders and list all of their contents.</p>
 
@@ -1947,7 +2179,7 @@ I need.</p>
 
 <ol>
 <li>Yes, I would much prefer to use an open source tool to accomplish the same
-thing but I haven&#8217;t found anything comparable that is this good to date…</li>
+thing but I haven&rsquo;t found anything comparable that is this good to date…</li>
 <li>In what I imagine is a complete coincidence, the JSON logo is uncannily
 similar to the initial (and much better, I thought) Sync logo, as seen on
 <a href="http://jasonwryan.com/blog/2013/03/16/sync/">my original post</a>.</li>
@@ -1998,15 +2230,16 @@ shared via <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Another 
 </ul>
 
 
-<p>In a couple of these cases, I don&#8217;t want to—or can&#8217;t—just <code>umount</code> them with
+<p>In a couple of these cases, I don&rsquo;t want to—or can't—just <code>umount</code> them with
 <code>udiskie</code>; they require a different approach. To facilitate this, I have adopted
 a simple approach: I use a standard naming convention for all external media
 or their mountpoints. When I first buy a USB drive, I give it a meaningful name,
-beginning with an uppercase letter, as this won&#8217;t clash with any of my internal
+beginning with an uppercase letter, as this won&rsquo;t clash with any of my internal
 drives and it happily accommodates drives from other operating systems. So:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo dosfslabel /dev/sdc1 EightBall
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo dosfslabel /dev/sdc1 EightBall
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>sets up a new 8GB drive I found in the schwag bag at the conference I attended
@@ -2017,7 +2250,66 @@ writing a script that checks how many are mounted, presents a menu if there is
 more than one, and unmounts the respective device correctly:</p>
 
 <figure class='code'><figcaption><span>dismount </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
 </span><span class='line'><span class="c"># unmount USB drives</span>
 </span><span class='line'>
 </span><span class='line'><span class="nv">target</span><span class="o">=(</span> <span class="k">$(</span>awk <span class="s1">&#39;/media\/[\^A-Z]/ {print $3}&#39;</span> &lt;<span class="o">(</span>mount<span class="k">)</span><span class="o">)</span> <span class="o">)</span>
@@ -2076,7 +2368,7 @@ more than one, and unmounts the respective device correctly:</p>
 </span><span class='line'><span class="k">fi</span>
 </span><span class='line'>
 </span><span class='line'><span class="c"># vim:set ts=2 sts=2 sw=2 et:</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Now, no matter the number or type of devices I currently have mounted, I can

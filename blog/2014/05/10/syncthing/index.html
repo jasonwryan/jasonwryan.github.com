@@ -10,7 +10,9 @@
 
   
   <meta name="description" content="Just over a year ago, I was invited to participate in an exciting Alpha, for
-<a href="http://www.bittorrent.com/sync" title="Sync website), an &hellip;">
+BitTorrent Sync.
+I wrote up my experience
+and, with one reservation, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,13 +21,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2014/05/10/syncthing">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2014/05/10/syncthing/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -66,9 +69,8 @@
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -95,14 +97,7 @@
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-05-10T09:30:00+12:00" pubdate data-updated="true">May 10<span>th</span>, 2014</time>
+<time class='entry-date' datetime='2014-05-10T09:30:00+12:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:30 am</span></time>
         
       </p>
     
@@ -121,7 +116,7 @@ entirely clear at the time, was clarified soon after and was crushingly disappoi
 the programme was closed source.</p>
 
 <p>Due to a combination of inertia (it was installed on all my devices and working well) and
-the lack of an alternative that didn&#8217;t involve installing and running a
+the lack of an alternative that didn&rsquo;t involve installing and running a
 <a href="https://en.wikipedia.org/wiki/Lamp_stack" title="Wikipedia page">LAMP stack</a> just to sync
 my files, I have persisted with it; even writing a
 <a href="http://jasonwryan.com/blog/2013/11/14/api/" title="Post on said script">simple Awk script</a>
@@ -132,7 +127,7 @@ For the last twelve months I have been pretty happy with it.</p>
 <a href="https://play.google.com/store/apps/details?id=com.bittorrent.sync" title="On Google Play">Android App</a>
 <em>chews</em> through your battery if it is left on (which sort of defeats the purpose, but I
 learned to live with it), the syncing can take a little while to pick up changes, and
-nodes that don&#8217;t see much action may flake out completely after a while.</p>
+nodes that don&rsquo;t see much action may flake out completely after a while.</p>
 
 <p>Then, a few weeks ago I read about <a href="https://github.com/jewel/clearskies" title="On Github">clearskies</a>,
 an open source implementation of this concept. Sadly, it is still a proof of
@@ -142,7 +137,7 @@ with <a href="https://twitter.com/csantosb" title="His profile on Twitter">cayet
 at <a href="http://syncthing.net/" title="Syncthing homepage">Syncthing</a>. Described thus (cue
 <a href="http://www.youtube.com/watch?v=7YaGwI7GjlA" title="G.F. Handel on Youtube">background music</a>):</p>
 
-<blockquote><p>Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it&#8217;s transmitted over the Internet.</p></blockquote>
+<blockquote><p>Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it's transmitted over the Internet.</p></blockquote>
 
 
 <p>Written in <a href="http://golang.org/" title="Go language site">Go</a>, Syncthing is still in
@@ -155,8 +150,8 @@ and have Syncthing set up and running nicely. It is simple, elegant and
 works wonderfully; <em>for what it does</em>.</p>
 
 <p>Which is to say that it is not all of the things that either of its
-predecessors are: it isn&#8217;t intended to distribute files, or to host images or
-simple websites. It doesn&#8217;t include versioning or have a built-in editor. It is
+predecessors are: it isn&rsquo;t intended to distribute files, or to host images or
+simple websites. It doesn&rsquo;t include versioning or have a built-in editor. It is
 for securely syncing your files independent of any third parties. And there is no
 Android app, so your battery is safe<sup>1</sup>.</p>
 
@@ -167,7 +162,7 @@ that once I understood how the configuration worked, editing the config file at
 simpler.  When setting up, you will also do a lot of stopping and starting of
 <code>syncthing</code>; if you use the service file that comes with the
 <a href="https://aur.archlinux.org/packages/syncthing/" title="Arch User Repo">AUR package</a>,
-that won&#8217;t work so well from the web interface… Run it from the command line
+that won&rsquo;t work so well from the web interface… Run it from the command line
 with one of the <code>STTRACE</code> variables to debug and then, once it is running to
 your liking, hand it off to systemd<sup>2</sup>.</p>
 
@@ -187,20 +182,20 @@ the nodes are started. Nodes still, from time-to-time, flake out, particularly
 if one of them is rebooted. Restarting the offending node is usually sufficient
 to bring the cluster back into sync.</p>
 
-<p>That isn&#8217;t to say that there aren&#8217;t any issues with it. The documentation is in
+<p>That isn&rsquo;t to say that there aren&rsquo;t any issues with it. The documentation is in
 need of some work; your best bet at the moment is a combination of the rather
 terse <code>--help</code> message and reading the source. There are also some hidden gems
 in the Github commits; for example, details on using
 <span class="file">.stignore</span> files, a very handy feature, are buried in
 an earlier
-<a href="https://github.com/calmh/syncthing/commit/986b15573a66f95beae53b10371ba50ab147124a" title="Github commit">commit to README.md</a> that didn&#8217;t survive the move of the documentation to the
+<a href="https://github.com/calmh/syncthing/commit/986b15573a66f95beae53b10371ba50ab147124a" title="Github commit">commit to README.md</a> that didn&rsquo;t survive the move of the documentation to the
 forum.</p>
 
 <p>The only other significant issue I have encountered is that getting all of the
 nodes across the cluster to connect to each other at the same time seems to be
 inexplicably difficult. It may just be my setup, but more often than not, nodes
 (on the LAN) will timeout while trying to connect to at least one of their peers.
-This isn&#8217;t a huge issue as you only really need one chained connection to bring
+This isn&rsquo;t a huge issue as you only really need one chained connection to bring
 all the data up to date, but it does cause a something of a minor
 <acronym title="Obsessive Compulsive Disorder">OCD</acronym> flare up.</p>
 
@@ -238,14 +233,7 @@ as there is no built in daemon functionality (yet).</li>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-05-10T09:30:00+12:00" pubdate data-updated="true">May 10<span>th</span>, 2014</time>
+<time class='entry-date' datetime='2014-05-10T09:30:00+12:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:30 am</span></time>
       
 
 <span class="categories">
@@ -394,7 +382,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -412,7 +400,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

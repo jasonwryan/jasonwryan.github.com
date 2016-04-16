@@ -21,13 +21,14 @@ to manage patches against an &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2012/07/24/queues">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2012/07/24/queues/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -68,9 +69,8 @@ to manage patches against an &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -97,14 +97,7 @@ to manage patches against an &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2012-07-24T19:18:00+12:00" pubdate data-updated="true">Jul 24<span>th</span>, 2012</time>
+<time class='entry-date' datetime='2012-07-24T19:18:00+12:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>7:18 pm</span></time>
         
       </p>
     
@@ -127,10 +120,10 @@ impressed: both the concept and the execution are simple and powerful. The conce
 of Mercurial Queues is best described in the Mercurial book: the aptly titled,
 <em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
 
-<blockquote><p>MQ&#8217;s marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don&#8217;t like a patch, you can drop it. If a patch isn&#8217;t quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote>
+<blockquote><p>MQ's marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don't like a patch, you can drop it. If a patch isn't quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote>
 
 
-<p>I followed Filippo Negroni&#8217;s excellent
+<p>I followed Filippo Negroni&rsquo;s excellent
 <a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
 to setup my own
 <a href="https://bitbucket.org/jasonwryan/dwm-patchset/src" title="Patchset in Bitbucket repo">dwm patchset</a>
@@ -146,7 +139,7 @@ with <code>makepkg</code>.<sup>3</sup></p>
 <p>Turns out, as you might expect with Arch, it was not much of a job to set it
 up at all.</p>
 
-<p><strong>Note</strong>: this doesn&#8217;t mean I think it is a good idea; I was just interested
+<p><strong>Note</strong>: this doesn&rsquo;t mean I think it is a good idea; I was just interested
 to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
 like dwm, this is definitely a case of introducing a huge amount of complexity for
 no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
@@ -159,16 +152,19 @@ repository and build the binary.  Then you need to make sure that the mercurial
 queue extension is enabled, so your <span class="file">.hgrc</span> needs to
 contain:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
 </span><span class='line'>hgext.mq <span class="o">=</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
 is <span class="file">dwm-hg/src/dwm</span>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
-</span></code></pre></div></figure>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg qinit -c
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The next step is to start applying the various patches that you want to comprise
@@ -185,23 +181,33 @@ This is taken care of by the PKGBUILD in this case.</p>
 <p>From here, it is very much as Filippo describes it in his tutorial: make
 some changes, add them to the queue and rinse and repeat:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>hg qnew base.customizations
 </span><span class='line'> <span class="c"># “hack hack hack…”</span>
 </span><span class='line'>hg qrefresh
 </span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>After committing each of your changes as a discrete patch, you can review the queue
 with <code>hg qseries</code>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
 </span><span class='line'>└─╼ hg qseries
 </span><span class='line'>config.customizations
 </span><span class='line'>statuscolours
 </span><span class='line'>cycle
 </span><span class='line'>push
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>And <code>hg qapplied</code> will tell you which of the patches is currently
@@ -209,21 +215,37 @@ applied in the working repository; at this stage the list should look
 the same as that in <code>hg qseries</code>. The next step is to remove all of the
 patches from the queue so that we have a clean repository:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
 </span><span class='line'>└─╼ hg qpop -a
 </span><span class='line'>popping push
 </span><span class='line'>popping cycle
 </span><span class='line'>popping statuscolours
 </span><span class='line'>popping config.customizations
 </span><span class='line'>patch queue now empty
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Should you need to edit a patch, it is simply a matter of popping
 to that spot in the stack (you can do so by name or by index
 number, beginning at 0):</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
 </span><span class='line'>└─╼ hg qpop config.customizations
 </span><span class='line'>popping push
 </span><span class='line'>popping cycle
@@ -232,7 +254,7 @@ number, beginning at 0):</p>
 </span><span class='line'> <span class="c"># “hack hack hack…”</span>
 </span><span class='line'>hg qrefresh
 </span><span class='line'>hg qpush -a
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Once you are satisfied with the state of the stack, remove all of the
@@ -241,7 +263,15 @@ to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> t
 rebuild the package and you should see the pushed patches as part of
 the output:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
 </span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
 </span><span class='line'>applying config.customizations
 </span><span class='line'>applying statuscolours
@@ -249,7 +279,7 @@ the output:</p>
 </span><span class='line'>applying push
 </span><span class='line'>now at: push
 </span><span class='line'>dwm build options:
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>…and when you restart dwm, your customizations will be applied.
@@ -259,7 +289,7 @@ you can just <code>makepkg -fi</code>, and, if any of the patches fail due
 to changes in the underlying code, pop the stack to the failed
 patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
 
-<p>As I said at the beginning of this post, this isn&#8217;t a particularly smart way to
+<p>As I said at the beginning of this post, this isn&rsquo;t a particularly smart way to
 use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
 better off just cloning dwm to your local repository, initializing a queue
 repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
@@ -272,13 +302,13 @@ and host it there: then just pull the patchset queue
 from your other boxes and <code>hg qpush -a</code>. If you require a slightly
 different patchset for each box, you can use MQ to manage this
 process as well. This is where MQ really excels;
-I&#8217;ll cover this in more detail in my next post.</p>
+I&rsquo;ll cover this in more detail in my next post.</p>
 
 <h4>Notes</h4>
 
 <ol>
 <li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
-<li>I can&#8217;t recommend this {book,wiki} highly enough; it is an excellent
+<li>I can&rsquo;t recommend this {book,wiki} highly enough; it is an excellent
 example of thorough, accessible documentation.</li>
 <li>In the case of something like dwm, this is really irrelevant, as there
 is a single tiny binary and a <code>man</code> page, so keeping track of these files on
@@ -303,14 +333,7 @@ your system is not an issue at all.</li>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2012-07-24T19:18:00+12:00" pubdate data-updated="true">Jul 24<span>th</span>, 2012</time>
+<time class='entry-date' datetime='2012-07-24T19:18:00+12:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>7:18 pm</span></time>
       
 
 <span class="categories">
@@ -459,7 +482,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -477,7 +500,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

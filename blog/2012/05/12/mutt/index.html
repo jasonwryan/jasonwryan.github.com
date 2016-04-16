@@ -20,13 +20,14 @@ get it to deal with—of all things— &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com/blog/2012/05/12/mutt">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2012/05/12/mutt/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!-- OpenId login -->
 <link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
 <link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
@@ -67,9 +68,8 @@ get it to deal with—of all things— &hellip;">
   
 <form action="http://www.duckduckgo.com/" method="get">
   <fieldset role="search">
-    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
-    <input type="hidden" name="sites" value="jasonwryan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+    <input type="hidden" name="sitesearch" value="jasonwryan.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
   
@@ -96,14 +96,7 @@ get it to deal with—of all things— &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2012-05-12T15:49:00+12:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
+<time class='entry-date' datetime='2012-05-12T15:49:00+12:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>3:49 pm</span></time>
         
       </p>
     
@@ -130,16 +123,19 @@ HTML as text in Mutt itself. That is accomplished easily enough with an entry in
 <span class="file">muttrc</span> and another in a <span class="file">mailcap</span> file.</p>
 
 <figure class='code'><figcaption><span>~/.mutt/muttrc </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>auto_view text/html                                      <span class="c"># view html automatically</span>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>auto_view text/html                                      <span class="c"># view html automatically</span>
 </span><span class='line'>alternative_order text/plain text/enriched text/html     <span class="c"># save html for last</span>
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 
 
 <figure class='code'><figcaption><span>~/.mutt/mailcap </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
-</span></code></pre></div></figure>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>This works for 80 percent of the HTML email I get. It is enough to confirm that the mail is useless
@@ -153,8 +149,8 @@ to access <strong>but it is not viewable in a text browser.</strong></p>
 <p>For this special level of retardation, I need to be able to open the email in a graphical browser.
 As I use vimprobable, that means sending the file to
 <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/" title="My post on Using vimprobable">vimprobable running in tabbed</a>. Fortunately, as you would expect with superior software,
-<code>mutt</code> has a way of handling this gracefully. In Mutt&#8217;s extensive documentation, there is a
-<a href="http://www.mutt.org/doc/manual/manual-5.html" title="Go and read it…">page on Mutt&#8217;s MIME support</a>
+<code>mutt</code> has a way of handling this gracefully. In Mutt&rsquo;s extensive documentation, there is a
+<a href="http://www.mutt.org/doc/manual/manual-5.html" title="Go and read it…">page on Mutt&rsquo;s MIME support</a>
 that details how to set up a graduated response to this pernicious issue:</p>
 
 <blockquote><p>In addition, you can use this with Autoview to denote two commands for viewing<br/>an attachment, one to be viewed automatically, the other to be viewed<br/>interactively from the attachment menu.</p><footer><strong>Mutt manual</strong> <cite><a href='http://www.mutt.org/doc/manual/manual-5.html'>www.mutt.org/doc/manual/&hellip;</a></cite></footer></blockquote>
@@ -165,9 +161,11 @@ instances of particularly cretinous behaviour make it to your inbox, you can cho
 view them in your web browser. In my case, by altering the <span class="file">mailcap</span>
 entry to look like this:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>text/html; vimprobtab.sh %s &amp;; <span class="nb">test</span><span class="o">=</span><span class="nb">test</span> -n <span class="s2">&quot;$DISPLAY&quot;</span>; needsterminal;
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>text/html; vimprobtab.sh %s &amp;; <span class="nb">test</span><span class="o">=</span><span class="nb">test</span> -n <span class="s2">&quot;$DISPLAY&quot;</span>; needsterminal;
 </span><span class='line'>text/html; w3m -I %<span class="o">{</span>charset<span class="o">}</span> -T text/html; copiousoutput;
-</span></code></pre></div></figure>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The first entry tests that X is running, and if it is, it hands the file to <code>vimprobable</code>. The
@@ -175,10 +173,9 @@ default, however, is determined by the <code>copiousoutput</code> tag. So, in <c
 of hitting <kbd>v</kbd> to view the attached HTML and then <kbd>m</kbd> to send it to <code>mailcap</code>.
 For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">muttrc</span>:</p>
 
-<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">bind </span>attach &lt;<span class="k">return</span>&gt;    view-mailcap
-</span></code></pre></div></figure>
-
-
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">bind </span>attach &lt;<span class="k">return</span>&gt;    view-mailcap
+</span></code></pre></td></tr></table></div></figure>
 
 </div>
 
@@ -195,14 +192,7 @@ For convenience, I bind <kbd>Enter</kbd> to that function in <span class="file">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2012-05-12T15:49:00+12:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
+<time class='entry-date' datetime='2012-05-12T15:49:00+12:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>3:49 pm</span></time>
       
 
 <span class="categories">
@@ -351,7 +341,7 @@ function showLastfmFeed(xml){
     </div>
   </div>
   <footer role="contentinfo"><p>
-All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2016 - Jason Ryan    
 <span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
 </p>
 
@@ -369,7 +359,7 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>

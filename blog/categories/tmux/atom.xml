@@ -4,7 +4,7 @@
   <title><![CDATA[Category: tmux | jasonwryan.com]]></title>
   <link href="http://jasonwryan.com/blog/categories/tmux/atom.xml" rel="self"/>
   <link href="http://jasonwryan.com/"/>
-  <updated>2015-01-19T08:20:47+13:00</updated>
+  <updated>2016-04-16T15:02:34+12:00</updated>
   <id>http://jasonwryan.com/</id>
   <author>
     <name><![CDATA[Jason Ryan]]></name>
@@ -39,20 +39,26 @@ on my Arch machines, I wanted to make it work with
 <a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
 Enter a simple shell script:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$HOME</span>/Dropbox/irssi/<span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;echo <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;done
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$dir</span><span class="p">&amp;</span>rdquo<span class="p">;</span> &gt;/dev/null 2&gt;<span class="p">&amp;</span>1<span class="p">;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="nb">echo</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>IRC: You have been pinged<span class="p">&amp;</span>hellip<span class="p">;&amp;</span>rdquo<span class="p">;</span> <span class="p">|</span> dzen2 -p 3
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>I have included this in my <span class="file">$HOME/.xinitrc</span>
 so that it runs in the background after login. Whenever the metadata
@@ -100,9 +106,11 @@ consequence, but each necessary.</p>
 
 <p>First, in your <span class="file">$HOME/.tmux.conf</span> you need to enable update-environment:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set</span> -g update-environment <span class="s2">&quot;DISPLAY SSH_ASKPASS SSH_AUTH_SOCK</span>
-</span><span class='line'><span class="s2">SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY&quot;</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set</span> -g update-environment <span class="p">&amp;</span>ldquo<span class="p">;</span>DISPLAY SSH_ASKPASS SSH_AUTH_SOCK
+</span><span class='line'>SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>From the <a href="http://www.openbsd.org/cgi-bin/man.cgi?query=tmux&amp;sektion=1" title="tmux manual">man page</a>:</p>
 
@@ -117,36 +125,47 @@ command).</p></blockquote>
 launch from scratch, you can adopt a simpler approach) that starts tmux
 and initializes ssh-agent:<sup>2</sup></p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;PID<span class="o">=</span><span class="k">$(</span>pgrep tmux<span class="k">)</span>
-</span><span class='line'><span class="nv">new</span><span class="o">=</span><span class="s2">&quot;tmux -f $HOME/.tmux/conf new -s secured&quot;</span>
-</span><span class='line'><span class="nv">old</span><span class="o">=</span><span class="s2">&quot;tmux attach -t secured -d&quot;</span>&lt;/p&gt;
+</span><span class='line'><span class="nv">new</span><span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>tmux -f <span class="nv">$HOME</span>/.tmux/conf new -s secured<span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'><span class="nv">old</span><span class="o">=</span><span class="p">&amp;</span>ldquo<span class="p">;</span>tmux attach -t secured -d<span class="p">&amp;</span>rdquo<span class="p">;</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="s2">&quot;$SSH_AUTH_SOCK&quot;</span> <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$SSH_AUTH_SOCK</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    <span class="nb">eval</span> &lt;code&gt;ssh-agent&lt;/code&gt;
+</span><span class='line'>    <span class="nb">trap</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nb">kill</span> <span class="nv">$SSH_AGENT_PID</span><span class="p">&amp;</span>rdquo<span class="p">;</span> 0
+</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;eval <span class="sb">`</span>ssh-agent<span class="sb">`</span>
-</span><span class='line'><span class="nb">trap</span> <span class="s2">&quot;kill $SSH_AGENT_PID&quot;</span> 0
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="s2">&quot;$PID&quot;</span> <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${new}&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;else&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;urxvtc -title <span class="s2">&quot;SSH&quot;</span> -e sh -c <span class="s2">&quot;${old}&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -z <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$PID</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    urxvtc -title <span class="p">&amp;</span>ldquo<span class="p">;</span>SSH<span class="p">&amp;</span>rdquo<span class="p">;</span> -e sh -c <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">new</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>    urxvtc -title <span class="p">&amp;</span>ldquo<span class="p">;</span>SSH<span class="p">&amp;</span>rdquo<span class="p">;</span> -e sh -c <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">old</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span>
+</span><span class='line'><span class="k">fi</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;ssh-add
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>The final step is to install
 <a href="http://www.funtoo.org/wiki/Keychain" title="Keychain homepage">keychain</a>, and
@@ -154,14 +173,13 @@ set it up. I followed the
 <a href="https://wiki.archlinux.org/index.php/SSH_Keys#Using_keychain" title="...because it rocks!">instructions on the Arch Wiki</a>
 and opted for a couple of lines in <span class="file">$HOME/.bash_profile</span><sup>3</sup>, like so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
-</span><span class='line'><span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span> &amp;amp;&amp;amp;&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;source <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/usr/bin/keychain -Q -q <span class="p">&amp;</span>ndash<span class="p">;</span>nogui ~/.ssh/id_rsa
+</span><span class='line'><span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span>
+</span><span class='line'>    <span class="nb">source</span> <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>That’s it. Now, hitting a key sequence opens a terminal, I am prompted
 for my passphrase and then, if I open another window, or another tmux
@@ -174,18 +192,23 @@ not</em>, I am authenticated and can SSH or push without a prompt.</p>
 keychain is only called if I start a specific named tmux session. To do
 this, I changed my <span class="file">$HOME/.bash_profile</span> to test for that session:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">tsess</span><span class="o">=</span><span class="k">$(</span>tmux ls<span class="k">)</span>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">tsess</span><span class="o">=</span><span class="k">$(</span>tmux ls<span class="k">)</span>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;${tsess%%:*}&quot;</span> <span class="o">=</span> <span class="s2">&quot;secured&quot;</span> <span class="o">]]</span> &amp;amp;&amp;amp;
-</span><span class='line'>   <span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;# start keychain
-</span><span class='line'>/usr/bin/keychain -Q -q --nogui ~/.ssh/id_rsa
-</span><span class='line'>. <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;fi
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="k">${</span><span class="nv">tsess</span><span class="p">%%:*</span><span class="k">}</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">=</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>secured<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">]]</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span>
+</span><span class='line'>   <span class="o">[[</span> -f <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    <span class="c"># start keychain</span>
+</span><span class='line'>    /usr/bin/keychain -Q -q <span class="p">&amp;</span>ndash<span class="p">;</span>nogui ~/.ssh/id_rsa
+</span><span class='line'>    . <span class="nv">$HOME</span>/.keychain/<span class="nv">$HOSTNAME</span>-sh
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <h5>Notes</h5>
 
@@ -227,14 +250,21 @@ and then working up from there. There is a section
 <a href="http://tmux.svn.sourceforge.net/viewvc/tmux/trunk/examples/t-williams.conf?revision=1833&amp;view=markup" title="Thayer's conf in SVN">at the bottom of this file</a>
 that has always puzzled me, and so I decided to get to the bottom of it.</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;show some useful stats but only when tmux is started&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;outside of Xorg, otherwise dwm statusbar shows these already&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>It is a great idea. If you are running tmux in X, then you have
 <a href="http://dwm.suckless.org/" title="dwm homepage">dwm’s</a> status bar telling you
@@ -256,28 +286,43 @@ source-file option in <span class="file">.tmux.conf</span> to call the relevant 
 depending if X was running or not. I just adapted Thayer’s code, like
 so:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;Statusbar starting in X or not&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="s1">&#39;[ -n &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/inx&#39;</span>
-</span><span class='line'><span class="k">if</span> <span class="s1">&#39;[ -z &quot;$DISPLAY&quot; ]&#39;</span> <span class="s1">&#39;source-file ~/.tmux/xless&#39;</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'>&lt;p&gt;if <span class="p">&amp;</span>lsquo<span class="p">;</span><span class="o">[</span> -n <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$DISPLAY</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">]</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>lsquo<span class="p">;</span><span class="nb">source</span>-file ~/.tmux/inx<span class="p">&amp;</span>rsquo<span class="p">;</span>
+</span><span class='line'><span class="k">if</span> <span class="p">&amp;</span>lsquo<span class="p">;</span><span class="o">[</span> -z <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$DISPLAY</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">]</span><span class="p">&amp;</span>rsquo<span class="p">;</span> <span class="p">&amp;</span>lsquo<span class="p">;</span><span class="nb">source</span>-file ~/.tmux/xless<span class="p">&amp;</span>rsquo<span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>And then created those files with the desired statusbar options. So, for
 example, if I am running tmux in the console, <span class="file">$HOME/.tmux/xless</span> is
 loaded:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;h1&gt;Statusbar <span class="k">if </span>tmux run in console&lt;/h1&gt;
+</span><span class='line'>&lt;h1&gt;Statusbar <span class="k">if</span> tmux run in console&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;information normally in dwm bar&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;set -g status-right-length 50
 </span><span class='line'><span class="nb">set</span> -g status-left-length 50
-</span><span class='line'><span class="nb">set</span> -g status-left <span class="err">&quot;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'><span class="nb">set</span> -g status-left <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="c">#[fg=green] #H #[default] …blah, blah, blah…</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Which prints a statusbar with the time and battery left on my laptop<sup>3</sup>:</p>
 
@@ -318,21 +363,28 @@ explained there, I thought I would share my approach anyway.</p>
 
 <p>First, I set tmux to use vi keys:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setw -g mode-keys vi
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>setw -g mode-keys vi
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Then I change the default keybinds to suit my workflow. As explained in
 the man page, the default keys to enter and exit copy mode are <kbd>[</kbd>
 and <kbd>]</kbd> respectively. I reset those in my <span class="file">.tmux.conf</span>
 to more intuitive and Vim-like keys:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>unbind <span class="o">[</span>
 </span><span class='line'><span class="nb">bind </span>Escape copy-mode
 </span><span class='line'>unbind p
 </span><span class='line'><span class="nb">bind </span>p paste-buffer
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;v&#39;</span> begin-selection
-</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="s1">&#39;y&#39;</span> copy-selection
-</span></code></pre></div></figure></notextile></div></p>
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="p">&amp;</span>lsquo<span class="p">;</span>v<span class="p">&amp;</span>rsquo<span class="p">;</span> begin-selection
+</span><span class='line'><span class="nb">bind</span>-key -t vi-copy <span class="p">&amp;</span>lsquo<span class="p">;</span>y<span class="p">&amp;</span>rsquo<span class="p">;</span> copy-selection
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>This seems a lot closer to all of the other Vim-like apps that I run -
 where <kbd>Escape</kbd> changes the mode, <kbd>v</kbd> begins visual selection,
@@ -392,10 +444,13 @@ running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux
 <p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
 colours, gave me the default:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> &amp;amp;&amp;amp; tput colors
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> &amp;amp;&amp;amp; tput colors
 </span><span class='line'>linux
 </span><span class='line'>8
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Which, under my current configuration of Vim, rendered colours like so:</p>
 
@@ -406,26 +461,35 @@ colours, gave me the default:</p>
 <p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
 colours:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Then I had to rewrite my colourscheme to change all of the references to
 the terminal colour numbers to colour <em>names</em>, as apparently that is
 what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
 </span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
 </span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
 </span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>…to the more literal:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
 </span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
 </span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
 </span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Once I had made the necessary changes, I saved this new colourscheme as
 <span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
@@ -442,46 +506,68 @@ to the console. Fortunately,
 <a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
 made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;Linux console colors <span class="o">(</span>jwr dark<span class="o">)</span>&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
-</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="nv">$TERM</span><span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">=</span> <span class="p">&amp;</span>ldquo<span class="p">;</span>linux<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P0000000<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#black</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P83d3d3d<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P18c4665<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkred</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P9bf4d80<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#red</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P2287373<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkgreen</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PA53a6a6<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#green</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P37c7c99<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#brown</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PB9e9ecb<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#yellow</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P4395573<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkblue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PC477ab3<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#blue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P55e468c<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkmagenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PD7e62b3<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#magenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P631658c<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#darkcyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PE6096bf<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#cyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>P7899ca1<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#lightgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="p">&amp;</span>ldquo<span class="p">;</span><span class="se">\e</span><span class="o">]</span>PFc0c0c0<span class="p">&amp;</span>rdquo<span class="p">;</span> <span class="c">#white</span>
 </span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
 </span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Then it was just a case of setting the relevant colourscheme in my
 <span class="file">.vimrc</span>:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;amp;<span class="nb">t_Co</span> &amp;<span class="k">lt</span>; <span class="m">256</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
-</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">else</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miromiro
-</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">endif</span>
-</span></code></pre></div></figure></notextile></div></p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;amp;<span class="nb">t_Co</span> &amp;<span class="k">lt</span>; <span class="m">256</span>
+</span><span class='line'>    <span class="k">colorscheme</span> miro8   &amp;ldquo; colourscheme <span class="k">for</span> the <span class="m">8</span> colour linux <span class="nb">term</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>    <span class="k">colorscheme</span> miromiro
+</span><span class='line'><span class="k">endif</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>And you can see
 <a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>
