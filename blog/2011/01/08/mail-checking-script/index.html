@@ -1,0 +1,381 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Mail Checking Script - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="I use mutt and
+offlineimap
+to manage email on my Arch Linux machines. I like the simplicity and the
+power that this approach offers; that’s power in &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/2011/01/08/mail-checking-script">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Mail Checking Script</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-08T11:04:00+13:00" pubdate data-updated="true">Jan 8<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img src="/images/post_images/mailcheck.png" alt="image" /></p>
+
+<p>I use <a href="http://www.mutt.org/" title="Mutt homepage">mutt</a> and
+<a href="https://github.com/jgoerzen/offlineimap/wiki" title="Offlineimap on github">offlineimap</a>
+to manage email on my Arch Linux machines. I like the simplicity and the
+power that this approach offers; that’s power in the sense of
+extensibility and customization, by the way…</p>
+
+<p>Using <a href="http://dwm.suckless.org/" title="dwm homepage">dwm</a> as my window
+manager, I had relied on
+<a href="http://jasonwryan.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/" title="My post on setting this up">conky and dzen2</a>
+to pipe system information into my status bar. Unfortunately, conky only
+supports one mail spool so if, like me, you use offlineimap to
+synchronize multiple mailboxes, conky would only show new mail in your
+primary box. I had asked in #conky about multiple mail spools, but it
+doesn’t seem to be supported.</p>
+
+<p>When I recently started using
+<a href="http://jasonwryan.com/blog/2010/12/26/wmfs-window-manager-from-scratch/" title="My post on Window Manager From Scratch">WMFS</a>
+I decided to move to a
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/wmfs-status" title="Script in mercurial repo">bash script for my status information</a>.
+So I approached the problem afresh and decided to write a script to poll
+the new mail directories and update my status bar when mail arrived.</p>
+
+<p>Offlineimap creates a directory structure like so:</p>
+
+<pre><code>   Mail/ -------
+      |         |
+      |     Mail_Account_1
+      |         |
+      |         | --  INBOX 
+      |         |       | -- cur
+      |         |       | -- new
+      |         |       | -- temp
+      |         |
+      |         | -- INBOX.Drafts
+      |         |       | -- cur
+</code></pre>
+
+<p>As I was only interested in checking the <span class="file">INBOX/new</span>
+directory of each account, I had imagined that it would be necessary to set up some
+elaborate array to effectively check each of the requisite sub-directories…</p>
+
+<p>No, it was pretty simple. Just
+<a href="http://www.faqs.org/docs/abs/HTML/globbingref.html" title="ABS entry on globing">globbing</a>
+and
+<a href="http://linuxmanpages.com/man1/find.1.php" title="man page for find">find</a>,
+actually.</p>
+
+<figure class='code'><figcaption><span>mailcheck.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="c"># Set maildirs</span>
+</span><span class='line'><span class="nv">maildirs</span><span class="o">=</span><span class="s2">&quot;$HOME/Mail/*/INBOX/new/&quot;</span>
+</span><span class='line'>
+</span><span class='line'>find <span class="nv">$maildirs</span> -type f | wc -l
+</span><span class='line'><span class="nb">exit </span>0
+</span></code></pre></div></figure>
+
+
+<p>The glob (<code>*</code>) takes care of the different mail account names, and has
+the added bonus of being portable, and find returns any files (<code>-type f</code>)
+with <code>wc</code> counting the number of lines (the <code>-l</code> switch).</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-08T11:04:00+13:00" pubdate data-updated="true">Jan 8<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/dwm/'>dwm</a>, <a class='category' href='/blog/categories/hack/'>hack</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2010/12/26/wmfs-window-manager-from-scratch/" title="Previous Post: WMFS - Window Manager From Scratch">&laquo; WMFS - Window Manager From Scratch</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/01/13/intuxication/" title="Next Post: Intuxication">Intuxication &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.com/blog/2011/01/08/mail-checking-script/';
+        var disqus_url = 'http://jasonwryan.com/blog/2011/01/08/mail-checking-script/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

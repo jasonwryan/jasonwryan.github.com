@@ -1,0 +1,447 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Managing modules with Awk - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="This is an addendum to my two previous posts on
+compiling kernels
+and automating the process.
+In the first of those posts I wrote about a wonderful &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/2013/09/15/awking">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Managing modules with Awk</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-15T09:23:00+12:00" pubdate data-updated="true">Sep 15<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="left" src="/images/post_images/awk.jpg" title="The Great Auk" >
+This is an addendum to my two previous posts on
+<a href="http://jasonwryan.com/blog/2013/08/03/kernels/" title="The first post">compiling kernels</a>
+and <a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="The folow up">automating the process</a>.
+In the first of those posts I wrote about a wonderful tool to track the modules
+necessary for building a custom kernel with <code>make localmodconfig</code>, graysky&#8217;s
+<a href="https://github.com/graysky2/modprobed_db" title="Github repo">modprobed_db</a>. A simple
+bash script, <code>modprobed_db</code> allows you to build up an array of modules and—as
+the name suggests—<code>modprobe</code> all of them prior to compilation.</p>
+
+<p>I forked it on github and started to play around with the script (mostly because
+I am slightly <acronym title="Obsessive Compulsive Disorder">OCD</acronym> about
+constructions
+<a href="https://github.com/graysky2/modprobed_db/blob/master/common/modprobed_db#L62" title="awk pipeline">like this</a>:</p>
+
+<figure class='code'><figcaption><span>modprobed_db lines 62-63 </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>cat /proc/modules | awk <span class="s1">&#39;{print $1}&#39;</span> | sort -k 1,1 | <span class="se">\</span>
+</span><span class='line'>  grep -Ev <span class="s2">&quot;$(echo ${IGNORE[*]} | sed -e &#39;s/^/^(/&#39; -e &#39;s/ /|/g&#39; -e &#39;s/$/)$/&#39;)&quot;</span> <span class="se">\</span>
+</span><span class='line'>  &gt;/tmp/.inmem
+</span></code></pre></div></figure>
+
+
+<p><a href="https://github.com/jasonwryan/modprobed_db/blob/jwr/common/modprobed_db" title="My branch">After hacking a while</a>,
+I started to realize that the venerable UNIX programme
+<a href="http://www.gnu.org/software/gawk/manual/" title="gawk manual on GNU site">Awk</a>
+ would, in many ways, be a better tool for this job. Essentially, we want to
+ manage three lists: the modules in <span class="file">/proc/modules</span>, a
+ list of modules to ignore, and the master list of all modules required prior to
+ compilation. This seems perfectly suited to Awk.</p>
+
+<p> So, in the interests of learning Awk, I decided to rewrite the required
+ functionality (or, more correctly, the subset that I required) in this
+ language. This wasn&#8217;t a straightforward task for me. I got stuck a couple of
+ times and, as I work in a building full of
+ <a href="http://catalyst.net.nz" title="Catalyst website">neckbeards</a>, I thought I could ask
+ for a couple of pointers. To my surprise, no-one I asked seemed interested in
+ Awk. Typical responses were along the lines of “just use Perl.”</p>
+
+<p> Aside from not knowing any
+ <a href="http://www.perl.org/" title="Perl homepage">Perl</a>, and being unlikely to learn any
+ in the immediate future, I was bemused by the notion that none of these skilled
+ developers rated Awk as a language worth knowing. One of the #awk FAQ&#8217;s
+ specifically addresses this:
+ <a href="http://awk.freeshell.org/Frequently_Asked_Questions#toc14" title="#awk FAQs">Why would anyone still use awk instead of perl?</a>
+ The quote by Tom Christiansen is worth repeating here:</p>
+
+<p> <blockquote><p>Awk is a venerable, powerful, elegant, and simple tool that everyone should know. Perl is a superset and child of awk, but has much more power that comes at expense of sacrificing some of that simplicity.</p></blockquote></p>
+
+<p>In a happy coincidence, this
+<a href="http://unix.stackexchange.com/questions/90489/compare-two-files-with-first-column-and-remove-duplicate-row-from-2nd-file-in-sh/90490#90490" title="Comparing two files">question on Unix &amp; Linux SE</a>
+showed up just as I was completing my script and it neatly illustrates (to my
+unututored eye, anyway) an example of a typical situation where Awk&#8217;s strengths
+make it a better approach than Perl.</p>
+
+<p>In any event, my rewriting of <code>modprobed_db</code> in Awk<sup>1</sup> resulted in this:</p>
+
+<figure class='code'><figcaption><span>awkmodules </span></figcaption>
+ <div class="highlight"><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
+</span><span class='line'><span class="c1"># script to manage modules for kernel builds</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">BEGIN</span> <span class="p">{</span> <span class="nx">dbfile</span> <span class="o">=</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">red</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">printf</span> <span class="s2">&quot;\033[1;31m&quot;</span> <span class="nx">s</span> <span class="s2">&quot;\033[0m &quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># read in the array</span>
+</span><span class='line'><span class="nb">FILENAME</span> <span class="o">!=</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">modlist</span><span class="p">[</span><span class="o">$</span><span class="mi">1</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="kr">next</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># check for ignored modules</span>
+</span><span class='line'><span class="o">!</span><span class="nx">modlist</span><span class="p">[</span><span class="o">$</span><span class="mi">1</span><span class="p">]</span><span class="o">++</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span> <span class="o">&gt;&gt;</span> <span class="nx">dbfile</span>
+</span><span class='line'>  <span class="kr">close</span><span class="p">(</span><span class="nx">dbfile</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="c1"># modprobe modules</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nx">p</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">modload</span><span class="o">=</span><span class="s2">&quot;sudo modprobe -a $(&lt;&quot;</span><span class="nx">dbfile</span><span class="s2">&quot;)&quot;</span>
+</span><span class='line'>  <span class="kr">system</span><span class="p">(</span><span class="nx">modload</span><span class="p">)</span>
+</span><span class='line'>  <span class="kr">close</span><span class="p">(</span><span class="nx">modload</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="c1"># update module count</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span> <span class="kr">getline</span> <span class="o">&lt;</span> <span class="nx">dbfile</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">count</span><span class="o">++</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">END</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">print</span> <span class="nx">red</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="s2">&quot;modules listed.&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># vim:set ts=2 sts=2 sw=2 et:</span>
+</span></code></pre></div></figure>
+
+
+<p>Just prior to compiling a kernel, I can invoke this script with (the admittedly
+rather ungainly line):</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>awkmodules <span class="nv">p</span><span class="o">=</span>1 .config/kmod_db/ignored .config/kmod_db/modules_db /proc/modules
+</span></code></pre></div></figure>
+
+
+<p>It does work, but I don&#8217;t claim that it is either idiomatic or attractive. The
+use of <code>getline</code> to update the module count strikes me as especially kludgy but
+I haven&#8217;t been able to think of a more correct way to handle it.</p>
+
+<p>Incidentally, the gawk manual<sup>2</sup>,
+<a href="http://www.gnu.org/software/gawk/manual/" title="GNU goodness">Gawk: Effective AWK Programming</a>
+has only just been updated<sup>3</sup> so Awk is, unlike it&#8217;s homonym, clearly
+alive and well.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In my <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/awkmodules">bitbucket repo</a>.</li>
+<li>The number of variants of <code>awk</code> is as much a delight as it is perplexing…</li>
+<li>May, 2013</li>
+</ol>
+
+
+<p>Public Domain image of the Great Auk by John James Audubon, from his book
+<a href="https://en.wikipedia.org/wiki/File:PinguinusImpennus.jpg">The Birds of America</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-15T09:23:00+12:00" pubdate data-updated="true">Sep 15<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/kernel/'>kernel</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/08/24/automating-kernels/" title="Previous Post: Automating Kernel Builds">&laquo; Automating Kernel Builds</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/10/28/dismount/" title="Next Post: Simple Unmounting">Simple Unmounting &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.com/blog/2013/09/15/awking/';
+        var disqus_url = 'http://jasonwryan.com/blog/2013/09/15/awking/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

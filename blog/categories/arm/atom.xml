@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: arm | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.com/blog/categories/arm/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-19T08:20:47+13:00</updated>
+  <id>http://jasonwryan.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Multi-arch Packages in AUR]]></title>
+    <link href="http://jasonwryan.com/blog/2014/09/20/multiarch/"/>
+    <updated>2014-09-20T09:16:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/09/20/multiarch</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/agra.jpg" title="Creative Commons image of Agra" >
+One of the easiest ways to contribute to Arch is to maintain a package, or
+packages, in the
+<acronym title="Arch User Repository"><a href="https://aur.archlinux.org/" title="AUR homepage">AUR</a></acronym>;
+the repository of user contributed PKGBUILDs that extends the range of packages available
+for Arch by some magnitude. Given that PKGBUILDs are just shell scripts, the barrier
+to entry is relatively low, and investing the small amount of effort required to clear
+that barrier will not only give you a much better understanding of how packaging works
+in Arch, but will scratch your own itch for a particular package and hopefully assuage
+someone else's similar desire at the same time.</p>
+
+<p>Now that I have a
+<a href="http://www.raspberrypi.org/" title="Raspberry Pi site">Raspberry Pi</a><sup>1</sup>, I am
+naturally much more interested in packages that can be built for the ARMv6
+architecture; especially those that are available in the AUR. It is worth a brief
+digression to note that
+<a href="http://archlinuxarm.org/" title="AL ARM home page">Arch Linux ARM</a> is an entirely
+<em>separate</em> distribution and, while they share features with Arch, support for
+each is restricted to their respective communities. It is with this
+consideration in mind that I had begun to think about multi-arch support in
+PKGBUILDs, particularly in the packages that I maintain in the AUR.</p>
+
+<p>I have
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on Syncthing">previously posted</a>
+about using <a href="http://syncthing.net/" title="Open source synching: genius…">Syncthing</a>
+across my network, including on a Pi as one of the nodes. As the Syncthing
+developer pushes out a release at least weekly, I have been maintaining my own
+PKGBUILD and, after Syncthing was pulled into [community], I uploaded it to the
+AUR as
+<a href="https://aur.archlinux.org/packages/syncthing-bin" title="AUR package">syncthing-bin</a>.</p>
+
+<p>Syncthing is a cross platform application so it runs on a wide range of
+architectures, including ARM (both v6 and v7). Initially, when I wrote the
+PKGBUILD, I would <code>updpkgsums</code> on my x86_64 machine, build the package and
+then, on the Pi, have to regenerate the integrity checks. This was manageable
+enough for my own use across two architectures, but wasn't really going to
+work for people using other architectures (especially if they are using
+<a href="http://jasonwryan.com/blog/2013/04/09/helpers/" title="My post on Yaourt">AUR helpers</a>).</p>
+
+<p>Naturally enough, this started me thinking about how I could more effectively
+manage the process of updating the PKGBUILD for each new release, <em>and</em> have it
+work across the four architectures—without having to manually copy and paste or
+anything similarly tedious. Managing multiple architectures in the PKGBUILD
+itself is not particularly problematic, a case statement is sufficient:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>PKGBUILD </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="s2">&quot;$CARCH&quot;</span> in&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;armv6h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv6&quot;</span>
+</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;a94e5d00cec32956eb27bc12dbbc4964b68913f9&#39;</span><span class="o">)</span>
+</span><span class='line'>       ;;
+</span><span class='line'>armv7h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv7&quot;</span>
+</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;9b782abf95668a906bfe76ad5ceb4cda17ec2289&#39;</span><span class="o">)</span>
+</span><span class='line'>       ;;
+</span><span class='line'>i686<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;386&quot;</span>
+</span><span class='line'>      sha1sums+<span class="o">=(</span><span class="s1">&#39;b2e1961594a931201799246f5cf61cb1e1700ff9&#39;</span><span class="o">)</span>
+</span><span class='line'>       ;;
+</span><span class='line'>x86_64<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;amd64&quot;</span>
+</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;035730c09ca5383c90fdd9898baf66b90acdef24&#39;</span><span class="o">)</span>
+</span><span class='line'>       ;;
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;esac
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The real challenge, for me, was to be able to script the replacement of each of
+the respective
+<a href="http://en.wikipedia.org/wiki/Sha1sum" title="Wikipedia entry">sha1sums</a>,
+and then to update the PKGBUILD with the new arrays.  Each release of
+Syncthing is accompanied by a text file containing all of the sha1sums, each on
+its own line in a conveniently ordered format, like so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>sha1sums.txt.asc </span></figcaption>
+ <div class="highlight"><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
+</span><span class='line'>035730c09ca5383c90fdd9898baf66b90acdef24    syncthing-linux-amd64-v0.9.16.tar.gz
+</span><span class='line'>d743b64204f0ac7884e4b42d9b1865b2436f5ecb    syncthing-linux-armv5-v0.9.16.tar.gz
+</span><span class='line'>…
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>'s
+<a href="https://www.gnu.org/software/gawk/manual/html_node/Switch-Statement.html" title="Gawk manual">switch statement</a>,
+and an admittedly rather convoluted <code>printf</code> incantation.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">armv6</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>    <span class="nx">arm6</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>    <span class="k">break</span>
+</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">armv7</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>    <span class="nx">arm7</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>    <span class="k">break</span>
+</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="mi">386</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>    <span class="nx">i386</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>    <span class="k">break</span>
+</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="nx">amd64</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>    <span class="nx">x86</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>    <span class="k">break</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>  <span class="p">}</span>
+</span><span class='line'><span class="nx">END</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">printf</span> <span class="s2">&quot;case \&quot;$CARCH\&quot; in\n\t&quot;</span><span class="err">\</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span>     <span class="s2">&quot;armv6h) _pkgarch=\&quot;armv6\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>     <span class="s2">&quot;armv7h) _pkgarch=\&quot;armv7\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>     <span class="s2">&quot;i686) _pkgarch=\&quot;386\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>     <span class="s2">&quot;x86_64) _pkgarch=\&quot;amd64\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n&quot;</span><span class="err">\</span>
+</span><span class='line'>     <span class="s2">&quot;esac\n&quot;</span><span class="p">,</span>
+</span><span class='line'>     <span class="nx">arm6</span><span class="p">,</span> <span class="nx">arm7</span><span class="p">,</span> <span class="nx">i386</span><span class="p">,</span> <span class="nx">x86</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The remaining step was to update the PKGBUILD with the new sha1sums. Fortunately,
+<a href="http://blog.falconindy.com/" title="Dave's blog">Dave Reisner</a> had already written the code
+for this in his <code>updpkgsums</code> utility; I had only to adapt it slightly:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>excerpt from updpkgsums </span></figcaption>
+ <div class="highlight"><pre><code class='awk'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">rm</span> <span class="s2">&quot;$buildfile&quot;</span>
+</span><span class='line'>  <span class="nx">exec</span> <span class="nx">awk</span> <span class="o">-</span><span class="nx">v</span> <span class="nx">newsums</span><span class="o">=</span><span class="s2">&quot;$newsums&quot;</span> <span class="s1">&#39;&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">&lt;pre&gt;&lt;code&gt;/^case/,/^esac$/ {</span>
+</span><span class='line'><span class="s1">  if (!w) { print newsums; w++ }</span>
+</span><span class='line'><span class="s1">    next</span>
+</span><span class='line'><span class="s1">  }; 1</span>
+</span><span class='line'><span class="s1">  END { if (!w) print newsums }</span>
+</span><span class='line'><span class="s1">&lt;/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">&lt;p&gt;  &#39;</span> <span class="o">&gt;</span> <span class="s2">&quot;$buildfile&quot;</span>
+</span><span class='line'><span class="p">}</span> <span class="err">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="s2">&quot;$buildfile&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Combining these two tasks means that I have a script that, when run, will download
+the current Syncthing release's <span class="file">sha1sum.txt.asc</span>
+file, extract the relevant sums into the replacement case statement and then
+write it into the PKGBUILD. I can then run <code>makepkg -ci &amp;&amp; mkaurball</code>, upload
+the new tarball to the AUR and the two other people that are using the PKGBUILD
+can download it and not have to generate new sums before installing their
+shiny, new version of Syncthing. You can see the full version of the script in
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/upsync" title="Tip…">my bitbucket repo</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See my other <a href="http://jasonwryan.com/blog/categories/arm/">posts about the Pi</a>…</li>
+</ol>
+
+
+<p>Creative Commons image of the Mosque at Agra, by
+<a href="https://www.flickr.com/photos/jasonwryan/14986166957/">yours truly</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[OpenVPN and Time on the Raspberry Pi]]></title>
+    <link href="http://jasonwryan.com/blog/2014/06/28/vpn/"/>
+    <updated>2014-06-28T09:57:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/06/28/vpn</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/raspberry-pi-logo.png" title="Pi logo" >
+After relieving my Pi of
+<a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on Torrent Pi">seedbox duties</a>,
+I was looking around for some other use for it. I decided, after looking over
+the Arch wiki article on <a href="https://wiki.archlinux.org/index.php/Openvpn" title="Simple, really…">OpenVPN</a>,
+that the Pi would be a terrific <acronym title="virtual private network">VPN</acronym>
+server; when I am out and about I can access a secure connection to my home
+network, thereby significantly reducing the risk of my privacy being
+compromised while using connectivity to the Internet provided by the
+notoriously security conscious sysadmins that run networks in hotels and
+other public places.</p>
+
+<p>Setting it up was straightforward enough, the wiki is typically clear and thorough; the only
+bottleneck in the process was waiting for the Pi's tiny chip to chug through the creation of
+<a href="https://wiki.archlinux.org/index.php/Create_a_Public_Key_Infrastructure_Using_the_easy-rsa_Scripts" title="Wiki page on the easy-rsa scripts">public keys</a>. Once it was done, and I had tested that it was
+indeed working as intended, a more vexing issue presented itself. The service wouldn't come
+up after rebooting. Not a deal breaker, I could always just <acronym title="Secure Shell">SSH</acronym>
+in and manually bring the server up, but that sort of defeats the purpose of being able to
+have the thing running reliably.</p>
+
+<p>The reason that it fails on boot is that, without a hardware clock, the Pi
+resets its time to
+<a href="https://en.wikipedia.org/wiki/Unix_time" title="Wikipedia article">UNIX time</a>
+until the
+<a href="https://wiki.archlinux.org/index.php/Ntp" title="Arch wiki page">NTP</a> daemon can
+start, which in turn depends upon the network being up. So, after rebooting,
+the journal would show the VPN server as having failed as the date was nearly
+half a century ago.</p>
+
+<p>There are a variety of fixes floating around, the most amusing being
+<a href="http://archlinuxarm.org/forum/viewtopic.php?f=31&amp;t=6037#p34228" title="Yes, really…">a wrapper for init</a>.
+Suffice to say, this wasn't an option for me. Looking at the problem logically, it occurred to me
+that the issue was actually a trivial one: the correct sequencing of different services
+post boot. Isn't this, I asked myself, one of the issues
+<a href="http://www.freedesktop.org/wiki/Software/systemd/" title="At freedesktop.org">systemd</a> was supposed
+to address?</p>
+
+<p>I just had to ensure that the network came up as quickly as possible after boot, that the time
+was reset correctly once there was a viable connection, and that the <code>openvpn.service</code> waited for
+those things to happen before launching.</p>
+
+<p>I have fitted the Pi with a wireless dongle, so the first step was to ditch
+<a href="https://wiki.archlinux.org/index.php/Netctl" title="Arch wiki page">netctl</a> (the
+default network manager on the ARM image) and replace it with
+<a href="https://wiki.archlinux.org/index.php/Systemd-networkd" title="More wiki pages for you…">systemd-networkd</a>.
+This is the point at which all the wingnuts that think that systemd is some
+sort of conspiracy to overthrow the old UNIX gods and replace them with false
+idols in <em>chapeau rouge</em> start foaming at their retrognathic mouths about
+“viral takeovers” and—seriously what fucking planet do these imbeciles hail
+from?—“an abhorrent and violent slap in the face to the Unix
+philosophy.”<sup>1</sup></p>
+
+<p>For those of us that accept the theory of evolution, this technology is both
+effective and non-threatening; in fact, it is quite an improvement over its by
+now ageing predecessor. So, a few minutes later,
+<span class="file">/etc/systemd/network/wlan0.network</span> and
+<span class="file">/etc/wpa_supplicant/wpa_supplicant-wlan0.conf</span> had pretty much
+written themselves and then it was just a matter of enabling the eponymous services
+as well as <code>systemd-resolved.service</code>. Reboot and the network is up seemingly
+<em>instantly</em>.</p>
+
+<p>Compounding my heresy, I then switched out NTP for
+<a href="http://man7.org/linux/man-pages/man8/systemd-timesyncd.8.html" title="Man page">systemd-timesyncd</a>
+and the Pi's clock was now reset with the same alacrity. The final piece, ensuring
+that the openvpn service waited for this to happen, was to add two lines to the
+service file:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">After</span><span class="o">=</span>network-online.target
+</span><span class='line'><span class="nv">Wants</span><span class="o">=</span>network-online.target
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>That is all there is to it. Reboot and the network comes up, the clock is reset and then
+the OpenVPN server starts. Like magic. The sort of heathen magic that threatens to
+sap and impurify all of our
+<a href="http://www.youtube.com/watch?v=rKR32ImWYzw" title="it's like that…">precious bodily fluids</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>No, Virginia, I did <a href="http://boycottsystemd.org/">not make that up</a>…
+And I don't really understand how you can slap a philosophy in the face, but then
+rationality is anathema to zealots; irrespective of which chimæra they
+prostrate before.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[RPi Headless Torrent Box]]></title>
+    <link href="http://jasonwryan.com/blog/2013/06/29/raspberry/"/>
+    <updated>2013-06-29T09:40:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2013/06/29/raspberry</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/raspberry-pi-logo.png" title="Raspberry Pi logo" >
+I was fortunate enough to be given a
+<a href="http://www.raspberrypi.org/" title="Pi homepage">Raspberry Pi</a> earlier this year
+and, naturally enough, have been running
+<a href="http://archlinuxarm.org/" title="Arch Linux ARM site">Arch ARM</a> on it over the
+last several months. Initially, I was at somewhat of a loss as to what to do
+with it, so was just (under)using it<sup>1</sup> for a persistent IRC connection.
+I have now, with very little effort, set it up as a headless torrent box and it is
+working nicely.</p>
+
+<p>As is generally the case, this involved little more than stitching together a
+few lightweight tools to accomplish the task. In this case, it is a combination
+of
+<a href="http://libtorrent.rakshasa.no/" title="rotrrent homepage">rtorrent</a>
+(with the canvas-colour patch applied),
+<a href="http://jasonwryan.com/blog/categories/surfraw/" title="Posts on surfraw">surfraw</a>
+and
+<a href="http://w3m.sourceforge.net/" title="w3m homepage">w3m</a> for discovering
+torrents,<sup>2</sup>
+<a href="http://labs.bittorrent.com/experiments/sync.html" title="Peer to Peer synching">bittorrent sync</a>
+and, optionally, a <acronym title="Virtual Private Network">VPN</acronym>.</p>
+
+<p>I use a 16GB <acronym title="Universal Serial Bus">USB</acronym> drive to act as
+storage for the device, and mount it at <span class="file">~/Downloads</span>
+via <span class="file">/etc/fstab</span>; depending on the size of your
+<acronym title="Secure Digital">SD card</acronym>, this may be superfluous.</p>
+
+<p>First a note on building packages; building <em>anything</em> on the Pi—with only
+512MB <acronym title="Random Access Memory">RAM</acronym>—is a protracted
+and thankless task. So if you intend to do more of this, or do it regularly,
+set up
+<a href="http://archlinuxarm.org/developers/distcc-cross-compiling" title="Arch ARM instructions">cross-compiling</a>;
+you won't regret the initial investment.</p>
+
+<p><code>rtorrent</code> is in the ARM repos, but I wanted to patch in colour, so I wrote
+<a href="https://gist.github.com/jasonwryan/5794623" title="Gist of the thing…">a PKGBUILD</a>,
+based on the package in [community] and
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="Arch User Repository">ashren's AUR package</a>.
+Once you have rtorrent installed and working, the rest is straightforward.</p>
+
+<p>The default config for w3m is perfectly functional, but can be easily customized
+further. The key to this setup is being able to find a torrent and then easily
+add it to rtorrent's queue.  To do this, I modified the hack that I wrote up
+<a href="http://jasonwryan.com/blog/2011/05/05/w3m/" title="Post on yanking URLs in w3m">a couple years back</a>.
+Essentially, you use w3m's external link function to trigger a script to grab
+the magnet link. Like so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/.w3m/config </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>extbrowser /home/jason/Scripts/magnets %s
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>and the script from the
+<a href="http://wiki.rtorrent.org/MagnetUri#Handling_.22magnet:.22_URIs_via_a_bash_script" title="Script for magnet links">rtorrent wiki</a>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/Scripts/magnets </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;cd <span class="nv">$HOME</span>/Downloads/Queue/watch/    <span class="c"># set your watch directory here</span>
+</span><span class='line'><span class="o">[[</span> <span class="s2">&quot;$1&quot;</span> <span class="o">=</span>~ <span class="nv">xt</span><span class="o">=</span>urn:btih:<span class="o">([</span>&lt;sup&gt;&amp;amp;/<span class="o">]</span>+<span class="o">)</span>&lt;/sup&gt; <span class="o">]]</span> <span class="o">||</span> <span class="nb">exit</span>;
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;d10:magnet-uri${#1}:${1}e&quot;</span> &gt; <span class="s2">&quot;meta-${BASH_REMATCH[1]}.torrent&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Remapping the w3m key to trigger the script to make it more Vim-like:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/.w3m/keymap </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>keymap Y EXTERN_LINK
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>And now hitting <kbd>Shift</kbd><kbd>y</kbd> over a magnet link adds it to your
+queue.</p>
+
+<p>The final piece was to ameliorate the step of transferring the completed files
+from the Pi, or for allowing me to add torrents remotely. To do this, I used
+a <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="My post on Sync">bittorrent sync</a>
+shared directory as <span class="file">~/Downloads</span>. All files are synched
+to my desktop as they are downloaded to the Pi. Simple.</p>
+
+<p><img src="/images/post_images/rtorrent-2.png" title="'Screenshot of rtorrent in action…'" ></p>
+
+<p>As I mentioned above, you could also use a VPN and, with a service
+file, have it connect on boot if you wished to further protect your privacy.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>This is not to say that I am now using it to it's full potential; quite the
+opposite. Recommendations or suggestions gratefully received.</li>
+<li>Discovery is <em>your</em> business; what you choose to download and share may be the
+business of copyright holders…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+</feed>

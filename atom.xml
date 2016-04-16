@@ -1,0 +1,2094 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[jasonwryan.com]]></title>
+  <link href="http://jasonwryan.com/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-19T08:20:47+13:00</updated>
+  <id>http://jasonwryan.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Playing with overlayfs]]></title>
+    <link href="http://jasonwryan.com/blog/2015/01/19/overlayfs/"/>
+    <updated>2015-01-19T08:20:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2015/01/19/overlayfs</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/jello.jpg" title="Creative Commons Image" >
+Around this time last year, I posted about setting up a
+<a href="http://jasonwryan.com/blog/2014/01/20/udev/" title="Post in Jan 14">udev rule to run a script</a>
+when I plugged my USB drive containing all of my music into one of my
+laptops; the script, a
+<a href="https://gist.github.com/jasonwryan/0df98a396af89bf82eb6" title="A gist…">couple of lines of bash</a>,
+removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
+repopulates the directory with an updated set. Almost. The one flaw that has
+been an irritant of variable intensity, depending on what I felt like listening
+at any given time, is that the symlinks aren&#8217;t written for directories that
+already exist on the target filesystem.</p>
+
+<p>In order that I am able to play some music if I forget the USB drive, each of
+the laptops has a subset of albums on it, depending on the size of their
+respective hard drives. If I add a new album to the USB drive, then that change won&#8217;t
+get written to either of the laptops when the drive is plugged in. Not entirely
+satisfactory. I had tinkered around with
+<a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
+having <a href="http://mywiki.wooledge.org/UsingFind" title="Wooledge again, because it is so great…"><code>find(1)</code></a>
+scan deeper into the tree, or even a loop to check for the presence of directories in an array…</p>
+
+<p>It just got too hard. My rudimentary scripting skills and the spectre of recursion,
+I am sorry to admit, conspired to undermine my resolve. So, rather than concede
+unconditional surrender, I
+<a href="http://unix.stackexchange.com/q/179397/6761%20'Question%20on%20Unix%20&amp;%20Linux%20SE">asked for help</a>.
+As is almost always the case in these situations, this proved to be a particularly
+wise move; the response I received was neither what I expected, nor was it anything I
+was even remotely familiar with: so in addition to an excellent solution (one far
+better suited to what I was trying to achieve), I learned something new.</p>
+
+<p>The first comment on my question proved singularly insightful.</p>
+
+<blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote>
+
+
+<p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
+
+<blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote>
+
+
+<p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
+<a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
+The genealogy of these mounts has been well covered in this 2010 LWN
+<a href="http://lwn.net/Articles/396020/" title="LWN.net">article by Valerie Aurora</a>. However, it is only
+in the current kernel, 3.18, that a union mount has been accepted into the kernel tree.</p>
+
+<p>After reading the
+<a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/overlayfs.txt" title="Kernel docs">documentation for overlayfs</a>, it seemed this was <em>exactly</em> what I
+was looking for. Essentially, an overlay mount would allow me to “merge&#8221;
+the underlying tree (the Music directory on the USB drive) with an “upper”
+one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
+seamlessly</em>.</p>
+
+<blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote>
+
+
+<p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
+trivial:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># union mount Music when Apollo plugged in</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">low</span><span class="o">=</span>/media/Apollo/Music
+</span><span class='line'><span class="nv">upp</span><span class="o">=</span>/home/jason/Music
+</span><span class='line'><span class="nv">wod</span><span class="o">=</span>/home/jason/.local/tmp
+</span><span class='line'><span class="nb">export </span><span class="nv">DISPLAY</span><span class="o">=</span>:0
+</span><span class='line'><span class="nb">export </span><span class="nv">XAUTHORITY</span><span class="o">=</span>/home/jason/.Xauthority
+</span><span class='line'>
+</span><span class='line'><span class="c"># overlayfs mount</span>
+</span><span class='line'>mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
+</span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>
+</span><span class='line'>mpc update &amp;&gt;/dev/null
+</span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 <span class="o">&amp;&amp;</span> <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>And now, when I plug in the USB drive, the contents of the drive are merged
+with my local music directory, and I can access whichever album I feel inclined
+to listen to. I can also copy files across to the local machines, knowing if I
+update the portable drive, it will no longer mean I have to forego listening to
+any newer additions by that artist in the future (without manually intervening,
+anyway).</p>
+
+<p>Overall, this is a lightweight union mount. There is neither a lot of functionality,
+nor complexity. As the
+<a href="https://github.com/torvalds/linux/commit/e9be9d5e76e34872f0c37d72e25bc27fe9e2c54c" title="Git commit">commit note</a>
+makes clear, this “simplifies the implementation and allows native performance
+in these cases.” Just note the warning about attempting to write to a mounted
+underlying filesystem, where the behaviour is described as “undefined”.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, <a href="https://flic.kr/p/5RRRXP">mulitlayered jello</a> by Frank Farm.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pruning Tarsnap Archives]]></title>
+    <link href="http://jasonwryan.com/blog/2014/10/25/snapclean/"/>
+    <updated>2014-10-25T09:38:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2014/10/25/snapclean</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/tarsnap-logo.png" title="Tarsnsap Logo" >
+I started using <a href="http://www.tarsnap.com/" title="Tarsnap website">Tarsnap</a> about
+<a href="http://jasonwryan.com/blog/2011/09/08/tarsnap/" title="Post on Tarsnap">three years ago</a>
+and I have been nothing but impressed with it since. It is simple to use,
+<em>extremely</em> cost effective and, more than once, it has saved me from myself;
+making it easy to retrieve copies of files that I have inadvertently
+overwritten or otherwise done stupid things with<sup>1</sup>.  When I
+<a href="http://jasonwryan.com/blog/2011/09/08/tarsnap/" title="Post on Tarsnap">first posted about it</a>,
+I included a
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snap" title="In Bitbucket repo">simple wrapper script</a>,
+which has held up pretty well over that time.</p>
+
+<p>What became apparent over the last couple of months, as I began to consciously
+make more regular backups, was that pruning the archives was a relatively
+tedious business. Given that Tarsnap
+<a href="http://www.tarsnap.com/efficiency.html" title="Tarsnap efficiency page">de-duplicates data</a>,
+there isn&#8217;t much mileage in keeping around older archives because, if you do
+have to retrieve a file, you don&#8217;t want to have to search through a large
+number of archives to find it; so there is a balance between making use of
+Tarsnap&#8217;s efficient functionality, and not creating a rod for your back if your
+use case is occasionally retrieving single—or small groups of—files, rather
+than large dumps.</p>
+
+<p>I have settled on keeping five to seven archives, depending on the frequency of
+my backups, which is somewhere around two to three times a week. Pruning these
+archives was becoming tedious, so I wrote a simple script to make it less
+onerous. Essentially, it writes a list of all the archives to a
+<span class="file">tmpfile</span>, runs
+<a href="http://linux.die.net/man/1/sort" title="sort man page">sort(1)</a>
+to order them from oldest to newest, and then deletes the oldest minus whatever
+the number to keep is set to.</p>
+
+<p>The bulk of the code is simple enough:</p>
+
+<figure class='code'><figcaption><span>snapclean </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># generate list</span>
+</span><span class='line'>tarsnap --list-archives &gt; <span class="s2">&quot;$tmpfile&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># sort by descending date, format is: host-ddmmyy_hh:mm</span>
+</span><span class='line'><span class="o">{</span>
+</span><span class='line'>  rm <span class="s2">&quot;$tmpfile&quot;</span> <span class="o">&amp;&amp;</span> sort -k 1.11,1.10 -k 1.8,1.9 -k 1.7,1.6 &gt; <span class="s2">&quot;$tmpfile&quot;</span>
+</span><span class='line'><span class="o">}</span> &lt; <span class="s2">&quot;$tmpfile&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># populate the list</span>
+</span><span class='line'>mapfile -t archives &lt; <span class="s2">&quot;$tmpfile&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># print the full list</span>
+</span><span class='line'><span class="nb">printf</span> <span class="s2">&quot;%s\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Current archives${end}:&quot;</span> <span class="s2">&quot;${archives[@]#*-}&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># identify oldest archives</span>
+</span><span class='line'><span class="nv">remove</span><span class="o">=</span><span class="k">$((</span> <span class="k">${#</span><span class="nv">archives</span><span class="p">[@]</span><span class="k">}</span> <span class="o">-</span> keep <span class="k">))</span>
+</span><span class='line'><span class="nv">targets</span><span class="o">=(</span> <span class="k">$(</span>head -n <span class="s2">&quot;$remove&quot;</span> <span class="s2">&quot;$tmpfile&quot;</span><span class="k">)</span> <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># if there is at least one to remove</span>
+</span><span class='line'><span class="k">if</span> <span class="o">((</span> <span class="k">${#</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span> &gt;<span class="o">=</span> 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${red}Archives to delete${end}:&quot;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${targets[@]#*-}&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Proceed with deletion? [${red}Y${end}/N] &quot;</span> YN
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$YN</span> <span class="o">==</span> Y <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    for </span>archive in <span class="s2">&quot;${targets[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">      </span>tarsnap -d --no-print-stats -f <span class="s2">&quot;$archive&quot;</span>
+</span><span class='line'>    <span class="k">done</span> <span class="o">&amp;&amp;</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Archives successfully deleted...${end}&quot;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Remaining archives:${end}&quot;</span>
+</span><span class='line'>    tarsnap --list-archives
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Operation aborted${end}&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Nothing to do&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>0
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>You can see the rest of the script in
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snapclean" title="snapclean in bitbucket">my bitbucket repo</a>.  It even comes <a href="http://jasonwryan.com/images/post_images/snapclean.png" title="Screenshot of snapclean">with colour</a>.</p>
+
+<p>Once every couple of weeks, I run the script, review the archives marked for
+deletion and then blow them away. Easy. If you aren&#8217;t using Tarsnap, you
+really should check it out; it is an excellent service and—for the almost
+ridiculously small investment—you get rock solid, encrypted peace of
+mind. Why would you not do that?</p>
+
+<h3>Coda</h3>
+
+<p>This is the <em>one hundredth</em> post on this blog: a milestone that I never
+envisaged getting anywhere near. Looking back through the posts, nearly 60,000
+words worth, there are a couple there that continue to draw traffic and are
+obviously seen at some level as helpful.  There are also quite a few that
+qualify as “filler”, but blogging is a discipline like any other and sometimes
+you just have to push something up to keep the rhythm going. In any event, this
+is a roundabout way of saying that, for a variety of reasons both personal and
+professional, I am no longer able to fulfil my own expectations of regularly
+pushing these posts out.</p>
+
+<p>I will endeavour to, from time to time when I find something that I genuinely
+think is worth sharing, make an effort to write about it, but I can&#8217;t see that
+happening all that often.  I&#8217;d like to thank all the people that have read
+these posts; especially those of you that have commented. With every post, I
+always looked forward to people telling me where I got something wrong or how I
+could have approached a problem differently or more effectively<sup>2</sup>; I
+learned a lot from these pointers and I am grateful to the people that were
+generous enough to share them.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The frequency with which this happens is, admittedly, low; but not
+low enough to confidently abandon a service like this…</li>
+<li>Leaving a complimentary note is just as welcome, don&#8217;t get me wrong…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Multi-arch Packages in AUR]]></title>
+    <link href="http://jasonwryan.com/blog/2014/09/20/multiarch/"/>
+    <updated>2014-09-20T09:16:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/09/20/multiarch</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/agra.jpg" title="Creative Commons image of Agra" >
+One of the easiest ways to contribute to Arch is to maintain a package, or
+packages, in the
+<acronym title="Arch User Repository"><a href="https://aur.archlinux.org/" title="AUR homepage">AUR</a></acronym>;
+the repository of user contributed PKGBUILDs that extends the range of packages available
+for Arch by some magnitude. Given that PKGBUILDs are just shell scripts, the barrier
+to entry is relatively low, and investing the small amount of effort required to clear
+that barrier will not only give you a much better understanding of how packaging works
+in Arch, but will scratch your own itch for a particular package and hopefully assuage
+someone else&#8217;s similar desire at the same time.</p>
+
+<p>Now that I have a
+<a href="http://www.raspberrypi.org/" title="Raspberry Pi site">Raspberry Pi</a><sup>1</sup>, I am
+naturally much more interested in packages that can be built for the ARMv6
+architecture; especially those that are available in the AUR. It is worth a brief
+digression to note that
+<a href="http://archlinuxarm.org/" title="AL ARM home page">Arch Linux ARM</a> is an entirely
+<em>separate</em> distribution and, while they share features with Arch, support for
+each is restricted to their respective communities. It is with this
+consideration in mind that I had begun to think about multi-arch support in
+PKGBUILDs, particularly in the packages that I maintain in the AUR.</p>
+
+<p>I have
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on Syncthing">previously posted</a>
+about using <a href="http://syncthing.net/" title="Open source synching: genius…">Syncthing</a>
+across my network, including on a Pi as one of the nodes. As the Syncthing
+developer pushes out a release at least weekly, I have been maintaining my own
+PKGBUILD and, after Syncthing was pulled into [community], I uploaded it to the
+AUR as
+<a href="https://aur.archlinux.org/packages/syncthing-bin" title="AUR package">syncthing-bin</a>.</p>
+
+<p>Syncthing is a cross platform application so it runs on a wide range of
+architectures, including ARM (both v6 and v7). Initially, when I wrote the
+PKGBUILD, I would <code>updpkgsums</code> on my x86_64 machine, build the package and
+then, on the Pi, have to regenerate the integrity checks. This was manageable
+enough for my own use across two architectures, but wasn&#8217;t really going to
+work for people using other architectures (especially if they are using
+<a href="http://jasonwryan.com/blog/2013/04/09/helpers/" title="My post on Yaourt">AUR helpers</a>).</p>
+
+<p>Naturally enough, this started me thinking about how I could more effectively
+manage the process of updating the PKGBUILD for each new release, <em>and</em> have it
+work across the four architectures—without having to manually copy and paste or
+anything similarly tedious. Managing multiple architectures in the PKGBUILD
+itself is not particularly problematic, a case statement is sufficient:</p>
+
+<figure class='code'><figcaption><span>PKGBUILD </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="s2">&quot;$CARCH&quot;</span> in
+</span><span class='line'>    armv6h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv6&quot;</span>
+</span><span class='line'>            sha1sums+<span class="o">=(</span><span class="s1">&#39;a94e5d00cec32956eb27bc12dbbc4964b68913f9&#39;</span><span class="o">)</span>
+</span><span class='line'>           ;;
+</span><span class='line'>    armv7h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv7&quot;</span>
+</span><span class='line'>            sha1sums+<span class="o">=(</span><span class="s1">&#39;9b782abf95668a906bfe76ad5ceb4cda17ec2289&#39;</span><span class="o">)</span>
+</span><span class='line'>           ;;
+</span><span class='line'>    i686<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;386&quot;</span>
+</span><span class='line'>          sha1sums+<span class="o">=(</span><span class="s1">&#39;b2e1961594a931201799246f5cf61cb1e1700ff9&#39;</span><span class="o">)</span>
+</span><span class='line'>           ;;
+</span><span class='line'>    x86_64<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;amd64&quot;</span>
+</span><span class='line'>            sha1sums+<span class="o">=(</span><span class="s1">&#39;035730c09ca5383c90fdd9898baf66b90acdef24&#39;</span><span class="o">)</span>
+</span><span class='line'>           ;;
+</span><span class='line'><span class="k">esac</span>
+</span></code></pre></div></figure>
+
+
+<p>The real challenge, for me, was to be able to script the replacement of each of
+the respective
+<a href="http://en.wikipedia.org/wiki/Sha1sum" title="Wikipedia entry">sha1sums</a>,
+and then to update the PKGBUILD with the new arrays.  Each release of
+Syncthing is accompanied by a text file containing all of the sha1sums, each on
+its own line in a conveniently ordered format, like so:</p>
+
+<figure class='code'><figcaption><span>sha1sums.txt.asc </span></figcaption>
+ <div class="highlight"><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
+</span><span class='line'>035730c09ca5383c90fdd9898baf66b90acdef24    syncthing-linux-amd64-v0.9.16.tar.gz
+</span><span class='line'>d743b64204f0ac7884e4b42d9b1865b2436f5ecb    syncthing-linux-armv5-v0.9.16.tar.gz
+</span><span class='line'>…
+</span></code></pre></div></figure>
+
+
+<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>&#8217;s
+<a href="https://www.gnu.org/software/gawk/manual/html_node/Switch-Statement.html" title="Gawk manual">switch statement</a>,
+and an admittedly rather convoluted <code>printf</code> incantation.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'>    <span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">armv6</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>        <span class="nx">arm6</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">armv7</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>        <span class="nx">arm7</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="mi">386</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>        <span class="nx">i386</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="nx">amd64</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>        <span class="nx">x86</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>        <span class="k">break</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="nx">END</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">printf</span> <span class="s2">&quot;case \&quot;$CARCH\&quot; in\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>         <span class="s2">&quot;armv6h) _pkgarch=\&quot;armv6\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>         <span class="s2">&quot;armv7h) _pkgarch=\&quot;armv7\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>         <span class="s2">&quot;i686) _pkgarch=\&quot;386\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>         <span class="s2">&quot;x86_64) _pkgarch=\&quot;amd64\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n&quot;</span><span class="err">\</span>
+</span><span class='line'>         <span class="s2">&quot;esac\n&quot;</span><span class="p">,</span>
+</span><span class='line'>         <span class="nx">arm6</span><span class="p">,</span> <span class="nx">arm7</span><span class="p">,</span> <span class="nx">i386</span><span class="p">,</span> <span class="nx">x86</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></div></figure>
+
+
+<p>The remaining step was to update the PKGBUILD with the new sha1sums. Fortunately,
+<a href="http://blog.falconindy.com/" title="Dave's blog">Dave Reisner</a> had already written the code
+for this in his <code>updpkgsums</code> utility; I had only to adapt it slightly:</p>
+
+<figure class='code'><figcaption><span>excerpt from updpkgsums </span></figcaption>
+ <div class="highlight"><pre><code class='awk'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">rm</span> <span class="s2">&quot;$buildfile&quot;</span>
+</span><span class='line'>  <span class="nx">exec</span> <span class="nx">awk</span> <span class="o">-</span><span class="nx">v</span> <span class="nx">newsums</span><span class="o">=</span><span class="s2">&quot;$newsums&quot;</span> <span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">    /^case/,/^esac$/ {</span>
+</span><span class='line'><span class="s1">      if (!w) { print newsums; w++ }</span>
+</span><span class='line'><span class="s1">        next</span>
+</span><span class='line'><span class="s1">      }; 1</span>
+</span><span class='line'><span class="s1">      END { if (!w) print newsums }</span>
+</span><span class='line'><span class="s1">  &#39;</span> <span class="o">&gt;</span> <span class="s2">&quot;$buildfile&quot;</span>
+</span><span class='line'><span class="p">}</span> <span class="o">&lt;</span> <span class="s2">&quot;$buildfile&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Combining these two tasks means that I have a script that, when run, will download
+the current Syncthing release&#8217;s <span class="file">sha1sum.txt.asc</span>
+file, extract the relevant sums into the replacement case statement and then
+write it into the PKGBUILD. I can then run <code>makepkg -ci &amp;&amp; mkaurball</code>, upload
+the new tarball to the AUR and the two other people that are using the PKGBUILD
+can download it and not have to generate new sums before installing their
+shiny, new version of Syncthing. You can see the full version of the script in
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/upsync" title="Tip…">my bitbucket repo</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See my other <a href="http://jasonwryan.com/blog/categories/arm/">posts about the Pi</a>…</li>
+</ol>
+
+
+<p>Creative Commons image of the Mosque at Agra, by
+<a href="https://www.flickr.com/photos/jasonwryan/14986166957/">yours truly</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Simple Reminders]]></title>
+    <link href="http://jasonwryan.com/blog/2014/09/06/reminder/"/>
+    <updated>2014-09-06T10:59:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/09/06/reminder</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/alarm_clock.jpg" title="Creative Commons image" >
+Due to a rather embarrassing episode in #archlinux a couple of weeks ago,
+where I naively shared one of the first bash scripts I had written without
+first looking back over it<sup>1</sup>, and had to subsequently endure what
+felt like the ritual
+<a href="http://www.dilbert.com/strips/comic/2013-02-24/" title="Classic Dilbert strip">code mocking</a>,
+but was in fact some helpful pointers as to how I could make the script suck
+less (a <em>lot</em> less) I have been going through those older scripts and applying
+the little knowledge that I have picked up in the interim; reappraising the
+usefulness of the scripts as I go.</p>
+
+<p>One that has proved to be of some utility for many years now is a simple
+wrapper script I wrote to help manage my finances. Like many useful scripts, it
+was written quickly and has been in constant use ever since; becoming almost
+transparent it is so ingrained in my workflow.</p>
+
+<p>The script allows me to manage the lag between when a company emails me an
+invoice and when the payment is actually due. I find that companies will
+typically email their invoices to me some weeks in advance, whereupon I will
+make a mental note and then, unsurprisingly, promptly forget all about it,
+thereby opening myself up for penalties for late payment.  It didn&#8217;t take me
+long (well, in my defence, a lot less time than it took for invoices to become
+digital) to realise that there was a better way™ - a script.</p>
+
+<p>The <a href="http://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html" title="POSIX spec">at command</a>
+is purpose built for running aperiodic commands at a later time (whereas
+<a href="http://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html" title="POSIX spec">cron</a>
+is for periodic tasks). So, using at(1), once I receive an invoice, I can set a
+reminder closer to the final payment window, thereby avoiding both the late
+payment penalty—and the loss of interest were I to pay it on receipt. I just
+needed a script to make it painless to achieve.</p>
+
+<p>The main function of the script is pretty self-explanatory:</p>
+
+<figure class='code'><figcaption><span>todo </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>aread<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Time of message? [HH:MM] &quot;</span> attime
+</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Date of message? [DD.MM.YY] &quot;</span> atdate
+</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Message body? &quot;</span> message
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">timexp</span><span class="o">=</span><span class="s1">&#39;^[0-9]{2}:[0-9]{2}&#39;</span>
+</span><span class='line'>  <span class="nv">datexp</span><span class="o">=</span><span class="s1">&#39;^[0-9]{2}.[0-9]{2}.[0-9]{2}&#39;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$attime</span> <span class="o">=</span>~ <span class="nv">$timexp</span> <span class="o">&amp;&amp;</span> <span class="nv">$atdate</span> <span class="o">=</span>~ <span class="nv">$datexp</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">     </span>at <span class="s2">&quot;$attime&quot;</span> <span class="s2">&quot;$atdate&quot;</span> <span class="s">&lt;&lt; EOF</span>
+</span><span class='line'><span class="s">     printf &#39;%s\n&#39; &quot;$message&quot; | mutt -s &quot;REMINDER&quot; jasonwryan@gmail.com</span>
+</span><span class='line'><span class="s">EOF</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">     </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Incorrectly formatted values, bailing...&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>1
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>Now, an invoice arrives, I open it and fire up
+<a href="https://github.com/jasonwryan/dwm/blob/patches/patchset/Base_config_changes.patch#L85" title="patch on github">a scratchpad</a>, and follow the prompts. A couple of weeks later, the
+reminder email arrives and I login to my bank account and dispatch payment.
+You could, of course, have the script trigger some other form of notification,
+but an email works well for me.</p>
+
+<p>The rest of the script is similarly basic; just some options for listing and
+reading any queued jobs and some more rudimentary checking. The full script is
+in my
+<a href="https://bitbucket.org/jasonwryan/centurion/src/tip/Scripts/todo" title="todo script">bitbucket repo</a><sup>2</sup>.</p>
+
+<h3>Update 7/09/14</h3>
+
+<p>Not more than a couple of hours after posting this,
+<a href="http://bluewind.at/">Florian Pritz</a> pinged me in #archlinux with some great suggestions
+for improving the script. I particularly liked relying on date(1) handling the input format
+for the time and date values. He also suggested a
+<a href="http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html" title="GNU readline page">readline</a>
+wrapper called (appropriately enough)
+<a href="https://github.com/hanslub42/rlwrap" title="Github repo">rlwrap</a> and a <code>tmpfile</code> to better manage
+input validation. You can see his
+<a href="https://gist.github.com/jasonwryan/54fead5ad2b0c3b82621" title="Gist on github">full diff</a> of
+changes. In the end, I adopted the <code>date</code> suggestion but passed on <code>rlwrap</code>. Thanks for the
+great pointers, Florian.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In the interests of full disclosure, the most egregious line was
+<code>myterm=$(echo $TERM)</code> which I would hope I copied blindly from somewhere
+else, but accept full responsibility for nonetheless.</li>
+<li>Don&#8217;t poke around too much in there, I still have quite a lot of cleaning up to do…</li>
+</ol>
+
+
+<p>Creative Commons image by <a href="https://www.flickr.com/photos/h_is_for_home/3494382794/">Adelle and Justin</a>
+on Flickr.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Building from Source]]></title>
+    <link href="http://jasonwryan.com/blog/2014/08/23/asp/"/>
+    <updated>2014-08-23T09:41:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/08/23/asp</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/lego.jpg" title="Creative Commons image" >
+One of the real strengths of Arch is its ability to be customised. Not just in
+terms of the packages that you choose to install, but how those packages
+themselves can be patched, altered or otherwise configured to suit your
+workflow and setup. I have posted previously about,
+for example, <a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on Vim configuration">building Vim</a>
+or <a href="http://jasonwryan.com/blog/2013/05/18/pkgbuilds/" title="More general observations">hacking PKGBUILDS</a>.
+What makes all this possible is the wonderful
+<a href="https://wiki.archlinux.org/index.php/Arch_Build_System" title="Arch Wiki page">ABS</a>,
+the Arch Build System.</p>
+
+<p>Essentially a tree of all of the PKGBUILDs (and other necessary files) for the
+packages in the official repositories, the ABS is the means by which you can
+easily acquire, compile and install any of the packages on your system:</p>
+
+<blockquote><p>ABS is made up of a directory tree (the ABS tree) residing under <span class="file">/var/abs</span>. This tree contains many subdirectories, each within a category and each named by their respective package. This tree represents (but does not contain) all <em>official Arch software</em>, retrievable through the SVN system.</p><footer><strong>Arch Wiki</strong> <cite>ABS</cite></footer></blockquote>
+
+
+<p>I have been using ABS since I started running Arch and it has worked well. I
+wrote a
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/abpkg" title="In my bitbucket repo">simple script</a>
+to check for and download updates when required to help simplify the process
+and have been generally content with that approach. That isn&#8217;t to say that
+elements of this process couldn&#8217;t be improved. One of the small niggles is that
+the ABS only syncs once a day so there is almost always—for me down here in
+.nz, anyway—at least a full day&#8217;s wait between the package hitting the local
+mirror and the updated ABS version arriving. The other issue is that you
+download and sync the entire tree…</p>
+
+<p>That all changed when, at the start of this month, one of the Arch developers,
+<a href="http://blog.falconindy.com/" title="Dave's blog">Dave Reisner</a>, opened a
+<a href="https://bbs.archlinux.org/viewtopic.php?id=185075" title="asp thread">thread on the Arch boards</a>
+announcing <a href="https://github.com/falconindy/asp" title="Github repo">asp</a>, the Arch
+Source Package management tool, a git-based alternative for <code>abs</code><sup>1</sup>.</p>
+
+<p>Basically a 200-line bash script, <code>asp</code> is an improvement over <code>abs</code> insofar as
+you get the updated PKGBUILDs immediately; you can choose between just pulling
+the necessary source files (as <em>per</em> <code>abs</code>), or checking out the package branch
+so that you can create your own development branch and, for example, keep your
+patch set in git as well.</p>
+
+<p>You can elect to locate the local git repository in a directory of your
+choosing by exporting <code>ASPROOT</code>, there are <kbd>Tab</kbd> completion scripts
+for bash and zsh and a succinct <code>man</code> page. Overall, for a utility that is only
+three weeks old, <code>asp</code> is already fulfilling the function of a drop-in
+replacement; a faster, more flexible tool for building Arch packages from
+source.</p>
+
+<blockquote><p>With thy sharp teeth this knot intrinsicate<br/>Of life at once untie…</p><footer><strong>Antony and Cleopatra</strong> <cite>V.ii</cite></footer></blockquote>
+
+
+<h4>Notes</h4>
+
+<ol>
+<li>The <a href="https://www.archlinux.org/packages/?name=abs">package</a>,
+not the entire build system…</li>
+</ol>
+
+
+<p>Creative Commons image, Red Lego Brick by <a href="https://www.flickr.com/photos/dillpixel/8506365952/">Brian Dill</a>
+on Flickr.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[pass{,word} manager]]></title>
+    <link href="http://jasonwryan.com/blog/2014/08/02/password/"/>
+    <updated>2014-08-02T09:28:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/08/02/password</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/key-board.jpg" title="Creative Commons image on Flickr" >
+After posting last week about
+<a href="http://jasonwryan.com/blog/2014/07/25/keepass/" title="Redundant blog post">KeePassC as a password manager</a>,
+a couple of people immediately commented about a utility billed as “the
+standard Unix password manager.” This is definitely one of the reasons I
+continue to write up my experiences with free and open source software: as soon
+as you think that you have learned something, someone will either offer a
+correction or encourage you to explore something else that is similar, related
+or interesting for some other tangential reason.</p>
+
+<p>So, I was off down that path… Called simply <a href="http://www.passwordstore.org/" title="Homepage">pass</a>,
+it is a 600 line bash script that uses
+<a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard" title="Wikpedia entry">GPG encryption</a>
+and some other standard tools and scripts to organize and manage your password
+files. I had never heard of it but, based on Cayetano and Bigby&#8217;s
+recommendations, I thought it would be worth a look.</p>
+
+<p>On of the reasons that I had not come across it before was that, after using
+<a href="http://www.keepassx.org/" title="KeePassX homepage">KeePassX</a> for so long, I had
+assumed that I would need to continue to use that database format; so when I
+was looking for an alternative,
+<a href="http://raymontag.github.io/keepassc/" title="KeePassC homepage">KeePassC</a>
+was a natural fit (and a fine application). The question of migrating my data
+hadn&#8217;t even occurred to me…</p>
+
+<p>It turns out that the migration process to pass is extraordinarily well catered
+for: there are
+<a href="http://git.zx2c4.com/password-store/tree/contrib/importers" title="pass git repo">10 migration scripts</a>
+for a range of different formats, including
+<a href="http://git.zx2c4.com/password-store/tree/contrib/importers/keepassx2pass.py" title="Said script…">keepassx2pass.py</a>,
+which takes the exported <acronym title="Extensible Markup Language">XML</acronym>
+KeePassX database file and creates your pass files,ordered by the schema you
+had used in that application.  You just need to make sure you amend the shebang
+to <code>python2</code> before running the script, otherwise it will fail with an
+unhelpful error message.</p>
+
+<p>After using KeePassX to dump my database, before I could use the script to
+create my pass directories, I had to export the <code>PASSWORD_STORE_DIR</code>
+environment variable to place the top level pass directory in an alternate
+location. This way, instead of initializing a git repository, I could have the
+store synced by
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="My post on Syncthing">Syncthing</a>.
+The git idea is a good one, but I&#8217;m not particularly interested in version
+controlling these directories, and I have no intention, encrypted or not, of
+pushing them to someone else&#8217;s server.</p>
+
+<p>That constitutes the basic setup. It took a grand total of five minutes. The
+real strength of pass, however, is in its integration with two other fantastic
+tools:
+<a href="http://www.funtoo.org/Keychain" title="Keychain homepage">keychain</a> and
+<a href="http://tools.suckless.org/dmenu/" title="Another quality Suckless product">dmenu</a>.
+Together with pass, these constitute a secure, convenient and effortless
+workflow for managing your passwords. With your GPG key loaded into keychain,
+you are only prompted for your master passphrase once<sup>1</sup> and with
+Chris Down&#8217;s excellent
+<a href="http://git.zx2c4.com/password-store/tree/contrib/dmenu/passmenu" title="In the pass repo">passmenu script</a>,
+you can use dmenu to sort through your password files, <kbd>Tab</kbd> complete
+the one you are looking for and have it copied to your clipboard with a couple
+of keystrokes.</p>
+
+<p>After using Chris&#8217; script for a couple of days, I made a few alterations to
+suit my setup: removed the <code>xdotool</code> stuff (as I don&#8217;t need it), included dmenu
+formatting options to match my
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/dwm-status" title="In my bitbucket repo">dwm statusbar</a>
+and, most significantly, changed the way that the files are printed in dmenu to
+remove the visual clutter of the parent directories, ie., print <span class="file">archwiki</span>
+as opposed to <span class="file">internet/archwiki</span>:</p>
+
+<figure class='code'><figcaption><span>dpass </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># based on: https://github.com/cdown/passmenu</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">shopt</span> -s nullglob globstar
+</span><span class='line'>
+</span><span class='line'><span class="nv">nb</span><span class="o">=</span><span class="s1">&#39;#121212&#39;</span>
+</span><span class='line'><span class="nv">nf</span><span class="o">=</span><span class="s1">&#39;#696969&#39;</span>
+</span><span class='line'><span class="nv">sb</span><span class="o">=</span><span class="s1">&#39;#121212&#39;</span>
+</span><span class='line'><span class="nv">sf</span><span class="o">=</span><span class="s1">&#39;#914E89&#39;</span>
+</span><span class='line'><span class="nv">font</span><span class="o">=</span><span class="s2">&quot;Dejavu Sans Mono:medium:size=7.5&quot;</span>
+</span><span class='line'><span class="nv">dmenucmd</span><span class="o">=(</span> dmenu -i -fn <span class="s2">&quot;$font&quot;</span> -nb <span class="s2">&quot;$nb&quot;</span> -nf <span class="s2">&quot;$nf&quot;</span> -sb <span class="s2">&quot;$sb&quot;</span> -sf <span class="s2">&quot;$sf&quot;</span> <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">prefix</span><span class="o">=</span><span class="k">${</span><span class="nv">PASSWORD_STORE_DIR</span><span class="k">:-</span><span class="p">~/.password-store</span><span class="k">}</span>
+</span><span class='line'><span class="nv">files</span><span class="o">=(</span> <span class="s2">&quot;$prefix&quot;</span>/**/*.gpg <span class="o">)</span>
+</span><span class='line'><span class="nv">files</span><span class="o">=(</span> <span class="s2">&quot;${files[@]#&quot;</span><span class="nv">$prefix</span><span class="s2">&quot;/}&quot;</span> <span class="o">)</span>
+</span><span class='line'><span class="nv">files</span><span class="o">=(</span> <span class="s2">&quot;${files[@]%.gpg}&quot;</span> <span class="o">)</span>
+</span><span class='line'><span class="nv">fbase</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##*/}&quot;</span> <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">word</span><span class="o">=</span><span class="k">$(</span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${fbase[@]}&quot;</span> | <span class="s2">&quot;${dmenucmd[@]}&quot;</span> <span class="s2">&quot;$@&quot;</span><span class="k">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -n <span class="nv">$word</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  for </span>match in <span class="s2">&quot;${files[@]}&quot;</span>; <span class="k">do  </span>
+</span><span class='line'><span class="k">    if</span> <span class="o">[[</span> <span class="nv">$word</span> <span class="o">==</span> <span class="k">${</span><span class="nv">match</span><span class="p">#*/</span><span class="k">}</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'>      /usr/bin/pass show -c <span class="s2">&quot;$match&quot;</span> 2&gt;/dev/null
+</span><span class='line'>    <span class="k">fi  </span>
+</span><span class='line'><span class="k">  done</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>It does introduce some more complexity into the script, but it makes it a lot
+easier for me to identify the desired password when reading it in dmenu.</p>
+
+<p>Now, when I need a to enter a password, I hit my dmenu hotkey, type <code>dpass</code>
+<kbd>Enter</kbd> and the first couple of letters of the desired password
+filename, <kbd>Tab</kbd><kbd>Enter</kbd> and the password is loaded and ready
+to go. There are also
+<a href="http://git.zx2c4.com/password-store/tree/src/completion" title="Git repo">completion scripts</a>
+for the main shells, and even one for
+<a href="http://fishshell.com/" title="Fish homepage">fish</a><sup>2</sup> for the iconoclasts…</p>
+
+<p>While I have no complaints at all with KeePassC, I have found this pass setup to
+be a lot less intrusive to use, it seamlessly integrates with my workflow,
+and the passwords themselves are much simpler to manage. Short of someone else
+popping up in the comments with another compelling proposition, I&#8217;m content
+with the way this has worked out. Many thanks to Cayetano Santos and Bigby
+James for the push.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>There is a very annoying <a href="https://bugs.funtoo.org/browse/FL-69">bug open for keychain</a>
+that means if, as I do, you start keychain from your <span class="file">$HOME/.profile</span>
+or <span class="file">$ZDOTDIR/.zprofile</span> you <em>will</em> need to enter the same
+passphrase to unlock a sub-key before you can use pass (the same thing applies
+to Mutt).  This gets really ugly if you attempt to use dmenu before unlocking
+your key…</li>
+<li><q>Finally, a command line shell for the 90s…</q> Indeed.</li>
+</ol>
+
+
+<p>Creative Commons image by <a href="http://www.flickr.com/photos/54450095@N05/8229504229/">Intel Free Press</a> on Flickr.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[CLI Password Manager]]></title>
+    <link href="http://jasonwryan.com/blog/2014/07/25/keepass/"/>
+    <updated>2014-07-25T09:36:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/07/25/keepass</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/lock.jpg" title="Creative Commons Lock image" >
+Managing passwords is a necessary evil. You can choose a number of different strategies
+for keeping track of all of your login credentials; from using the same password for every
+site which prioritises convenience over <strike>sanity</strike>security, through to
+creating heinously complex unique passwords for every service and then balancing the relief
+of knowing your risks of being hacked have been minimised with the very real fear you will
+only remember any of them for a short period—if at all—and will shortly be locked out of
+everything.</p>
+
+<p>Fortunately, this is a solved problem. There are a number of password managers available,
+both as desktop clients and cloud services. Personally, I find the idea of storing my
+passwords in the cloud has all the fascination of bungee jumping; it&#8217;s apparently
+<a href="http://en.wikipedia.org/wiki/Bungee_jumping#Safety_and_possible_injury" title="Wikipedia page">mostly safe</a>,
+but that can be cold comfort… The first application that I used, and used happily for
+quite a long time, was
+<a href="http://www.keepassx.org/" title="Homepage for KeePassX">KeePassX</a>.</p>
+
+<p>Around the end of 2012, I started experimenting with
+<a href="http://raymontag.github.io/keepassc/" title="Homepage">KeePassC</a>, a curses-based password manager
+that is completely compatible with KeePassX and has very little in the way of dependencies.
+I have been using it solidly on my home and work laptops ever since and, after recently
+uninstalling Skype on my desktop, have switched over to it completely<sup>1</sup>.
+I&#8217;m still not entirely clear why I haven&#8217;t written about it previously.</p>
+
+<p>Written in <a href="https://www.python.org/download/releases/3.0/" title="The New Python">Python 3</a>,
+KeePassC is entirely keyboard driven (naturally enough, you can use Vim keybinds) and
+integrates seamlessly with your browser and clipboard. My experience of the
+software over the last eighteen-odd months is that it has been incredibly stable and
+the developer, Karsten-Kai, has been exceptionally responsive and helpful in the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=148004" title="Arch BBS thread">forum thread</a>.</p>
+
+<p>Like most good software, there is not a lot to it. You pull up the login page, switch
+to a terminal and run <code>keepassc</code>, enter your passphrase (I use a
+<a href="http://www.yubico.com/products/yubikey-hardware/yubikey/" title="Yubico site">Yubikey</a>
+for this and it works wonderfully) and then search for your desired entry with
+<kbd>/</kbd> and then hit <kbd>c</kbd> to copy the password to your clipboard before
+switching back to the browser and you are in.</p>
+
+<p>KeePassC also has a set of simple command line options, run <code>keepassc -h</code> to see them.
+Additionally, you can set up KeePassC as
+<a href="http://raymontag.github.io/keepassc/server.html" title="Server documentation">a server</a>, I haven&#8217;t
+experimented with this as I sync my database. The only functionality that the X application
+offers in addition, as far as I can tell, is the auto-filling of your username and password
+fields bound to a keybind; undoubtedly, this is a very handy feature, but I haven&#8217;t
+really missed it at all.</p>
+
+<p>As I said, I store the database in a directory synced between all my machines<sup>2</sup> (using
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on the same">Syncthing</a>),
+so I have access to an up-to-date versions of my credentials everywhere. Well, almost
+everywhere. I don&#8217;t use the Android client because the mobile web is just such a
+fundamentally <a href="http://en.wikipedia.org/wiki/Mobile_security" title="Wikipedi page">insecure environment</a>
+and I see it as just being sensible, rather than any sort of inconvenience.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Skype and KeePassX were the only two applications I used that required
+<a href="http://qt-project.org/">Qt</a>, so once Skype was gone there was no reason to keep
+KeePassX installed.</li>
+<li>And, after a nasty scare very early on with a corrupt database, I back that file up
+daily.</li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/xserve/368758286/" title="Licensed CC by xserv">xserv</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Install scripts]]></title>
+    <link href="http://jasonwryan.com/blog/2014/07/11/aif/"/>
+    <updated>2014-07-11T09:49:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/07/11/aif</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/spoons.jpg" title="Creative Commons image of spoons" >
+It is now almost exactly two years since the <acronym title="Arch Installer Framework">AIF</acronym>
+was <a href="https://www.archlinux.org/news/install-media-20120715-released/" title="Arch News item">put out to pasture</a>.
+At the time, it caused a degree of consternation, inexplicably causing some to
+believe that it presaged the demise of—if not Arch itself, then certainly the
+community around it. And I think it would be fair to say that it was the signal
+event that launched a number of spin-offs, the first of which from memory was
+Archbang; soon followed by a number of others that promised “Arch Linux with an
+easy installation,” or something to that effect…</p>
+
+<p>Of course, if you look back at the Installation Guide immediately before the
+move to the new scripts, for example the version that shipped with the last AIF
+in
+<a href="https://projects.archlinux.org/aif.git/tree/doc/official_installation_guide_en?id=4b075d9cd09b5a0912528bd94ae2a0d4eeb2d7f9" title="In the Git repository">October, 2011</a>, it is pretty evident that
+the <a href="https://wiki.archlinux.org/index.php/Installation_guide" title="Installation Guide">current approach</a>
+is <em>a lot</em> simpler. Sure, there is no curses <acronym title="Graphic User
+Interface">GUI</acronym> to step you through each part of the install but the
+introduction of <code>pacstrap</code> and <code>arch-chroot</code> meant that you no longer need those
+prompts.</p>
+
+<p>There is also the added advantage that these scripts are useful outside the
+installation process itself; they can be used for system maintenance and, in
+the rare event that your recent bout of experimentation at 2am after a few
+drinks doesn&#8217;t pan out the way you anticipated, repair.</p>
+
+<p>One of the other responses to the new approach, however, has been the steady
+proliferation of “helpful” install scripts. These are essentially bash scripts
+that emulate the behaviour of the AIF and walk people through an automated
+install of their system. Well, not really their system, more accurately <em>a</em>
+system. So you run one of these scripts, answer a few prompts and then, when
+you reboot, you have a brand spanking new Arch Linux install running KDE with
+the full panoply of software and, in a few special cases, some customized dot
+files to “enhance” your experience.</p>
+
+<p>From a certain perspective, I can see how these things appeal. “I wonder if I
+could script an entire install, from the partitioning right through to the
+desktop environment?” That sounds like a fun project, right? Where it all comes
+unstuck, unfortunately, is when the corollary thought appears that suggests
+sharing it with the wider community would be a good idea. It is at this point
+that a rigorous bout of self-examination about the outcomes that you are
+seeking and your base motivations for this act of selflessness are called for.</p>
+
+<p>Whatever those motivations are, whether driven by altruism or the naked desire
+for fame and fortune that have—from time to time—alighted on these projects
+when they appear on /r/archlinux and the adoring throngs bestow their favours
+in equal measures of upvotes and bitcoin, they are grotesquely misplaced. No
+good comes from these things, I tell you; none.</p>
+
+<p>Why not? Because, in the guise of being helpful, you are effectively depriving
+people of the single most important part of using Arch: building it themselves.
+It&#8217;s like inviting someone to a restaurant for an amazing <em>haute cuisine</em> meal,
+sitting them down across the table from you and then them watching as the
+staff bring out a mouth-watering array of dishes, each of which you
+ostentatiously savour before vomiting it all back into their mouth.</p>
+
+<p>Now, I am sure there is a small minority (well, at least from my own
+sheltered experience I imagine it is small) who would
+<a href="http://en.wikipedia.org/wiki/Emetophilia" title="Wikipedia: SFW">relish this scenario</a>,
+but for most it would qualify as a pretty disappointing date.</p>
+
+<p>Then, after the technicolour <em>table d&#8217;hôte</em>, there is the matter of the
+clean up. Recently, we had someone show up on the
+<a href="http://bbs.archlinux.org" title="Community forums">Arch boards</a> who had
+“installed Arch” but who did not understand how to edit a text file;
+literally had no clue how to open a file like <span class="file">/etc/fstab</span>
+make some changes and then save it. This is beyond stupid; it is a drain
+on the goodwill of the community that has to deal with this ineptitude, it
+is unfair on people to put them in a position where they feel they are
+at the mercy of their technology, rather than in control of it, and it
+does nothing to advance the interests of Arch.</p>
+
+<p>If you want to write something like this to improve your scripting skills,
+by all means proceed. If you want to contribute to Arch, then pick a
+project to contribute to, some bugs to squash, wiki edits, whatever; just
+don&#8217;t publish another one of these idiotic scripts, because you aren&#8217;t
+doing anyone any favours, quite the contrary.</p>
+
+<h4>Notes</h4>
+
+<p>Flickr Creative Commons image, <a href="https://flic.kr/p/dSK6yG">Measuring spoons</a> by
+Theen Moy.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[OpenVPN and Time on the Raspberry Pi]]></title>
+    <link href="http://jasonwryan.com/blog/2014/06/28/vpn/"/>
+    <updated>2014-06-28T09:57:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/06/28/vpn</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/raspberry-pi-logo.png" title="Pi logo" >
+After relieving my Pi of
+<a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on Torrent Pi">seedbox duties</a>,
+I was looking around for some other use for it. I decided, after looking over
+the Arch wiki article on <a href="https://wiki.archlinux.org/index.php/Openvpn" title="Simple, really…">OpenVPN</a>,
+that the Pi would be a terrific <acronym title="virtual private network">VPN</acronym>
+server; when I am out and about I can access a secure connection to my home
+network, thereby significantly reducing the risk of my privacy being
+compromised while using connectivity to the Internet provided by the
+notoriously security conscious sysadmins that run networks in hotels and
+other public places.</p>
+
+<p>Setting it up was straightforward enough, the wiki is typically clear and thorough; the only
+bottleneck in the process was waiting for the Pi&#8217;s tiny chip to chug through the creation of
+<a href="https://wiki.archlinux.org/index.php/Create_a_Public_Key_Infrastructure_Using_the_easy-rsa_Scripts" title="Wiki page on the easy-rsa scripts">public keys</a>. Once it was done, and I had tested that it was
+indeed working as intended, a more vexing issue presented itself. The service wouldn&#8217;t come
+up after rebooting. Not a deal breaker, I could always just <acronym title="Secure Shell">SSH</acronym>
+in and manually bring the server up, but that sort of defeats the purpose of being able to
+have the thing running reliably.</p>
+
+<p>The reason that it fails on boot is that, without a hardware clock, the Pi
+resets its time to
+<a href="https://en.wikipedia.org/wiki/Unix_time" title="Wikipedia article">UNIX time</a>
+until the
+<a href="https://wiki.archlinux.org/index.php/Ntp" title="Arch wiki page">NTP</a> daemon can
+start, which in turn depends upon the network being up. So, after rebooting,
+the journal would show the VPN server as having failed as the date was nearly
+half a century ago.</p>
+
+<p>There are a variety of fixes floating around, the most amusing being
+<a href="http://archlinuxarm.org/forum/viewtopic.php?f=31&amp;t=6037#p34228" title="Yes, really…">a wrapper for init</a>.
+Suffice to say, this wasn&#8217;t an option for me. Looking at the problem logically, it occurred to me
+that the issue was actually a trivial one: the correct sequencing of different services
+post boot. Isn&#8217;t this, I asked myself, one of the issues
+<a href="http://www.freedesktop.org/wiki/Software/systemd/" title="At freedesktop.org">systemd</a> was supposed
+to address?</p>
+
+<p>I just had to ensure that the network came up as quickly as possible after boot, that the time
+was reset correctly once there was a viable connection, and that the <code>openvpn.service</code> waited for
+those things to happen before launching.</p>
+
+<p>I have fitted the Pi with a wireless dongle, so the first step was to ditch
+<a href="https://wiki.archlinux.org/index.php/Netctl" title="Arch wiki page">netctl</a> (the
+default network manager on the ARM image) and replace it with
+<a href="https://wiki.archlinux.org/index.php/Systemd-networkd" title="More wiki pages for you…">systemd-networkd</a>.
+This is the point at which all the wingnuts that think that systemd is some
+sort of conspiracy to overthrow the old UNIX gods and replace them with false
+idols in <em>chapeau rouge</em> start foaming at their retrognathic mouths about
+“viral takeovers” and—seriously what fucking planet do these imbeciles hail
+from?—“an abhorrent and violent slap in the face to the Unix
+philosophy.”<sup>1</sup></p>
+
+<p>For those of us that accept the theory of evolution, this technology is both
+effective and non-threatening; in fact, it is quite an improvement over its by
+now ageing predecessor. So, a few minutes later,
+<span class="file">/etc/systemd/network/wlan0.network</span> and
+<span class="file">/etc/wpa_supplicant/wpa_supplicant-wlan0.conf</span> had pretty much
+written themselves and then it was just a matter of enabling the eponymous services
+as well as <code>systemd-resolved.service</code>. Reboot and the network is up seemingly
+<em>instantly</em>.</p>
+
+<p>Compounding my heresy, I then switched out NTP for
+<a href="http://man7.org/linux/man-pages/man8/systemd-timesyncd.8.html" title="Man page">systemd-timesyncd</a>
+and the Pi&#8217;s clock was now reset with the same alacrity. The final piece, ensuring
+that the openvpn service waited for this to happen, was to add two lines to the
+service file:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>
+</span><span class='line'><span class="nv">After</span><span class="o">=</span>network-online.target
+</span><span class='line'><span class="nv">Wants</span><span class="o">=</span>network-online.target
+</span></code></pre></div></figure>
+
+
+<p>That is all there is to it. Reboot and the network comes up, the clock is reset and then
+the OpenVPN server starts. Like magic. The sort of heathen magic that threatens to
+sap and impurify all of our
+<a href="http://www.youtube.com/watch?v=rKR32ImWYzw" title="it's like that…">precious bodily fluids</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>No, Virginia, I did <a href="http://boycottsystemd.org/">not make that up</a>…
+And I don&#8217;t really understand how you can slap a philosophy in the face, but then
+rationality is anathema to zealots; irrespective of which chimæra they
+prostrate before.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Writing with Vim]]></title>
+    <link href="http://jasonwryan.com/blog/2014/06/14/writing/"/>
+    <updated>2014-06-14T09:30:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/06/14/writing</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/vimbot.jpg" title="Practical Vim cover image" >
+<a href="http://www.vim.org/" title="Vim homepage">Vim</a> is not just an editor (and not in the way that
+<a href="http://www.gnu.org/software/emacs/" title="GNU Emacs page">Emacs</a> is more than
+<a href="http://en.uncyclopedia.co/wiki/Emacs" title="Uncyclopedia entry">just an editor</a>);
+it is for all intents and purposes a universal design pattern. The concept of using
+Vim&#8217;s modes and keybinds extends from
+<a href="http://jasonwryan.com/blog/2011/12/01/readline/" title="Post on readline">the shell</a>
+through to <a href="http://jasonwryan.com/blog/2009/12/28/changing-keybinds-in-vifm/" title="Post on Vifm">file managers</a>
+and <a href="http://jasonwryan.com/blog/2012/11/20/vimprobable/" title="Vimprobable screencast">browsers</a>.
+If you so choose (and I <em>do</em>), then a significant amount of your interactions with your
+operating system are mediated by Vim&#8217;s design principles. This is undeniably a
+good thing™ as it goes some way to standardising your command interface (whether at the
+command line or in a <acronym title="Graphic User Interface">GUI</acronym>).</p>
+
+<p>To that end, I have been spending more time working with Vim and trying to
+improve both my understanding of it&#8217;s capabilities, the environment in which I
+use it and how I can optimise both of those conditions to not necessarily just
+be more productive, but to minimise friction in my work flows.</p>
+
+<p>A large part of my job involves writing and, happily, so does a good deal of
+what constitutes my leisure activity. Whether it is emails written in
+<a href="http://jasonwryan.com/blog/categories/mutt/" title="Mutt category">Mutt</a>, these blog posts,
+longer documents written in <a href="http://www.latex-project.org/" title="LaTeX website">LaTeX</a>,
+or just <a href="http://jasonwryan.com/blog/2014/03/22/autotext/" title="Autotext function">roboposting to forums</a>;
+it is Vim all the way down. So I have spent some effort setting up Vim to make
+that experience as comfortable as possible.</p>
+
+<p><a href="http://jasonwryan.com/images/post_images/distract-full.png"><img class="right" src="http://jasonwryan.com/images/post_images/distract.png" title="Click for full-size" ></a>
+The first step, and one I took several years ago now, was to write custom
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/.vim/colors/" title="In Bitbucket repo">colour schemes</a>,
+depending on whether I am in the console or X. Several weeks ago, I came across a Vim plugin
+called <a href="https://github.com/chrisbra/DistractFree" title="Github repo">DistractFree</a>, which
+is described as “enabling a distraction free writing mode.” I had always been slightly
+(well, perhaps <em>scathingly</em> would be more accurate) cynical when reading about these sorts
+of things when they first started to appear, but—after playing with two or three of them—this
+one has really grown on me (see the screenshot on the right).</p>
+
+<p>I <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/.vim/colors/mirowriter.vim" title="Bitbucket repo">adapted my colour scheme</a> for it, added a line to my <span class="file">~/.vimrc</span>
+to enable it for specific document types, and have not looked back.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'>autocmd <span class="nb">BufRead</span> *.markdown<span class="p">,</span>*tex <span class="k">call</span> DistractFree#DistractFreeToggle<span class="p">()</span> <span class="p">|</span> <span class="k">wincmd</span> <span class="k">w</span>
+</span></code></pre></div></figure>
+
+
+<p>The final piece was to set up spell checking  to work properly. As well as
+using English, I wanted to share my personal whitelist of words between all of
+my machines, so I define a location in <span class="file">~/.vimrc</span>
+as well:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">spelllang</span><span class="p">=</span>en_gb                               <span class="c">&quot; real English spelling</span>
+</span><span class='line'><span class="k">set</span> <span class="nb">dictionary</span><span class="p">+=</span><span class="sr">/usr/</span>share<span class="sr">/dict/</span>words             <span class="c">&quot; use standard dictionary</span>
+</span><span class='line'><span class="k">set</span> <span class="nb">spellfile</span><span class="p">=</span>$HOME<span class="sr">/Sync/</span><span class="k">vim</span><span class="sr">/spell/</span><span class="k">en</span>.utf<span class="m">-8</span>.add   <span class="c">&quot; my whitelist</span>
+</span></code></pre></div></figure>
+
+
+<p>Then it is just a matter of ensuring that misspelled or other flagged words (like those
+that should be capitalised) are highlighted correctly. This required a couple of lines in
+my colour schemes:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="c">&quot; Spell checking  --- </span>
+</span><span class='line'><span class="k">if</span> <span class="k">version</span> <span class="p">&gt;=</span> <span class="m">700</span>
+</span><span class='line'>  <span class="k">hi</span> clear SpellBad
+</span><span class='line'>  <span class="k">hi</span> clear SpellCap
+</span><span class='line'>  <span class="k">hi</span> clear SpellRare
+</span><span class='line'>  <span class="k">hi</span> clear SpellLocal
+</span><span class='line'>  <span class="k">hi</span> SpellBad    ctermfg<span class="p">=</span><span class="m">9</span>
+</span><span class='line'>  <span class="k">hi</span> SpellCap    ctermfg<span class="p">=</span><span class="m">3</span>    cterm<span class="p">=</span><span class="nb">underline</span>
+</span><span class='line'>  <span class="k">hi</span> SpellRare   ctermfg<span class="p">=</span><span class="m">13</span>   cterm<span class="p">=</span><span class="nb">underline</span>
+</span><span class='line'>  <span class="k">hi</span> SpellLocal  cterm<span class="p">=</span>None
+</span><span class='line'><span class="k">endif</span>
+</span></code></pre></div></figure>
+
+
+<p>The most significant change, however, was that I recently purchased a hard
+copy of Drew Neill&#8217;s excellent
+<a href="http://pragprog.com/book/dnvim/practical-vim" title="Just buy it, now…">Practical Vim</a>. I
+have long been a fan of Drew&#8217;s excellent podcast, <a href="http://vimcasts.org/" title="Drew's site">Vimcasts</a>,
+and the book is every bit as impressive as the collection of those episodes,
+and more.  Reading it on my commute over the last week, I have been constantly
+amazed at the power and flexibility of this editor and Drew&#8217;s ability to clearly
+articulate how to work economically and efficiently with it.  I&#8217;m convinced
+this is an invaluable resource for anyone that currently uses Vim or wants to
+learn.</p>
+
+<p>I expect that, over time, as I become more proficient with Vim, that I will adapt
+some of these settings, but for the time being they feel very comfortable and allow
+me to focus on hacking words together (and to do the occasional bit of
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/" title="Scripts in Bitbucket">scripting on the side</a>)…</p>
+
+<h4>Notes</h4>
+
+<p>Image is from the cover of Drew Neill&#8217;s
+<a href="http://pragprog.com/book/dnvim/practical-vim">Practical Vim</a>, by
+<a href="http://en.wikipedia.org/wiki/Ben_Cormack">Ben Cormack</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Browser tunnels]]></title>
+    <link href="http://jasonwryan.com/blog/2014/05/30/tunnels/"/>
+    <updated>2014-05-30T09:32:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/05/30/tunnels</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/tunnel.jpg" title="Creative Commons image" >
+Using a
+<a href="http://en.wikipedia.org/wiki/SOCKS" title="Wikipedia article">Socks proxy</a> over an
+<a href="http://en.wikipedia.org/wiki/Tunneling_protocol#Secure_shell_tunneling" title="Wikipedia entry">SSH tunnel</a>
+is a well documented and simple if much less flexible stand in for a full-blown
+<a href="http://en.wikipedia.org/wiki/Virtual_private_network%20'VPN%20on%20Wikipedia">VPN</a>. It
+can provide a degree of comfort when accessing private or sensitive information
+over a public Internet connection, or you might use it to get around the
+terminally Canutian<sup>1</sup> construct that is known as geo-blocking; that
+asinine practice of pretending that the Internet observes political boundaries…</p>
+
+<p>By way of a digression, it occurred to me at some point while I was wrestling
+with setting this up that, over the last seven or so years, much of the
+“entertainment” provided by corporate content distributors has been in the form
+of encouraging me to spend hundreds? thousands? of hours researching and
+implementing ways to circumvent their litany of failed and defective
+technological restrictions: region codes,
+<a href="http://www.defectivebydesign.org/what_is_drm_digital_restrictions_management" title="Defective by Design">DRM</a>
+and the like. It is worth noting that, in the vast majority of cases, I was
+just seeking access to content that I already owned (in another format), or was
+prepared to pay for.</p>
+
+<p>My move to GNU/Linux in 2007 was in large part motivated by the awful
+realisation that the music I had bought in iTunes was stuck in there. The
+combined intellectual effort globally expended trying to legitimately route
+around broken copyright law would have comfortably powered another golden age
+of the sciences; it&#8217;s not entirely implausible to think that the only reason we
+still have to deal with cancer is the malignant legacy of
+<a href="https://en.wikipedia.org/wiki/Sonny_Bono_Copyright_Term_Extension_Act" title="Sonny's gift…">Sonny Bono</a><sup>2</sup>.</p>
+
+<p>Now, back to our regular programming… One of my approaches to get around this
+sort of economic and policy rigor mortis has been to use a basic script to
+create a proxy tunnel to my home server. It assumes that you have
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia, again">public key</a>
+authentication set up and your passphrase loaded in
+<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Keychain" title="Arch wiki, for a change">keychain</a>,
+or something similar.</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">SSH_HOST</span><span class="o">=</span><span class="s2">&quot;jason@XXX.XXX.XXX.XXX -p XXX -i $HOME/.ssh/box1&quot;</span>
+</span><span class='line'>
+</span><span class='line'>up<span class="o">(){</span>
+</span><span class='line'>    ssh -f -N -D 8080 -M -S /tmp/ssh_tunnel_%h.sock -o <span class="nv">ExitOnForwardFailure</span><span class="o">=</span>yes <span class="nv">$SSH_HOST</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel started successfully&quot;</span> <span class="o">||</span> <span class="se">\</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel failed to start&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>down<span class="o">(){</span>
+</span><span class='line'>    ssh -S /tmp/ssh_tunnel_%h.sock -O <span class="nb">exit</span> <span class="nv">$SSH_HOST</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> up <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>up <span class="o">&amp;&amp;</span> chromium --proxy-server<span class="o">=</span><span class="s2">&quot;socks://127.0.0.1:8080&quot;</span> &amp;
+</span><span class='line'><span class="k">elif</span> <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> down <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span>down
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail…&quot;</span>
+</span><span class='line'>    <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure>
+
+
+<p>Over the last couple of weeks, though, while I have been setting up and
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on Syncthing">playing with Syncthing</a>,
+I found this script wanting. With six nodes and, depending if I was on the
+<acronym title="Local Area Network">LAN</acronym> or not, as many as four of those
+hosts only accessible via SSH, then having the ability to quickly and painlessly
+open a browser on any one of the nodes <em>without having to edit the script</em>
+suddenly seemed like quite a good idea.</p>
+
+<p>Accordingly I went to work on the script, including a test to determine if I
+was on my home network and passing the name of the desired host as an
+argument. With this approach, I simply type <code>tunnel $host</code> and chromium
+opens tunneled to that host, where I can the happily open
+<strike>Hulu</strike> the Syncthing GUI.</p>
+
+<p>The updated script is posted as
+<a href="https://gist.github.com/jasonwryan/715a4f3fcb55e995de0d" title="On Github">a gist</a>,
+and as you can see, still needs some work to make it a little more generic.
+You will need, for example, to hand edit in the hosts and ports in
+<code>get_host()</code>. It is also the first time I have played with
+<a href="http://mywiki.wooledge.org/BashGuide/InputAndOutput#Pipes" title="Wooledge wiki">named pipes</a>
+and I am not convinced that my use of <code>mkfifo</code> here is either the correct
+approach or implementation; but it works. Comments enlightening me would
+be gratefully received.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The good king was, appropriately enough, actually called Cnut the Great…</li>
+<li>And, no, I am not referring to his musical corpus, which is as carcinogenic as his
+political career was as a Myrmidon for Big Content.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image, <a href="https://www.flickr.com/photos/lawrence_evil/113733779/">The Tunnel</a>,
+by Lawrence Whitmore.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Syncthing]]></title>
+    <link href="http://jasonwryan.com/blog/2014/05/10/syncthing/"/>
+    <updated>2014-05-10T09:30:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/05/10/syncthing</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/syncthing.png" title="Syncthing logo" >
+Just over a year ago, I was invited to participate in an exciting Alpha, for
+<a href="http://www.bittorrent.com/sync" title="Sync website), an application
+that allows you to sync selected directories across devices using a
+[peer-to-peer protocol](https://en.wikipedia.org/wiki/Bittorent 'Wikipedia article">BitTorrent Sync</a>.
+I <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Click the damn thing…">wrote up my experience</a>
+and, with one reservation, found it to be a fantastic tool that did pretty much everything I
+needed, including letting me finally get rid of Dropbox. That one reservation, although not
+entirely clear at the time, was clarified soon after and was crushingly disappointing:
+the programme was closed source.</p>
+
+<p>Due to a combination of inertia (it was installed on all my devices and working well) and
+the lack of an alternative that didn&#8217;t involve installing and running a
+<a href="https://en.wikipedia.org/wiki/Lamp_stack" title="Wikipedia page">LAMP stack</a> just to sync
+my files, I have persisted with it; even writing a
+<a href="http://jasonwryan.com/blog/2013/11/14/api/" title="Post on said script">simple Awk script</a>
+to interact with the <acronym title="Application Program Interface">API</acronym>.
+For the last twelve months I have been pretty happy with it.</p>
+
+<p>In addition to the licensing choice, there are some other small issues that I have discovered: the
+<a href="https://play.google.com/store/apps/details?id=com.bittorrent.sync" title="On Google Play">Android App</a>
+<em>chews</em> through your battery if it is left on (which sort of defeats the purpose, but I
+learned to live with it), the syncing can take a little while to pick up changes, and
+nodes that don&#8217;t see much action may flake out completely after a while.</p>
+
+<p>Then, a few weeks ago I read about <a href="https://github.com/jewel/clearskies" title="On Github">clearskies</a>,
+an open source implementation of this concept. Sadly, it is still a proof of
+concept. This discovery, however, led to an extremely fortuitous exchange
+<a href="https://twitter.com/csantosb/status/460714748322258944" title="Twitter conversation">on Twitter</a>
+with <a href="https://twitter.com/csantosb" title="His profile on Twitter">cayetano santos</a> who pointed me
+at <a href="http://syncthing.net/" title="Syncthing homepage">Syncthing</a>. Described thus (cue
+<a href="http://www.youtube.com/watch?v=7YaGwI7GjlA" title="G.F. Handel on Youtube">background music</a>):</p>
+
+<blockquote><p>Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it&#8217;s transmitted over the Internet.</p></blockquote>
+
+
+<p>Written in <a href="http://golang.org/" title="Go language site">Go</a>, Syncthing is still in
+early development, but judging by the
+<a href="https://github.com/calmh/syncthing/releases" title="Releases on Github">release history</a>,
+it is moving ahead quickly. The developer, <a href="https://nym.se/" title="Jakob's site">Jakob Borg</a>,
+is obviously both talented and productive. After using it for the last
+couple of weeks, I have uninstalled BitTorrent Sync from all my machines
+and have Syncthing set up and running nicely. It is simple, elegant and
+works wonderfully; <em>for what it does</em>.</p>
+
+<p>Which is to say that it is not all of the things that either of its
+predecessors are: it isn&#8217;t intended to distribute files, or to host images or
+simple websites. It doesn&#8217;t include versioning or have a built-in editor. It is
+for securely syncing your files independent of any third parties. And there is no
+Android app, so your battery is safe<sup>1</sup>.</p>
+
+<p>Setup is through a tidy, <a href="http://getbootstrap.com/" title="Bootstrap site">bootstrap</a>
+built web interface, by default running on <code>127.0.0.1:8080</code>. I subsequently found
+that once I understood how the configuration worked, editing the config file at
+<span class="file">$XDG_CONFIG_HOME/syncthing/config.xml</span> was much
+simpler.  When setting up, you will also do a lot of stopping and starting of
+<code>syncthing</code>; if you use the service file that comes with the
+<a href="https://aur.archlinux.org/packages/syncthing/" title="Arch User Repo">AUR package</a>,
+that won&#8217;t work so well from the web interface… Run it from the command line
+with one of the <code>STTRACE</code> variables to debug and then, once it is running to
+your liking, hand it off to systemd<sup>2</sup>.</p>
+
+<p>With a reasonably tricky cluster setup (six machines; two outside the
+<acronym title="Local Area Network">LAN</acronym> sharing half a dozen
+repositories with three different topologies), there is a fair bit of trial and
+error involved getting everything set up and working correctly. But when you
+do, it is much faster to pick up changes than either of the other two and there
+is none of the risk around privacy and security presented by Dropbox and—to a
+(much, I would hazard to guess) lesser extent—BitTorrent Sync.</p>
+
+<p>I have also found that it is much quicker for all of the nodes connect if,
+for the LAN connections in your cluster, you specify the
+<acronym title="Internet Protocol">IP</acronym> addresses and port and disable
+global discovery for those nodes: this speeds up the discovery time when
+the nodes are started. Nodes still, from time-to-time, flake out, particularly
+if one of them is rebooted. Restarting the offending node is usually sufficient
+to bring the cluster back into sync.</p>
+
+<p>That isn&#8217;t to say that there aren&#8217;t any issues with it. The documentation is in
+need of some work; your best bet at the moment is a combination of the rather
+terse <code>--help</code> message and reading the source. There are also some hidden gems
+in the Github commits; for example, details on using
+<span class="file">.stignore</span> files, a very handy feature, are buried in
+an earlier
+<a href="https://github.com/calmh/syncthing/commit/986b15573a66f95beae53b10371ba50ab147124a" title="Github commit">commit to README.md</a> that didn&#8217;t survive the move of the documentation to the
+forum.</p>
+
+<p>The only other significant issue I have encountered is that getting all of the
+nodes across the cluster to connect to each other at the same time seems to be
+inexplicably difficult. It may just be my setup, but more often than not, nodes
+(on the LAN) will timeout while trying to connect to at least one of their peers.
+This isn&#8217;t a huge issue as you only really need one chained connection to bring
+all the data up to date, but it does cause a something of a minor
+<acronym title="Obsessive Compulsive Disorder">OCD</acronym> flare up.</p>
+
+<p>Given the early stages of the project, though, and the fact that it is open
+source, these anomalies are trivial. Overall, Syncthing is a delight. It does
+exactly what I need it to do, and it does it securely. Given the promise it is
+showing this early, I can only imagine it getting a lot better over time as
+more
+<a href="https://github.com/calmh/syncthing/issues?state=open" title="Issues on Github">bugs are squashed</a>
+and features rolled out.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Naturally enough, someone is <a href="https://github.com/calmh/syncthing/issues/177">on the case</a>…
+<strong>Update: 17/5/14</strong> App is available on
+<a href="https://play.google.com/store/apps/details?id=com.nutomic.syncthingandroid">Google Play</a> and it works pretty well.</li>
+<li>I added a debian daemon script to a thread on
+<a href="http://discourse.syncthing.net/t/keeping-syncthing-running/30/2">the Syncthing boards</a>
+as there is no built in daemon functionality (yet).</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Minimum Standards]]></title>
+    <link href="http://jasonwryan.com/blog/2014/05/03/standards/"/>
+    <updated>2014-05-03T10:58:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/05/03/standards</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/crowd.jpg" title="Creative Commons crowd image" >
+Late last month there was a post on
+<a href="http://meta.stackoverflow.com/questions/251758/why-is-stack-overflow-so-negative-of-late" title="All the hate…">Meta Stack Overflow</a> wondering why SO is “so negative of late.” Reading through the
+extensive list of answers, and all the comments that quickly adhered to them
+like barnacles on a becalmed schooner, it was hard not to extrapolate to the
+experiences of online communities elsewhere, especially in the free and open
+software world. Stack Overflow is going on six years old now and has grown to
+be a truly formidable<sup>1</sup> resource for programmers, <em>dilettantes</em>—the
+category to which I clearly belong—and, apparently, people wanting their
+homework done for them. This isn&#8217;t the first time this question has been raised
+there, and I am sure it won&#8217;t be the last.</p>
+
+<p>I don&#8217;t spend <a href="http://stackoverflow.com/users/712613/jasonwryan" title="My SO profile">much time on SO</a>,
+mostly because I am not a programmer and so I don&#8217;t have much to contribute there, but also because
+I <a href="http://unix.stackexchange.com/users/6761/jasonwryan" title="U&amp;L profile">am active on Unix &amp; Linux</a><sup>2</sup>,
+one of the clones that has emerged out of the metastasizing StackExchange
+empire. I do, however, subscribe to quite a few of the <acronym title="Really Simple Syndication">RSS</acronym>
+feeds for question tags on SO: things like #awk, #bash, and other topics that are of interest
+to me. Given the amount of noise in these feeds; in the form of redundancy (ie., questions
+that have been asked in one form or another <em>many</em> times before) or just a signal failure to read
+<em>any</em> documentation, it is not surprising that the people responsible for this degradation
+see the site as negative, or unfriendly, or elitist. This is perfectly natural: it is the
+community attempting to defend itself from
+<a href="http://jasonwryan.com/blog/2012/03/17/vampires/" title="Post on the scourge">help vampires</a>.</p>
+
+<p>What was also quite predictable, given StackExchange&#8217;s response to this “problem” which was the
+2012 <a href="http://blog.stackoverflow.com/2012/07/kicking-off-the-summer-of-love/" title="SE Blog post">Summer of Love</a>
+campaign where they wanted to make SO a more friendly place, was that this would only
+exacerbate the issue. My experience of the site over that time is that the signal to noise has
+not improved at all, quite the contrary. I think that setting an expectation that the site
+would be more welcoming has two perverse consequences: first, it validates the perceptions
+of the newcomers about purported hostility, and in doing so signals to the existing community
+that built the value of the site that their culture needs remediation. Secondly, it signals
+more tolerance for behaviours that add no value to the community; so it is hardly surprising
+to see those behaviours proliferate.</p>
+
+<p>From time to time the Arch community faces exactly the same criticisms: we are unfriendly,
+or elitist. I neither agree with these types of comments, nor am I particularly perturbed by
+them. Arch is a small community of volunteers, in order to create an environment where people
+who are willing and able to actively contribute, I think is important to ensure that there
+are clearly articulated standards<sup>3</sup> and that they are maintained by the
+community at large.</p>
+
+<p>I don&#8217;t see any scope for increasing the community&#8217;s tolerance for vampirism or the sort
+of self-entitlement that has a sad habit of appearing from time-to-time:</p>
+
+<blockquote> As for the Arch team and their lacking resources, let&#8217;s take your point at face value.  Now, we&#8217;ve known what the problem is for almost four hours and no fix has been issued.</blockquote>
+
+
+<p>There is some sort of “problem” that “we” have known about for <em>four hours</em> and
+yet, inconceivably<sup>4</sup>, <em>nothing</em> has been done about it?</p>
+
+<p>There is no bug report on the <a href="https://bugs.archlinux.org/" title="Flyspray">Arch tracker</a> so
+I am not sure why the collective pronoun is warranted here, that quibble aside; in what
+universe is this sort of petulance considered acceptable? The only reasonable response
+to this sort of whining is to close the thread and ban the infractor and their progeny, who
+will no doubt suffer from the same sort of genetic deficiencies, <em>in perpetuam</em>…</p>
+
+<p>Clearly articulating, and enforcing, minimum standards of behaviour doesn&#8217;t
+make your community hostile or unfriendly; it establishes boundaries for people
+that supports respectful collaboration and the effective ability of that
+community to self-moderate.  People new to the community who take the time to
+read the guidelines and observe how things work will have no problem
+adapting<sup>5</sup>. It may not make you popular, but it will make a
+significant contribution to the sustainability of the community and the levels
+of engagement of those that do contribute and wish to continue doing so.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>“Fear” and it&#8217;s synonyms appear with remarkable frequency in that thread and the accompanying one on
+<a href="https://news.ycombinator.com/item?id=7650799">Hacker News</a>.</li>
+<li>I have written about U&amp;L <a href="http://jasonwryan.com/blog/2011/05/28/quoras-quandary/">previously</a>.</li>
+<li>The <a href="https://wiki.archlinux.org/index.php/Forum_Etiquette">Forum Etiquette</a>, for example.</li>
+<li>With apologies to Wallace Shawn…</li>
+<li>I have written about this <a href="http://jasonwryan.com/blog/categories/community/">in the past</a>.</li>
+</ol>
+
+
+<p>Creative Commons photo on Flickr by <a href="https://www.flickr.com/photos/moonstoneportrait/75687093/">Chris Lester</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Syncing with khal]]></title>
+    <link href="http://jasonwryan.com/blog/2014/04/18/vdir/"/>
+    <updated>2014-04-18T10:32:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/04/18/vdir</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/arrows.png" title="Creative Commons image" >
+Following up on my post from last week, about using
+<a href="http://jasonwryan.com/blog/2014/04/05/calendar/" title="Check it out…">khal and mutt</a>,
+where I covered off a couple of simple hacks to integrate command line
+calendaring with <a href="http://www.mutt.org/" title="Mutt hompeage">Mutt</a>, I had been using
+the main development branch of
+<a href="https://github.com/geier/khal" title="Master branch on github">khal</a> which includes
+syncing capability. However, as I was conversing with the developer, Christian,
+around
+<a href="https://github.com/geier/khal/issues/47" title="Issue on khal github repo">a bug report</a>,
+he indicated that this functionality would be superseded by development in a
+separate branch that uses
+<a href="https://github.com/untitaker/vdirsyncer" title="Github repo">vdirsyncer</a> to
+synchronise calendars.</p>
+
+<p>As Christian intimated that this change would happen in the
+<a href="https://github.com/geier/khal/issues/47#issuecomment-40175915" title="Relevant comment">very near future</a>,
+and “js” had commented on my last post to the effect that it was working well, I
+thought I should take a look for myself.</p>
+
+<p>There are packages in the AUR for
+<a href="https://aur.archlinux.org/packages/python2-vdirsyncer/" title="Grab it">vdirsyncer-git</a> and
+<a href="https://aur.archlinux.org/packages/python2-argvard/" title="Same deal…">python2-argvard</a>
+so you will just need to grab the khal branch that uses <code>vdirsyncer</code> as it&#8217;s
+syncing engine. I have thrown up a
+<a href="https://gist.github.com/jasonwryan/10949540" title="Nothing too flash…">PKGBUILD gist</a>,
+or—as we are only talking about a couple of simple scripts—you could install the
+complete set using
+<a href="http://www.pip-installer.org/en/latest/" title="Official documentation">pip</a>, the
+Python package manager; in which case it would be a straightforward:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo pacman -S python2-pip
+</span><span class='line'>pip2 install --user git+https://github.com/geier/khal.git@vdir
+</span><span class='line'>pip2 install --user vdirsyncer
+</span></code></pre></div></figure>
+
+
+<p>…and then remember to make sure that <span class="file">$HOME/.local/bin</span>
+is included in your <code>$PATH</code>.</p>
+
+<p>I wanted to have vdirsyncer manage two of my calendars, my
+<a href="http://en.wikipedia.org/wiki/CalDAV" title="Wikipedia page">CalDav</a> work calendar and
+a simple <a href="http://en.wikipedia.org/wiki/ICalendar" title="Wikipedia, again…">iCalendar</a>
+with all of the New Zealand public holidays. Configuring vdirsyncer to
+successfully do this took me a <em>lot</em> longer than I would like to admit: a
+combination of my ineptitude, a bug and a broken schema in the original
+<span class="file">holidays.ics</span> that I wanted to use.</p>
+
+<p>The <code>collections</code> variable in the config file merits a mention in this regard.
+If you choose to use it, be aware that your <acronym title="Unique Resource Locator">URL</acronym>
+will have this value appended to it, which may throw
+<a href="http://en.wikipedia.org/wiki/HTTP_404" title="Wikipedia entry">a 404</a>. Using the
+<code>DEBUG</code> verbosity level will identify this issue if you are struck by it.</p>
+
+<p>Eventually, with the help of both Christian and Markus, the vdirsyncer
+developer, I got it set up and running smoothly. I then just had to create
+a <code>cron</code> job to sync my work calendar every two hours and it was done.</p>
+
+<p>As you would expect with such a simple tool, there is not a lot to say, or do,
+with vdirsycner. It runs on a similar model to
+<a href="http://offlineimap.org/" title="Home page">OfflineIMAP</a>, in that it synchronises a
+remote and local repository. There are a couple of nice touches: it will read
+your credentials from <span class="file">$HOME/.netrc</span> so you don&#8217;t have
+to worry about sensitive information in plain text in yet another file, and there
+is a <code>VDIRSYNCER_CONFIG</code> variable, so you can place the config file wherever it
+suits.</p>
+
+<h4>Notes</h4>
+
+<p><a href="https://flic.kr/p/Re9Sb">Elevator</a>, a Creative Commons image on Flickr by Mykl Roventine.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mutt and iCal]]></title>
+    <link href="http://jasonwryan.com/blog/2014/04/05/calendar/"/>
+    <updated>2014-04-05T09:48:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2014/04/05/calendar</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/calendar.jpg" title="Creative Commons Calendar image" >
+I have posted a few times now about how I use
+<a href="http://www.mutt.org/" title="Mutt homepage">Mutt</a><sup>1</sup>, that most superlative
+of email clients. Using a variety of different tools, I have
+settled on an effective and satisfying workflow for managing both my personal
+and professional email, with one glaring exception: calendaring. This, I should
+stress, is not for want of trying. It is not necessarily a nagging concern in
+terms of my personal use of email, but professionally it is a daily frustration.</p>
+
+<p>Day after day, I receive a <em>lot</em> of meeting invitations and, when these show up
+in my inbox they are, for all intents and purposes, unintelligble. Yes, with
+careful scrutiny you can decypher the
+<a href="http://en.wikipedia.org/wiki/ICalendar" title="Wikipedia entry">iCalendar files</a>, but
+doing so is more likely to induce a seizure than a punctual appearance at an
+important meeting. To get around this, I had been using a basic Awk script that
+would parse the most important parts of the message and print them out. This was
+working well enough until I started to receive invitations from people using
+OSX. For some god-unknown reason, Apple&#8217;s “interpretation” of the
+standard<sup>2</sup> is different enough to those sent from Evolution and
+Thunderbird that my script wouldn&#8217;t successfully print some of the data (just
+the start and end times of the meeting, nothing too important).</p>
+
+<p>I started to try and expand the capability of the script and then realized that
+I would be much better off seeing if someone else had solved this problem;
+satisfactorily, that is.
+<a href="https://github.com/terabyte/mutt-filters" title="Github fork of the repo">And they had</a>.
+In a further delightful coincidence, the original author of the script,
+<a href="https://github.com/martynsmith" title="Martyn's Github repo">Martyn Smith</a> is an
+ex-colleague who, in 2004, first got me interested in Linux (thank you, Martyn).
+Armed with this script and entries in <span class="file">$HOME/.mutt/{mailcap,muttrc}</span>
+now, whenever I open a calendar invitation, the pertinent details are printed
+out perfectly legibly. It&#8217;s a small step, but an important one.</p>
+
+<p>Next I started playing around with
+<a href="http://lostpackets.de/khal/" title="khal homepage">khal</a>, a command line calendaring
+application that uses
+<a href="http://en.wikipedia.org/wiki/CalDAV" title="Wikipedia page">CalDav</a> to sync to
+calendar servers. It is described as being in “the early stages of development”
+and that certainly is the case. Nonetheless, it is incredibly promising as—even
+in this rudimentary form—it performs well and offers most of the basics that I
+require. khal is simple to setup, does not have too many (python2) dependencies
+and handles multiple calendars<sup>3</sup>. Yes, there are bugs, but nothing
+grievous and the developer,
+<a href="http://lostpackets.de/blog/" title="Christian's blog">Christian Geier</a>, is very
+responsive and helpful<sup>4</sup>.</p>
+
+<p>The <a href="http://lostpackets.de/khal/pages/usage.html" title="Usage page">khal documentation</a>
+gives you a pretty good idea of the current feature set. Set up your
+<span class="file">khal.conf</span> with the calendars you want synched and then
+you have two modes of interaction: directly via the command line or an
+interactive mode invoked with <code>ikhal</code>. Both modes allow you to perform the basic
+functions of adding, editing or deleting events.</p>
+
+<p><img class="center" src="http://jasonwryan.com/images/post_images/khal.png" title="Simple screenshot of khal" ></p>
+
+<p>While the interactive mode is very simple and straightforward, what I am most
+excited about is the ability to add events from the command line, as per the
+example in the documentation:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>khal --new 25.10. 16:00 18:00 Another Event :: with Alice and Bob
+</span></code></pre></div></figure>
+
+
+<p>I just needed to figure out a way to extract the relevant fields from the iCal
+file and pass them to khal. My first attempt is unashamedly ugly, both in
+conception and execution. However, I don&#8217;t know Perl (and at this stage of my
+life
+<a href="https://twitter.com/jasonwryan/status/204660063669989376" title="Sad, but true…">I have run out of time to learn it</a>),
+and it actually works. I
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/ical_filter.pl" title="In my bitbucket repo">modified</a>
+Martyn&#8217;s script to write to a temp file and then, for iCal events I want to
+import to khal, I bound a key sequence in Mutt to a simple Awk
+script<sup>5</sup>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'><span class="c1">#!/usr/bin/awk -f</span>
+</span><span class='line'><span class="c1"># read from ical_filter.pl and then send ical invitation details </span>
+</span><span class='line'><span class="c1"># in mutt to khal</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">/^Summary/</span>   <span class="p">{</span> <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="o">-</span><span class="mi">2</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="o">$</span><span class="nx">i</span> <span class="o">=</span> <span class="o">$</span><span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="mi">2</span><span class="p">);</span> <span class="nb">NF</span><span class="o">-=</span><span class="mi">2</span><span class="p">;</span> <span class="nx">summ</span> <span class="o">=</span> <span class="o">$</span><span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="sr">/^Location/</span>  <span class="p">{</span> <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="o">-</span><span class="mi">2</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="o">$</span><span class="nx">i</span> <span class="o">=</span> <span class="o">$</span><span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="mi">2</span><span class="p">);</span> <span class="nb">NF</span><span class="o">-=</span><span class="mi">2</span><span class="p">;</span> <span class="nx">meet</span> <span class="o">=</span> <span class="o">$</span><span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="sr">/^Dtstart/</span>   <span class="p">{</span> <span class="nx">date_st</span> <span class="o">=</span> <span class="o">$</span><span class="mi">3</span><span class="p">;</span> <span class="nx">time_st</span> <span class="o">=</span> <span class="o">$</span><span class="mi">4</span> <span class="p">}</span>
+</span><span class='line'><span class="sr">/^Dtend/</span>     <span class="p">{</span> <span class="nx">time_nd</span> <span class="o">=</span> <span class="o">$</span><span class="mi">4</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">END</span>          <span class="p">{</span> <span class="kr">print</span>  <span class="nx">date_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_st</span><span class="s2">&quot; &quot;</span><span class="nx">time_nd</span><span class="s2">&quot; &quot;</span><span class="nx">summ</span> <span class="p">}</span>
+</span></code></pre></div></figure>
+
+
+<p>In <span class="file">$HOME/.mutt/muttrc</span>, I have
+<kbd>Ctrl</kbd><kbd>k</kbd> in pager view trigger the script like so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># save iCal to khal</span>
+</span><span class='line'>macro pager <span class="se">\C</span>k  <span class="s2">&quot;!/usr/bin/khal --new $(~/Scripts/mutt2khal ~/.mutt/temp/caldata)&quot;</span> <span class="s2">&quot;Saving Calendar event&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>Neither elegant nor imaginative, I know; but for a first attempt, it gets the
+job done. If I did know any Perl, I am sure I would be able to avoid the
+additional temp file and the need to reread the information before handing it
+off to khal, but you work with the skills (or lack thereof) that you have.
+Needless to say, patches are welcomed.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See all my mutt posts:
+
+<ul>
+<li><a href="http://jasonwryan.com/blog/2012/04/21/lbdb/">Using Mutt, LDAP and SSL</a></li>
+<li><a href="http://jasonwryan.com/blog/2012/05/12/mutt/">Mutt and HTML Email</a></li>
+<li><a href="http://jasonwryan.com/blog/2012/05/23/notmuch/">Using Notmuch with Mutt</a></li>
+<li><a href="http://jasonwryan.com/blog/2013/07/20/gnupg/">Encrypting Mutt</a></li>
+</ul>
+</li>
+<li>Yes, I understand how special Apple is but this is particularly annoying…</li>
+<li>There is a <a href="https://aur.archlinux.org/packages/khal-git/">package in AUR</a>.</li>
+<li>I <a href="https://github.com/geier/khal/issues/36">logged a bug</a> and it was fixed in a matter of hours.</li>
+<li>The script is <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/mutt2khal">in my bitbucket repo</a>.</li>
+</ol>
+
+
+<p>Creative Commons image, <a href="https://flic.kr/p/4h1oE5">Calendar</a> by Angela Mabray.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Autotext Function]]></title>
+    <link href="http://jasonwryan.com/blog/2014/03/22/autotext/"/>
+    <updated>2014-03-22T09:20:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2014/03/22/autotext</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/cans.jpg" title="Flickr CC image" ></p>
+
+<p>Once you have your environment set up; your
+<a href="http://dwm.suckless.org" title="dwm site">window manager</a>
+patched
+<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="Post on mercurial queues"><em>exactly</em> the way you want</a>,
+same for
+<a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on building Vim">your editor</a>
+and even
+<a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="Yet another post…">your kernel builds automated</a>,
+then you either start from scratch and learn a whole lot more, or you start to
+focus on the really small details. The endless polishing that is bred of a
+mania for automation and customisation and the liberating freedom of using
+software that allows, and even encourages, this approach.</p>
+
+<p>Since I started using a couple of basic functions for managing my
+<a href="http://jasonwryan.com/blog/2012/09/01/notes-updated/" title="Post on the updated functions">note taking</a>,
+I have been conscious of the way I can use this tool to make my workflow a
+little less onerous.</p>
+
+<p>One of the things I find myself doing <em>a lot</em> is reusing the same snippets of
+text; either prose in work documents, or links to relevant articles on the
+Arch Wiki and Forums. It is simple enough to add this material to my
+<span class="file">~/.notes</span>, but retrieval has always been&mdash;for the
+text I reuse frequently&mdash;unwieldy.</p>
+
+<p>How many times do you really want to open the file, search for the relevant
+excerpt, highlight it and then copy it to the system clipboard before closing
+the file and pasting it into your email or a web form? I must have logged
+several thousand before I finally decided to do something about it.</p>
+
+<p>I now have a couple of different files in <span class="file">~/.notes/</span>
+depending upon the context; the example I&#8217;ll use is the one for the Arch Forums
+kept, naturally enough, at
+<span class="file">$HOME/Sync/notes/arch</span> (I symlink to
+<span class="file">~/.notes</span> so that the directory is synched using
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on using Sync">BitTorrent Sync</a>).</p>
+
+<p>This is just a simple text file with all of the links, guidance and wisdom that
+I generously share with those people, mostly new to the community, who have yet
+to embrace the opportunity to commit the
+<a href="https://wiki.archlinux.org/index.php/Forum_Etiquette" title="On the Wiki">Forum Etiquette</a>
+to memory. The format of each file is the same and is pretty basic:</p>
+
+<blockquote><p># rules sticky<br/>https://bbs.archlinux.org/viewtopic.php?id=130309</p><p># smart questions<br/>[url=http://www.catb.org/esr/faqs/smart-questions.html]How To Ask Questions The Smart Way[/url]</p><p># arch only<br/>https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY</p></blockquote>
+
+
+<p>I use the commented title to identify the desired piece of text and then just
+copy it to the clipboard, ready to pasted into a post that will undoubtedly
+be gratefully received by the infractor:</p>
+
+<figure class='code'><figcaption><span>$HOME/.bashrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># board snippets</span>
+</span><span class='line'>bbs<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;$HOME/.notes/arch&quot;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">((</span> <span class="nv">$# </span><span class="o">==</span> 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">local </span><span class="nv">opt</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span>
+</span><span class='line'>    awk -v <span class="nv">line</span><span class="o">=</span><span class="s2">&quot;$opt&quot;</span> <span class="s1">&#39;index($0, line) { getline; print }&#39;</span> <span class="s2">&quot;$file&quot;</span> | xsel -b
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">    </span>awk <span class="s1">&#39;/^# /&#39;</span> <span class="s2">&quot;$file&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>So, on the rare occasion that I need to remind someone that on the Arch boards
+we only support Arch Linux (I know, quite the revelation…), I just open
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/tip/base.config.customizations#cl-76" title="Config in Bitbucket">a scratchpad</a>
+and enter <code>bbs only</code> and then <kbd>Shift</kbd>+<kbd>Insert</kbd> the
+text into the post and I am done. Not passing an argument just prints the
+commented titles in the file in the event that I forget what the damn thing
+is called.</p>
+
+<p>I have a similar setup for work, with a couple of files that feature longer
+pieces of text that I find myself reusing for proposals, email responses
+and other administrivia. It&#8217;s a simple enough approach, but it works well and
+does lend a certain satisfaction to the otherwise tedious business of writing
+boilerplate.</p>
+
+<h4>Notes</h4>
+
+<p>Flickr Creative Commons image
+<a href="http://www.flickr.com/photos/shrapnel1/134674051/">how many cans</a> by shrapnel1</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Scripting with udev]]></title>
+    <link href="http://jasonwryan.com/blog/2014/01/20/udev/"/>
+    <updated>2014-01-20T10:02:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2014/01/20/udev</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/usb.jpg" title="Creative Commons image" >
+One of the most satisfying aspects of running free and open source software is
+the ability to be able to continually tinker with your setup, limited only by
+your imagination and ability.  The more you do tinker, the smaller the gap
+between the former and the latter, as each small project inevitably leads you
+into a deeper understanding of various aspects of your system<sup>1</sup> and
+how you can customize that system to suit your exact requirements.</p>
+
+<p>Over the last couple of days, I have been playing with
+<a href="http://en.wikipedia.org/wiki/Udev" title="Wikipedia page">udev</a>, the kernel device
+manager, as I was attempting to run a script once a specific
+<acronym title="Universal Serial Bus">USB</acronym> drive was plugged in. It
+turns out, as is so often the case, that udev is only <em>part</em> of the
+picture…</p>
+
+<p>As both my work and personal laptops have relatively small
+<acronym title="Solid State Drives">SSDs</acronym>, I carry around
+<a href="http://alpha.libre.fm/user/jasonwryan/" title="Libre.fm profile">my music</a>
+on a 1TB external drive. As the drive only contains <span class="file">.flac</span>
+files, I wanted to automate the process of <code>rsync</code>’ing music from my desktop to
+the drive and, for the laptops, repopulating the symlinks to
+<span class="file">~/Music/</span> when the drive was plugged in.</p>
+
+<p>My first thought was a rule in <span class="file">/etc/udev/rules.d/</span>,
+using <code>RUN+=</code>. There are any number of blog posts espousing this approach and,
+as I quickly discovered, they are <em>all</em> wrong. The problem with using this key is
+that, as the <code>man</code> page makes clear, it is not designed for long running
+programs:</p>
+
+<blockquote><p>This can only be used for very short-running foreground tasks. Running an event process for a long period of time may block all further events for this or a dependent device.</p><p>Starting daemons or other long running processes is not appropriate for udev; the forked processes, detached or not, will be unconditionally killed after the event handling has finished.</p><footer><strong>udev manual</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/udev.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
+
+
+<p>The problem, as it manifest for me, was the drive would be blocked from
+mounting until <em>after</em> the script had run, meaning <code>rsync</code> or my symlinks would
+have no target.  There are various “workarounds” on the web for this, including
+using <em>two</em> scripts, one to trigger the other<sup>2</sup>. Even for me, this
+seemed like a
+<a href="http://en.wikipedia.org/wiki/Pyrrhic_victory" title="Wikipedia entry">Pyrrhic victory</a>.</p>
+
+<p>The correct way to do this, as I found once I uncovered
+<a href="https://bbs.archlinux.org/viewtopic.php?id=149419" title="Arch BBS">this thread</a>
+on the Arch boards where WonderWoofy and 65kid helpfully pieced it together, is
+to use <code>SYSTEMD_WANTS</code>.  As it is described in the manual:</p>
+
+<blockquote><p>THE UDEV DATABASE<br/>  The settings of device units may either be configured via unit files, or directly from the udev database (which is recommended). The following udev properties are understood by systemd:</p><p>  SYSTEMD_WANTS=<br/>  Adds dependencies of type Wants from this unit to all listed units. This may be used to activate arbitrary units, when a specific device becomes available. Note that this and the other tags are not taken into account unless the device is tagged with the &#8220;systemd&#8221; string in the udev database, because otherwise the device is not exposed as systemd unit.</p><footer><strong>man systemd.device</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/systemd.device.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
+
+
+<p>So, I edited <span class="file">/etc/udev/rules.d/90-usb-music.rules</span> to
+remove the <code>RUN+=</code> key, using a systemd service file instead, like so<sup>3</sup>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SUBSYSTEMS</span><span class="o">==</span><span class="s2">&quot;usb&quot;</span>, ATTRS<span class="o">{</span>idProduct<span class="o">}==</span><span class="s2">&quot;1905&quot;</span>, <span class="nv">ACTION</span><span class="o">==</span><span class="s2">&quot;add&quot;</span>, ENV<span class="o">{</span>SYSTEMD_WANTS<span class="o">}==</span><span class="s2">&quot;upmusic.service&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>And then wrote the corresponding service file to have systemd hand off to the bash script:</p>
+
+<figure class='code'><figcaption><span>/usr/lib/systemd/system/upmusic.service </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>Unit<span class="o">]</span>
+</span><span class='line'><span class="nv">Description</span><span class="o">=</span>Update music links from Apollo
+</span><span class='line'><span class="nv">Requires</span><span class="o">=</span>media-Apollo.mount
+</span><span class='line'><span class="nv">After</span><span class="o">=</span>media-Apollo.mount
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>Service<span class="o">]</span>
+</span><span class='line'><span class="nv">ExecStart</span><span class="o">=</span>/home/jason/Scripts/upmusic
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>Install<span class="o">]</span>
+</span><span class='line'><span class="nv">WantedBy</span><span class="o">=</span>media-Apollo.mount
+</span></code></pre></div></figure>
+
+
+<p>As I mentioned in my post on my
+<a href="http://jasonwryan.com/blog/2013/10/28/dismount/" title="Unmount USB drives…">simple unmounting script</a>,
+I use a naming convention for all my USB drives. In this case, my music is stored on Apollo, and
+it is auto-mounted with
+<a href="https://wiki.archlinux.org/index.php/Udiskie" title="Arch wiki page">udiskie</a>. In the
+service file, systemd uses a hyphen instead of a forward slash, so the correct
+designation is <code>media-Apollo.mount</code>.</p>
+
+<p>Then it is just a matter of enabling the service with <code>systemctl enable upmusic</code> and,
+whenever Apollo is plugged in to either my desktop of laptop, the appropriate
+script will run and either update the files on Apollo or the symlinks on one of the
+laptops.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>This shouldn&#8217;t be taken as any sort of claim of expertise or deep
+understanding of this, or any other, part of my system. See below.</li>
+<li>Which is why you should never trust anything written by bloggers…</li>
+<li>The definitive reference for udev rules remains
+<a href="http://www.reactivated.net/writing_udev_rules.html" title="Daniel Drake's page">Writing udev rules</a></li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/jacobgarcia/2550146/" title="Licensed CC by Jacob Garcia">Jacob Garcia</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Ad Blocking with Hostsblock]]></title>
+    <link href="http://jasonwryan.com/blog/2013/12/28/hostsblock/"/>
+    <updated>2013-12-28T10:09:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2013/12/28/hostsblock</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/ad_free.png" title="Flickr CC Image" >
+The relentless commercialization of traditional holidays, not just the December
+variety but all of them now, means that what was ostensibly an occasion for
+celebrating your particular flavour of $deity, pagan ritual or just an
+opportunity to reconnect with your wider family, has been co-opted to the
+worship of the most pernicious of all cults, consumerism.</p>
+
+<p>Concomitant with this is the increasing corporatisation of the Internet; the
+deliberate and seemingly ineluctable effort by a relatively small number of
+global interests to turn most of the Internet into something more like cable
+television. As someone who has not lived with a television for decades
+precisely because I don&#8217;t want to live in a
+<a href="http://en.wikipedia.org/wiki/Operant_conditioning_chamber" title="Wikipedia page">Skinner box</a>
+that is solely designed to condition me to compliantly purchase more product,
+I find this rankly offensive (in the sense of morally repugnant as well as a
+coordinated and remorseless assault).</p>
+
+<p>With the escalation of both the level and nauseating intensity of advertising
+around the “holiday season” and the almost hysterical exhortations to purchase
+more happiness, I decided that the one thing that I would be really thankful for
+this Christmas was better ad blocking.</p>
+
+<p>I had been using
+<a href="https://wiki.archlinux.org/index.php/Privoxy" title="Arch wiki entry">Privoxy</a> and an
+<acronym title="Arch User Repository">AUR</acronym> script,
+<a href="https://aur.archlinux.org/packages/blocklist-to-privoxy/?ID=63431" title="AUR page">blocklist-to-privoxy</a>
+but I was still experiencing a lot of ads sneaking through (particularly local
+ones) and some unintended side effects of using Privoxy for this job, so I
+decide to give Jake VanderKolk&#8217;s
+<a href="http://gaenserich.github.io/hostsblock/" title="Homepage for Hostsblock">Hostsblock</a>
+a shot.</p>
+
+<p>I went with the basic, entry level setup:
+<a href="https://aur.archlinux.org/packages/kwakd/" title="AUR page">kwakd</a> for serving blank
+<acronym title="HyperText Markup Language">HTML</acronym> in place of ads and
+<a href="https://aur.archlinux.org/packages.php?ID=58976" title="AUR package">hostsblock</a> to
+write to my <span class="file">/etc/hosts</span>. I didn&#8217;t see the need for
+<a href="https://wiki.archlinux.org/index.php/Dnsmasq" title="Arch Wiki page">dnsmasq</a> and,
+after a week or so or using it haven&#8217;t seen the need to revisit that decision.</p>
+
+<p>Suffice to say, it is working brilliantly. Where once web pages were festooned
+with garish advertisements promising me ripped abdominals, tropical holidays and the
+lasting serenity that only Apple products can really truly deliver, I now have
+<a href="http://jasonwryan.com/images/post_images/herald.png" title="Screenshot of the local rag…">glorious whitespace</a></p>
+
+<p>There are a couple of other factors to consider with Hostsblock. There is a very
+simple command line interface for managing black and white listing of websites,
+and the various “content distribution networks” that infest most commercial
+sites like fleas. You can easily allow advertisements on or from sites and
+organizations that you want to support, while forever muting the inane drivel
+from the likes of Failbook <em>et al</em>.</p>
+
+<p>Installation and setup are very straightforward, with simple instructions on the
+<a href="http://gaenserich.github.io/hostsblock/" title="Two or three steps, max…">Hostsblock site</a>.
+There is also an active thread on the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=139784" title="Arch forum thread">Arch boards</a>
+where Jake and a couple of others are extremely helpful.</p>
+
+<p>If you are feeling listless, run-down and lacking in energy, why not try
+Hostsblock? It will make your web pages brighter, speed up your page loads,
+protect your privacy and make you insanely popular. Try Hostsblock today!</p>
+
+<h4>Notes</h4>
+
+<p>ad free, a Creative Commons image by
+<a href="http://www.flickr.com/photos/louisa_catlover/2875951548/">Louisa Billeter on Flickr</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[BitTorrent Sync's API]]></title>
+    <link href="http://jasonwryan.com/blog/2013/11/14/api/"/>
+    <updated>2013-11-14T09:51:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2013/11/14/api</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/sync.png" title="Bittorrent logo" >
+I have
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on the Alpha release">written previously</a>
+about
+<a href="http://www.bittorrent.com/sync" title="Sync webpage">BitTorrent Sync</a>, the encrypted
+file syncing application that uses the bittorrent protocol to sync your data
+over your <acronym title="Local Area Network">LAN</acronym>, or over the Internet,
+using <a href="https://en.wikipedia.org/wiki/Peer_to_peer" title="Wikipedia page">P2P technology</a>.
+I have been using it since early this year as a replacement for
+dropbox.<sup>1</sup></p>
+
+<p>At the beginning of this month, BitTorrent unveiled the
+<a href="http://blog.bittorrent.com/2013/11/05/bittorrent-sync-beta-api-now-available-to-developers/" title="Sync blog announcement">Beta API</a>
+for developers (meaning you have to tell them what you plan to do in order to
+be issued a key). After some equivocation, I signed up with the rather flimsy
+excuse of “writing a shell wrapper for the command line” and found, to my
+chagrin, a key in my inbox the next morning.</p>
+
+<p>This proved to be something of an unwelcome arrival. In theory, I was excited
+about having access to a tool to query the Sync application. One of the nodes is
+on my
+<a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on setting up a torrent box">headless Raspberry Pi</a>
+and the idea of being able to issue a command from my laptop to ascertain what
+was going on in the Pi&#8217;s synced folders was (and is) a tremendously attractive
+one.</p>
+
+<p>However, now that I was in
+possession of the key, I felt morally obliged to do something with it. The
+problem with this realization was that I had no idea how to work with an
+<acronym title="Application Program Interface">API</acronym>, let alone writing
+a script to accomplish my purported goal.</p>
+
+<p>After spending some time looking at
+<a href="http://www.bittorrent.com/sync/developers/api" title="Such as it is…">the documentation</a>,
+and buoyed by the optimism of ignorance, I decided to make good on my promise.
+My first attempt sort of worked, but was hampered as much by a serious
+conceptual flaw as it was by poor implementation. I decided, in spite of any number
+of Stack Overflow posts warning expressly not to do this, to use <code>awk</code> to parse
+the <a href="http://www.json.org/" title="JSON homepage">JSON data</a><sup>2</sup>. This was what I would
+euphemistically describe as a “learning opportunity.” The result is preserved
+for posterity in my <a href="https://bitbucket.org/jasonwryan/shiv/commits/16c9dee17f097e83fb325e303d867e6fda488992?at=default" title="Bit of a trainwreck, but you have to start somewhere…">bitbucket repo</a>
+(for the completists)…</p>
+
+<p>At this point, I was fortunate that Earnestly in #archlinux introduced me to
+keenerd&#8217;s purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
+And by “introduced” I mean generously (and patiently) talked me through how it
+worked and how I could use it with the Sync API to achieve what I was after.
+After a while playing with it, there was the—inevitably belated—moment of
+realization: this thing is genius! It allows you to intelligently
+<em>interrogate</em> the data. Not blindly chopping at it with an increasingly complex
+series of actions in <code>awk</code><sup>3</sup>; but quite directly traversing the structure and
+extracting the desired elements.</p>
+
+<p>Now I was <em>cooking</em>. Well, more to the point, I was flailing about in a smoke
+filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
+asphyxiation. Once again, Earnestly&#8217;s patience and bash skills were put to good effect.
+The resulting script,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="In bitbucket">btstat</a>,
+is undeniably a triumph of his good ideas over my own poor execution. In other
+words, the fact that it works so well is testament to his ability, but any and
+all faults are mine alone<sup>4</sup>.</p>
+
+<p>And it does work. It only requires
+<a href="https://www.archlinux.org/packages/?sort=&amp;q=jshon" title="Arch package db">Jshon</a>
+(which you will already have installed because you use
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="My post on this great utility">aurphan, right?</a>)
+and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
+</span><span class='line'>directory2 H0p3fu11yY0uG3tTh31d3@
+</span></code></pre></div></figure>
+
+
+<p>The functionality in the script is limited at this stage to just querying the
+application; I wasn&#8217;t interested in pushing changes at this point. So you can
+access the version of the currently installed Syncapp, upload and download
+speeds, the size of synced folders and list all of their contents.</p>
+
+<p>It is a beta release, so the odd bug is to be expected. Overall, though, the API is
+a welcome addition to what is a great application. If you have an API key, add
+it to your <span class="file">sync.conf</span>,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="On bitbucket">grab the script</a>
+and give it a whirl. Undoubtedly, over the coming weeks more polished versions
+will emerge in “proper” languages, but for the time being this does exactly what
+I need.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Yes, I would much prefer to use an open source tool to accomplish the same
+thing but I haven&#8217;t found anything comparable that is this good to date…</li>
+<li>In what I imagine is a complete coincidence, the JSON logo is uncannily
+similar to the initial (and much better, I thought) Sync logo, as seen on
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/">my original post</a>.</li>
+<li>This is not intended as a slight on <code>awk</code>; which I am undoubtedly
+<a href="http://jasonwryan.com/blog/2013/09/15/awking/">fond of</a>, but rather the
+limits of my ability with that language.</li>
+<li>I am also indebted to Scott (firecat53) for testing and providing helpful
+feedback on the early versions of the script.</li>
+<li>It is worth noting that in the <code>$json</code> variable, I pass <code>curl</code> the -<code>n</code> option,
+which means it reads my credentials from <span class="file">$HOME/.netrc</span>.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Simple Unmounting]]></title>
+    <link href="http://jasonwryan.com/blog/2013/10/28/dismount/"/>
+    <updated>2013-10-28T15:29:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2013/10/28/dismount</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://jasonwryan.com/images/post_images/dismount.jpg" title="Creative Commons image" >
+For those people that prefer to forego the full blown
+<acronym title="Desktop Environment">DE</acronym> and—instead of all the
+“convenience” that this sort of setup offers—piece together their setup from a
+variety of different tools and knit it all together with some scripting,
+automounting external drives is, notwithstanding the inexplicable number of
+posts to the forums to the contrary, incredibly straightforward with
+<a href="https://wiki.archlinux.org/index.php/Udev#Udisks" title="Arch Wiki page on Udev">udisks</a>.
+My approach in this respect is to use
+<a href="https://wiki.archlinux.org/index.php/Udiskie" title="Wiki page">udiskie</a>; it is
+lightweight, unobtrusive, configurable and foolproof, as far as I can tell.</p>
+
+<p>Where I have found a small gap, or more a minor irritation really, is with
+unmounting devices. <code>udiskie-umount /media/MY_USB_DRIVE</code> works just fine, but
+I often have a variety of media mounted, and not just standard
+<acronym title="Universal Serial Bus">USB</acronym> drives. At work, for
+example, it is not uncommon for me to have mounted under
+<span class="file">/media</span> any or all of the following:</p>
+
+<ul>
+<li>A USB drive containing all of my music</li>
+<li>An encrypted volume mounted with
+<a href="http://jasonwryan.com/blog/2013/01/10/truecrypt/" title="My post on replacing TrueCrypt">tcplay</a>
+shared via <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Another postof mine…">Bittorrent Sync</a></li>
+<li>A <acronym title="Common Internet File System">CIFS</acronym> share</li>
+<li>An <acronym title="Network File System">NFS</acronym> share or an
+<acronym title="SSH Filesystem">SSHFS</acronym> mount.</li>
+</ul>
+
+
+<p>In a couple of these cases, I don&#8217;t want to—or can&#8217;t—just <code>umount</code> them with
+<code>udiskie</code>; they require a different approach. To facilitate this, I have adopted
+a simple approach: I use a standard naming convention for all external media
+or their mountpoints. When I first buy a USB drive, I give it a meaningful name,
+beginning with an uppercase letter, as this won&#8217;t clash with any of my internal
+drives and it happily accommodates drives from other operating systems. So:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sudo dosfslabel /dev/sdc1 EightBall
+</span></code></pre></div></figure>
+
+
+<p>sets up a new 8GB drive I found in the schwag bag at the conference I attended
+last week.</p>
+
+<p>Now that all external media are predictably named, it is just a matter of
+writing a script that checks how many are mounted, presents a menu if there is
+more than one, and unmounts the respective device correctly:</p>
+
+<figure class='code'><figcaption><span>dismount </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/usr/bin/env bash</span>
+</span><span class='line'><span class="c"># unmount USB drives</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">target</span><span class="o">=(</span> <span class="k">$(</span>awk <span class="s1">&#39;/media\/[\^A-Z]/ {print $3}&#39;</span> &lt;<span class="o">(</span>mount<span class="k">)</span><span class="o">)</span> <span class="o">)</span>
+</span><span class='line'><span class="nv">shares</span><span class="o">=(</span>Scout Sentinel<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>checkbusy<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  grep <span class="s2">&quot;PID&quot;</span> &lt;<span class="o">(</span>lsof +d <span class="s2">&quot;$target&quot;</span> &amp;&gt;/dev/null<span class="o">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${target##*/} busy…&quot;</span>
+</span><span class='line'>    <span class="nb">exit </span>1
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>exstatus<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${target##*/} unmounted…&quot;</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Failed to unmount.&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># check for multiple devices</span>
+</span><span class='line'><span class="k">if</span> <span class="o">((</span> <span class="s2">&quot;${#target[@]}&quot;</span> &gt; 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nv">PS3</span><span class="o">=</span><span class="s2">&quot;Select your device to unmount: &quot;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;There are ${#target[@]} devices mounted&quot;</span>
+</span><span class='line'>  <span class="k">select </span>dev in <span class="s2">&quot;${target[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="nv">target</span><span class="o">=</span><span class="s2">&quot;$dev&quot;</span>
+</span><span class='line'>    <span class="nb">break</span>
+</span><span class='line'><span class="nb">  </span><span class="k">done</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># check for share</span>
+</span><span class='line'><span class="k">for </span>drive in <span class="s2">&quot;${shares[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">  if</span> <span class="o">[[</span> <span class="s2">&quot;$drive&quot;</span> <span class="o">=</span>~ <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nv">share</span><span class="o">=</span><span class="s2">&quot;$drive&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># options per filesystem</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> -n <span class="s2">&quot;$target&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  for </span>drive in <span class="s2">&quot;${shares[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">    if</span> <span class="o">[[</span> <span class="s2">&quot;$drive&quot;</span> <span class="o">=</span> <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">&amp;&amp;</span> <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">=</span> Safebox <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cmd</span><span class="o">=</span><span class="k">$(</span>sudo safebox close<span class="k">)</span>
+</span><span class='line'>    <span class="k">elif</span> <span class="o">[[</span> <span class="s2">&quot;$drive&quot;</span> <span class="o">=</span> <span class="s2">&quot;${target##*/}&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cmd</span><span class="o">=</span><span class="k">$(</span>sudo umount <span class="s2">&quot;$target&quot;</span><span class="k">)</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'><span class="k">      </span><span class="nv">cmd</span><span class="o">=</span><span class="k">$(</span>udiskie-umount -d <span class="s2">&quot;$target&quot;</span> &amp;&gt;/dev/null<span class="k">)</span>
+</span><span class='line'>    <span class="k">fi</span>
+</span><span class='line'><span class="k">  done</span>
+</span><span class='line'><span class="c"># do it</span>
+</span><span class='line'>checkbusy
+</span><span class='line'><span class="nv">$cmd</span>
+</span><span class='line'>exstatus
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;No drive mounted!&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># vim:set ts=2 sts=2 sw=2 et:</span>
+</span></code></pre></div></figure>
+
+
+<p>Now, no matter the number or type of devices I currently have mounted, I can
+unmount them by typing <code>dismount</code> and choosing the appropriate drive via the
+<code>select</code> menu. Simple, but satisfying. The script is in my
+<a href="https://bitbucket.org/jasonwryan/centurion/src/tip/Scripts/dismount" title="Grab it!">bitbucket repo</a></p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, Dismount, by
+<a href="http://www.flickr.com/photos/chrisinplymouth/3659964278/">Chris</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

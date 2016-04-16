@@ -1,0 +1,593 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="Once you have your environment set up; your
+window manager
+patched
+exactly the way you want,
+same for
+your editor
+and even
+your kernel builds &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/6">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/22/autotext/">Autotext Function</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-22T09:20:00+13:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/cans.jpg" title="Flickr CC image" ></p>
+
+<p>Once you have your environment set up; your
+<a href="http://dwm.suckless.org" title="dwm site">window manager</a>
+patched
+<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="Post on mercurial queues"><em>exactly</em> the way you want</a>,
+same for
+<a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on building Vim">your editor</a>
+and even
+<a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="Yet another post…">your kernel builds automated</a>,
+then you either start from scratch and learn a whole lot more, or you start to
+focus on the really small details. The endless polishing that is bred of a
+mania for automation and customisation and the liberating freedom of using
+software that allows, and even encourages, this approach.</p>
+
+<p>Since I started using a couple of basic functions for managing my
+<a href="http://jasonwryan.com/blog/2012/09/01/notes-updated/" title="Post on the updated functions">note taking</a>,
+I have been conscious of the way I can use this tool to make my workflow a
+little less onerous.</p>
+
+<p>One of the things I find myself doing <em>a lot</em> is reusing the same snippets of
+text; either prose in work documents, or links to relevant articles on the
+Arch Wiki and Forums. It is simple enough to add this material to my
+<span class="file">~/.notes</span>, but retrieval has always been&mdash;for the
+text I reuse frequently&mdash;unwieldy.</p>
+
+<p>How many times do you really want to open the file, search for the relevant
+excerpt, highlight it and then copy it to the system clipboard before closing
+the file and pasting it into your email or a web form? I must have logged
+several thousand before I finally decided to do something about it.</p>
+
+<p>I now have a couple of different files in <span class="file">~/.notes/</span>
+depending upon the context; the example I&#8217;ll use is the one for the Arch Forums
+kept, naturally enough, at
+<span class="file">$HOME/Sync/notes/arch</span> (I symlink to
+<span class="file">~/.notes</span> so that the directory is synched using
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on using Sync">BitTorrent Sync</a>).</p>
+
+<p>This is just a simple text file with all of the links, guidance and wisdom that
+I generously share with those people, mostly new to the community, who have yet
+to embrace the opportunity to commit the
+<a href="https://wiki.archlinux.org/index.php/Forum_Etiquette" title="On the Wiki">Forum Etiquette</a>
+to memory. The format of each file is the same and is pretty basic:</p>
+
+<blockquote><p># rules sticky<br/>https://bbs.archlinux.org/viewtopic.php?id=130309</p><p># smart questions<br/>[url=http://www.catb.org/esr/faqs/smart-questions.html]How To Ask Questions The Smart Way[/url]</p><p># arch only<br/>https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY</p></blockquote>
+
+
+<p>I use the commented title to identify the desired piece of text and then just
+copy it to the clipboard, ready to pasted into a post that will undoubtedly
+be gratefully received by the infractor:</p>
+
+<figure class='code'><figcaption><span>$HOME/.bashrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># board snippets</span>
+</span><span class='line'>bbs<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;$HOME/.notes/arch&quot;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">((</span> <span class="nv">$# </span><span class="o">==</span> 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">    </span><span class="nb">local </span><span class="nv">opt</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span>
+</span><span class='line'>    awk -v <span class="nv">line</span><span class="o">=</span><span class="s2">&quot;$opt&quot;</span> <span class="s1">&#39;index($0, line) { getline; print }&#39;</span> <span class="s2">&quot;$file&quot;</span> | xsel -b
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">    </span>awk <span class="s1">&#39;/^# /&#39;</span> <span class="s2">&quot;$file&quot;</span>
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></div></figure>
+
+
+<p>So, on the rare occasion that I need to remind someone that on the Arch boards
+we only support Arch Linux (I know, quite the revelation…), I just open
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/tip/base.config.customizations#cl-76" title="Config in Bitbucket">a scratchpad</a>
+and enter <code>bbs only</code> and then <kbd>Shift</kbd>+<kbd>Insert</kbd> the
+text into the post and I am done. Not passing an argument just prints the
+commented titles in the file in the event that I forget what the damn thing
+is called.</p>
+
+<p>I have a similar setup for work, with a couple of files that feature longer
+pieces of text that I find myself reusing for proposals, email responses
+and other administrivia. It&#8217;s a simple enough approach, but it works well and
+does lend a certain satisfaction to the otherwise tedious business of writing
+boilerplate.</p>
+
+<h4>Notes</h4>
+
+<p>Flickr Creative Commons image
+<a href="http://www.flickr.com/photos/shrapnel1/134674051/">how many cans</a> by shrapnel1</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/01/20/udev/">Scripting with udev</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-20T10:02:00+13:00" pubdate data-updated="true">Jan 20<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/usb.jpg" title="Creative Commons image" >
+One of the most satisfying aspects of running free and open source software is
+the ability to be able to continually tinker with your setup, limited only by
+your imagination and ability.  The more you do tinker, the smaller the gap
+between the former and the latter, as each small project inevitably leads you
+into a deeper understanding of various aspects of your system<sup>1</sup> and
+how you can customize that system to suit your exact requirements.</p>
+
+<p>Over the last couple of days, I have been playing with
+<a href="http://en.wikipedia.org/wiki/Udev" title="Wikipedia page">udev</a>, the kernel device
+manager, as I was attempting to run a script once a specific
+<acronym title="Universal Serial Bus">USB</acronym> drive was plugged in. It
+turns out, as is so often the case, that udev is only <em>part</em> of the
+picture…</p>
+
+<p>As both my work and personal laptops have relatively small
+<acronym title="Solid State Drives">SSDs</acronym>, I carry around
+<a href="http://alpha.libre.fm/user/jasonwryan/" title="Libre.fm profile">my music</a>
+on a 1TB external drive. As the drive only contains <span class="file">.flac</span>
+files, I wanted to automate the process of <code>rsync</code>’ing music from my desktop to
+the drive and, for the laptops, repopulating the symlinks to
+<span class="file">~/Music/</span> when the drive was plugged in.</p>
+
+<p>My first thought was a rule in <span class="file">/etc/udev/rules.d/</span>,
+using <code>RUN+=</code>. There are any number of blog posts espousing this approach and,
+as I quickly discovered, they are <em>all</em> wrong. The problem with using this key is
+that, as the <code>man</code> page makes clear, it is not designed for long running
+programs:</p>
+
+<blockquote><p>This can only be used for very short-running foreground tasks. Running an event process for a long period of time may block all further events for this or a dependent device.</p><p>Starting daemons or other long running processes is not appropriate for udev; the forked processes, detached or not, will be unconditionally killed after the event handling has finished.</p><footer><strong>udev manual</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/udev.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
+
+
+<p>The problem, as it manifest for me, was the drive would be blocked from
+mounting until <em>after</em> the script had run, meaning <code>rsync</code> or my symlinks would
+have no target.  There are various “workarounds” on the web for this, including
+using <em>two</em> scripts, one to trigger the other<sup>2</sup>. Even for me, this
+seemed like a
+<a href="http://en.wikipedia.org/wiki/Pyrrhic_victory" title="Wikipedia entry">Pyrrhic victory</a>.</p>
+
+<p>The correct way to do this, as I found once I uncovered
+<a href="https://bbs.archlinux.org/viewtopic.php?id=149419" title="Arch BBS">this thread</a>
+on the Arch boards where WonderWoofy and 65kid helpfully pieced it together, is
+to use <code>SYSTEMD_WANTS</code>.  As it is described in the manual:</p>
+
+<blockquote><p>THE UDEV DATABASE<br/>  The settings of device units may either be configured via unit files, or directly from the udev database (which is recommended). The following udev properties are understood by systemd:</p><p>  SYSTEMD_WANTS=<br/>  Adds dependencies of type Wants from this unit to all listed units. This may be used to activate arbitrary units, when a specific device becomes available. Note that this and the other tags are not taken into account unless the device is tagged with the &#8220;systemd&#8221; string in the udev database, because otherwise the device is not exposed as systemd unit.</p><footer><strong>man systemd.device</strong> <cite><a href='http://www.freedesktop.org/software/systemd/man/systemd.device.html'>www.freedesktop.org/software/&hellip;</a></cite></footer></blockquote>
+
+
+<p>So, I edited <span class="file">/etc/udev/rules.d/90-usb-music.rules</span> to
+remove the <code>RUN+=</code> key, using a systemd service file instead, like so<sup>3</sup>:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">SUBSYSTEMS</span><span class="o">==</span><span class="s2">&quot;usb&quot;</span>, ATTRS<span class="o">{</span>idProduct<span class="o">}==</span><span class="s2">&quot;1905&quot;</span>, <span class="nv">ACTION</span><span class="o">==</span><span class="s2">&quot;add&quot;</span>, ENV<span class="o">{</span>SYSTEMD_WANTS<span class="o">}==</span><span class="s2">&quot;upmusic.service&quot;</span>
+</span></code></pre></div></figure>
+
+
+<p>And then wrote the corresponding service file to have systemd hand off to the bash script:</p>
+
+<figure class='code'><figcaption><span>/usr/lib/systemd/system/upmusic.service </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>Unit<span class="o">]</span>
+</span><span class='line'><span class="nv">Description</span><span class="o">=</span>Update music links from Apollo
+</span><span class='line'><span class="nv">Requires</span><span class="o">=</span>media-Apollo.mount
+</span><span class='line'><span class="nv">After</span><span class="o">=</span>media-Apollo.mount
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>Service<span class="o">]</span>
+</span><span class='line'><span class="nv">ExecStart</span><span class="o">=</span>/home/jason/Scripts/upmusic
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>Install<span class="o">]</span>
+</span><span class='line'><span class="nv">WantedBy</span><span class="o">=</span>media-Apollo.mount
+</span></code></pre></div></figure>
+
+
+<p>As I mentioned in my post on my
+<a href="http://jasonwryan.com/blog/2013/10/28/dismount/" title="Unmount USB drives…">simple unmounting script</a>,
+I use a naming convention for all my USB drives. In this case, my music is stored on Apollo, and
+it is auto-mounted with
+<a href="https://wiki.archlinux.org/index.php/Udiskie" title="Arch wiki page">udiskie</a>. In the
+service file, systemd uses a hyphen instead of a forward slash, so the correct
+designation is <code>media-Apollo.mount</code>.</p>
+
+<p>Then it is just a matter of enabling the service with <code>systemctl enable upmusic</code> and,
+whenever Apollo is plugged in to either my desktop of laptop, the appropriate
+script will run and either update the files on Apollo or the symlinks on one of the
+laptops.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>This shouldn&#8217;t be taken as any sort of claim of expertise or deep
+understanding of this, or any other, part of my system. See below.</li>
+<li>Which is why you should never trust anything written by bloggers…</li>
+<li>The definitive reference for udev rules remains
+<a href="http://www.reactivated.net/writing_udev_rules.html" title="Daniel Drake's page">Writing udev rules</a></li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by <a href="http://www.flickr.com/photos/jacobgarcia/2550146/" title="Licensed CC by Jacob Garcia">Jacob Garcia</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/12/28/hostsblock/">Ad Blocking with Hostsblock</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-28T10:09:00+13:00" pubdate data-updated="true">Dec 28<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="left" src="/images/post_images/ad_free.png" title="Flickr CC Image" >
+The relentless commercialization of traditional holidays, not just the December
+variety but all of them now, means that what was ostensibly an occasion for
+celebrating your particular flavour of $deity, pagan ritual or just an
+opportunity to reconnect with your wider family, has been co-opted to the
+worship of the most pernicious of all cults, consumerism.</p>
+
+<p>Concomitant with this is the increasing corporatisation of the Internet; the
+deliberate and seemingly ineluctable effort by a relatively small number of
+global interests to turn most of the Internet into something more like cable
+television. As someone who has not lived with a television for decades
+precisely because I don&#8217;t want to live in a
+<a href="http://en.wikipedia.org/wiki/Operant_conditioning_chamber" title="Wikipedia page">Skinner box</a>
+that is solely designed to condition me to compliantly purchase more product,
+I find this rankly offensive (in the sense of morally repugnant as well as a
+coordinated and remorseless assault).</p>
+
+<p>With the escalation of both the level and nauseating intensity of advertising
+around the “holiday season” and the almost hysterical exhortations to purchase
+more happiness, I decided that the one thing that I would be really thankful for
+this Christmas was better ad blocking.</p>
+
+<p>I had been using
+<a href="https://wiki.archlinux.org/index.php/Privoxy" title="Arch wiki entry">Privoxy</a> and an
+<acronym title="Arch User Repository">AUR</acronym> script,
+<a href="https://aur.archlinux.org/packages/blocklist-to-privoxy/?ID=63431" title="AUR page">blocklist-to-privoxy</a>
+but I was still experiencing a lot of ads sneaking through (particularly local
+ones) and some unintended side effects of using Privoxy for this job, so I
+decide to give Jake VanderKolk&#8217;s
+<a href="http://gaenserich.github.io/hostsblock/" title="Homepage for Hostsblock">Hostsblock</a>
+a shot.</p>
+
+<p>I went with the basic, entry level setup:
+<a href="https://aur.archlinux.org/packages/kwakd/" title="AUR page">kwakd</a> for serving blank
+<acronym title="HyperText Markup Language">HTML</acronym> in place of ads and
+<a href="https://aur.archlinux.org/packages.php?ID=58976" title="AUR package">hostsblock</a> to
+write to my <span class="file">/etc/hosts</span>. I didn&#8217;t see the need for
+<a href="https://wiki.archlinux.org/index.php/Dnsmasq" title="Arch Wiki page">dnsmasq</a> and,
+after a week or so or using it haven&#8217;t seen the need to revisit that decision.</p>
+
+<p>Suffice to say, it is working brilliantly. Where once web pages were festooned
+with garish advertisements promising me ripped abdominals, tropical holidays and the
+lasting serenity that only Apple products can really truly deliver, I now have
+<a href="/images/post_images/herald.png" title="Screenshot of the local rag…">glorious whitespace</a></p>
+
+<p>There are a couple of other factors to consider with Hostsblock. There is a very
+simple command line interface for managing black and white listing of websites,
+and the various “content distribution networks” that infest most commercial
+sites like fleas. You can easily allow advertisements on or from sites and
+organizations that you want to support, while forever muting the inane drivel
+from the likes of Failbook <em>et al</em>.</p>
+
+<p>Installation and setup are very straightforward, with simple instructions on the
+<a href="http://gaenserich.github.io/hostsblock/" title="Two or three steps, max…">Hostsblock site</a>.
+There is also an active thread on the
+<a href="https://bbs.archlinux.org/viewtopic.php?id=139784" title="Arch forum thread">Arch boards</a>
+where Jake and a couple of others are extremely helpful.</p>
+
+<p>If you are feeling listless, run-down and lacking in energy, why not try
+Hostsblock? It will make your web pages brighter, speed up your page loads,
+protect your privacy and make you insanely popular. Try Hostsblock today!</p>
+
+<h4>Notes</h4>
+
+<p>ad free, a Creative Commons image by
+<a href="http://www.flickr.com/photos/louisa_catlover/2875951548/">Louisa Billeter on Flickr</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/7/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/5/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks&#8230;</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: backup | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.com/blog/categories/backup/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-19T08:20:47+13:00</updated>
+  <id>http://jasonwryan.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Pruning Tarsnap Archives]]></title>
+    <link href="http://jasonwryan.com/blog/2014/10/25/snapclean/"/>
+    <updated>2014-10-25T09:38:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2014/10/25/snapclean</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/tarsnap-logo.png" title="Tarsnsap Logo" >
+I started using <a href="http://www.tarsnap.com/" title="Tarsnap website">Tarsnap</a> about
+<a href="http://jasonwryan.com/blog/2011/09/08/tarsnap/" title="Post on Tarsnap">three years ago</a>
+and I have been nothing but impressed with it since. It is simple to use,
+<em>extremely</em> cost effective and, more than once, it has saved me from myself;
+making it easy to retrieve copies of files that I have inadvertently
+overwritten or otherwise done stupid things with<sup>1</sup>.  When I
+<a href="http://jasonwryan.com/blog/2011/09/08/tarsnap/" title="Post on Tarsnap">first posted about it</a>,
+I included a
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snap" title="In Bitbucket repo">simple wrapper script</a>,
+which has held up pretty well over that time.</p>
+
+<p>What became apparent over the last couple of months, as I began to consciously
+make more regular backups, was that pruning the archives was a relatively
+tedious business. Given that Tarsnap
+<a href="http://www.tarsnap.com/efficiency.html" title="Tarsnap efficiency page">de-duplicates data</a>,
+there isn't much mileage in keeping around older archives because, if you do
+have to retrieve a file, you don't want to have to search through a large
+number of archives to find it; so there is a balance between making use of
+Tarsnap's efficient functionality, and not creating a rod for your back if your
+use case is occasionally retrieving single—or small groups of—files, rather
+than large dumps.</p>
+
+<p>I have settled on keeping five to seven archives, depending on the frequency of
+my backups, which is somewhere around two to three times a week. Pruning these
+archives was becoming tedious, so I wrote a simple script to make it less
+onerous. Essentially, it writes a list of all the archives to a
+<span class="file">tmpfile</span>, runs
+<a href="http://linux.die.net/man/1/sort" title="sort man page">sort(1)</a>
+to order them from oldest to newest, and then deletes the oldest minus whatever
+the number to keep is set to.</p>
+
+<p>The bulk of the code is simple enough:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>snapclean </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;generate list&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;tarsnap --list-archives &gt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;sort by descending date, format is: host-ddmmyy_hh:mm&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">{</span>
+</span><span class='line'>  rm <span class="s2">&quot;$tmpfile&quot;</span> &amp;amp;&amp;amp; sort -k 1.11,1.10 -k 1.8,1.9 -k 1.7,1.6 &gt; <span class="s2">&quot;$tmpfile&quot;</span>
+</span><span class='line'><span class="o">}</span> &amp;lt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;populate the list&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mapfile -t archives &amp;lt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;print the full list&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;printf <span class="s2">&quot;%s\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Current archives${end}:&quot;</span> <span class="s2">&quot;${archives[@]#*-}&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;identify oldest archives&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;remove<span class="o">=</span><span class="k">$((</span> <span class="k">${#</span><span class="nv">archives</span><span class="p">[@]</span><span class="k">}</span> <span class="o">-</span> keep <span class="k">))</span>
+</span><span class='line'><span class="nv">targets</span><span class="o">=(</span> <span class="k">$(</span>head -n <span class="s2">&quot;$remove&quot;</span> <span class="s2">&quot;$tmpfile&quot;</span><span class="k">)</span> <span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;if there is at least one to remove&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">((</span> <span class="k">${#</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span> &gt;<span class="o">=</span> 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${red}Archives to delete${end}:&quot;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${targets[@]#*-}&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="nb">read</span> -p <span class="s2">&quot;Proceed with deletion? [${red}Y${end}/N] &quot;</span> YN&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$YN</span> <span class="o">==</span> Y <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;for archive in <span class="s2">&quot;${targets[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span>tarsnap -d --no-print-stats -f <span class="s2">&quot;$archive&quot;</span>
+</span><span class='line'><span class="k">done</span> &amp;amp;&amp;amp; <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Archives successfully deleted...${end}&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Remaining archives:${end}&quot;</span>
+</span><span class='line'>tarsnap --list-archives
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Operation aborted${end}&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Nothing to do&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>0
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>You can see the rest of the script in
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snapclean" title="snapclean in bitbucket">my bitbucket repo</a>.  It even comes <a href="/images/post_images/snapclean.png" title="Screenshot of snapclean">with colour</a>.</p>
+
+<p>Once every couple of weeks, I run the script, review the archives marked for
+deletion and then blow them away. Easy. If you aren't using Tarsnap, you
+really should check it out; it is an excellent service and—for the almost
+ridiculously small investment—you get rock solid, encrypted peace of
+mind. Why would you not do that?</p>
+
+<h3>Coda</h3>
+
+<p>This is the <em>one hundredth</em> post on this blog: a milestone that I never
+envisaged getting anywhere near. Looking back through the posts, nearly 60,000
+words worth, there are a couple there that continue to draw traffic and are
+obviously seen at some level as helpful.  There are also quite a few that
+qualify as “filler”, but blogging is a discipline like any other and sometimes
+you just have to push something up to keep the rhythm going. In any event, this
+is a roundabout way of saying that, for a variety of reasons both personal and
+professional, I am no longer able to fulfil my own expectations of regularly
+pushing these posts out.</p>
+
+<p>I will endeavour to, from time to time when I find something that I genuinely
+think is worth sharing, make an effort to write about it, but I can't see that
+happening all that often.  I'd like to thank all the people that have read
+these posts; especially those of you that have commented. With every post, I
+always looked forward to people telling me where I got something wrong or how I
+could have approached a problem differently or more effectively<sup>2</sup>; I
+learned a lot from these pointers and I am grateful to the people that were
+generous enough to share them.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The frequency with which this happens is, admittedly, low; but not
+low enough to confidently abandon a service like this…</li>
+<li>Leaving a complimentary note is just as welcome, don't get me wrong…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Syncthing]]></title>
+    <link href="http://jasonwryan.com/blog/2014/05/10/syncthing/"/>
+    <updated>2014-05-10T09:30:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/05/10/syncthing</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/syncthing.png" title="Syncthing logo" >
+Just over a year ago, I was invited to participate in an exciting Alpha, for
+<a href="http://www.bittorrent.com/sync" title="Sync website), an application
+that allows you to sync selected directories across devices using a
+[peer-to-peer protocol](https://en.wikipedia.org/wiki/Bittorent 'Wikipedia article">BitTorrent Sync</a>.
+I <a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Click the damn thing…">wrote up my experience</a>
+and, with one reservation, found it to be a fantastic tool that did pretty much everything I
+needed, including letting me finally get rid of Dropbox. That one reservation, although not
+entirely clear at the time, was clarified soon after and was crushingly disappointing:
+the programme was closed source.</p>
+
+<p>Due to a combination of inertia (it was installed on all my devices and working well) and
+the lack of an alternative that didn't involve installing and running a
+<a href="https://en.wikipedia.org/wiki/Lamp_stack" title="Wikipedia page">LAMP stack</a> just to sync
+my files, I have persisted with it; even writing a
+<a href="http://jasonwryan.com/blog/2013/11/14/api/" title="Post on said script">simple Awk script</a>
+to interact with the <acronym title="Application Program Interface">API</acronym>.
+For the last twelve months I have been pretty happy with it.</p>
+
+<p>In addition to the licensing choice, there are some other small issues that I have discovered: the
+<a href="https://play.google.com/store/apps/details?id=com.bittorrent.sync" title="On Google Play">Android App</a>
+<em>chews</em> through your battery if it is left on (which sort of defeats the purpose, but I
+learned to live with it), the syncing can take a little while to pick up changes, and
+nodes that don't see much action may flake out completely after a while.</p>
+
+<p>Then, a few weeks ago I read about <a href="https://github.com/jewel/clearskies" title="On Github">clearskies</a>,
+an open source implementation of this concept. Sadly, it is still a proof of
+concept. This discovery, however, led to an extremely fortuitous exchange
+<a href="https://twitter.com/csantosb/status/460714748322258944" title="Twitter conversation">on Twitter</a>
+with <a href="https://twitter.com/csantosb" title="His profile on Twitter">cayetano santos</a> who pointed me
+at <a href="http://syncthing.net/" title="Syncthing homepage">Syncthing</a>. Described thus (cue
+<a href="http://www.youtube.com/watch?v=7YaGwI7GjlA" title="G.F. Handel on Youtube">background music</a>):</p>
+
+<p><blockquote><p>Syncthing replaces Dropbox and BitTorrent Sync with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it's transmitted over the Internet.</p></blockquote></p>
+
+<p>Written in <a href="http://golang.org/" title="Go language site">Go</a>, Syncthing is still in
+early development, but judging by the
+<a href="https://github.com/calmh/syncthing/releases" title="Releases on Github">release history</a>,
+it is moving ahead quickly. The developer, <a href="https://nym.se/" title="Jakob's site">Jakob Borg</a>,
+is obviously both talented and productive. After using it for the last
+couple of weeks, I have uninstalled BitTorrent Sync from all my machines
+and have Syncthing set up and running nicely. It is simple, elegant and
+works wonderfully; <em>for what it does</em>.</p>
+
+<p>Which is to say that it is not all of the things that either of its
+predecessors are: it isn't intended to distribute files, or to host images or
+simple websites. It doesn't include versioning or have a built-in editor. It is
+for securely syncing your files independent of any third parties. And there is no
+Android app, so your battery is safe<sup>1</sup>.</p>
+
+<p>Setup is through a tidy, <a href="http://getbootstrap.com/" title="Bootstrap site">bootstrap</a>
+built web interface, by default running on <code>127.0.0.1:8080</code>. I subsequently found
+that once I understood how the configuration worked, editing the config file at
+<span class="file">$XDG_CONFIG_HOME/syncthing/config.xml</span> was much
+simpler.  When setting up, you will also do a lot of stopping and starting of
+<code>syncthing</code>; if you use the service file that comes with the
+<a href="https://aur.archlinux.org/packages/syncthing/" title="Arch User Repo">AUR package</a>,
+that won't work so well from the web interface… Run it from the command line
+with one of the <code>STTRACE</code> variables to debug and then, once it is running to
+your liking, hand it off to systemd<sup>2</sup>.</p>
+
+<p>With a reasonably tricky cluster setup (six machines; two outside the
+<acronym title="Local Area Network">LAN</acronym> sharing half a dozen
+repositories with three different topologies), there is a fair bit of trial and
+error involved getting everything set up and working correctly. But when you
+do, it is much faster to pick up changes than either of the other two and there
+is none of the risk around privacy and security presented by Dropbox and—to a
+(much, I would hazard to guess) lesser extent—BitTorrent Sync.</p>
+
+<p>I have also found that it is much quicker for all of the nodes connect if,
+for the LAN connections in your cluster, you specify the
+<acronym title="Internet Protocol">IP</acronym> addresses and port and disable
+global discovery for those nodes: this speeds up the discovery time when
+the nodes are started. Nodes still, from time-to-time, flake out, particularly
+if one of them is rebooted. Restarting the offending node is usually sufficient
+to bring the cluster back into sync.</p>
+
+<p>That isn't to say that there aren't any issues with it. The documentation is in
+need of some work; your best bet at the moment is a combination of the rather
+terse <code>--help</code> message and reading the source. There are also some hidden gems
+in the Github commits; for example, details on using
+<span class="file">.stignore</span> files, a very handy feature, are buried in
+an earlier
+<a href="https://github.com/calmh/syncthing/commit/986b15573a66f95beae53b10371ba50ab147124a" title="Github commit">commit to README.md</a> that didn't survive the move of the documentation to the
+forum.</p>
+
+<p>The only other significant issue I have encountered is that getting all of the
+nodes across the cluster to connect to each other at the same time seems to be
+inexplicably difficult. It may just be my setup, but more often than not, nodes
+(on the LAN) will timeout while trying to connect to at least one of their peers.
+This isn't a huge issue as you only really need one chained connection to bring
+all the data up to date, but it does cause a something of a minor
+<acronym title="Obsessive Compulsive Disorder">OCD</acronym> flare up.</p>
+
+<p>Given the early stages of the project, though, and the fact that it is open
+source, these anomalies are trivial. Overall, Syncthing is a delight. It does
+exactly what I need it to do, and it does it securely. Given the promise it is
+showing this early, I can only imagine it getting a lot better over time as
+more
+<a href="https://github.com/calmh/syncthing/issues?state=open" title="Issues on Github">bugs are squashed</a>
+and features rolled out.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Naturally enough, someone is <a href="https://github.com/calmh/syncthing/issues/177">on the case</a>…
+<strong>Update: 17/5/14</strong> App is available on
+<a href="https://play.google.com/store/apps/details?id=com.nutomic.syncthingandroid">Google Play</a> and it works pretty well.</li>
+<li>I added a debian daemon script to a thread on
+<a href="http://discourse.syncthing.net/t/keeping-syncthing-running/30/2">the Syncthing boards</a>
+as there is no built in daemon functionality (yet).</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[BitTorrent Sync's API]]></title>
+    <link href="http://jasonwryan.com/blog/2013/11/14/api/"/>
+    <updated>2013-11-14T09:51:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2013/11/14/api</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/sync.png" title="Bittorrent logo" >
+I have
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on the Alpha release">written previously</a>
+about
+<a href="http://www.bittorrent.com/sync" title="Sync webpage">BitTorrent Sync</a>, the encrypted
+file syncing application that uses the bittorrent protocol to sync your data
+over your <acronym title="Local Area Network">LAN</acronym>, or over the Internet,
+using <a href="https://en.wikipedia.org/wiki/Peer_to_peer" title="Wikipedia page">P2P technology</a>.
+I have been using it since early this year as a replacement for
+dropbox.<sup>1</sup></p>
+
+<p>At the beginning of this month, BitTorrent unveiled the
+<a href="http://blog.bittorrent.com/2013/11/05/bittorrent-sync-beta-api-now-available-to-developers/" title="Sync blog announcement">Beta API</a>
+for developers (meaning you have to tell them what you plan to do in order to
+be issued a key). After some equivocation, I signed up with the rather flimsy
+excuse of “writing a shell wrapper for the command line” and found, to my
+chagrin, a key in my inbox the next morning.</p>
+
+<p>This proved to be something of an unwelcome arrival. In theory, I was excited
+about having access to a tool to query the Sync application. One of the nodes is
+on my
+<a href="http://jasonwryan.com/blog/2013/06/29/raspberry/" title="Post on setting up a torrent box">headless Raspberry Pi</a>
+and the idea of being able to issue a command from my laptop to ascertain what
+was going on in the Pi's synced folders was (and is) a tremendously attractive
+one.</p>
+
+<p>However, now that I was in
+possession of the key, I felt morally obliged to do something with it. The
+problem with this realization was that I had no idea how to work with an
+<acronym title="Application Program Interface">API</acronym>, let alone writing
+a script to accomplish my purported goal.</p>
+
+<p>After spending some time looking at
+<a href="http://www.bittorrent.com/sync/developers/api" title="Such as it is…">the documentation</a>,
+and buoyed by the optimism of ignorance, I decided to make good on my promise.
+My first attempt sort of worked, but was hampered as much by a serious
+conceptual flaw as it was by poor implementation. I decided, in spite of any number
+of Stack Overflow posts warning expressly not to do this, to use <code>awk</code> to parse
+the <a href="http://www.json.org/" title="JSON homepage">JSON data</a><sup>2</sup>. This was what I would
+euphemistically describe as a “learning opportunity.” The result is preserved
+for posterity in my <a href="https://bitbucket.org/jasonwryan/shiv/commits/16c9dee17f097e83fb325e303d867e6fda488992?at=default" title="Bit of a trainwreck, but you have to start somewhere…">bitbucket repo</a>
+(for the completists)…</p>
+
+<p>At this point, I was fortunate that Earnestly in #archlinux introduced me to
+keenerd's purpose built tool, <a href="http://kmkeen.com/jshon/" title="Kyle's site: visit it. Now.">Jshon</a>.
+And by “introduced” I mean generously (and patiently) talked me through how it
+worked and how I could use it with the Sync API to achieve what I was after.
+After a while playing with it, there was the—inevitably belated—moment of
+realization: this thing is genius! It allows you to intelligently
+<em>interrogate</em> the data. Not blindly chopping at it with an increasingly complex
+series of actions in <code>awk</code><sup>3</sup>; but quite directly traversing the structure and
+extracting the desired elements.</p>
+
+<p>Now I was <em>cooking</em>. Well, more to the point, I was flailing about in a smoke
+filled kitchen convinced that the feeling of euphoria was inspiration—not imminent
+asphyxiation. Once again, Earnestly's patience and bash skills were put to good effect.
+The resulting script,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="In bitbucket">btstat</a>,
+is undeniably a triumph of his good ideas over my own poor execution. In other
+words, the fact that it works so well is testament to his ability, but any and
+all faults are mine alone<sup>4</sup>.</p>
+
+<p>And it does work. It only requires
+<a href="https://www.archlinux.org/packages/?sort=&amp;q=jshon" title="Arch package db">Jshon</a>
+(which you will already have installed because you use
+<a href="http://jasonwryan.com/blog/2012/03/09/aurphan/" title="My post on this great utility">aurphan, right?</a>)
+and a file with your synced folders and their respective secrets on each line<sup>5</sup>, like so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>directory1 YourRe@llyTr1cky53cr3t
+</span><span class='line'>directory2 H0p3fu11yY0uG3tTh31d3@
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The functionality in the script is limited at this stage to just querying the
+application; I wasn't interested in pushing changes at this point. So you can
+access the version of the currently installed Syncapp, upload and download
+speeds, the size of synced folders and list all of their contents.</p>
+
+<p>It is a beta release, so the odd bug is to be expected. Overall, though, the API is
+a welcome addition to what is a great application. If you have an API key, add
+it to your <span class="file">sync.conf</span>,
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/btstat" title="On bitbucket">grab the script</a>
+and give it a whirl. Undoubtedly, over the coming weeks more polished versions
+will emerge in “proper” languages, but for the time being this does exactly what
+I need.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Yes, I would much prefer to use an open source tool to accomplish the same
+thing but I haven't found anything comparable that is this good to date…</li>
+<li>In what I imagine is a complete coincidence, the JSON logo is uncannily
+similar to the initial (and much better, I thought) Sync logo, as seen on
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/">my original post</a>.</li>
+<li>This is not intended as a slight on <code>awk</code>; which I am undoubtedly
+<a href="http://jasonwryan.com/blog/2013/09/15/awking/">fond of</a>, but rather the
+limits of my ability with that language.</li>
+<li>I am also indebted to Scott (firecat53) for testing and providing helpful
+feedback on the early versions of the script.</li>
+<li>It is worth noting that in the <code>$json</code> variable, I pass <code>curl</code> the -<code>n</code> option,
+which means it reads my credentials from <span class="file">$HOME/.netrc</span>.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[BitTorrent Sync Alpha]]></title>
+    <link href="http://jasonwryan.com/blog/2013/03/16/sync/"/>
+    <updated>2013-03-16T10:17:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2013/03/16/sync</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/syncapp.png" title="BitTorrent Sync logo" >
+I have posted about using <a href="http://dropbox.com" title="dropbox homepage">dropbox</a> quite
+<a href="https://duckduckgo.com/?sites=jasonwryan.com&amp;q=dropbox" title="DDG search results">a few times</a>
+over the last couple of years; it is one of those utilities that quickly insinuates itself
+into an indispensable niche in your workflow and, consequently, can be <em>very</em> difficult to
+dislodge. Perhaps because it has started to glue together so much of the way I work, I have
+been wondering when I would find a replacement that would deliver all, or much, of the
+functionality, without the standard
+<a href="http://arstechnica.com/security/2012/07/dropbox-confirms-it-got-hacked-will-offer-two-factor-authentication/" title="Ars post on the dropbox hack">cloud security issues</a>,
+that seem to bedevil these services.<sup>1</sup></p>
+
+<p>When I saw that BitTorrent had release a distributed synching app called—appropriately—
+<a href="http://blog.bittorrent.com/2013/01/24/test-bittorrent-sync-pre-alpha/" title="Blog post on sync release">Sync</a>,
+I <a href="http://labs.bittorrent.com/experiments/sync.html" title="Invitation form">signed up for the Alpha</a> and
+have been running it in lieu of dropbox for the past three weeks. My initial reaction is,
+that for a first release, it is very impressive.</p>
+
+<p>Essentially, Sync uses the
+<a href="https://en.wikipedia.org/wiki/Bittorent" title="Wikipedia entry">bittorrent peer-to-peer protocol</a>
+and encryption
+(<a href="https://en.wikipedia.org/wiki/Aes_256" title="Wikipedia entry on the standard">AES 256</a>
+using a private key based on the secret generated for each shared folder)
+to sync files between your machines—or anyone with whom you share the secret
+for a particular directory. This has several advantages over dropbox, from my perspective.
+First and foremost, you are not relying on some third party for security<sup>2</sup>, storage
+and uptime. Secondly, all of the traffic between your devices is encrypted. And finally,
+it is free (sadly, only as in beer).</p>
+
+<h3>Positives</h3>
+
+<p>So what does it do well? It is ridiculously easy to setup. You download the binary, start
+the app and then (on Linux) use the web interface to setup your first synching folder by
+generating a secret and then nominating a folder to share. On your next machine, enter the
+secret and select or create the shared folder and your files will be synched. Done.</p>
+
+<p>On a headless machine, there is a config file that you can create:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --dump-sample-config &gt; syncapp.conf
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Edit it to suit your requirements, and then start <code>syncapp</code> with that configuration:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>syncapp --config /path/to/syncapp.conf
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>and you are away, happily synching.</p>
+
+<p>Like other applications that use the bittorrent protocol, it can take a minute or
+two for the synching to begin, but once it does I found it—over the Internet as well
+as my <acronym title="Local Area Network">LAN</acronym> to be much faster than
+dropbox. Another plus.</p>
+
+<h3>Areas for improvement</h3>
+
+<p>It is Alpha software so there are some areas where you can expect to see improvements
+with subsequent release. For me, that includes:</p>
+
+<ul>
+<li>Better command line tools; the current limited set are servicable, but could do
+with more flexibility and options</li>
+<li>The ability to create your own secret, rather than rely on generated ones</li>
+<li>A less fragile config file; it is written in JSON and the simplest errors will
+break it</li>
+<li>More Linux love; the other platforms have a much more sophisticated <acronym title="User Interface">UI</acronym></li>
+</ul>
+
+
+<p>A comparison with dropbox is not entirely fair; there are some things that dropbox
+does—like versioning—that Sync can/will not do. Dropbox also allows you to host
+public files and folders, meaning that you can
+<a href="http://jasonwryan.com/blog/2010/01/11/using-dropbox-to-share-dotfiles/" title="Post on using dropbox to host dotfiles">setup a basic webpage</a>
+or <a href="https://www.dropbox.com/sh/t6ko1rbl9edy8p4/OkwVLtY5fO" title="My Top 10 Albums">share a photo album</a>.
+Sync clearly isn't designed for this.</p>
+
+<p>However, in some other respects, like architectures
+for example, Sync is already a better choice. The ARMv6 port means that I am able
+to run it on my Raspberry Pi, and that I have been able to update my
+<a href="http://jasonwryan.com/blog/2011/11/07/irc-dzen/" title="Post on IRC highlights">IRC notification system</a>
+to use Sync rather than dropbox and it is working perfectly well.</p>
+
+<p>There is one area, though, where I wish the BitTorrent team would be a lot more
+forthcoming. There has been an unanswered question on the Sync forums for
+over three weeks now asking
+<a href="http://forum.bittorrent.com/topic/8816-will-syncapp-be-open-source/" title="Syncapp Forums">will Syncapp be open sourced?</a>
+Aside from the issue of whether or not the source will be made available (and I am guessing
+that given their reticence to answer the question on their boards the prognosis
+is not promising) people using the application now should know under what terms
+they are using it.</p>
+
+<p>In the absence of any definitive licensing, I can only assume that the application
+is covered by BitTorrent's
+<a href="http://www.bittorrent.com/legal/eula" title="Licensing agreement on BitTorrent site">default EULA</a>.
+That ambiguity means that I am happy to participate in the
+trial and provide feedback, but I won't be using the app for any remotely
+sensitive data and I am unlikely to do so until that issue is clarified.</p>
+
+<p>I'll install <a href="http://sparkleshare.org/" title="Sparkleshare site">Sparkleshare</a>
+and give that a shot instead…</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Naturally, there are more issues at play here than just their (in)security policies.</li>
+<li>Assuming, of course, you trust what BitTorrent pack into the binary…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[rsync + SSH Backups]]></title>
+    <link href="http://jasonwryan.com/blog/2011/11/28/rsync/"/>
+    <updated>2011-11-28T12:23:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2011/11/28/rsync</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/rsync-ssh.png" alt="image" /></p>
+
+<p>I <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
+and included a
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
+script for backing up my files to the server. At the time, I was running
+it manually, but since have sorted out the excludes list and have now
+automated it.</p>
+
+<p>My original scheme was to set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
+mount an
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
+before rsync’ing the directories across. In the end, I went with SSH and
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
+as debugging all of the various permissions issues with the NFS share
+did not seem worth the effort.</p>
+
+<p>First, on my local desktop, I created the keypair called, inventively,
+rsync:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
+</span><span class='line'>mv rsync ~/.ssh &amp;amp;&amp;amp; chmod 600 ~/.ssh/rsync
+</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>This keypair was created <em>without a passphrase</em> so that the script could
+be successfully called from <code>cron</code>. To slightly increase the security
+around a key without a passphrase, I used the from option in
+authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
+machine(s), like so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
+the SSH command:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.ssh/config </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>Host backups
+</span><span class='line'>   Hostname 192.168.1.200
+</span><span class='line'>   Port 0000
+</span><span class='line'>   User jason
+</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></div></figure></notextile></div></p>
+
+<p>And I was done. Everynight at 10pm, all of my data will be backed up to
+the server. The rsync command in the script:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Backup to remote server over SSH&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;--log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
+</span><span class='line'>-e ssh /home/jason /etc backups:Backups/Centurion
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></div></figure></notextile></div></p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
+</ol>
+
+
+<p>Creative Commons image from
+<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: hack | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.com/blog/categories/hack/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-19T08:20:47+13:00</updated>
+  <id>http://jasonwryan.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Playing with overlayfs]]></title>
+    <link href="http://jasonwryan.com/blog/2015/01/19/overlayfs/"/>
+    <updated>2015-01-19T08:20:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2015/01/19/overlayfs</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/jello.jpg" title="Creative Commons Image" >
+Around this time last year, I posted about setting up a
+<a href="http://jasonwryan.com/blog/2014/01/20/udev/" title="Post in Jan 14">udev rule to run a script</a>
+when I plugged my USB drive containing all of my music into one of my
+laptops; the script, a
+<a href="https://gist.github.com/jasonwryan/0df98a396af89bf82eb6" title="A gist…">couple of lines of bash</a>,
+removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
+repopulates the directory with an updated set. Almost. The one flaw that has
+been an irritant of variable intensity, depending on what I felt like listening
+at any given time, is that the symlinks aren't written for directories that
+already exist on the target filesystem.</p>
+
+<p>In order that I am able to play some music if I forget the USB drive, each of
+the laptops has a subset of albums on it, depending on the size of their
+respective hard drives. If I add a new album to the USB drive, then that change won't
+get written to either of the laptops when the drive is plugged in. Not entirely
+satisfactory. I had tinkered around with
+<a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
+having <a href="http://mywiki.wooledge.org/UsingFind" title="Wooledge again, because it is so great…"><code>find(1)</code></a>
+scan deeper into the tree, or even a loop to check for the presence of directories in an array…</p>
+
+<p>It just got too hard. My rudimentary scripting skills and the spectre of recursion,
+I am sorry to admit, conspired to undermine my resolve. So, rather than concede
+unconditional surrender, I
+<a href="http://unix.stackexchange.com/q/179397/6761%20'Question%20on%20Unix%20&amp;%20Linux%20SE">asked for help</a>.
+As is almost always the case in these situations, this proved to be a particularly
+wise move; the response I received was neither what I expected, nor was it anything I
+was even remotely familiar with: so in addition to an excellent solution (one far
+better suited to what I was trying to achieve), I learned something new.</p>
+
+<p>The first comment on my question proved singularly insightful.</p>
+
+<p><blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&amp;L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote></p>
+
+<p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
+
+<p><blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote></p>
+
+<p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
+<a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
+The genealogy of these mounts has been well covered in this 2010 LWN
+<a href="http://lwn.net/Articles/396020/" title="LWN.net">article by Valerie Aurora</a>. However, it is only
+in the current kernel, 3.18, that a union mount has been accepted into the kernel tree.</p>
+
+<p>After reading the
+<a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/overlayfs.txt" title="Kernel docs">documentation for overlayfs</a>, it seemed this was <em>exactly</em> what I
+was looking for. Essentially, an overlay mount would allow me to “merge"
+the underlying tree (the Music directory on the USB drive) with an “upper”
+one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
+seamlessly</em>.</p>
+
+<p><blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote></p>
+
+<p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
+trivial:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;union mount Music when Apollo plugged in&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;low<span class="o">=</span>/media/Apollo/Music
+</span><span class='line'><span class="nv">upp</span><span class="o">=</span>/home/jason/Music
+</span><span class='line'><span class="nv">wod</span><span class="o">=</span>/home/jason/.local/tmp
+</span><span class='line'><span class="nb">export </span><span class="nv">DISPLAY</span><span class="o">=</span>:0
+</span><span class='line'><span class="nb">export </span><span class="nv">XAUTHORITY</span><span class="o">=</span>/home/jason/.Xauthority&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;overlayfs mount&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
+</span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mpc update &amp;amp;&gt;/dev/null
+</span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 &amp;amp;&amp;amp; <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>And now, when I plug in the USB drive, the contents of the drive are merged
+with my local music directory, and I can access whichever album I feel inclined
+to listen to. I can also copy files across to the local machines, knowing if I
+update the portable drive, it will no longer mean I have to forego listening to
+any newer additions by that artist in the future (without manually intervening,
+anyway).</p>
+
+<p>Overall, this is a lightweight union mount. There is neither a lot of functionality,
+nor complexity. As the
+<a href="https://github.com/torvalds/linux/commit/e9be9d5e76e34872f0c37d72e25bc27fe9e2c54c" title="Git commit">commit note</a>
+makes clear, this “simplifies the implementation and allows native performance
+in these cases.” Just note the warning about attempting to write to a mounted
+underlying filesystem, where the behaviour is described as “undefined”.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, <a href="https://flic.kr/p/5RRRXP">mulitlayered jello</a> by Frank Farm.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pruning Tarsnap Archives]]></title>
+    <link href="http://jasonwryan.com/blog/2014/10/25/snapclean/"/>
+    <updated>2014-10-25T09:38:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2014/10/25/snapclean</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/tarsnap-logo.png" title="Tarsnsap Logo" >
+I started using <a href="http://www.tarsnap.com/" title="Tarsnap website">Tarsnap</a> about
+<a href="http://jasonwryan.com/blog/2011/09/08/tarsnap/" title="Post on Tarsnap">three years ago</a>
+and I have been nothing but impressed with it since. It is simple to use,
+<em>extremely</em> cost effective and, more than once, it has saved me from myself;
+making it easy to retrieve copies of files that I have inadvertently
+overwritten or otherwise done stupid things with<sup>1</sup>.  When I
+<a href="http://jasonwryan.com/blog/2011/09/08/tarsnap/" title="Post on Tarsnap">first posted about it</a>,
+I included a
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snap" title="In Bitbucket repo">simple wrapper script</a>,
+which has held up pretty well over that time.</p>
+
+<p>What became apparent over the last couple of months, as I began to consciously
+make more regular backups, was that pruning the archives was a relatively
+tedious business. Given that Tarsnap
+<a href="http://www.tarsnap.com/efficiency.html" title="Tarsnap efficiency page">de-duplicates data</a>,
+there isn't much mileage in keeping around older archives because, if you do
+have to retrieve a file, you don't want to have to search through a large
+number of archives to find it; so there is a balance between making use of
+Tarsnap's efficient functionality, and not creating a rod for your back if your
+use case is occasionally retrieving single—or small groups of—files, rather
+than large dumps.</p>
+
+<p>I have settled on keeping five to seven archives, depending on the frequency of
+my backups, which is somewhere around two to three times a week. Pruning these
+archives was becoming tedious, so I wrote a simple script to make it less
+onerous. Essentially, it writes a list of all the archives to a
+<span class="file">tmpfile</span>, runs
+<a href="http://linux.die.net/man/1/sort" title="sort man page">sort(1)</a>
+to order them from oldest to newest, and then deletes the oldest minus whatever
+the number to keep is set to.</p>
+
+<p>The bulk of the code is simple enough:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>snapclean </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;generate list&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;tarsnap --list-archives &gt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;sort by descending date, format is: host-ddmmyy_hh:mm&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">{</span>
+</span><span class='line'>  rm <span class="s2">&quot;$tmpfile&quot;</span> &amp;amp;&amp;amp; sort -k 1.11,1.10 -k 1.8,1.9 -k 1.7,1.6 &gt; <span class="s2">&quot;$tmpfile&quot;</span>
+</span><span class='line'><span class="o">}</span> &amp;lt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;populate the list&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mapfile -t archives &amp;lt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;print the full list&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;printf <span class="s2">&quot;%s\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Current archives${end}:&quot;</span> <span class="s2">&quot;${archives[@]#*-}&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;identify oldest archives&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;remove<span class="o">=</span><span class="k">$((</span> <span class="k">${#</span><span class="nv">archives</span><span class="p">[@]</span><span class="k">}</span> <span class="o">-</span> keep <span class="k">))</span>
+</span><span class='line'><span class="nv">targets</span><span class="o">=(</span> <span class="k">$(</span>head -n <span class="s2">&quot;$remove&quot;</span> <span class="s2">&quot;$tmpfile&quot;</span><span class="k">)</span> <span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;if there is at least one to remove&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">((</span> <span class="k">${#</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span> &gt;<span class="o">=</span> 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${red}Archives to delete${end}:&quot;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${targets[@]#*-}&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="nb">read</span> -p <span class="s2">&quot;Proceed with deletion? [${red}Y${end}/N] &quot;</span> YN&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$YN</span> <span class="o">==</span> Y <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;for archive in <span class="s2">&quot;${targets[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span>tarsnap -d --no-print-stats -f <span class="s2">&quot;$archive&quot;</span>
+</span><span class='line'><span class="k">done</span> &amp;amp;&amp;amp; <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Archives successfully deleted...${end}&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Remaining archives:${end}&quot;</span>
+</span><span class='line'>tarsnap --list-archives
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Operation aborted${end}&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Nothing to do&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>0
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>You can see the rest of the script in
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snapclean" title="snapclean in bitbucket">my bitbucket repo</a>.  It even comes <a href="/images/post_images/snapclean.png" title="Screenshot of snapclean">with colour</a>.</p>
+
+<p>Once every couple of weeks, I run the script, review the archives marked for
+deletion and then blow them away. Easy. If you aren't using Tarsnap, you
+really should check it out; it is an excellent service and—for the almost
+ridiculously small investment—you get rock solid, encrypted peace of
+mind. Why would you not do that?</p>
+
+<h3>Coda</h3>
+
+<p>This is the <em>one hundredth</em> post on this blog: a milestone that I never
+envisaged getting anywhere near. Looking back through the posts, nearly 60,000
+words worth, there are a couple there that continue to draw traffic and are
+obviously seen at some level as helpful.  There are also quite a few that
+qualify as “filler”, but blogging is a discipline like any other and sometimes
+you just have to push something up to keep the rhythm going. In any event, this
+is a roundabout way of saying that, for a variety of reasons both personal and
+professional, I am no longer able to fulfil my own expectations of regularly
+pushing these posts out.</p>
+
+<p>I will endeavour to, from time to time when I find something that I genuinely
+think is worth sharing, make an effort to write about it, but I can't see that
+happening all that often.  I'd like to thank all the people that have read
+these posts; especially those of you that have commented. With every post, I
+always looked forward to people telling me where I got something wrong or how I
+could have approached a problem differently or more effectively<sup>2</sup>; I
+learned a lot from these pointers and I am grateful to the people that were
+generous enough to share them.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The frequency with which this happens is, admittedly, low; but not
+low enough to confidently abandon a service like this…</li>
+<li>Leaving a complimentary note is just as welcome, don't get me wrong…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Multi-arch Packages in AUR]]></title>
+    <link href="http://jasonwryan.com/blog/2014/09/20/multiarch/"/>
+    <updated>2014-09-20T09:16:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/09/20/multiarch</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/agra.jpg" title="Creative Commons image of Agra" >
+One of the easiest ways to contribute to Arch is to maintain a package, or
+packages, in the
+<acronym title="Arch User Repository"><a href="https://aur.archlinux.org/" title="AUR homepage">AUR</a></acronym>;
+the repository of user contributed PKGBUILDs that extends the range of packages available
+for Arch by some magnitude. Given that PKGBUILDs are just shell scripts, the barrier
+to entry is relatively low, and investing the small amount of effort required to clear
+that barrier will not only give you a much better understanding of how packaging works
+in Arch, but will scratch your own itch for a particular package and hopefully assuage
+someone else's similar desire at the same time.</p>
+
+<p>Now that I have a
+<a href="http://www.raspberrypi.org/" title="Raspberry Pi site">Raspberry Pi</a><sup>1</sup>, I am
+naturally much more interested in packages that can be built for the ARMv6
+architecture; especially those that are available in the AUR. It is worth a brief
+digression to note that
+<a href="http://archlinuxarm.org/" title="AL ARM home page">Arch Linux ARM</a> is an entirely
+<em>separate</em> distribution and, while they share features with Arch, support for
+each is restricted to their respective communities. It is with this
+consideration in mind that I had begun to think about multi-arch support in
+PKGBUILDs, particularly in the packages that I maintain in the AUR.</p>
+
+<p>I have
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on Syncthing">previously posted</a>
+about using <a href="http://syncthing.net/" title="Open source synching: genius…">Syncthing</a>
+across my network, including on a Pi as one of the nodes. As the Syncthing
+developer pushes out a release at least weekly, I have been maintaining my own
+PKGBUILD and, after Syncthing was pulled into [community], I uploaded it to the
+AUR as
+<a href="https://aur.archlinux.org/packages/syncthing-bin" title="AUR package">syncthing-bin</a>.</p>
+
+<p>Syncthing is a cross platform application so it runs on a wide range of
+architectures, including ARM (both v6 and v7). Initially, when I wrote the
+PKGBUILD, I would <code>updpkgsums</code> on my x86_64 machine, build the package and
+then, on the Pi, have to regenerate the integrity checks. This was manageable
+enough for my own use across two architectures, but wasn't really going to
+work for people using other architectures (especially if they are using
+<a href="http://jasonwryan.com/blog/2013/04/09/helpers/" title="My post on Yaourt">AUR helpers</a>).</p>
+
+<p>Naturally enough, this started me thinking about how I could more effectively
+manage the process of updating the PKGBUILD for each new release, <em>and</em> have it
+work across the four architectures—without having to manually copy and paste or
+anything similarly tedious. Managing multiple architectures in the PKGBUILD
+itself is not particularly problematic, a case statement is sufficient:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>PKGBUILD </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="k">case</span> <span class="s2">&quot;$CARCH&quot;</span> in&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;armv6h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv6&quot;</span>
+</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;a94e5d00cec32956eb27bc12dbbc4964b68913f9&#39;</span><span class="o">)</span>
+</span><span class='line'>       ;;
+</span><span class='line'>armv7h<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;armv7&quot;</span>
+</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;9b782abf95668a906bfe76ad5ceb4cda17ec2289&#39;</span><span class="o">)</span>
+</span><span class='line'>       ;;
+</span><span class='line'>i686<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;386&quot;</span>
+</span><span class='line'>      sha1sums+<span class="o">=(</span><span class="s1">&#39;b2e1961594a931201799246f5cf61cb1e1700ff9&#39;</span><span class="o">)</span>
+</span><span class='line'>       ;;
+</span><span class='line'>x86_64<span class="o">)</span> <span class="nv">_pkgarch</span><span class="o">=</span><span class="s2">&quot;amd64&quot;</span>
+</span><span class='line'>        sha1sums+<span class="o">=(</span><span class="s1">&#39;035730c09ca5383c90fdd9898baf66b90acdef24&#39;</span><span class="o">)</span>
+</span><span class='line'>       ;;
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;esac
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The real challenge, for me, was to be able to script the replacement of each of
+the respective
+<a href="http://en.wikipedia.org/wiki/Sha1sum" title="Wikipedia entry">sha1sums</a>,
+and then to update the PKGBUILD with the new arrays.  Each release of
+Syncthing is accompanied by a text file containing all of the sha1sums, each on
+its own line in a conveniently ordered format, like so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>sha1sums.txt.asc </span></figcaption>
+ <div class="highlight"><pre><code class='text'><span class='line'>b2e1961594a931201799246f5cf61cb1e1700ff9    syncthing-linux-386-v0.9.16.tar.gz
+</span><span class='line'>035730c09ca5383c90fdd9898baf66b90acdef24    syncthing-linux-amd64-v0.9.16.tar.gz
+</span><span class='line'>d743b64204f0ac7884e4b42d9b1865b2436f5ecb    syncthing-linux-armv5-v0.9.16.tar.gz
+</span><span class='line'>…
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>This seemed a perfect job for Awk, or more particularly, <code>gawk</code>'s
+<a href="https://www.gnu.org/software/gawk/manual/html_node/Switch-Statement.html" title="Gawk manual">switch statement</a>,
+and an admittedly rather convoluted <code>printf</code> incantation.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='awk'><span class='line'><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="nx">switch</span> <span class="p">(</span><span class="o">$</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">armv6</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>    <span class="nx">arm6</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>    <span class="k">break</span>
+</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">armv7</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>    <span class="nx">arm7</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>    <span class="k">break</span>
+</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="mi">386</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>    <span class="nx">i386</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>    <span class="k">break</span>
+</span><span class='line'>  <span class="nx">case</span> <span class="o">/</span><span class="nx">linux</span><span class="o">-</span><span class="nx">amd64</span><span class="o">/</span><span class="err">:</span>
+</span><span class='line'>    <span class="nx">x86</span> <span class="o">=</span> <span class="o">$</span><span class="mi">1</span>
+</span><span class='line'>    <span class="k">break</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>  <span class="p">}</span>
+</span><span class='line'><span class="nx">END</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">printf</span> <span class="s2">&quot;case \&quot;$CARCH\&quot; in\n\t&quot;</span><span class="err">\</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span>     <span class="s2">&quot;armv6h) _pkgarch=\&quot;armv6\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>     <span class="s2">&quot;armv7h) _pkgarch=\&quot;armv7\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>     <span class="s2">&quot;i686) _pkgarch=\&quot;386\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n\t&quot;</span><span class="err">\</span>
+</span><span class='line'>     <span class="s2">&quot;x86_64) _pkgarch=\&quot;amd64\&quot;\n\t\tsha1sums+=(\047%s\047)\n\t\t;;\n&quot;</span><span class="err">\</span>
+</span><span class='line'>     <span class="s2">&quot;esac\n&quot;</span><span class="p">,</span>
+</span><span class='line'>     <span class="nx">arm6</span><span class="p">,</span> <span class="nx">arm7</span><span class="p">,</span> <span class="nx">i386</span><span class="p">,</span> <span class="nx">x86</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The remaining step was to update the PKGBUILD with the new sha1sums. Fortunately,
+<a href="http://blog.falconindy.com/" title="Dave's blog">Dave Reisner</a> had already written the code
+for this in his <code>updpkgsums</code> utility; I had only to adapt it slightly:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>excerpt from updpkgsums </span></figcaption>
+ <div class="highlight"><pre><code class='awk'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">rm</span> <span class="s2">&quot;$buildfile&quot;</span>
+</span><span class='line'>  <span class="nx">exec</span> <span class="nx">awk</span> <span class="o">-</span><span class="nx">v</span> <span class="nx">newsums</span><span class="o">=</span><span class="s2">&quot;$newsums&quot;</span> <span class="s1">&#39;&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">&lt;pre&gt;&lt;code&gt;/^case/,/^esac$/ {</span>
+</span><span class='line'><span class="s1">  if (!w) { print newsums; w++ }</span>
+</span><span class='line'><span class="s1">    next</span>
+</span><span class='line'><span class="s1">  }; 1</span>
+</span><span class='line'><span class="s1">  END { if (!w) print newsums }</span>
+</span><span class='line'><span class="s1">&lt;/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">&lt;p&gt;  &#39;</span> <span class="o">&gt;</span> <span class="s2">&quot;$buildfile&quot;</span>
+</span><span class='line'><span class="p">}</span> <span class="err">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="s2">&quot;$buildfile&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Combining these two tasks means that I have a script that, when run, will download
+the current Syncthing release's <span class="file">sha1sum.txt.asc</span>
+file, extract the relevant sums into the replacement case statement and then
+write it into the PKGBUILD. I can then run <code>makepkg -ci &amp;&amp; mkaurball</code>, upload
+the new tarball to the AUR and the two other people that are using the PKGBUILD
+can download it and not have to generate new sums before installing their
+shiny, new version of Syncthing. You can see the full version of the script in
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/upsync" title="Tip…">my bitbucket repo</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See my other <a href="http://jasonwryan.com/blog/categories/arm/">posts about the Pi</a>…</li>
+</ol>
+
+
+<p>Creative Commons image of the Mosque at Agra, by
+<a href="https://www.flickr.com/photos/jasonwryan/14986166957/">yours truly</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Simple Reminders]]></title>
+    <link href="http://jasonwryan.com/blog/2014/09/06/reminder/"/>
+    <updated>2014-09-06T10:59:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/09/06/reminder</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/alarm_clock.jpg" title="Creative Commons image" >
+Due to a rather embarrassing episode in #archlinux a couple of weeks ago,
+where I naively shared one of the first bash scripts I had written without
+first looking back over it<sup>1</sup>, and had to subsequently endure what
+felt like the ritual
+<a href="http://www.dilbert.com/strips/comic/2013-02-24/" title="Classic Dilbert strip">code mocking</a>,
+but was in fact some helpful pointers as to how I could make the script suck
+less (a <em>lot</em> less) I have been going through those older scripts and applying
+the little knowledge that I have picked up in the interim; reappraising the
+usefulness of the scripts as I go.</p>
+
+<p>One that has proved to be of some utility for many years now is a simple
+wrapper script I wrote to help manage my finances. Like many useful scripts, it
+was written quickly and has been in constant use ever since; becoming almost
+transparent it is so ingrained in my workflow.</p>
+
+<p>The script allows me to manage the lag between when a company emails me an
+invoice and when the payment is actually due. I find that companies will
+typically email their invoices to me some weeks in advance, whereupon I will
+make a mental note and then, unsurprisingly, promptly forget all about it,
+thereby opening myself up for penalties for late payment.  It didn't take me
+long (well, in my defence, a lot less time than it took for invoices to become
+digital) to realise that there was a better way™ - a script.</p>
+
+<p>The <a href="http://pubs.opengroup.org/onlinepubs/9699919799/utilities/at.html" title="POSIX spec">at command</a>
+is purpose built for running aperiodic commands at a later time (whereas
+<a href="http://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html" title="POSIX spec">cron</a>
+is for periodic tasks). So, using at(1), once I receive an invoice, I can set a
+reminder closer to the final payment window, thereby avoiding both the late
+payment penalty—and the loss of interest were I to pay it on receipt. I just
+needed a script to make it painless to achieve.</p>
+
+<p>The main function of the script is pretty self-explanatory:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>todo </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>aread<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Time of message? [HH:MM] &quot;</span> attime
+</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Date of message? [DD.MM.YY] &quot;</span> atdate
+</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Message body? &quot;</span> message&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="nv">timexp</span><span class="o">=</span><span class="s1">&#39;&lt;sup&gt;[0-9]{2}:[0-9]{2}&#39;</span>&lt;/sup&gt;
+</span><span class='line'>  <span class="nv">datexp</span><span class="o">=</span><span class="s1">&#39;&lt;sup&gt;[0-9]{2}.[0-9]{2}.[0-9]{2}&#39;</span>&lt;/sup&gt;&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$attime</span> <span class="o">=</span>~ <span class="nv">$timexp</span> &amp;amp;&amp;amp; <span class="nv">$atdate</span> <span class="o">=</span>~ <span class="nv">$datexp</span> <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; at <span class="s2">&quot;$attime&quot;</span> <span class="s2">&quot;$atdate&quot;</span> &amp;lt;&amp;lt; EOF
+</span><span class='line'> <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;$message&quot;</span> | mutt -s <span class="s2">&quot;REMINDER&quot;</span> jasonwryan@gmail.com
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;EOF
+</span><span class='line'>  <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Incorrectly formatted values, bailing...&quot;</span> &amp;amp;&amp;amp; <span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>&lt;br/&gt;
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Now, an invoice arrives, I open it and fire up
+<a href="https://github.com/jasonwryan/dwm/blob/patches/patchset/Base_config_changes.patch#L85" title="patch on github">a scratchpad</a>, and follow the prompts. A couple of weeks later, the
+reminder email arrives and I login to my bank account and dispatch payment.
+You could, of course, have the script trigger some other form of notification,
+but an email works well for me.</p>
+
+<p>The rest of the script is similarly basic; just some options for listing and
+reading any queued jobs and some more rudimentary checking. The full script is
+in my
+<a href="https://bitbucket.org/jasonwryan/centurion/src/tip/Scripts/todo" title="todo script">bitbucket repo</a><sup>2</sup>.</p>
+
+<h3>Update 7/09/14</h3>
+
+<p>Not more than a couple of hours after posting this,
+<a href="http://bluewind.at/">Florian Pritz</a> pinged me in #archlinux with some great suggestions
+for improving the script. I particularly liked relying on date(1) handling the input format
+for the time and date values. He also suggested a
+<a href="http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html" title="GNU readline page">readline</a>
+wrapper called (appropriately enough)
+<a href="https://github.com/hanslub42/rlwrap" title="Github repo">rlwrap</a> and a <code>tmpfile</code> to better manage
+input validation. You can see his
+<a href="https://gist.github.com/jasonwryan/54fead5ad2b0c3b82621" title="Gist on github">full diff</a> of
+changes. In the end, I adopted the <code>date</code> suggestion but passed on <code>rlwrap</code>. Thanks for the
+great pointers, Florian.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In the interests of full disclosure, the most egregious line was
+<code>myterm=$(echo $TERM)</code> which I would hope I copied blindly from somewhere
+else, but accept full responsibility for nonetheless.</li>
+<li>Don't poke around too much in there, I still have quite a lot of cleaning up to do…</li>
+</ol>
+
+
+<p>Creative Commons image by <a href="https://www.flickr.com/photos/h_is_for_home/3494382794/">Adelle and Justin</a>
+on Flickr.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Building from Source]]></title>
+    <link href="http://jasonwryan.com/blog/2014/08/23/asp/"/>
+    <updated>2014-08-23T09:41:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/08/23/asp</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/lego.jpg" title="Creative Commons image" >
+One of the real strengths of Arch is its ability to be customised. Not just in
+terms of the packages that you choose to install, but how those packages
+themselves can be patched, altered or otherwise configured to suit your
+workflow and setup. I have posted previously about,
+for example, <a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on Vim configuration">building Vim</a>
+or <a href="http://jasonwryan.com/blog/2013/05/18/pkgbuilds/" title="More general observations">hacking PKGBUILDS</a>.
+What makes all this possible is the wonderful
+<a href="https://wiki.archlinux.org/index.php/Arch_Build_System" title="Arch Wiki page">ABS</a>,
+the Arch Build System.</p>
+
+<p>Essentially a tree of all of the PKGBUILDs (and other necessary files) for the
+packages in the official repositories, the ABS is the means by which you can
+easily acquire, compile and install any of the packages on your system:</p>
+
+<p><blockquote><p>ABS is made up of a directory tree (the ABS tree) residing under <span class="file">/var/abs</span>. This tree contains many subdirectories, each within a category and each named by their respective package. This tree represents (but does not contain) all <em>official Arch software</em>, retrievable through the SVN system.</p><footer><strong>Arch Wiki</strong> <cite>ABS</cite></footer></blockquote></p>
+
+<p>I have been using ABS since I started running Arch and it has worked well. I
+wrote a
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/abpkg" title="In my bitbucket repo">simple script</a>
+to check for and download updates when required to help simplify the process
+and have been generally content with that approach. That isn't to say that
+elements of this process couldn't be improved. One of the small niggles is that
+the ABS only syncs once a day so there is almost always—for me down here in
+.nz, anyway—at least a full day's wait between the package hitting the local
+mirror and the updated ABS version arriving. The other issue is that you
+download and sync the entire tree…</p>
+
+<p>That all changed when, at the start of this month, one of the Arch developers,
+<a href="http://blog.falconindy.com/" title="Dave's blog">Dave Reisner</a>, opened a
+<a href="https://bbs.archlinux.org/viewtopic.php?id=185075" title="asp thread">thread on the Arch boards</a>
+announcing <a href="https://github.com/falconindy/asp" title="Github repo">asp</a>, the Arch
+Source Package management tool, a git-based alternative for <code>abs</code><sup>1</sup>.</p>
+
+<p>Basically a 200-line bash script, <code>asp</code> is an improvement over <code>abs</code> insofar as
+you get the updated PKGBUILDs immediately; you can choose between just pulling
+the necessary source files (as <em>per</em> <code>abs</code>), or checking out the package branch
+so that you can create your own development branch and, for example, keep your
+patch set in git as well.</p>
+
+<p>You can elect to locate the local git repository in a directory of your
+choosing by exporting <code>ASPROOT</code>, there are <kbd>Tab</kbd> completion scripts
+for bash and zsh and a succinct <code>man</code> page. Overall, for a utility that is only
+three weeks old, <code>asp</code> is already fulfilling the function of a drop-in
+replacement; a faster, more flexible tool for building Arch packages from
+source.</p>
+
+<p><blockquote><p>With thy sharp teeth this knot intrinsicate<br/>Of life at once untie…</p><footer><strong>Antony and Cleopatra</strong> <cite>V.ii</cite></footer></blockquote></p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The <a href="https://www.archlinux.org/packages/?name=abs">package</a>,
+not the entire build system…</li>
+</ol>
+
+
+<p>Creative Commons image, Red Lego Brick by <a href="https://www.flickr.com/photos/dillpixel/8506365952/">Brian Dill</a>
+on Flickr.</p>
+]]></content>
+  </entry>
+  
+</feed>

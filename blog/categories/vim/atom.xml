@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: vim | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.com/blog/categories/vim/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-19T08:20:47+13:00</updated>
+  <id>http://jasonwryan.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Writing with Vim]]></title>
+    <link href="http://jasonwryan.com/blog/2014/06/14/writing/"/>
+    <updated>2014-06-14T09:30:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/06/14/writing</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/vimbot.jpg" title="Practical Vim cover image" >
+<a href="http://www.vim.org/" title="Vim homepage">Vim</a> is not just an editor (and not in the way that
+<a href="http://www.gnu.org/software/emacs/" title="GNU Emacs page">Emacs</a> is more than
+<a href="http://en.uncyclopedia.co/wiki/Emacs" title="Uncyclopedia entry">just an editor</a>);
+it is for all intents and purposes a universal design pattern. The concept of using
+Vim's modes and keybinds extends from
+<a href="http://jasonwryan.com/blog/2011/12/01/readline/" title="Post on readline">the shell</a>
+through to <a href="http://jasonwryan.com/blog/2009/12/28/changing-keybinds-in-vifm/" title="Post on Vifm">file managers</a>
+and <a href="http://jasonwryan.com/blog/2012/11/20/vimprobable/" title="Vimprobable screencast">browsers</a>.
+If you so choose (and I <em>do</em>), then a significant amount of your interactions with your
+operating system are mediated by Vim's design principles. This is undeniably a
+good thing™ as it goes some way to standardising your command interface (whether at the
+command line or in a <acronym title="Graphic User Interface">GUI</acronym>).</p>
+
+<p>To that end, I have been spending more time working with Vim and trying to
+improve both my understanding of it's capabilities, the environment in which I
+use it and how I can optimise both of those conditions to not necessarily just
+be more productive, but to minimise friction in my work flows.</p>
+
+<p>A large part of my job involves writing and, happily, so does a good deal of
+what constitutes my leisure activity. Whether it is emails written in
+<a href="http://jasonwryan.com/blog/categories/mutt/" title="Mutt category">Mutt</a>, these blog posts,
+longer documents written in <a href="http://www.latex-project.org/" title="LaTeX website">LaTeX</a>,
+or just <a href="http://jasonwryan.com/blog/2014/03/22/autotext/" title="Autotext function">roboposting to forums</a>;
+it is Vim all the way down. So I have spent some effort setting up Vim to make
+that experience as comfortable as possible.</p>
+
+<p><a href="/images/post_images/distract-full.png"><img class="right" src="/images/post_images/distract.png" title="Click for full-size" ></a>
+The first step, and one I took several years ago now, was to write custom
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/.vim/colors/" title="In Bitbucket repo">colour schemes</a>,
+depending on whether I am in the console or X. Several weeks ago, I came across a Vim plugin
+called <a href="https://github.com/chrisbra/DistractFree" title="Github repo">DistractFree</a>, which
+is described as “enabling a distraction free writing mode.” I had always been slightly
+(well, perhaps <em>scathingly</em> would be more accurate) cynical when reading about these sorts
+of things when they first started to appear, but—after playing with two or three of them—this
+one has really grown on me (see the screenshot on the right).</p>
+
+<p>I <a href="https://bitbucket.org/jasonwryan/shiv/src/tip/.vim/colors/mirowriter.vim" title="Bitbucket repo">adapted my colour scheme</a> for it, added a line to my <span class="file">~/.vimrc</span>
+to enable it for specific document types, and have not looked back.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'>autocmd <span class="nb">BufRead</span> <span class="p">&lt;</span><span class="k">em</span><span class="p">&gt;</span>.markdown<span class="p">,&lt;</span>/<span class="k">em</span><span class="p">&gt;</span>tex <span class="k">call</span> DistractFree#DistractFreeToggle<span class="p">()</span> <span class="p">|</span> <span class="k">wincmd</span> <span class="k">w</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The final piece was to set up spell checking  to work properly. As well as
+using English, I wanted to share my personal whitelist of words between all of
+my machines, so I define a location in <span class="file">~/.vimrc</span>
+as well:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">set</span> <span class="nb">spelllang</span><span class="p">=</span>en_gb                               <span class="c">&quot; real English spelling</span>
+</span><span class='line'><span class="k">set</span> <span class="nb">dictionary</span><span class="p">+=</span><span class="sr">/usr/</span>share<span class="sr">/dict/</span>words             <span class="c">&quot; use standard dictionary</span>
+</span><span class='line'><span class="k">set</span> <span class="nb">spellfile</span><span class="p">=</span>$HOME<span class="sr">/Sync/</span><span class="k">vim</span><span class="sr">/spell/</span><span class="k">en</span>.utf<span class="m">-8</span>.add   <span class="c">&quot; my whitelist</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then it is just a matter of ensuring that misspelled or other flagged words (like those
+that should be capitalised) are highlighted correctly. This required a couple of lines in
+my colour schemes:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="c">&quot; Spell checking  ---</span>
+</span><span class='line'><span class="k">if</span> <span class="k">version</span> <span class="p">&gt;=</span> <span class="m">700</span>
+</span><span class='line'>  <span class="k">hi</span> clear SpellBad
+</span><span class='line'>  <span class="k">hi</span> clear SpellCap
+</span><span class='line'>  <span class="k">hi</span> clear SpellRare
+</span><span class='line'>  <span class="k">hi</span> clear SpellLocal
+</span><span class='line'>  <span class="k">hi</span> SpellBad    ctermfg<span class="p">=</span><span class="m">9</span>
+</span><span class='line'>  <span class="k">hi</span> SpellCap    ctermfg<span class="p">=</span><span class="m">3</span>    cterm<span class="p">=</span><span class="nb">underline</span>
+</span><span class='line'>  <span class="k">hi</span> SpellRare   ctermfg<span class="p">=</span><span class="m">13</span>   cterm<span class="p">=</span><span class="nb">underline</span>
+</span><span class='line'>  <span class="k">hi</span> SpellLocal  cterm<span class="p">=</span>None
+</span><span class='line'><span class="k">endif</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The most significant change, however, was that I recently purchased a hard
+copy of Drew Neill's excellent
+<a href="http://pragprog.com/book/dnvim/practical-vim" title="Just buy it, now…">Practical Vim</a>. I
+have long been a fan of Drew's excellent podcast, <a href="http://vimcasts.org/" title="Drew's site">Vimcasts</a>,
+and the book is every bit as impressive as the collection of those episodes,
+and more.  Reading it on my commute over the last week, I have been constantly
+amazed at the power and flexibility of this editor and Drew's ability to clearly
+articulate how to work economically and efficiently with it.  I'm convinced
+this is an invaluable resource for anyone that currently uses Vim or wants to
+learn.</p>
+
+<p>I expect that, over time, as I become more proficient with Vim, that I will adapt
+some of these settings, but for the time being they feel very comfortable and allow
+me to focus on hacking words together (and to do the occasional bit of
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/" title="Scripts in Bitbucket">scripting on the side</a>)…</p>
+
+<h4>Notes</h4>
+
+<p>Image is from the cover of Drew Neill's
+<a href="http://pragprog.com/book/dnvim/practical-vim">Practical Vim</a>, by
+<a href="http://en.wikipedia.org/wiki/Ben_Cormack">Ben Cormack</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Building Vim]]></title>
+    <link href="http://jasonwryan.com/blog/2013/03/29/vim/"/>
+    <updated>2013-03-29T10:17:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2013/03/29/vim</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/vim-logo.png" title="'Vim logo'" >
+Apart from a brief, but nevertheless instructive, flirtation with
+<a href="http://www.gnu.org/software/emacs/" title="Emacs homepage">Emacs</a><sup>1</sup> I have
+been a consistent <a href="http://www.vim.org/" title="Vim home">Vim</a> user over the last three
+or four years. Like most Vim users, I have made some progress over that time
+in spite of Vim's
+<a href="http://stackoverflow.com/a/1815372/712613" title="SO answer on Vim">notorious learning curve</a>
+and have now reached the point where, belatedly, I think I understand it just enough
+to really grasp how little I actually know. It's a milestone that speaks more to
+necessity than gratification, granted.</p>
+
+<p>In any event, as part of confronting my Vim shortcomings (no
+<a href="http://www.vimgolf.com/" title="Vim golf…">golfing</a> for me), I have been able
+to land on the features of Vim that I require to be enabled so that I am moderately
+productive (in my own, admittedly cloistered, working environment). That, you will
+probably not be surprised to read, does not include needing support for Arabic or
+Farsi to be built into Vim.</p>
+
+<p>Part of the beauty of Vim is that, unlike it's
+<a href="http://en.wikipedia.org/wiki/Editor_war#Humor" title="…lacking a decent editor">operating system counterpart Emacs</a>,
+you can choose how much functionality you wish to enable at compile-time. You do want
+support for Farsi? Then the <code>--with-features=big</code> option is what you are looking for.
+If, on the other hand, you just want the barest of bones, editor-wise, you could opt
+for the austere minimalism that is <code>--with-features=tiny</code> and find yourself happily
+transported back in time to
+<a href="https://en.wikipedia.org/wiki/Vi" title="Wikipedia page on Vi">Bill Joy's lab in 1976</a>.</p>
+
+<p>You can peruse all of the various features available to Vim using the <code>:help version</code>
+command.<sup>2</sup> There is also
+<a href="http://www.drchip.org/astronaut/vim/vimfeat.html" title="Vim's versions and features">this table</a>
+where the various features are listed against the respective feature flags (tiny, small,
+normal, big &amp; huge).</p>
+
+<p>After this
+<a href="https://bugs.archlinux.org/task/33019" title="Add +profile to gvim on Flyspray">bug report</a>
+late last year, the default Arch PKGBUILD ships with <code>huge</code> as the feature set. Make
+what you will of that, but for my purposes it is overkill. With all the magic of
+<a href="https://wiki.archlinux.org/index.php/Abs" title="Arch Wiki page on ABS">ABS</a> and
+<code>makepkg</code>, however, it is simple enough to build a Vim package that is tailored
+to exactly your requirements. For me, that means this set of simplified <code>configure</code>
+options:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>  ./configure <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;--prefix<span class="o">=</span>/usr <span class="se">\</span>
+</span><span class='line'>--localstatedir<span class="o">=</span>/var/lib/vim <span class="se">\</span>
+</span><span class='line'>--with-features<span class="o">=</span>normal <span class="se">\</span>
+</span><span class='line'>--with-compiledby<span class="o">=</span>Arch:jwr <span class="se">\</span>
+</span><span class='line'>--with-x<span class="o">=</span>yes <span class="se">\</span>
+</span><span class='line'>--enable-acl <span class="se">\</span>
+</span><span class='line'>--disable-gui <span class="se">\</span>
+</span><span class='line'>--disable-signs <span class="se">\</span>
+</span><span class='line'>--disable-netbeans <span class="se">\</span>
+</span><span class='line'>--enable-multibyte
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>With these options, I have the minimum amount of functionality I comfortably
+require (including the ability to access the system clipboard, <code>--with-x=yes</code>)
+but without the other bloat.</p>
+
+<p>In addition to these changes to the config options, I also strip out all of the
+<code>gvim</code>-related stuff from the PKGBUILD as I do not require it. Even though it
+is a split package, just building <code>vim</code> still includes options superfluous to
+my needs.  As a result, I get Vim with just the features I need, without the
+dependencies of <code>ruby</code> and <code>lua</code> and god knows what else.</p>
+
+<p>I'm not operating under any illusions about the fact that this is
+really saving a huge amount of space or, for that matter, drastically reducing the
+number of dependencies I have installed. It is partly about understanding how Vim
+works at another level while also catering for the obsessive-compulsive drive to
+micro-control what is and isn't installed on my systems. If you want to scratch either
+of the same itches, you can see the full
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/vim/PKGBUILD" title="Eviscerated Vim PKGBUILD">PKGBUILD in Bitbucket</a>.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Still visible in some of my early Arch screenshots
+<a href="http://www.flickr.com/photos/jasonwryan/3748882572/in/photostream" title="Emacs in Openbox">on Flickr</a>…</li>
+<li>The official documentation for the features is also
+<a href="http://vimdoc.sourceforge.net/htmldoc/various.html#+feature-list" title="Vim Feature list">online</a>.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Readline Bindings in Vi Mode]]></title>
+    <link href="http://jasonwryan.com/blog/2011/12/01/readline/"/>
+    <updated>2011-12-01T18:43:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2011/12/01/readline</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/readline.png" alt="image" /></p>
+
+<p>I recently threw caution to the wind and
+<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
+I wanted to take advantage of the superior command editing ability that
+this mode offered, and also to continue to bake vi[m] methods into every
+aspect of my working environment.</p>
+
+<p>The change has been relatively straightforward; the only issues I have
+experienced are really just around a couple of keybinds that I had
+become accustomed to in normal/Emacs mode:</p>
+
+<ul>
+<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
+<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
+</ul>
+
+
+<p>The first, the ability to recall the final arguments of previous
+commands was a showstopper for me: I really struggled without this.
+Being able to recall a long file path and append it to a new command is
+invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
+exactly this. Why it is not bound by default in vi mode is beyond me…</p>
+
+<p>The other was purely cosmetic, really. I am an inveterate clearer of the
+screen—unless I am referring to something printed to stdout, I always
+prefer to work at the top of the console.</p>
+
+<p>In any event, with the
+<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
+it was a trivial exercize to restore this functionality to my bash shell
+in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>for vi mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set editing-mode vi
+</span><span class='line'>$if mode=vi&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set keymap vi-command&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>these are for vi-command mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>"\e[A": history-search-backward            # arrow up
+</span><span class='line'>"\e[B": history-search-forward             # arrow down
+</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
+</span><span class='line'>Control-l: clear-screen&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set keymap vi-insert&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>these are for vi-insert mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>"\e[A": history-search-backward
+</span><span class='line'>"\e[B": history-search-forward
+</span><span class='line'>"\ep": yank-last-arg
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>$endif</span></code></pre></div></figure></notextile></div></p>
+
+<p>There is an extensive list of
+<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
+with which you can customize your shell environment.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vim Colours in the Console]]></title>
+    <link href="http://jasonwryan.com/blog/2011/04/06/vim-colours-in-the-console/"/>
+    <updated>2011-04-06T21:19:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2011/04/06/vim-colours-in-the-console</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/vim-colours1.png" alt="image" /></p>
+
+<p>I have spent the last couple of days trying to understand why I couldn’t
+get <a href="http://www.vim.org/" title="Vim: the _only_ editor">Vim</a> to display the
+correct 16 colours in the console. Not in a terminal emulator in X, like
+<a href="http://invisible-island.net/xterm/xterm.html" title="XTerm homepage">xterm</a>
+or
+<a href="http://software.schmorp.de/pkg/rxvt-unicode.html" title="Homepage for urxvt">rxvt-unicode</a>,
+but in the consoles, TTY1-6.</p>
+
+<p>After a lot of searching, more reading into the
+<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-16.html" title="The Linux terminal...">arcane documentation</a>
+of Linux terminals than I was either prepared for or keen on and some
+experimentation, I have it working. With one caveat; I wasn’t prepared
+to set the <code>TERM</code> environment in my <span class="file">.vimrc</span>. Apart from being
+<a href="http://tldp.org/HOWTO/Text-Terminal-HOWTO-10.html#ss10.5" title="Console documentation">cautioned against</a>,
+as I <em>do</em> set it for tmux, I was anxious to avoid any clashes when
+running Vim in <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+(which I do most of the time).</p>
+
+<p>From the top, then. Logging into a console and checking the <code>$TERM</code> and
+colours, gave me the default:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$TERM</span> &amp;amp;&amp;amp; tput colors
+</span><span class='line'>linux
+</span><span class='line'>8
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Which, under my current configuration of Vim, rendered colours like so:</p>
+
+<p><img src="/images/post_images/vim-colours2.png" alt="image" /></p>
+
+<p>Hardly satisfactory.</p>
+
+<p>The first step was to remove the line in my <span class="file">.vimrc</span> that was forcing 256
+colours:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span><span class="nv">t_Co</span><span class="o">=</span>256
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then I had to rewrite my colourscheme to change all of the references to
+the terminal colour numbers to colour <em>names</em>, as apparently that is
+what 8-colour terms accept. So, my <span class="file">miromiro.vim</span>, went from looking like:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal          ctermfg<span class="p">=</span><span class="m">15</span>
+</span><span class='line'><span class="k">hi</span> Ignore          ctermfg<span class="p">=</span><span class="m">8</span>
+</span><span class='line'><span class="k">hi</span> Comment         ctermfg<span class="p">=</span><span class="m">7</span>
+</span><span class='line'><span class="k">hi</span> LineNr          ctermfg<span class="p">=</span><span class="m">8</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>…to the more literal:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">hi</span> Normal         ctermfg<span class="p">=</span>white    cterm<span class="p">=</span><span class="nb">bold</span>
+</span><span class='line'><span class="k">hi</span> Ignore         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
+</span><span class='line'><span class="k">hi</span> Comment        ctermfg<span class="p">=</span>grey
+</span><span class='line'><span class="k">hi</span> LineNr         ctermfg<span class="p">=</span>black    cterm<span class="p">=</span><span class="nb">bold</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Once I had made the necessary changes, I saved this new colourscheme as
+<span class="file">miro8.vim</span><sup>1</sup>. And, yes, I know I could
+have included it in an <code>if</code> condition in my original colourscheme<sup>2</sup>,
+but I was intent on keeping things compartmentalized until I had it working…</p>
+
+<p>Running Vim in the console was now starting to look promising:</p>
+
+<p><img src="/images/post_images/vim-colours3.png" alt="image" /></p>
+
+<p>The final piece of the puzzle was to pass my
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.colours/dark" title="jwr dark colours: mercurial repo">X colours</a>
+to the console. Fortunately,
+<a href="http://phraktured.net/linux-console-colors.html" title="The Overlord himself…">Aaron Griffin’s 2006 post</a>
+made this a trivial exercise. With the following lines in my <span class="file">.bashrc</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Linux console colors <span class="o">(</span>jwr dark<span class="o">)</span>&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="s2">&quot;$TERM&quot;</span> <span class="o">=</span> <span class="s2">&quot;linux&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">   </span><span class="nb">echo</span> -en <span class="s2">&quot;\e]P0000000&quot;</span> <span class="c">#black</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P83d3d3d&quot;</span> <span class="c">#darkgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P18c4665&quot;</span> <span class="c">#darkred</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P9bf4d80&quot;</span> <span class="c">#red</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P2287373&quot;</span> <span class="c">#darkgreen</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PA53a6a6&quot;</span> <span class="c">#green</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P37c7c99&quot;</span> <span class="c">#brown</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PB9e9ecb&quot;</span> <span class="c">#yellow</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P4395573&quot;</span> <span class="c">#darkblue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PC477ab3&quot;</span> <span class="c">#blue</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P55e468c&quot;</span> <span class="c">#darkmagenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PD7e62b3&quot;</span> <span class="c">#magenta</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P631658c&quot;</span> <span class="c">#darkcyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PE6096bf&quot;</span> <span class="c">#cyan</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]P7899ca1&quot;</span> <span class="c">#lightgrey</span>
+</span><span class='line'>   <span class="nb">echo</span> -en <span class="s2">&quot;\e]PFc0c0c0&quot;</span> <span class="c">#white</span>
+</span><span class='line'>   clear <span class="c"># bring us back to default input colours</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then it was just a case of setting the relevant colourscheme in my
+<span class="file">.vimrc</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="k">if</span> &amp;amp;<span class="nb">t_Co</span> &amp;<span class="k">lt</span>; <span class="m">256</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miro8   <span class="c">&quot; colourscheme for the 8 colour linux term</span>
+</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">else</span><span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="k">pre</span><span class="p">&gt;&lt;</span>code<span class="p">&gt;</span><span class="k">colorscheme</span> miromiro
+</span><span class='line'><span class="p">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="k">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="k">endif</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>And you can see
+<a href="http://www.flickr.com/photos/jasonwryan/5594191615/#/photos/jasonwryan/5594191615/lightbox/" title="Vim colours in console">a screenshot</a>
+of the finished product on Flickr.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li><p><a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.vim/colors/miro8.vim" title="Mercurial repo: miro8 colourscheme">miro8.vim</a></p></li>
+<li><p><a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/.vim/colors/miromiro.vim" title="Mercurial repo: miromiro.vim colourscheme">miromiro.vim</a></p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+</feed>

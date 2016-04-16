@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: dwm | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.com/blog/categories/dwm/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-19T08:20:47+13:00</updated>
+  <id>http://jasonwryan.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[A dwm Screencast]]></title>
+    <link href="http://jasonwryan.com/blog/2012/09/28/screencast/"/>
+    <updated>2012-09-28T09:18:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2012/09/28/screencast</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/dwm-logo.png" title="'dwm logo'" >
+Over the last week as I have been at home convalescing I have, quite unaccountably,
+found myself watching videos of tiling window managers. In all, I have probably watched
+between twenty and thirty of these videos so I feel, quite confidently, that I have a
+firm grasp of what constitutes the genre. Consequently, I also feel that I can&mdash;based
+on the range of the material I have reviewed, and the scrutiny and attention therein
+applied&mdash;share an unequivocal judgement as to the overall quality of the genre: it
+sucks.</p>
+
+<p>Moreover, these videos invariably suck in the same couple of ways; they always lack
+any sort of narration, which means that you are stuck silently watching some sort of
+paroxysm of window rearrangement without <em>any</em> context or explanation, as if the fact
+that you can inflict this sort of injury on an X display is rationale enough. And,
+secondly, just as frequently, they feature a cursor being dragged around the screen
+doing the damage; using the mouse to demonstrate the capabilities of a tiling window
+manager is the sort of vestigial behaviour more commonly associated with pagan
+superstition or mild enfeeblement…</p>
+
+<p>Rather that simply bask in the sense of superiority that these observations have
+afforded me, I thought that I would make my own, more lasting, contribution to the
+canon. I can only describe this process as instructive.</p>
+
+<p><a href="http://www.youtube.com/watch?v=GQ5s6T25jCc"><img class="center" src="/images/post_images/tower.jpg" title="dwm screencast" ></a></p>
+
+<p>The best that can be said of this video is that, while it sucks just as hard as the others
+that I have reviewed over the past week, it has the distinguishing feature of at least
+sucking <em>differently</em>. For example, it has an audio track, so in theory the actions on the
+screen should be accompanied by the narrator's soothing tones. Sadly, this is not the case.
+The crappy quality of my headset, my hoarse throat, and most egregiously, my decision to eschew
+post production and shoot it in one take means that the audio is poorly recorded, and at times
+literally inarticulate, rambling.</p>
+
+<p>If nothing else, the exercise has taught me to really appreciate the work of people who
+do this thing well; Drew Neil's excellent
+<a href="http://vimcasts.org/" title="The Vimcasts homepage">Vimcasts</a> being a case in point.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Sharing Mercurial Patchsets]]></title>
+    <link href="http://jasonwryan.com/blog/2012/07/26/guards/"/>
+    <updated>2012-07-26T18:48:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2012/07/26/guards</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/guard.jpg" title="'On Guard image on Flickr'" >
+In my last post, on
+<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="You should read it…">Mercurial Queues</a>,
+I outlined how you might use MQ to manage a
+<a href="http://dwm.suckless.org/" title="Dynamic window manager">dwm</a> patchset.
+Mercurial makes this process ridiculously easy, and this functionality is more
+than enough to recommend it. However, where I think it really gets interesting
+is when you share that same patchset across multiple machines and are easily
+able to customize which patches in the queue are applied, based upon the
+particular machine you are building dwm on.</p>
+
+<p>For example, in my case I use dwm on all three of my machines: my desktop at home,
+my laptop at work and my EeePC. Given the nature of each of these three machines,
+though, I want a slightly different stack of patches applied. These differences
+might extend only to particular rules applied in <span class="file">config.def.h</span>
+based upon the number of tags I use, or the different applications that I run
+at home as opposed to at work.</p>
+
+<p>In any event, what I want to be able to do is maintain
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/" title="Patchset in Bitbucket">a single patchset</a>
+in a mercurial repository, clone it to all my machines and then, using MQ,
+filter which specific patches are applied. This is all possible using a killer
+feature of MQ called
+<a href="http://hgbook.red-bean.com/read/advanced-uses-of-mercurial-queues.html%20'Advanced%20uses%20of%20MQ%20in%20the%20Mercurial%20book">guards</a>.
+Guards allow you to conditionally apply patches in a queue. Essentially, in
+a queue, you “tag” a patch with a guard and—depending on whether or not the
+guard is positive (to be applied), or negative (to be skipped)—when you
+<code>hg qpush -a</code> MQ takes care of applying the correct patches in the queue.</p>
+
+<p>So, in the case of my work laptop, I begin by cloning dwm and intializing
+a patch queue:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd </span>Build/
+</span><span class='line'>hg clone http://hg.suckless.org/dwm
+</span><span class='line'>hg qinit -c
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>I setup my <span class="file">.hgrc</span> within the patches directory so that
+it points at the correct mercurial repository:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.hg/patches/.hg/hgrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'> <span class="c"># Mercurial config file</span>
+</span><span class='line'><span class="o">[</span>ui<span class="o">]</span>
+</span><span class='line'><span class="nv">username</span> <span class="o">=</span> jasonwryan &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;&amp;#x6d;&amp;#97;&amp;#105;&amp;#108;&amp;#x74;&amp;#111;&amp;#58;&amp;#106;&amp;#97;&amp;#x73;&amp;#111;&amp;#110;&amp;#x77;&amp;#x72;&amp;#121;&amp;#97;&amp;#110;&amp;#64;&amp;#103;&amp;#109;&amp;#x61;&amp;#105;&amp;#108;&amp;#x2e;&amp;#99;&amp;#111;&amp;#109;&quot;</span>&gt;&amp;#x6a;&amp;#x61;&amp;#115;&amp;#111;&amp;#110;&amp;#x77;&amp;#114;&amp;#121;&amp;#97;&amp;#110;&amp;#64;&amp;#103;&amp;#109;&amp;#x61;&amp;#105;&amp;#108;&amp;#x2e;&amp;#99;&amp;#111;&amp;#x6d;&lt;/a&gt;
+</span><span class='line'><span class="nv">ssh</span> <span class="o">=</span> ssh -i ~/.ssh/bb -C
+</span><span class='line'><span class="o">[</span>paths<span class="o">]</span>
+</span><span class='line'><span class="nv">default</span> <span class="o">=</span> ssh://hg@bitbucket.com/jasonwryan/dwm-patchset
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then I pull down my dwm patchset from the mercurial repository
+with <code>hg pull</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pulling from ssh://hg@bitbucket.com/jasonwryan/dwm-patchset
+</span><span class='line'>requesting all changes
+</span><span class='line'>adding changesets
+</span><span class='line'>adding manifests
+</span><span class='line'>adding file changes
+</span><span class='line'>added 6 changesets with 16 changes to 10 files
+</span><span class='line'><span class="o">(</span>run <span class="s1">&#39;hg update&#39;</span> to get a working copy<span class="o">)</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>After I update my local repo,<sup>1</sup> I can see the full patchset with
+<code>hg qseries</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>setup.makefile
+</span><span class='line'>base.config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span><span class='line'>bstack
+</span><span class='line'>centurion.config
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then, as I decribed in my previous post, I make the changes to
+<span class="file">config.def.h</span> that are specific to this
+machine:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew veles.config
+</span><span class='line'> <span class="c"># “hack, hack, hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Adaptions for Veles&#39;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>My patchset now has an additional patch in it:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>setup.makefile
+</span><span class='line'>base.config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span><span class='line'>bstack
+</span><span class='line'>centurion.config
+</span><span class='line'>veles.config
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>This is where guards come in to play. If I wasn't interested in sharing
+the patchset, it would just be a matter of deleting the patch for Centurion.
+However, what I want to do is direct MQ to ignore that specific patch
+when applying the queue. I do that by creating a negative guard and then
+activating it:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qguard centurion.config -- -block
+</span><span class='line'>hg qselect block
+</span><span class='line'>number of unguarded, unapplied patches has changed from 8 to 7
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>That's it! Adding a verbose flag to <code>hg qseries</code><sup>2</sup> will print out the
+patchset and the accompanying guard status:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries -v
+</span><span class='line'>0 U setup.makefile
+</span><span class='line'>1 U base.config.customizations
+</span><span class='line'>2 U statuscolours
+</span><span class='line'>3 U cycle
+</span><span class='line'>4 U push
+</span><span class='line'>5 U bstack
+</span><span class='line'>6 G centurion.config
+</span><span class='line'>7 U veles.config
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The real test, of course, is pushing the patchset onto the fresh
+dwm code:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Veles ~/Build/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpush -a
+</span><span class='line'>applying setup.makefile
+</span><span class='line'>applying base.config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>applying bstack
+</span><span class='line'>skipping centurion.config - guarded by <span class="s1">&#39;-block&#39;</span>
+</span><span class='line'>applying veles.config
+</span><span class='line'>now at: veles.config
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>How cool is that? One central patchset, applied conditionally depending
+upon the machine you are using at the time.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Any guards applied on other machines will be present in the newly
+pulled <span class="file">series</span> file: these conflicts will need
+to be manually merged…</li>
+<li>The options for all of the <code>hg</code> commands can be read with
+<code>hg -v help $command</code>. For those related to queues, just prepend
+a <code>q</code> to <code>$command</code>.</li>
+</ol>
+
+
+<p>Creative Commons image on Flickr by
+<a href="http://www.flickr.com/photos/alternatewords/4903560373/" title="On Guard on Flickr">Thorsten Becker</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Mercurial Queues]]></title>
+    <link href="http://jasonwryan.com/blog/2012/07/24/queues/"/>
+    <updated>2012-07-24T19:18:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2012/07/24/queues</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/queue.jpg" title="'Queue image on Flickr'" >
+Over the last week or so, I have finally gotten around to digging into the whole concept of
+using
+<a href="http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html" title="Chapter on queues in the Mercurial book">Mercurial Queues</a>
+to manage patches against an upstream project; in my case
+<a href="http://dwm.suckless.org" title="The truly suckless window manager…">dwm</a>.<sup>1</sup>
+Essentially, this mercurial extension helps you manage a stack of patches on
+top of a directory tree. This gives you quite a lot of fine-grained control
+over your patchset and assists immeasurably with automating the application of
+patches when the underlying codebase changes.</p>
+
+<p>After having played around with queues for the last couple of days, I am quite
+impressed: both the concept and the execution are simple and powerful. The concept
+of Mercurial Queues is best described in the Mercurial book: the aptly titled,
+<em>Mercurial: The Definitive Guide</em>:<sup>2</sup></p>
+
+<p><blockquote><p>MQ's marriage of distributed revision control with patches makes it much easier to isolate your work. Your patches live on top of normal revision history, and you can make them disappear or reappear at will. If you don't like a patch, you can drop it. If a patch isn't quite as you want it to be, simply fix it—as many times as you need to, until you have refined it into the form you desire.</p><footer><strong>Mercurial, The Definitive Guide</strong> <cite><a href='http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html'>hgbook.red-bean.com/read/&hellip;</a></cite></footer></blockquote></p>
+
+<p>I followed Filippo Negroni's excellent
+<a href="http://dwm.suckless.org/customisation/patch_queue" title="Step-by-step guide">tutorial on the dwm site</a>
+to setup my own
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src" title="Patchset in Bitbucket repo">dwm patchset</a>
+based on
+<a href="http://hg.suckless.org/dwm" title="dwm hg repository">tip</a>, and the process was
+surprisingly straightforward; the only caveat being it is a good idea to plan
+quite carefully what changes you want in each particular patch. Once I had
+completed the setup, it got me thinking about the fact that the final install
+is done without <code>pacman</code>, just using <code>make install</code>. And, as a proof-of-concept
+more than anything else, I wondered whether this functionality could be used
+with <code>makepkg</code>.<sup>3</sup></p>
+
+<p>Turns out, as you might expect with Arch, it was not much of a job to set it
+up at all.</p>
+
+<p><strong>Note</strong>: this doesn't mean I think it is a good idea; I was just interested
+to see <em>if</em> it could be done and <em>how</em> it would work once it was set up. For something
+like dwm, this is definitely a case of introducing a huge amount of complexity for
+no apparent benefit (for those people running Gnome, this may quite appeal to you…).</p>
+
+<p>I have a
+<a href="http://pikacode.com/jasonwryan/Centurion/file/default/Build/dwm-hg/PKGBUILD" title="If you must…">working PKGBUILD</a>
+that you can use if you want to follow along at home. Once you have downloaded
+it into <span class="file">dwm-hg/</span>, run <code>makepkg</code> to clone the dwm
+repository and build the binary.  Then you need to make sure that the mercurial
+queue extension is enabled, so your <span class="file">.hgrc</span> needs to
+contain:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">[</span>extensions<span class="o">]</span>
+</span><span class='line'>hgext.mq <span class="o">=</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Now, you need to setup the queue repository. We do this in <code>$srcdir</code>, which
+is <span class="file">dwm-hg/src/dwm</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qinit -c
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The next step is to start applying the various patches that you want to comprise
+your patchset on dwm. In my case that is base customizations to <span class="file">config.def.h</span>
+and three other patches:
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/statuscolours" title="Patch in mercurial queue">statuscolours</a>,
+<a href="http://https://bitbucket.org/jasonwryan/dwm-patchset/src/default/cycle" title="ditto">cycle</a>, and
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/push" title="etc…">push</a>.
+There are other patches in my repository, one of which patches the appropriate
+settings for an Arch build in the
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/default/setup.makefile" title="Arch settings for Makefiles">relevant makefiles</a>.
+This is taken care of by the PKGBUILD in this case.</p>
+
+<p>From here, it is very much as Filippo describes it in his tutorial: make
+some changes, add them to the queue and rinse and repeat:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>hg qnew base.customizations
+</span><span class='line'> <span class="c"># “hack hack hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qcommit -m <span class="s1">&#39;Added changes to config.def.h to customize&#39;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>After committing each of your changes as a discrete patch, you can review the queue
+with <code>hg qseries</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qseries
+</span><span class='line'>config.customizations
+</span><span class='line'>statuscolours
+</span><span class='line'>cycle
+</span><span class='line'>push
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>And <code>hg qapplied</code> will tell you which of the patches is currently
+applied in the working repository; at this stage the list should look
+the same as that in <code>hg qseries</code>. The next step is to remove all of the
+patches from the queue so that we have a clean repository:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop -a
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>popping config.customizations
+</span><span class='line'>patch queue now empty
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Should you need to edit a patch, it is simply a matter of popping
+to that spot in the stack (you can do so by name or by index
+number, beginning at 0):</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>┌─<span class="o">[</span>Centurion ~/Build/dwm-hg/src/dwm<span class="o">]</span>
+</span><span class='line'>└─╼ hg qpop config.customizations
+</span><span class='line'>popping push
+</span><span class='line'>popping cycle
+</span><span class='line'>popping statuscolours
+</span><span class='line'>now at: config.customizations
+</span><span class='line'> <span class="c"># “hack hack hack…”</span>
+</span><span class='line'>hg qrefresh
+</span><span class='line'>hg qpush -a
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Once you are satisfied with the state of the stack, remove all of the
+patches to return to the original clean working directory and <code>cd</code> back
+to <span class="file">dwm-hg/</span>. You can now use <code>makepkg -fi</code> to
+rebuild the package and you should see the pushed patches as part of
+the output:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="o">==</span>&gt; Starting build<span class="o">()</span>...
+</span><span class='line'><span class="o">==</span>&gt; Pushing queued patchset
+</span><span class='line'>applying config.customizations
+</span><span class='line'>applying statuscolours
+</span><span class='line'>applying cycle
+</span><span class='line'>applying push
+</span><span class='line'>now at: push
+</span><span class='line'>dwm build options:
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>…and when you restart dwm, your customizations will be applied.
+When new changes are pushed to
+<a href="http://hg.suckless.org/dwm" title="dwm mercurial repo">the dwm repo</a>
+you can just <code>makepkg -fi</code>, and, if any of the patches fail due
+to changes in the underlying code, pop the stack to the failed
+patch, rebase the code, <code>hg qrefresh</code> and continue until done.</p>
+
+<p>As I said at the beginning of this post, this isn't a particularly smart way to
+use Mercurial Queues, PKGBUILDs or a combination of the two. You are much
+better off just cloning dwm to your local repository, initializing a queue
+repository and, once you are done setting up your patchset, issuing <code>make &amp;&amp;
+sudo make install</code>.</p>
+
+<p>If you have more than one machine, you can easily setup a repository for
+your patchset on
+<a href="https://bitbucket.org/" title="bitbucket free mercurial hosting">bitbucket</a>
+and host it there: then just pull the patchset queue
+from your other boxes and <code>hg qpush -a</code>. If you require a slightly
+different patchset for each box, you can use MQ to manage this
+process as well. This is where MQ really excels;
+I'll cover this in more detail in my next post.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>See <a href="http://jasonwryan.com/blog/categories/dwm/" title="dwm category in the archives">related dwm posts</a>.</li>
+<li>I can't recommend this {book,wiki} highly enough; it is an excellent
+example of thorough, accessible documentation.</li>
+<li>In the case of something like dwm, this is really irrelevant, as there
+is a single tiny binary and a <code>man</code> page, so keeping track of these files on
+your system is not an issue at all.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image by
+<a href="http://www.flickr.com/photos/bagelmouse/3936852444/" title="Queue image on Flickr">RachelH</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Setting Urgent Hints in dwm]]></title>
+    <link href="http://jasonwryan.com/blog/2011/01/25/setting-urgent-hints-in-dwm/"/>
+    <updated>2011-01-25T17:45:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2011/01/25/setting-urgent-hints-in-dwm</id>
+    <content type="html"><![CDATA[<p><a href="http://www.flickr.com/photos/jasonwryan/5379701719/#/photos/jasonwryan/5379701719/lightbox/" title="Arch Linux: dwm with statuscolors patch"><img src="/images/post_images/dwm-urgent.png" alt="image" /></a></p>
+
+<p>After nearly 12 months of running a pretty stable
+<a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>, with a consistent
+patchset (cycle,
+<a href="http://dwm.suckless.org/patches/push" title="Push on suckless wiki">push</a>,
+and init pertag<sup>1</sup>) I finally added another one:
+statuscolours<sup>2</sup>…</p>
+
+<p>I have been experimenting with
+<a href="http://jasonwryan.com/blog/2010/12/26/wmfs-window-manager-from-scratch/" title="My post on using WMFS">WMFS</a>,
+which is another very nice, minimal tiling window manager and was really
+enjoying the urgency hints in the status bar, so I decided to patch that
+functionality into dwm.</p>
+
+<p>Most terminal applications will send a bell when your attention is
+required; in my case, I was looking for a way to trigger notifications
+for new mail in
+<a href="http://www.mutt.org/" title="If you are using another mail user agent, you are doing it wrong...">mutt</a>
+or highlights in <a href="http://irssi.org/" title="IRC client">irssi</a>. In mutt, it
+was just a case of setting a bell for when mail arrived:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set </span>beep_new             <span class="c"># bell on new mail</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>And in irssi:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">beep_msg_level</span> <span class="o">=</span> <span class="s2">&quot;NOTICE MSGS HILIGHT&quot;</span>;
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>In <a href="http://tmux.sourceforge.net/" title="terminal mulitplexer">tmux</a>, to cover
+all your terminal bases, add:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">set</span> -g bell-action any <span class="c"># listen for activity on all windows</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The next step is to pass those beeps to your terminal. The entry for
+Urxvt is one I picked up after a quick search turned up
+<a href="http://rsontech.net/articles/2008/11/17/1/handling-urgency-hints" title="Post on reson.tech">this post by rson</a>
+which had the .Xdefaults line I was looking for:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>URxvt*urgentOnBell: <span class="nb">true</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Now, whenever a bell is triggered in irssi or mutt, that is passed to
+the terminal as an urgent hint. The final step was patching statuscolors
+into dwm.c to change the tag colour when the hint was received.</p>
+
+<p>You can see my
+<a href="https://bitbucket.org/jasonwryan/workstation/src/82e7f34ee0a3/dwm-5.8.2-2/5.8.2-2.diff" title="dwm.c patched">patched dwm.c</a>
+in my mercurial repo.</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>These patches are from the extremely helpful Arch Forum thread:
+<a href="https://bbs.archlinux.org/viewtopic.php?id=92895" title="Thread on Arch boards for dwm hackers">DWM Hackers Unite!</a></li>
+<li>I used a <a href="http://lists.suckless.org/dev/1011/6445.html" title="Dan Brown's patch">modified statuscolours patch</a>
+from the suckless mailing list. It irons out the padding issues in the one on the wiki.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mail Checking Script]]></title>
+    <link href="http://jasonwryan.com/blog/2011/01/08/mail-checking-script/"/>
+    <updated>2011-01-08T11:04:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2011/01/08/mail-checking-script</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/mailcheck.png" alt="image" /></p>
+
+<p>I use <a href="http://www.mutt.org/" title="Mutt homepage">mutt</a> and
+<a href="https://github.com/jgoerzen/offlineimap/wiki" title="Offlineimap on github">offlineimap</a>
+to manage email on my Arch Linux machines. I like the simplicity and the
+power that this approach offers; that’s power in the sense of
+extensibility and customization, by the way…</p>
+
+<p>Using <a href="http://dwm.suckless.org/" title="dwm homepage">dwm</a> as my window
+manager, I had relied on
+<a href="http://jasonwryan.com/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/" title="My post on setting this up">conky and dzen2</a>
+to pipe system information into my status bar. Unfortunately, conky only
+supports one mail spool so if, like me, you use offlineimap to
+synchronize multiple mailboxes, conky would only show new mail in your
+primary box. I had asked in #conky about multiple mail spools, but it
+doesn’t seem to be supported.</p>
+
+<p>When I recently started using
+<a href="http://jasonwryan.com/blog/2010/12/26/wmfs-window-manager-from-scratch/" title="My post on Window Manager From Scratch">WMFS</a>
+I decided to move to a
+<a href="https://bitbucket.org/jasonwryan/eeepc/src/241da582a0fd/Scripts/wmfs-status" title="Script in mercurial repo">bash script for my status information</a>.
+So I approached the problem afresh and decided to write a script to poll
+the new mail directories and update my status bar when mail arrived.</p>
+
+<p>Offlineimap creates a directory structure like so:</p>
+
+<pre><code>   Mail/ -------
+      |         |
+      |     Mail_Account_1
+      |         |
+      |         | --  INBOX 
+      |         |       | -- cur
+      |         |       | -- new
+      |         |       | -- temp
+      |         |
+      |         | -- INBOX.Drafts
+      |         |       | -- cur
+</code></pre>
+
+<p>As I was only interested in checking the <span class="file">INBOX/new</span>
+directory of each account, I had imagined that it would be necessary to set up some
+elaborate array to effectively check each of the requisite sub-directories…</p>
+
+<p>No, it was pretty simple. Just
+<a href="http://www.faqs.org/docs/abs/HTML/globbingref.html" title="ABS entry on globing">globbing</a>
+and
+<a href="http://linuxmanpages.com/man1/find.1.php" title="man page for find">find</a>,
+actually.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>mailcheck.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Set maildirs&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;maildirs<span class="o">=</span><span class="s2">&quot;$HOME/Mail/*/INBOX/new/&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;find <span class="nv">$maildirs</span> -type f | wc -l
+</span><span class='line'><span class="nb">exit </span>0
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The glob (<code>*</code>) takes care of the different mail account names, and has
+the added bonus of being portable, and find returns any files (<code>-type f</code>)
+with <code>wc</code> counting the number of lines (the <code>-l</code> switch).</p>
+]]></content>
+  </entry>
+  
+</feed>

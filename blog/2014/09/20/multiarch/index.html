@@ -1,16 +1,18 @@
+
 <!DOCTYPE html>
 <!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
 <!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>jasonwryan.com</title>
+  <title>Multi-arch Packages in AUR - jasonwryan.com</title>
   <meta name="author" content="Jason Ryan">
 
   
-  <meta name="description" content="Around this time last year, I posted about setting up a
-udev rule to run a script
-when I plugged my USB drive containing all of my music into one of &hellip;">
+  <meta name="description" content="One of the easiest ways to contribute to Arch is to maintain a package, or
+packages, in the
+AUR;
+the repository of user contributed PKGBUILDs that &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +21,7 @@ when I plugged my USB drive containing all of my music into one of &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://jasonwryan.com">
+  <link rel="canonical" href="http://jasonwryan.com/blog/2014/09/20/multiarch">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -81,298 +83,12 @@ when I plugged my USB drive containing all of my music into one of &hellip;">
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-01-19T08:20:00+13:00" pubdate data-updated="true">Jan 19<span>th</span>, 2015</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="/images/post_images/jello.jpg" title="Creative Commons Image" >
-Around this time last year, I posted about setting up a
-<a href="http://jasonwryan.com/blog/2014/01/20/udev/" title="Post in Jan 14">udev rule to run a script</a>
-when I plugged my USB drive containing all of my music into one of my
-laptops; the script, a
-<a href="https://gist.github.com/jasonwryan/0df98a396af89bf82eb6" title="A gist…">couple of lines of bash</a>,
-removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
-repopulates the directory with an updated set. Almost. The one flaw that has
-been an irritant of variable intensity, depending on what I felt like listening
-at any given time, is that the symlinks aren&#8217;t written for directories that
-already exist on the target filesystem.</p>
-
-<p>In order that I am able to play some music if I forget the USB drive, each of
-the laptops has a subset of albums on it, depending on the size of their
-respective hard drives. If I add a new album to the USB drive, then that change won&#8217;t
-get written to either of the laptops when the drive is plugged in. Not entirely
-satisfactory. I had tinkered around with
-<a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
-having <a href="http://mywiki.wooledge.org/UsingFind" title="Wooledge again, because it is so great…"><code>find(1)</code></a>
-scan deeper into the tree, or even a loop to check for the presence of directories in an array…</p>
-
-<p>It just got too hard. My rudimentary scripting skills and the spectre of recursion,
-I am sorry to admit, conspired to undermine my resolve. So, rather than concede
-unconditional surrender, I
-<a href="http://unix.stackexchange.com/q/179397/6761%20'Question%20on%20Unix%20&amp;%20Linux%20SE">asked for help</a>.
-As is almost always the case in these situations, this proved to be a particularly
-wise move; the response I received was neither what I expected, nor was it anything I
-was even remotely familiar with: so in addition to an excellent solution (one far
-better suited to what I was trying to achieve), I learned something new.</p>
-
-<p>The first comment on my question proved singularly insightful.</p>
-
-<blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote>
-
-
-<p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
-
-<blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote>
-
-
-<p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
-<a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
-The genealogy of these mounts has been well covered in this 2010 LWN
-<a href="http://lwn.net/Articles/396020/" title="LWN.net">article by Valerie Aurora</a>. However, it is only
-in the current kernel, 3.18, that a union mount has been accepted into the kernel tree.</p>
-
-<p>After reading the
-<a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/overlayfs.txt" title="Kernel docs">documentation for overlayfs</a>, it seemed this was <em>exactly</em> what I
-was looking for. Essentially, an overlay mount would allow me to “merge&#8221;
-the underlying tree (the Music directory on the USB drive) with an “upper”
-one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
-seamlessly</em>.</p>
-
-<blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote>
-
-
-<p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
-trivial:</p>
-
-<figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'><span class="c">#!/usr/bin/env bash</span>
-</span><span class='line'><span class="c"># union mount Music when Apollo plugged in</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">low</span><span class="o">=</span>/media/Apollo/Music
-</span><span class='line'><span class="nv">upp</span><span class="o">=</span>/home/jason/Music
-</span><span class='line'><span class="nv">wod</span><span class="o">=</span>/home/jason/.local/tmp
-</span><span class='line'><span class="nb">export </span><span class="nv">DISPLAY</span><span class="o">=</span>:0
-</span><span class='line'><span class="nb">export </span><span class="nv">XAUTHORITY</span><span class="o">=</span>/home/jason/.Xauthority
-</span><span class='line'>
-</span><span class='line'><span class="c"># overlayfs mount</span>
-</span><span class='line'>mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
-</span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>
-</span><span class='line'>
-</span><span class='line'>mpc update &amp;&gt;/dev/null
-</span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 <span class="o">&amp;&amp;</span> <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
-
-
-<p>And now, when I plug in the USB drive, the contents of the drive are merged
-with my local music directory, and I can access whichever album I feel inclined
-to listen to. I can also copy files across to the local machines, knowing if I
-update the portable drive, it will no longer mean I have to forego listening to
-any newer additions by that artist in the future (without manually intervening,
-anyway).</p>
-
-<p>Overall, this is a lightweight union mount. There is neither a lot of functionality,
-nor complexity. As the
-<a href="https://github.com/torvalds/linux/commit/e9be9d5e76e34872f0c37d72e25bc27fe9e2c54c" title="Git commit">commit note</a>
-makes clear, this “simplifies the implementation and allows native performance
-in these cases.” Just note the warning about attempting to write to a mounted
-underlying filesystem, where the behaviour is described as “undefined”.</p>
-
-<h4>Notes</h4>
-
-<p>Creative Commons image, <a href="https://flic.kr/p/5RRRXP">mulitlayered jello</a> by Frank Farm.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-10-25T09:38:00+13:00" pubdate data-updated="true">Oct 25<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img class="left" src="/images/post_images/tarsnap-logo.png" title="Tarsnsap Logo" >
-I started using <a href="http://www.tarsnap.com/" title="Tarsnap website">Tarsnap</a> about
-<a href="http://jasonwryan.com/blog/2011/09/08/tarsnap/" title="Post on Tarsnap">three years ago</a>
-and I have been nothing but impressed with it since. It is simple to use,
-<em>extremely</em> cost effective and, more than once, it has saved me from myself;
-making it easy to retrieve copies of files that I have inadvertently
-overwritten or otherwise done stupid things with<sup>1</sup>.  When I
-<a href="http://jasonwryan.com/blog/2011/09/08/tarsnap/" title="Post on Tarsnap">first posted about it</a>,
-I included a
-<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snap" title="In Bitbucket repo">simple wrapper script</a>,
-which has held up pretty well over that time.</p>
-
-<p>What became apparent over the last couple of months, as I began to consciously
-make more regular backups, was that pruning the archives was a relatively
-tedious business. Given that Tarsnap
-<a href="http://www.tarsnap.com/efficiency.html" title="Tarsnap efficiency page">de-duplicates data</a>,
-there isn&#8217;t much mileage in keeping around older archives because, if you do
-have to retrieve a file, you don&#8217;t want to have to search through a large
-number of archives to find it; so there is a balance between making use of
-Tarsnap&#8217;s efficient functionality, and not creating a rod for your back if your
-use case is occasionally retrieving single—or small groups of—files, rather
-than large dumps.</p>
-
-<p>I have settled on keeping five to seven archives, depending on the frequency of
-my backups, which is somewhere around two to three times a week. Pruning these
-archives was becoming tedious, so I wrote a simple script to make it less
-onerous. Essentially, it writes a list of all the archives to a
-<span class="file">tmpfile</span>, runs
-<a href="http://linux.die.net/man/1/sort" title="sort man page">sort(1)</a>
-to order them from oldest to newest, and then deletes the oldest minus whatever
-the number to keep is set to.</p>
-
-<p>The bulk of the code is simple enough:</p>
-
-<figure class='code'><figcaption><span>snapclean </span></figcaption>
- <div class="highlight"><pre><code class='sh'><span class='line'><span class="c"># generate list</span>
-</span><span class='line'>tarsnap --list-archives &gt; <span class="s2">&quot;$tmpfile&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># sort by descending date, format is: host-ddmmyy_hh:mm</span>
-</span><span class='line'><span class="o">{</span>
-</span><span class='line'>  rm <span class="s2">&quot;$tmpfile&quot;</span> <span class="o">&amp;&amp;</span> sort -k 1.11,1.10 -k 1.8,1.9 -k 1.7,1.6 &gt; <span class="s2">&quot;$tmpfile&quot;</span>
-</span><span class='line'><span class="o">}</span> &lt; <span class="s2">&quot;$tmpfile&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># populate the list</span>
-</span><span class='line'>mapfile -t archives &lt; <span class="s2">&quot;$tmpfile&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># print the full list</span>
-</span><span class='line'><span class="nb">printf</span> <span class="s2">&quot;%s\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Current archives${end}:&quot;</span> <span class="s2">&quot;${archives[@]#*-}&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># identify oldest archives</span>
-</span><span class='line'><span class="nv">remove</span><span class="o">=</span><span class="k">$((</span> <span class="k">${#</span><span class="nv">archives</span><span class="p">[@]</span><span class="k">}</span> <span class="o">-</span> keep <span class="k">))</span>
-</span><span class='line'><span class="nv">targets</span><span class="o">=(</span> <span class="k">$(</span>head -n <span class="s2">&quot;$remove&quot;</span> <span class="s2">&quot;$tmpfile&quot;</span><span class="k">)</span> <span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># if there is at least one to remove</span>
-</span><span class='line'><span class="k">if</span> <span class="o">((</span> <span class="k">${#</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span> &gt;<span class="o">=</span> 1 <span class="o">))</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${red}Archives to delete${end}:&quot;</span>
-</span><span class='line'>  <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${targets[@]#*-}&quot;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nb">read</span> -p <span class="s2">&quot;Proceed with deletion? [${red}Y${end}/N] &quot;</span> YN
-</span><span class='line'>
-</span><span class='line'>  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$YN</span> <span class="o">==</span> Y <span class="o">]]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    for </span>archive in <span class="s2">&quot;${targets[@]}&quot;</span>; <span class="k">do</span>
-</span><span class='line'><span class="k">      </span>tarsnap -d --no-print-stats -f <span class="s2">&quot;$archive&quot;</span>
-</span><span class='line'>    <span class="k">done</span> <span class="o">&amp;&amp;</span> <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Archives successfully deleted...${end}&quot;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Remaining archives:${end}&quot;</span>
-</span><span class='line'>    tarsnap --list-archives
-</span><span class='line'>  <span class="k">else</span>
-</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Operation aborted${end}&quot;</span>
-</span><span class='line'>  <span class="k">fi</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Nothing to do&quot;</span>
-</span><span class='line'>  <span class="nb">exit </span>0
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></div></figure>
-
-
-<p>You can see the rest of the script in
-<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snapclean" title="snapclean in bitbucket">my bitbucket repo</a>.  It even comes <a href="/images/post_images/snapclean.png" title="Screenshot of snapclean">with colour</a>.</p>
-
-<p>Once every couple of weeks, I run the script, review the archives marked for
-deletion and then blow them away. Easy. If you aren&#8217;t using Tarsnap, you
-really should check it out; it is an excellent service and—for the almost
-ridiculously small investment—you get rock solid, encrypted peace of
-mind. Why would you not do that?</p>
-
-<h3>Coda</h3>
-
-<p>This is the <em>one hundredth</em> post on this blog: a milestone that I never
-envisaged getting anywhere near. Looking back through the posts, nearly 60,000
-words worth, there are a couple there that continue to draw traffic and are
-obviously seen at some level as helpful.  There are also quite a few that
-qualify as “filler”, but blogging is a discipline like any other and sometimes
-you just have to push something up to keep the rhythm going. In any event, this
-is a roundabout way of saying that, for a variety of reasons both personal and
-professional, I am no longer able to fulfil my own expectations of regularly
-pushing these posts out.</p>
-
-<p>I will endeavour to, from time to time when I find something that I genuinely
-think is worth sharing, make an effort to write about it, but I can&#8217;t see that
-happening all that often.  I&#8217;d like to thank all the people that have read
-these posts; especially those of you that have commented. With every post, I
-always looked forward to people telling me where I got something wrong or how I
-could have approached a problem differently or more effectively<sup>2</sup>; I
-learned a lot from these pointers and I am grateful to the people that were
-generous enough to share them.</p>
-
-<h4>Notes</h4>
-
-<ol>
-<li>The frequency with which this happens is, admittedly, low; but not
-low enough to confidently abandon a service like this…</li>
-<li>Leaving a complimentary note is just as welcome, don&#8217;t get me wrong…</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a></h1>
+      <h1 class="entry-title">Multi-arch Packages in AUR</h1>
     
     
       <p class="meta">
@@ -395,7 +111,7 @@ low enough to confidently abandon a service like this…</li>
   </header>
 
 
-  <div class="entry-content"><p><img class="left" src="/images/post_images/agra.jpg" title="Creative Commons image of Agra" >
+<div class="entry-content"><p><img class="left" src="/images/post_images/agra.jpg" title="Creative Commons image of Agra" >
 One of the easiest ways to contribute to Arch is to maintain a package, or
 packages, in the
 <acronym title="Arch User Repository"><a href="https://aur.archlinux.org/" title="AUR homepage">AUR</a></acronym>;
@@ -541,20 +257,65 @@ shiny, new version of Syncthing. You can see the full version of the script in
 <p>Creative Commons image of the Mosque at Agra, by
 <a href="https://www.flickr.com/photos/jasonwryan/14986166957/">yours truly</a>.</p>
 </div>
+
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
   
 
 
-    </article>
+<time datetime="2014-09-20T09:16:00+12:00" pubdate data-updated="true">Sep 20<span>th</span>, 2014</time>
+      
+
+<span class="categories">
   
-  <div class="pagination">
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/hack/'>hack</a>
+  
+</span>
+
+
+    </p>
     
-      <a class="prev" href="/blog/page/2/">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+      <div class="sharing">
+  
+  
+  
 </div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/09/06/reminder/" title="Previous Post: Simple Reminders">&laquo; Simple Reminders</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/10/25/snapclean/" title="Next Post: Pruning Tarsnap Archives">Pruning Tarsnap Archives &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -586,7 +347,7 @@ shiny, new version of Syncthing. You can see the full version of the script in
 
 <section>
   <h1>Pinboard</h1>
-  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
   <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
 </section>
 <script type="text/javascript">
@@ -609,7 +370,7 @@ shiny, new version of Syncthing. You can see the full version of the script in
   #lastfmList li{ text-align: left; }
 </style>
 <ul id="lastfmList">
-  <li class="loading">Updating tracks&#8230;</li>
+  <li class="loading">Updating tracks...</li>
 </ul>
 <p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
 
@@ -662,6 +423,7 @@ function showLastfmFeed(xml){
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -676,7 +438,10 @@ All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/"
       var disqus_shortname = 'jasonwryan';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.com/blog/2014/09/20/multiarch/';
+        var disqus_url = 'http://jasonwryan.com/blog/2014/09/20/multiarch/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

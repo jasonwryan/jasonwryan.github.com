@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: linux | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.com/blog/categories/linux/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-19T08:20:47+13:00</updated>
+  <id>http://jasonwryan.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Readline Bindings in Vi Mode]]></title>
+    <link href="http://jasonwryan.com/blog/2011/12/01/readline/"/>
+    <updated>2011-12-01T18:43:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2011/12/01/readline</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/readline.png" alt="image" /></p>
+
+<p>I recently threw caution to the wind and
+<a href="https://bitbucket.org/jasonwryan/eeepc/changeset/765405e97e25" title="Bitbucket commit">changed my shell over to vi mode</a>.
+I wanted to take advantage of the superior command editing ability that
+this mode offered, and also to continue to bake vi[m] methods into every
+aspect of my working environment.</p>
+
+<p>The change has been relatively straightforward; the only issues I have
+experienced are really just around a couple of keybinds that I had
+become accustomed to in normal/Emacs mode:</p>
+
+<ul>
+<li><kbd>Alt</kbd><kbd>.</kbd>: to recall the last argument of the previous command(s)</li>
+<li><kbd>Ctrl</kbd><kbd>l</kbd>: to clear the screen in <em>insert</em> mode</li>
+</ul>
+
+
+<p>The first, the ability to recall the final arguments of previous
+commands was a showstopper for me: I really struggled without this.
+Being able to recall a long file path and append it to a new command is
+invaluable. Fortunately, there is the <code>yank-last-arg</code> command that does
+exactly this. Why it is not bound by default in vi mode is beyond me…</p>
+
+<p>The other was purely cosmetic, really. I am an inveterate clearer of the
+screen—unless I am referring to something printed to stdout, I always
+prefer to work at the top of the console.</p>
+
+<p>In any event, with the
+<a href="http://tiswww.case.edu/php/chet/readline/readline.html#SEC13" title="GNU Readline Library">bindable readline commands</a>,
+it was a trivial exercize to restore this functionality to my bash shell
+in vi mode. I created <span class="file">$HOME/.inputrc</span>, and added the requisite binds:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>~/inputrc </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>$include /etc/inputrc&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>for vi mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set editing-mode vi
+</span><span class='line'>$if mode=vi&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set keymap vi-command&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>these are for vi-command mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>"\e[A": history-search-backward            # arrow up
+</span><span class='line'>"\e[B": history-search-forward             # arrow down
+</span><span class='line'>"\ep": yank-last-arg                       # bind to Alt-p
+</span><span class='line'>Control-l: clear-screen&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>set keymap vi-insert&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>these are for vi-insert mode&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>"\e[A": history-search-backward
+</span><span class='line'>"\e[B": history-search-forward
+</span><span class='line'>"\ep": yank-last-arg
+</span><span class='line'>Control-l: clear-screen
+</span><span class='line'>$endif</span></code></pre></div></figure></notextile></div></p>
+
+<p>There is an extensive list of
+<a href="http://linux.about.com/library/cmd/blcmdl3_readline.htm" title="About.Linux page on readline">readline commands and variables</a>
+with which you can customize your shell environment.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Building rtorrent on Debian Squeeze]]></title>
+    <link href="http://jasonwryan.com/blog/2011/11/29/rtorrent/"/>
+    <updated>2011-11-29T21:21:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2011/11/29/rtorrent</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/rtorrent.png" alt="image" /></p>
+
+<p>After <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Post on the HP microserver">setting up my server</a>,
+I wanted to use it as a torrent box. The version of
+<a href="http://libtorrent.rakshasa.no/" title="rtorrent &amp; libtorrent homepage">rtorrent</a>
+in the Debian stable repositories is 0.8.6, which is unfortunate as
+support for <a href="http://en.wikipedia.org/wiki/Magnet_URI_scheme" title="Wikipedia page on magnet URIs">magnet links</a>
+was introduced in 0.8.7.</p>
+
+<p>To remedy this, I decided to build the current stable version of
+rtorrent, 0.8.9. At the same time—seeing as I was getting my hands dirty
+anyway—I thought I’d patch in colour support.</p>
+
+<p>This is a straightforward two-step process. First, build the current
+version of libtorrent, 0.12.9:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.12.9.tar.gz
+</span><span class='line'>tar -xvf libtorrent-0.12.9.tar.gz
+</span><span class='line'><span class="nb">cd </span>libtorrent-0.12.9/
+</span><span class='line'>./configure &amp;amp;&amp;amp; make
+</span><span class='line'>sudo checkinstall
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Once libtorrent is successfully built and installed, you can begin the
+rtorrent build:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget http://rtorrent.rakshasa.no/downloads/rtorrent-0.8.9.tar.gz
+</span><span class='line'>tar -xvf rtorrent-0.8.9.tar.gz
+</span><span class='line'><span class="nb">cd </span>rtorrent-0.8.9/
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then, if you want colour support, you need the patch. I used the version
+in the
+<a href="https://aur.archlinux.org/packages.php?ID=31956" title="rtorrent-color in AUR">AUR</a>,
+but you can also grab a copy from a paste site:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>wget -O canvas_colour.patch http://paste.geekosphere.org/twy7
+</span><span class='line'>mv canvas_colour.patch src/
+</span><span class='line'>patch -uNp1 -i canvas_colour.patch
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The patch should apply cleanly. Then specify where libtorrent is
+installed to ensure that it is linked during the rtorrent build:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>./configure --libdir<span class="o">=</span>/usr/local/lib
+</span><span class='line'>make
+</span><span class='line'>sudo checkinstall
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Once again, this should compile cleanly and you will now have rtorrent
+with colour and magnet link support installed in
+<span class="file">/usr/local/bin/rtorrent</span>.</p>
+
+<h5>Notes</h5>
+
+<p>I prefer to use
+<a href="http://asic-linux.com.mx/~izto/checkinstall/" title="checkinstall homepage">checkinstall</a>
+so that self-installed applications are tracked by
+<a href="http://wiki.debian.org/Apt" title="Debian wiki entry">Apt</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[rsync + SSH Backups]]></title>
+    <link href="http://jasonwryan.com/blog/2011/11/28/rsync/"/>
+    <updated>2011-11-28T12:23:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2011/11/28/rsync</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/rsync-ssh.png" alt="image" /></p>
+
+<p>I <a href="http://jasonwryan.com/blog/2011/11/18/microserver/" title="Writeup of microserver setup">posted recently about setting up a microserver</a>
+and included a
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync article">rsync</a>
+script for backing up my files to the server. At the time, I was running
+it manually, but since have sorted out the excludes list and have now
+automated it.</p>
+
+<p>My original scheme was to set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia entry on cron">cron job</a> and
+mount an
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia NFS protocol article">NFS share</a>
+before rsync’ing the directories across. In the end, I went with SSH and
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia: public key cryptography">public key authentication</a>
+as debugging all of the various permissions issues with the NFS share
+did not seem worth the effort.</p>
+
+<p>First, on my local desktop, I created the keypair called, inventively,
+rsync:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh-keygen -t rsa -f rsync
+</span><span class='line'>mv rsync ~/.ssh &amp;amp;&amp;amp; chmod 600 ~/.ssh/rsync
+</span><span class='line'>ssh-copy-id -i rsync.pub jason@microserver
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>This keypair was created <em>without a passphrase</em> so that the script could
+be successfully called from <code>cron</code>. To slightly increase the security
+around a key without a passphrase, I used the from option in
+authorized_keys<sup>1</sup>, to restrict access to the IP address of the client
+machine(s), like so:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">from</span><span class="o">=</span><span class="s2">&quot;192.168.1.10*&quot;</span> ssh-rsa AAAAB3Nza...
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>It was then just a matter of adding a line to my <code>crontab</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>crontab -e
+</span><span class='line'>00 22 * * * /home/jason/Scripts/runbackup
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>To further simplify matters, I created an alias in <span class="file">$HOME/.ssh/config</span> for
+the SSH command:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>.ssh/config </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>Host backups
+</span><span class='line'>   Hostname 192.168.1.200
+</span><span class='line'>   Port 0000
+</span><span class='line'>   User jason
+</span><span class='line'>   IdentityFile ~/.ssh/rsync</span></code></pre></div></figure></notextile></div></p>
+
+<p>And I was done. Everynight at 10pm, all of my data will be backed up to
+the server. The rsync command in the script:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Backup to remote server over SSH&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;rsync -azP --delete --exclude-from<span class="o">=</span>/home/jason/Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;--log-file<span class="o">=</span>/home/jason/Documents/rsync-<span class="k">$(</span>date +%d%m%y<span class="k">)</span>.log <span class="se">\</span>
+</span><span class='line'>-e ssh /home/jason /etc backups:Backups/Centurion
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;
+</span></code></pre></div></figure></notextile></div></p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>All of the options are detailed in <a href="http://www.manpagez.com/man/8/sshd/" title="manual page for sshd">man sshd(8)</a>.</li>
+</ol>
+
+
+<p>Creative Commons image from
+<a href="http://www.flickr.com/photos/skreuzer/511738484/" title="Flickr image from skreuzer">skreuzer</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Microserver]]></title>
+    <link href="http://jasonwryan.com/blog/2011/11/18/microserver/"/>
+    <updated>2011-11-18T17:13:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2011/11/18/microserver</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/microserver.png" alt="image" /></p>
+
+<p>I recently picked up a
+<a href="http://h10010.www1.hp.com/wwpc/us/en/sm/WF05a/15351-15351-4237916-4237918-4237917-4248009.html" title="HP specs page">HP Microserver</a>;
+a small, silent server to use primarily to back up
+<a href="http://jasonwryan.com/blog/2010/10/04/the-setup" title="Slightly out-of-date setup post">my other boxes</a>.
+I went for the 2GB version without any preinstalled operating system.</p>
+
+<p>As I want this machine to just sit quietly in my garage for the next 5
+or 6 years, I opted for
+<a href="http://www.debian.org/releases/stable/" title="Debian site">Debian stable</a> as the
+base system. After installing two 1TB drives, I set them up as an
+<a href="http://www.saout.de/misc/dm-crypt/" title="Device mapper homepage">encrypted</a>
+RAID 1 array, in a
+<a href="http://en.wikipedia.org/wiki/Logical_volume_management" title="Wikipedia entry on LVM">logical volume</a>.</p>
+
+<p><strong>Pro tip</strong> when you get to the part of the partitioning where you
+configure the volume for encryption, make sure you select <em>No</em> for
+<em>erase data</em>. It took close to 90 hours to scrub both the hard drives.
+And, as I am not really expecting
+<a href="http://www.extremetech.com/computing/105931-full-disk-encryption-is-too-good-says-us-intelligence-agency" title="FDE defeats the NSA">a visit from the spooks</a>,
+that seems a little like overkill…</p>
+
+<p>Once the base install was complete, I set up my SSH keys,
+<a href="http://tmux.sourceforge.net/" title="tmux page">tmux</a>, configured the
+firewall and forwarded the necessary ports, set up
+<a href="http://en.wikipedia.org/wiki/Network_File_System_%28protocol%29" title="Wikipedia page: network file system">NFS</a>,
+and that was it. The box is deathly quite, can be mounted locally for
+<a href="http://en.wikipedia.org/wiki/Rsync" title="Wikipedia rsync entry">rsync backups</a> and
+accessed remotely (for a tmux session running
+<a href="http://irssi.org/" title="Irssi homepage">irssi</a>), and all for less than
+NZD700.</p>
+
+<p>I knocked together a quick script<sup>1</sup> to manage the backing up; currently
+I run it manually, but once I have the excludes file tweaked properly,
+I’ll set up a
+<a href="http://en.wikipedia.org/wiki/Cron" title="Wikipedia page on cron">cron job</a> to
+automate the task.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>runbackup.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Backup to remote server over NFS&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> <span class="k">$(</span>id -u<span class="k">)</span> -ne 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;You must run this as root. Terminating.&quot;</span>
+</span><span class='line'> <span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[</span> -d /media/Sentinel/Backups <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Sentinel mounted.&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Mounting Sentinel.&quot;</span>
+</span><span class='line'> mount.nfs 192.168.1.200:/home/jason /media/Sentinel <span class="o">||</span> <span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">fi</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;sync directories&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Starting sync...&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; rsync -azP --delete --exclude-from<span class="o">=</span>Scripts/excludes.txt <span class="se">\&lt;</span>/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; --log-file<span class="o">=</span>Documents/rsync.log <span class="se">\</span>
+</span><span class='line'> /home/jason /etc /media/Sentinel/Backups/Centurion
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$?&quot;</span> -eq 0 <span class="o">]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Synched successfully; now unmounting.&quot;</span>
+</span><span class='line'> umount /media/Sentinel
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt; <span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail!&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt; <span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Any faults aside, it should be reasonably portable…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[IRC Notifications with dzen2]]></title>
+    <link href="http://jasonwryan.com/blog/2011/11/07/irc-dzen/"/>
+    <updated>2011-11-07T19:48:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2011/11/07/irc-dzen</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/irc-dzen.png" alt="image" /></p>
+
+<p>I have a persistent <a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>
+session running on a server connected to IRC and I wanted to get
+notifications whenever someone addressed me, irrespective of whether I
+was connected to the session, or that particular machine at the time.</p>
+
+<p>I use <a href="http://irssi.org/about" title="irssi homepage">irssi</a> as my IRC client,
+and there is a script called
+<a href="http://thorstenl.blogspot.com/2007/01/thls-irssi-notification-script.html" title="Blog post explaining fnotify">fnotify</a>
+that will print any mentions in a channel to a file. I then configured
+the fnotify script to write to a folder in Dropbox. Now, whenever I am
+mentioned in freenode, the file is updated across all my machines.</p>
+
+<p>The next challenge was to translate the updating of the fnotify file
+into a notification on my current machine. As I don’t use
+<a href="http://developer.gnome.org/libnotify/" title="libnotify reference manual">libnotify</a>
+on my Arch machines, I wanted to make it work with
+<a href="http://sites.google.com/site/gotmor/dzen" title="dzen homepage">dzen2</a><sup>1</sup>
+Enter a simple shell script:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>highlights.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;dir<span class="o">=</span><span class="s2">&quot;$HOME/Dropbox/irssi/&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;while inotifywait -qqre attrib <span class="s2">&quot;$dir&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;echo <span class="s2">&quot;IRC: You have been pinged...&quot;</span> | dzen2 -p 3
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;done
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>I have included this in my <span class="file">$HOME/.xinitrc</span>
+so that it runs in the background after login. Whenever the metadata
+(the <code>attrib</code> switch) of the file changes, a dzen2 notification is
+written to my
+<a href="http://dwm.suckless.org" title="THE supreme window manager">dwm</a> statusbar
+with the message.</p>
+
+<p>Simple; but does what I need…</p>
+
+<h5>Notes</h5>
+
+<ol>
+<li>Dropbox’s API won’t work with dzen2—or with other lightweight
+notifications like
+<a href="https://github.com/halhen/statnot" title="statnot on github">statnot</a>, so I
+<a href="http://dropbox.zendesk.com/requests/336478" title="Closed Dropbox bug report">filed a bug report</a>
+(that was closed without any progress)—hence my having to resort to a
+home-cooked solution…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+</feed>

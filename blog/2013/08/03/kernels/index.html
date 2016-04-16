@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Compiling Kernels - jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="While chasing edits on the Arch Wiki a couple of weeks ago, I stumbled upon
+this page:
+Kernels/Compilation/Traditional;
+fortuitously, it transpired &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/2013/08/03/kernels">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Compiling Kernels</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-03T09:24:00+12:00" pubdate data-updated="true">Aug 3<span>rd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="left" src="/images/post_images/kernel.jpg" title="Kernels on Flickr" >
+While chasing edits on the Arch Wiki a couple of weeks ago, I stumbled upon
+this page:
+<a href="https://wiki.archlinux.org/index.php/Kernels/Compilation/Traditional" title="What it says on the tin…">Kernels/Compilation/Traditional</a>;
+fortuitously, it transpired. For it piqued my interest sufficiently for me to
+try my hand at compiling my own kernel, and—after half a dozen attempts at
+getting it right—I had no sooner switched to my custom built kernel as the
+default in my boot manager when 3.10.2 landed in [testing] and would not boot.
+<a href="https://bbs.archlinux.org/viewtopic.php?id=167090" title="Forum thread">At all</a>.</p>
+
+<p>I still have no idea why 3.10.2 would do nothing other than fail silently, but
+the convenience of having another kernel to switch to without needing a rescue
+image or any other panicked interventions immediately won me over. In the years
+that I have used Arch, this was my
+<a href="http://jasonwryan.com/blog/2012/07/19/breakage/" title="Post on the Myth of Breakage">first near brush</a>
+with an unbootable system<sup>1</sup> and the small amount of effort required to
+mitigate this risk with a custom or alternate kernel seems a smart investment to
+me at this point.<sup>2</sup></p>
+
+<p>The documentation on the wiki is both comprehensive and easy to follow. The
+lessons I learned between kernels zero and three or four were mostly around
+ensuring the correct modules were configured into the build. One surefire way to
+make this a tedious and laborious process, should you be so inclined, is to
+blindly enable and disable settings in <code>menuconfig</code>.</p>
+
+<p>Around about the time of the fourth failed build (well, the builds were working
+but the kernel wasn&#8217;t booting or was booting with missing functionality), I
+decided to switch approaches and go down the <code>localmodconfig</code> route. This, for
+someone with my limited experience with this aspect of GNU/Linux, was in
+retrospect a decision I should have made sooner.</p>
+
+<p>First, I started with <span class="file">streamline_config.pl</span>, a helpful
+script that allows you to create a <span class="file">.config</span> file
+containing only those modules necessary to your currently running
+kernel<sup>3</sup>. This yielded a booting kernel at the first attempt. It turns
+out, though, that you still need to ensure that <em>all</em> of the modules you are
+going to need, <em>at any time in the future</em>, are loaded. I missed a couple.</p>
+
+<p>Then I discovered this script by graysky,
+<a href="https://github.com/graysky2/modprobed_db" title="In graysky2's github repo">modprobed_db</a>.
+For a newbie to kernel compilation, this is simply invaluable. It allows you to
+create a record of your used modules over time, compare it with those that are
+currently loaded and then—right before you <code>make localmodconfig</code>—load the
+remaining necessary ones. Foolproof kernel compilation. Just like that.
+Brilliant. And, naturally enough, it is in
+<a href="https://aur.archlinux.org/packages/modprobed_db/" title="AUR package">the AUR</a>.</p>
+
+<p>Run the script, create your <span class="file">.conf</span> file and database in
+<span class="file">$XDG_CONFIG_HOME/modprobed_db{,.conf}</span> and then either
+call it from a <code>cron</code> job or, if you are impatient like me, spend a frenzied 10
+minutes plugging ALL the devices you own into your machine, and you are good to
+go. Running <code>sudo modprobed_db recall</code> will load all of the required modules,
+you generate your kernel <span class="file">.config</span>, check it to make
+sure it is complete and then run <code>make</code>.</p>
+
+<p>On my laptop, I have 115 modules activated for a build, 10 of which need to be
+recalled prior to creating the <span class="file">.config</span>. When I was
+trying to debug 3.10.2, I compiled the vanilla Arch kernel using
+<a href="https://wiki.archlinux.org/index.php/Abs" title="Wiki page on Arch Build System">ABS</a>
+and it took almost exactly 60 minutes using all four threads on my i5. Building
+my own kernel is done and installed in under 10.</p>
+
+<p>I susbcribed to the <a href="https://www.kernel.org/feeds/kdist.xml" title="Kernel updates">RSS feed for kernel versions</a>
+and now, whenever a new stable kernel is posted, I <code>wget</code> it, compile it and
+boot from it. As new Arch versions appear in the repositories, they are updated
+by <code>pacman</code> and happily coexist on my <span class="file">/boot</span>; thereby
+ensuring that the likelihood of me being unable to boot my machine (other than
+through
+<acronym title="Problem Exists Between Keyboard And Chair">PEBKAC</acronym>)
+has hopefully been staved off for another five years.</p>
+
+<p>The next step would be to write a script that completely automates the process…</p>
+
+<h3>Update 7/8/13</h3>
+
+<p>After poring over PKGBUILDS in the AUR, principally graysky&#8217;s
+<a href="https://aur.archlinux.org/packages/linux-ck/" title="Arch User Repository">linux-ck PKGBUILD</a>,
+and the official
+<a href="https://projects.archlinux.org/svntogit/packages.git/tree/trunk?h=packages/linux" title="Arch SVN Package Repo">ABS PKGBUILD</a>,
+I decide to write my own to automate the above. It works well enough for me, but
+hasn&#8217;t been tested more widely. You will need to ensure that you have an
+up-to-date <code>modprobed_db</code> database with all of your required modules listed and
+that you have configured <code>sudoers</code> to have this run from the PKGBUILD.</p>
+
+<p>The PKGBUILD and the attendant files are in my
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Build/linux-jwr" title="PKGBUILD and related files">bitbucket repo</a>:
+let me know if there are any issues with this approach.</p>
+
+<p><em>See also the follow up post on automating this process:</em> <a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="Newer post">Automating Kernel Builds</a></p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>Other than those occassions for which I bear complete responsibility…</li>
+<li>There are, of course, other benefits such as the self-satisfied glow of geek
+accomplishment.</li>
+<li>This is located in <span class="file">scripts/kconfig/</span>.</li>
+</ol>
+
+
+<p>Creative Commons image of kernels on Flickr by
+<a href="http://www.flickr.com/photos/the_girl/56432091">Nadia Prigoda-Lee</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jason Ryan</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-03T09:24:00+12:00" pubdate data-updated="true">Aug 3<span>rd</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/archlinux/'>archlinux</a>, <a class='category' href='/blog/categories/hack/'>hack</a>, <a class='category' href='/blog/categories/kernel/'>kernel</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/07/20/gnupg/" title="Previous Post: Encrypting Mutt">&laquo; Encrypting Mutt</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/08/17/terminal/" title="Next Post: Terminal Conditions">Terminal Conditions &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks...</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jasonwryan.com/blog/2013/08/03/kernels/';
+        var disqus_url = 'http://jasonwryan.com/blog/2013/08/03/kernels/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,523 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>jasonwryan.com</title>
+  <meta name="author" content="Jason Ryan">
+
+  
+  <meta name="description" content="Vifm is a ncurses based file manager with vi-like
+keybindings; it gives you complete keyboard control over your files without
+having to learn a new &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jasonwryan.com/blog/page/33">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="jasonwryan.com" type="application/atom+xml">
+  <!-- OpenId login -->
+<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider">
+<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/e970c157-315b-49b2-8b30-1d8a64215d0f">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-907012-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">jasonwryan.com</a></h1>
+  
+    <h2>Miscellaneous ephemera…</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <!-- <input type="hidden" name="q" value="site:jasonwryan.com" /> -->
+    <input type="hidden" name="sites" value="jasonwryan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search duckduckgo&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/contact.html">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/28/changing-keybinds-in-vifm/">Changing Keybinds in vifm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-12-28T13:50:00+13:00" pubdate data-updated="true">Dec 28<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://vifm.sourceforge.net/">Vifm</a> is a ncurses based file manager with vi-like
+keybindings; it gives you complete keyboard control over your files without
+having to learn a new set of commands.</p>
+
+<p><a href="http://www.flickr.com/photos/jasonwryan/4220632362/" title="Vifm by
+jasonwryan, on Flickr" target="_blank"><img src="http://farm5.static.flickr.com/4039/4220632362_ea980811e1.jpg" width="500"
+height="227" alt="Vifm"/></a></p>
+
+<p>The only drawback, for me, is that as of the current version (0.5-1) you
+can&#8217;t map keys. While the developer has indicated it is on the todo list,
+he also flagged that it is some way off. If, like me, you <code>map : ;</code>
+in <a href="http://www.vim.org/">Vim</a>, then not having this functionality is a minor
+irritant. Fortunately, it is also easily fixed. Ken Steen, the Vifm developer,
+was kind enough to point me in the right direction…</p>
+
+<p>Download <a href="http://aur.archlinux.org/packages.php?ID=6011">the tarball</a> from
+<acronym title="Arch User Repository">AUR</acronym> and untar it etc.,</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span>tar -xzf vifm.tar.gz <span class="nb">cd </span>vifm/
+</span></code></pre></div></figure>
+
+
+<p>Build the package</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span>makepkg -s
+</span></code></pre></div></figure>
+
+
+<p>Then you will need to edit the file, keys.c</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>vim src/vifm-0.5/src/keys.c
+</span></code></pre></div></figure>
+
+
+<p>Search for the command key</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>/case <span class="s1">&#39;:&#39;</span>:
+</span></code></pre></div></figure>
+
+
+<p>In this version it is at line 982. Change the entry to your key of choice —
+in my case <kbd>;</kbd> — and save and quit.</p>
+
+<p>Recompile Vifm and you are done&#8230;</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">$ </span>makepkg -efi
+</span></code></pre></div></figure>
+
+
+<h3>Update 18/2/10</h3>
+
+<p>Vifm has now been moved to Community, so you can use
+<a href="http://wiki.archlinux.org/index.php/Arch_Build_System%22">ABS</a> to build the package.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/19/patching-dwm-with-pertag-and-bstack/">Patching dwm with pertag and bstack</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-12-19T17:40:00+13:00" pubdate data-updated="true">Dec 19<span>th</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Over the last several months I have been using <a href="http://dwm.suckless.org/">dwm</a>
+as my window manager on two <a href="http://www.archlinux.org/">Arch Linux</a>
+machines:  my <a href="http://www.flickr.com/photos/jasonwryan/4196530478/" title="Flickr image"
+target="_blank">EeePC 901</a> and an <a href="http://www.flickr.com/photos/jasonwryan/4193384965/" title="Flickr image"
+target="_blank">old Dell</a> at work.</p>
+
+<p>There is a lot to like about dwm, but the most attractive qualities for me
+are the fact that it is <a href="http://en.wikipedia.org/wiki/Source_lines_of_code">under 2000 SLOC</a>
+and is very configurable.</p>
+
+<p>The most recent version, 5.7.2, included some changes that meant that some
+of the patches wouldn&#8217;t play nicely together anymore; trying to combine
+any of the layout patches with <a href="http://dwm.suckless.org/patches/pertag">pertag</a>
+would result in the code failing to compile.</p>
+
+<p>Fortunately, there is a fix described on <a href="http://lists.suckless.org/dev/0911/2317.html">the mailing list</a>.
+Essentially, it involves manually applying the patch to the source code.</p>
+
+<p>Start with a vanilla version of the code. Move to the source directory and
+apply the pertag patch:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nb">cd</span> <span class="nv">$BUILD</span>/dwm/src/dwm-5.7.2/ patch -p1 &lt; dwm-5.7.2-pertag.diff
+</span></code></pre></div></figure>
+
+
+<p>Then manually add the <a href="http://dwm.suckless.org/patches/bottom_stack">bstack</a>
+(or any of the other layout patches) to <span class="file">dwm.c</span>:</p>
+
+<p>Include the <code>bstack</code> declaring function with the others, beginning line 153. I
+inserted it alphabetically…</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='c'><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">attachstack</span><span class="p">(</span><span class="n">Client</span> <span class="o">*</span><span class="n">c</span><span class="p">);</span>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">*</span><span class="n">m</span><span class="p">);</span>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="n">buttonpress</span><span class="p">(</span><span class="n">XEvent</span> <span class="o">*</span><span class="n">e</span><span class="p">);</span>
+</span><span class='line'><span class="err">…</span>
+</span></code></pre></div></figure>
+
+
+<p>And then, <em>after</em> the <code>#include “config.h”</code> declaration at
+275, add in the rest of the patch. For consistency&#8217;s sake, I included it
+at line 415:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='c'><span class='line'><span class="kt">void</span> <span class="nf">bstack</span><span class="p">(</span><span class="n">Monitor</span> <span class="o">*</span><span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">mh</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">Client</span> <span class="o">*</span><span class="n">c</span><span class="p">;</span> <span class="k">for</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">m</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">clients</span><span class="p">);</span> <span class="n">c</span><span class="p">;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">nexttiled</span><span class="p">(</span><span class="n">c</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span><span class="n">next</span><span class="p">),</span> <span class="n">n</span><span class="o">++</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'><span class="k">return</span><span class="p">;</span>
+</span><span class='line'><span class="err">…</span>
+</span></code></pre></div></figure>
+
+
+<p>Add you keybindings into your header file (<span class="file">config.h</span>) and recompile:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>makepkg -efi
+</span></code></pre></div></figure>
+
+
+<p>Done.</p>
+
+<p>The only fly in the ointment is that, for me anyway, I have been unable to
+get any of the other layout patches to work with this setup; either by regular
+patching or using the above method. YMMV.</p>
+
+<h3>Update</h3>
+
+<p>So I was wrong: you can get pertag to work with all the
+other patches, and it is <a href="http://jasonwryan.com/blog/2010/03/02/patching-dwm/">not that difficult</a>…</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/11/21/dzen2-and-conky-cli-in-dwm/">dzen2 and conky-cli in dwm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-11-21T12:07:00+13:00" pubdate data-updated="true">Nov 21<span>st</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I struggled over the last couple of days to pipe conky into a Dzen2 status bar alongside the default dwm bar.</p>
+
+<p>Here is how I sorted it.</p>
+
+<p>First, I installed <code>conky-cli</code> and <code>dzen2</code>. Conky-cli is in AUR, and dzen2 is in Community:</p>
+
+<figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>pacman -S dzen2 <span class="o">&amp;&amp;</span> yaourt conky-cli
+</span></code></pre></div></figure>
+
+
+<p>Then it was a matter of setting up the relevant files.</p>
+
+<figure class='code'><figcaption><span>.xinitrc.sh </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># ~/.xinitrc</span>
+</span><span class='line'>setxkbmap -option terminate:ctrl_alt_bksp &amp;amp;
+</span><span class='line'><span class="nb">eval</span> <span class="sb">`</span>cat ~/.fehbg<span class="sb">`</span> &amp;amp;
+</span><span class='line'>numlockx &amp;amp;
+</span><span class='line'>xscreensaver -no-splash &amp;amp;
+</span><span class='line'><span class="c"># Dzen &amp;amp; conky</span>
+</span><span class='line'><span class="o">(</span>sleep 15s &amp;amp;&amp;amp; conky | dzen2 -x <span class="s1">&#39;500&#39;</span> -e <span class="s1">&#39;&#39;</span> -fg <span class="s1">&#39;#dcdcdc&#39;</span> -bg <span class="s1">&#39;#3f3f3f&#39;</span> <span class="se">\</span>
+</span><span class='line'>-w <span class="s1">&#39;650&#39;</span> -ta r -fn <span class="s1">&#39;-*-terminus-*-r-normal-*-*-120-*-*-*-*-iso8859-*&#39;</span> -p <span class="o">)</span> &amp;amp;
+</span><span class='line'><span class="c"># Start dwm</span>
+</span><span class='line'><span class="nb">exec </span>ck-launch-session ~/Scripts/dwm-start
+</span></code></pre></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>.conkyrc .sh </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>background no
+</span><span class='line'>out_to_console yes
+</span><span class='line'>update_interval 2
+</span><span class='line'>total_run_times 0
+</span><span class='line'>use_spacer none
+</span><span class='line'>double_buffer yes
+</span><span class='line'>TEXT
+</span><span class='line'>${if_existing /sys/class/power_supply/BAT0/present}^i(/home/jason/Build/dwm/dzen/bat.xbm)…</span></code></pre></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>dwm-start .sh </span></figcaption>
+<div class="highlight"><pre><code class=''><span class='line'>while true; do 
+</span><span class='line'>    dwm >/dev/null
+</span><span class='line'>done</span></code></pre></div></figure>
+
+
+<p>The key is —and it took me a while to work it out— to delay the loading of conky until <em>after</em> dwm has painted it&#8217;s
+status bar; otherwise <code>conky | dzen2</code> is obscured.</p>
+
+<p>Now, the “before” shot:</p>
+
+<p><img src="/images/post_images/conky-dzen.png"></p>
+
+<p>…and the finished product:</p>
+
+<p><a href="http://www.flickr.com/photos/jasonwryan/4121324068/" title="Conky-cli to dzen2 in dwm on Arch by jasonwryan, on Flickr" target="_blank"><img src="http://farm3.static.flickr.com/2666/4121324068_6ec29262d7.jpg" width="500" height="293" alt="Conky-cli to dzen2 in dwm on Arch"/></a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/34/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/32/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/19/overlayfs/">Playing with overlayfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/snapclean/">Pruning Tarsnap Archives</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/20/multiarch/">Multi-arch Packages in AUR</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/06/reminder/">Simple Reminders</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/23/asp/">Building from Source</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
+  <p><a href="http://pinboard.in/u:jasonwryan">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "jasonwryan"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="lastfm">
+<h1>Recently Scrobbled</h1>
+<style type="text/css">
+  #lastfmList li{ text-align: left; }
+</style>
+<ul id="lastfmList">
+  <li class="loading">Updating tracks&#8230;</li>
+</ul>
+<p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
+
+<script type="text/javascript">
+  $.domReady(function(){
+    getLastfmFeed("jasonwryan", 5, "3a19a6604d742024a1331bebb7a68d33");
+  });
+</script>
+<script src="/javascripts/twitter.js" type="text/javascript"> </script>
+
+<script lang="Javascript">
+function getLastfmFeed(user,count,api_key) {
+  count = parseInt(count, 10);
+  $.ajax({
+      url: "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + user + "&limit=" + count + "&api_key=" + api_key
+    , type: 'xml'
+    , error: function (err) { $('#lastfmList li.loading').addClass('error').text("Last.fm's busted"); }
+    , success: function(data) { showLastfmFeed(data); }
+  });
+}
+
+function showLastfmFeed(xml){
+  var tracklist = document.getElementById('lastfmList'),
+      content = '',
+      i=0;
+  
+  $(xml.responseXML).find("recenttracks").children().each(function(){
+    var artist = $(this).find('artist').text(),
+        name = $(this).find('name').text(),
+        date = $(this).find('date').text(),
+        url = $(this).find('url').text();
+    content += '<li id="lastfmItem_'+i+'"><a href="'+ url + '">' + name +'</a> by '+ artist + '<span class="date"> ' + prettyDate(date) + ' ago</span></li>';
+    i+=1;
+  });
+
+  tracklist.innerHTML = content;
+}
+</script>
+</section>
+
+<section>
+<p class="arch"><a href="http://unix.stackexchange.com/users/6761/jasonwryan">
+<img src="http://unix.stackexchange.com/users/flair/6761.png" border="0" width="208" height="58" alt="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems." title="profile for jasonwryan at Unix and Linux, Q&amp;A for users of Linux, FreeBSD and other Un*x-like operating systems.">
+</a></p>
+</section>
+<section>
+<p class="arch"><a href="https://archlinux.org/" title="Arch Linux"><img src="/images/running-on-arch.png" /></a></p>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+All content licensed under <a href="http://creativecommons.org/licenses/by/2.5/" title="Creative Commons by Attribution">Creative Commons</a> 2015 - Jason Ryan    
+<span class="credit">This site is powered by <a href="http://vim.org">Vim</a>, <a href="http://octopress.org">Octopress</a> and <a href="http://github.com">Github</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'jasonwryan';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

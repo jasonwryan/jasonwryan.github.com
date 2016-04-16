@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: browser | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.com/blog/categories/browser/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-19T08:20:47+13:00</updated>
+  <id>http://jasonwryan.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Browser tunnels]]></title>
+    <link href="http://jasonwryan.com/blog/2014/05/30/tunnels/"/>
+    <updated>2014-05-30T09:32:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/05/30/tunnels</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/tunnel.jpg" title="Creative Commons image" >
+Using a
+<a href="http://en.wikipedia.org/wiki/SOCKS" title="Wikipedia article">Socks proxy</a> over an
+<a href="http://en.wikipedia.org/wiki/Tunneling_protocol#Secure_shell_tunneling" title="Wikipedia entry">SSH tunnel</a>
+is a well documented and simple if much less flexible stand in for a full-blown
+<a href="http://en.wikipedia.org/wiki/Virtual_private_network%20'VPN%20on%20Wikipedia">VPN</a>. It
+can provide a degree of comfort when accessing private or sensitive information
+over a public Internet connection, or you might use it to get around the
+terminally Canutian<sup>1</sup> construct that is known as geo-blocking; that
+asinine practice of pretending that the Internet observes political boundaries…</p>
+
+<p>By way of a digression, it occurred to me at some point while I was wrestling
+with setting this up that, over the last seven or so years, much of the
+“entertainment” provided by corporate content distributors has been in the form
+of encouraging me to spend hundreds? thousands? of hours researching and
+implementing ways to circumvent their litany of failed and defective
+technological restrictions: region codes,
+<a href="http://www.defectivebydesign.org/what_is_drm_digital_restrictions_management" title="Defective by Design">DRM</a>
+and the like. It is worth noting that, in the vast majority of cases, I was
+just seeking access to content that I already owned (in another format), or was
+prepared to pay for.</p>
+
+<p>My move to GNU/Linux in 2007 was in large part motivated by the awful
+realisation that the music I had bought in iTunes was stuck in there. The
+combined intellectual effort globally expended trying to legitimately route
+around broken copyright law would have comfortably powered another golden age
+of the sciences; it's not entirely implausible to think that the only reason we
+still have to deal with cancer is the malignant legacy of
+<a href="https://en.wikipedia.org/wiki/Sonny_Bono_Copyright_Term_Extension_Act" title="Sonny's gift…">Sonny Bono</a><sup>2</sup>.</p>
+
+<p>Now, back to our regular programming… One of my approaches to get around this
+sort of economic and policy rigor mortis has been to use a basic script to
+create a proxy tunnel to my home server. It assumes that you have
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia, again">public key</a>
+authentication set up and your passphrase loaded in
+<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Keychain" title="Arch wiki, for a change">keychain</a>,
+or something similar.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;SSH_HOST<span class="o">=</span><span class="s2">&quot;jason@XXX.XXX.XXX.XXX -p XXX -i $HOME/.ssh/box1&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;up<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;ssh -f -N -D 8080 -M -S /tmp/ssh_tunnel_%h.sock -o <span class="nv">ExitOnForwardFailure</span><span class="o">=</span>yes <span class="nv">$SSH_HOST</span> &amp;amp;&amp;amp; <span class="se">\</span>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel started successfully&quot;</span> <span class="o">||</span> <span class="se">\</span>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel failed to start&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;down<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;ssh -S /tmp/ssh_tunnel_%h.sock -O <span class="nb">exit</span> <span class="nv">$SSH_HOST</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> up <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;up &amp;amp;&amp;amp; chromium --proxy-server<span class="o">=</span><span class="s2">&quot;socks://127.0.0.1:8080&quot;</span> &amp;amp;
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> down <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;down
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;else&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail…&quot;</span>
+</span><span class='line'><span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Over the last couple of weeks, though, while I have been setting up and
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on Syncthing">playing with Syncthing</a>,
+I found this script wanting. With six nodes and, depending if I was on the
+<acronym title="Local Area Network">LAN</acronym> or not, as many as four of those
+hosts only accessible via SSH, then having the ability to quickly and painlessly
+open a browser on any one of the nodes <em>without having to edit the script</em>
+suddenly seemed like quite a good idea.</p>
+
+<p>Accordingly I went to work on the script, including a test to determine if I
+was on my home network and passing the name of the desired host as an
+argument. With this approach, I simply type <code>tunnel $host</code> and chromium
+opens tunneled to that host, where I can the happily open
+<strike>Hulu</strike> the Syncthing GUI.</p>
+
+<p>The updated script is posted as
+<a href="https://gist.github.com/jasonwryan/715a4f3fcb55e995de0d" title="On Github">a gist</a>,
+and as you can see, still needs some work to make it a little more generic.
+You will need, for example, to hand edit in the hosts and ports in
+<code>get_host()</code>. It is also the first time I have played with
+<a href="http://mywiki.wooledge.org/BashGuide/InputAndOutput#Pipes" title="Wooledge wiki">named pipes</a>
+and I am not convinced that my use of <code>mkfifo</code> here is either the correct
+approach or implementation; but it works. Comments enlightening me would
+be gratefully received.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The good king was, appropriately enough, actually called Cnut the Great…</li>
+<li>And, no, I am not referring to his musical corpus, which is as carcinogenic as his
+political career was as a Myrmidon for Big Content.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image, <a href="https://www.flickr.com/photos/lawrence_evil/113733779/">The Tunnel</a>,
+by Lawrence Whitmore.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Replacing Google Reader]]></title>
+    <link href="http://jasonwryan.com/blog/2013/05/25/greader/"/>
+    <updated>2013-05-25T09:10:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2013/05/25/greader</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/commafeed.png" title="'CommaFeed Logo'" >
+I have been using <a href="https://en.wikipedia.org/wiki/Google_reader" title="Wikipedi page">Google Reader</a>
+everyday since I first discovered the service over seven years ago. It is my
+primary source of news and information and the announcement that Google is, on July 1 this year,
+set to <a href="http://googlereader.blogspot.ca/2013/03/powering-down-google-reader.html" title="Official announcemet on Google Blog">shut down Reader</a>
+was something considerably more than just an inconvenience for me.</p>
+
+<p>Over the years, I had looked at other <acronym title="Rich Site Summary">RSS</acronym>
+readers but, for a variety of reasons, had invariably found that the speed,
+simplicity and flexibility that Google Reader offered meant that any dalliances
+were unsatisfactory and short-lived. I resigned myself to having to settle for
+an inferior alternative, rather than moving to a genuine replacement.</p>
+
+<p>On the recommendation of <a href="https://pinboard.in/" title="Not so-social bookmarking">@pinboard</a>,
+I first signed up for a premium account at
+<a href="https://www.newsblur.com/" title="NewsBlur website">NewsBlur</a>. It is open source and,
+given the recommendation from Maciej<sup>1</sup>, I was hopeful that it would
+bridge the gap. Newsblur is a good service (especially considering the rush of
+signups in the days after the Google announcement), but it has a couple of
+critical weaknesses for me: no search (yes, you read that correctly—there is <em>no
+way to search through your feeds</em>) and, less importantly but just as annoying,
+occasionally sluggish performance.</p>
+
+<p>After a couple of weeks using NewBlur I happily stumbled across
+<a href="https://www.commafeed.com/" title="CommaFeed homepage">CommaFeed</a>, a
+Reader clone that emulates the austere minimalism of Google Reader. Apart from
+the fact that it is open source, the other aspect that attracted me to it
+was the ability to run it on Red Hat's Platform as a Service offering,
+<a href="http://www.openshift.com/" title="Red Hat PaaS">OpenShift</a>.</p>
+
+<p>The README on the <a href="https://github.com/Athou/commafeed" title="CommaFeed repo">Github repo</a>
+explains how to set it all up. Unfortunately, due to an
+<a href="https://github.com/Athou/commafeed/issues/91" title="OpenShift fails silently">open issue</a>,
+some manual intervention is required, but it is still a very
+straightforward and painless process to get your own instance of CommaFeed up
+and running.</p>
+
+<p>Creat an OpenShift account, log in and add the JBoss 6.0 application (or
+cartridge as it is called on OpenShift) and the MySQL cartridge. Once your setup
+is created, add your public <acronym title="Secure Shell">SSH</acronym> key and,
+under your <code>My Applications</code> tab, copy down your Git repo address, which will be
+of the form:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then you need to make a local clone of CommaFeed and push it to the Red Hat
+server:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>git clone https://github.com/Athou/commafeed.git
+</span><span class='line'><span class="nb">cd </span>commafeed&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;add OpenShift as a repo&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;git remote add openshift -f ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.etc…
+</span><span class='line'>git merge openshift/master -s recursive -X ours
+</span><span class='line'>git push openshift master
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>This will then trigger a series of hooks that build the application and restart
+the server. If everything goes well you will see something like:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Total <span class="nb">time</span>: 3:18.195s
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Finished at: Mon May 20 03:21:37 EDT 2013
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> Final Memory: 42M/185M
+</span><span class='line'>remote: <span class="o">[</span>INFO<span class="o">]</span> ------------------------------------------------------------------------
+</span><span class='line'>remote: Running .openshift/action_hooks/build
+</span><span class='line'>remote: Running .openshift/action_hooks/deploy
+</span><span class='line'>remote: <span class="nv">hot_deploy_added</span><span class="o">=</span><span class="nb">false</span>
+</span><span class='line'>remote: MySQL already running
+</span><span class='line'>remote: Found 127.12.712.712:8080 listening port
+</span><span class='line'>remote: Done
+</span><span class='line'>remote: Running .openshift/action_hooks/post_deploy
+</span><span class='line'>To ssh://76758382475ef809976543@<span class="nv">$appname</span>-<span class="nv">$namespace</span>.rhcloud.com/~/git/feeds.git/
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>You now have CommaFeed successfully running on OpenShift. After a couple of
+minutes, visit the public <acronym title="Unique Resource Locator">URL</acronym>
+and you will be able to login to your CommaFeed instance. Updating your
+CommaFeed is as simple as pulling to your local repo, merging and
+then pushing to <code>openshift master</code>.</p>
+
+<p>Importing directly from Google Reader still seems broken (I was  getting
+errors from builds late this week), but if you import from an existing <code>.opml</code>
+or <code>.xml</code> file you will see CommaFeed in all it's glory:</p>
+
+<p><img class="left" src="/images/post_images/commafeed_screen.png" title="'ComaFeed screenshot'" ></p>
+
+<p>As you can see, it is remarkably similar to the Google Reader interface; a
+clean, minimalist design that is focussed—quite rightly—on the content. There
+is an option to load your own <code>.css</code> if you want to apply some additional
+styling, but for me the base style is just about perfect.</p>
+
+<p>More impressively, in the week or so that I have been using CommaFeed, the
+developer,
+<a href="https://github.com/Athou" title="Athou on Github">Athou</a>, has been committing
+enhancements and bug fixes several times <em>a day</em>; almost every night,
+I have pushed changes to OpenShift, reloaded my browser and found a
+smoother, enhanced feed reader with additional functionality; it is
+literally growing in leaps and bounds, and is a great reminder of the power
+of open source<sup>2</sup>.</p>
+
+<p>The performance of OpenShift has also been solid; feeds are delivered
+seemingly instantaneously and, apart from the slight lag after restarting
+the application, I haven't experienced any issues whatsoever in terms
+of availability.</p>
+
+<p>There are still a couple of areas where CommaFeed can be improved. Most
+notably, there is an open feature request for a
+<a href="https://github.com/Athou/commafeed/issues/54" title="Github Issue">mobile friendly CSS</a>
+and this is badly needed, the site is pretty much unusable on my phone. With
+any luck, some enterprising Android developer will build a CommaFeed app (for
+which I would happily pay good money)…</p>
+
+<p>In any event, if you are looking for a Google Reader replacement, try
+running CommaFeed (either on your own server or one of Red Hat's); for
+a project that is only a couple of months old, it has covered a
+tremendous amount of ground and will undoubtedly continue to grow
+and improve.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>In conjunction with his great advice about not being a
+<a href="http://blog.pinboard.in/2011/12/don_t_be_a_free_user/" title="Pinboard blog">free user</a>.</li>
+<li>The <a href="http://feeds-jwr.rhcloud.com/#/feeds/help" title="About and Help page">about page</a>
+has a donate button: if you want to support an application which I have no doubt
+will soon be even better than Google Reader, you might want to use it.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[A Vimprobable Walkthrough]]></title>
+    <link href="http://jasonwryan.com/blog/2012/11/20/vimprobable/"/>
+    <updated>2012-11-20T18:58:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2012/11/20/vimprobable</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/vimprobable-logo.png" title="'Vimprobable logo'" >
+I have written about <a href="http://vimprobable.org" title="Vimprobable homepage">Vimprobable</a>
+a couple of times over the last two years<sup>1</sup>,
+it is one of those projects that, for a variety of reasons, I have picked up
+and stuck with.  Like <a href="http://dwm.suckless.org" title="dwm homepage">dwm</a>,
+<a href="http://vim.org" title="Vim homepage">Vim</a> and
+<a href="http://tmux.sourceforge.net/" title="tmux homepage">tmux</a>,
+it is an essential part of my working environment and is installed on all of my
+machines, where it is my default browser. It's simplicity, power and
+configurability are why, despite looking at a few other similar projects, I
+have stuck with Vimprobable since first installing it.</p>
+
+<p>After my last post, a <a href="http://jasonwryan.com/blog/2012/09/28/screencast/" title="An intro to dwm">dwm screencast</a>,
+I wanted to have another crack at making a decent screencast. Sadly,
+this is not it.  I can say that making a <em>good</em> screencast is not a simple
+accomplishment; there are so many elements that require significant attention. I
+spent a good many hours this time around playing with custom Xorg modelines,
+<code>ffmpeg</code>'s arcane encoding options and, to be frank, the final product is just not worth
+all that effort.</p>
+
+<p>I'm going to stick with plain text from now on. It requires little more from me
+than a passing acquaintance with the subject matter, some loosely held and
+<a href="http://jasonwryan.com/blog/2012/08/18/trolls/" title="Trolling Arch Linux">firmly expressed opinions</a>
+and my unbridled confidence in the fact that anyone who
+has read this far down the page is so bereft of other, more pressing things to
+think about that they may inadvertently find a scintilla of amusement in here…</p>
+
+<p>With that explanation out of the way, I give you my final screencast:</p>
+
+<iframe src="http://player.vimeo.com/video/53829053?byline=0&amp;portrait=0&amp;badge=0&amp;color=ffffff" 
+width="350" height="197" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+
+
+<p></p>
+
+<p><a href="http://vimeo.com/53829053">An Introduction to Vimprobable</a> on 
+<a href="http://vimeo.com">Vimeo</a>.</p>
+
+
+<h4>Notes</h4>
+
+<ol>
+<li>First back in <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/">October, 2010</a> and then,
+more recently, in <a href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/">June, 2011</a>.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Vimprobable]]></title>
+    <link href="http://jasonwryan.com/blog/2011/06/26/using-vimprobable/"/>
+    <updated>2011-06-26T14:08:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2011/06/26/using-vimprobable</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/vimprobable2.png" alt="image" /></p>
+
+<p>I <a href="http://jasonwryan.com/blog/2010/10/07/vimprobable/" title="Post on using Vimprobable">posted last year about Vimprobable</a>
+a <a href="http://www.webkit.org/" title="Webkit site">webkit browser</a> that uses
+Vim-like keybinds and can be run completely without the rodent.</p>
+
+<p>Over the last couple of months I have become increasingly comfortable
+with it, and with the addition of
+<a href="http://vimprobable.org/pipermail/vimprobable-users/2011-June/000800.html" title="External handlers patch on ML">some great recent functionality</a>,
+it has become my default browser.</p>
+
+<p>The project has good documentation, in the form of two man pages:
+<code>vimprobable</code> and <code>vimprobablerc</code>, but I thought I’d share some of my
+customizations and working methods.</p>
+
+<h3>Copy &amp; Paste</h3>
+
+<p>The only time I have been tempted to take my hand off the keyboard was
+to insert the cursor at the correct character to begin a selection to
+copy and paste. This is unnecessary. With the right options in
+<span class="file">$XDG_CONFIG_HOME/vimprobable/vimprobablerc</span>,
+you can do it all from the keyboard.</p>
+
+<p>Map the keys you would like to use to enter and exit caret mode. I use
+<kbd>Ctrl</kbd><kbd>c</kbd> to enter and <kbd>Shift</kbd><kbd>c</kbd> to
+return to normal mode:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>map &lt;C-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">true</span>
+</span><span class='line'>map &lt;S-c&gt;<span class="o">=</span>:set <span class="nv">caret</span><span class="o">=</span><span class="nb">false</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then, it is just a matter of identifying the text that you wish to copy
+(in the photo above I was copying a script to launch <code>tabbed</code>), and
+highlighting it via search. So the sequence is:</p>
+
+<pre>
+1.  <kbd>/</kbd> - to enter search mode
+2.  <kbd>#</kbd><kbd>!</kbd> <kbd>Enter</kbd> - the shebang and then enter to highlight the correct
+    sequence
+3.  <kbd>Ctrl</kbd><kbd>c</kbd> to enter caret mode
+4.  and then <kbd>Shift</kbd><kbd>Up</kbd> or <kbd>Shift</kbd><kbd>Down</kbd> to highlight the following or
+    preceding lines
+5.  yanking the selected text is <kbd>Shift</kbd><kbd>y</kbd>, and the text is now stored in
+    your clipboard.
+</pre>
+
+
+<h3>Opening new instances in tabbed</h3>
+
+<p>I highlighted the section on tabbed from the
+<a href="http://www.vimprobable.org/" title="Vimprobable website">Vimprobable site</a> for a reason.
+The second tip is how to set up
+<a href="http://tools.suckless.org/tabbed" title="tabbed on suckless.org">tabbed</a> to
+work well with other applications.</p>
+
+<p>By default, any new windows (ie., instances of Vimprobable) opened from
+within Vimprobable are “caught”—and managed— by <code>tabbed</code>. However, if you
+open a link from, say
+<a href="http://newsbeuter.org/" title="ncurses rss reader">newsbeuter</a> or
+<a href="http://tyrs.nicosphere.net/index.html" title="ncurses twitter/identi.ca client">Tyrs</a>,
+this will open an instance outside <code>tabbed</code> which, if you are using a
+tiling window manager like
+<a href="http://dwm.suckless.org/" title="THE titling wm">dwm</a>, means this window gets
+pushed to master in your stack. This is not entirely satisfactory.</p>
+
+<p>Thanks to
+<a href="http://lists.suckless.org/dev/1106/8761.html" title="Tabbed thread on suckless ML">Connor Lane Smith on the suckless ML</a>,
+I have a solution to have all new instances of Vimprobable sent to
+<code>tabbed</code>, whether opened in another application, or if I click on a link
+in my terminal, <a href="http://www.rxvt.org/" title="Rxvt. org">Urxvtc</a>.</p>
+
+<p>CLS’s solution is elegantly simple. Launch tabbed with an <code>.xid</code> file in
+<psan class="file">/tmp</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="s2">&quot;$(tabbed -d &gt;/tmp/tabbed.xid); vimprobable2 -e $(&amp;lt;/tmp/tabbed.xid)&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Then it is just a matter of setting up other applications to pass links
+to the <code>tabbed</code> <span class="file">tmp</span> file. For example, in my
+<span class="file">$XDG_CONFIG_HOME/tyrs/tyrs.cfg</span>, I have:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'><span class="nv">openurl_command</span> <span class="o">=</span> vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> %s
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The workaround for Urxvtc was a little trickier. I finally got there
+with some help from
+<a href="http://unix.stackexchange.com/questions/15550/passing-clicked-links-in-rxvt-to-a-script/15555#15555" title="Unix SE answer">Riccardo Murri on Unix &amp; Linux SE</a>.
+In my <span class="file">~/.Xdefaults</span> I have:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>! -- Clickable urls -- !
+</span><span class='line'>URxvt.perl-ext-common: default,matcher
+</span><span class='line'>URxvt.urlLauncher: /home/jason/Scripts/vimprobtab.sh
+</span><span class='line'>URxvt.matcher.button: 1
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>…and the wrapper script <span class="file">vimprobtab.sh</span> looks like this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;Script to open Vimprobable instances in tabbed&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;exec vimprobable2 -e <span class="k">$(</span>&amp;lt;/tmp/tabbed.xid<span class="k">)</span> <span class="s2">&quot;$1&quot;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Now whenever I open a link in an application or by clicking a link in
+the terminal (in <a href="http://irssi.org/" title="IRC client">irssi</a>, for example)
+it is passed to Vimprobable in <code>tabbed</code>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[w3m, Surfraw and Yanking URLs]]></title>
+    <link href="http://jasonwryan.com/blog/2011/05/05/w3m/"/>
+    <updated>2011-05-05T19:57:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2011/05/05/w3m</id>
+    <content type="html"><![CDATA[<p><img src="/images/post_images/w3m.png" alt="image" /></p>
+
+<p>I posted a couple of weeks ago about
+<a href="http://jasonwryan.com/blog/2011/04/13/archwiki-elvis-for-surfraw/" title="My post on the Arch Wiki elvis">how much I was enjoying Surfraw</a>,
+to the point of writing a couple of my own <em>elvi</em>. As part of the
+ongoing tweaking of my Surfraw experience, I have been experimenting
+with different
+<a href="http://en.wikipedia.org/wiki/Text-based_web_browser" title="Wikipedia entry: text browsers">text-based browsers</a>,
+to see which one best fits my workflow.</p>
+
+<p>I have previously been using both
+<a href="http://www.jikos.cz/~mikulas/links/" title="Links homepage (Spartan enough for you?)">links</a>
+and it’s homophone,
+<a href="http://lynx.browser.org/" title="See you, and raise you...">lynx</a>. While
+these have been perfectly acceptable, they weren’t quite providing the
+level of functionality —and integration with my vim-oriented workflow—
+that I was looking for. Enter
+<a href="http://w3m.sourceforge.net/" title="Lavish, by comparison...">w3m</a>.</p>
+
+<blockquote><p>w3m is a text-based web browser as well as a pager like `more’ or
+`less’. With w3m you can browse web pages through a terminal emulator
+window (xterm, rxvt or something like that). Moreover, w3m can be used
+as a text formatting tool which typesets HTML into plain text.</p></blockquote>
+
+<p>w3m is a step up from the other two for a variety of reasons. It
+supports tables, frames, SSL connections, color and inline images. It
+also renders pages in a form as true to their original layout as
+possible. The killer features on top of that are, for me, the above
+mentioned rendering of HTML as text (meaning you can save content
+easily), and the customizable keybinds.</p>
+
+<p>There was however, one significant sticking point. After countless hours
+fruitlessly searching, I was unable to find a way to yank URLs to the
+clipboard. As I have been spending a little time of late on
+<a href="http://unix.stackexchange.com/" title="Unix &amp; Linux Stack Exchange">Unix &amp; Linux Stack Exchange</a>,
+I thought I would ask the good folk there…</p>
+
+<p>Less than fourty hours later, I had an answer so simple and elegant,
+that I was literally grinning when I read it. It deserves quoting in
+full. It is that ingenious.</p>
+
+<blockquote><p>Set the “External Browser” option to
+<code>sh -c 'echo "$0" | xsel'</code></p>
+
+<p>You can use xsel -b to use the clipboard instead of the primary
+selection. An alternative to
+<a href="http://www.vergenet.net/~conrad/software/xsel/" title="xsel homepage">xsel</a>
+is <a href="http://sourceforge.net/projects/xclip/" title="xclip homepage">xclip</a>
+(xclip for the primary selection, xclip -selection CLIPBOARD for the
+clipboard).</p>
+
+<p>In <span class="file">~/.w3m/config</span>, that’s the extbrowser setting.
+Then press M to copy (yank) the URL of the current page, or ESCM to
+copy the URL of the link under the cursor.</p>
+
+<p>You can use the second or third external browser for that instead;
+then the key combination is 2M or 3M or 2ESCM or 3ESCM.
+<a href="http://unix.stackexchange.com/questions/12497/yanking-urls-in-w3m/12572#12572" title="THE answer">Gilles on Unix &amp; Linux Stack Exchange</a></p></blockquote>
+
+<p>This simple hack means that it is now trivial to yank either the URL of
+the current page, or of the link under the cursor to primary selection.
+It was just a matter then of adding some intuitive keybinds – as the <kbd>M</kbd>
+and <kbd>Escape</kbd><kbd>M</kbd> combination are redolent of
+<a href="http://en.wikipedia.org/wiki/Editor_war" title="Emacs vs Vi">the unamed editor</a>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='vim'><span class='line'><span class="nb">keymap</span> <span class="k">y</span> EXTERN    <span class="p">&lt;</span><span class="k">br</span>/<span class="p">&gt;</span>
+</span><span class='line'><span class="nb">keymap</span> Y EXTERN_LINK
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>The perfect <a href="http://en.wikipedia.org/wiki/Unix_philosophy" title="The UNIX philosophy on Wikipedia">UNIX solution</a>…</p>
+
+<h4>Updated 8/5/11</h4>
+
+<p>Gilles has edited and updated his answer with a slight change:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>sh -c <span class="s1">&#39;printf %s &quot;$0&quot; | xsel&#39;</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>This prevents a new line being appended.</p>
+]]></content>
+  </entry>
+  
+</feed>

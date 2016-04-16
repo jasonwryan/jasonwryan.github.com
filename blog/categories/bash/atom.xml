@@ -1,0 +1,625 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: bash | jasonwryan.com]]></title>
+  <link href="http://jasonwryan.com/blog/categories/bash/atom.xml" rel="self"/>
+  <link href="http://jasonwryan.com/"/>
+  <updated>2015-01-19T08:20:47+13:00</updated>
+  <id>http://jasonwryan.com/</id>
+  <author>
+    <name><![CDATA[Jason Ryan]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Playing with overlayfs]]></title>
+    <link href="http://jasonwryan.com/blog/2015/01/19/overlayfs/"/>
+    <updated>2015-01-19T08:20:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2015/01/19/overlayfs</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/jello.jpg" title="Creative Commons Image" >
+Around this time last year, I posted about setting up a
+<a href="http://jasonwryan.com/blog/2014/01/20/udev/" title="Post in Jan 14">udev rule to run a script</a>
+when I plugged my USB drive containing all of my music into one of my
+laptops; the script, a
+<a href="https://gist.github.com/jasonwryan/0df98a396af89bf82eb6" title="A gist…">couple of lines of bash</a>,
+removes all pre-existing symlinks to <span class="file">$HOME/Music</span> and
+repopulates the directory with an updated set. Almost. The one flaw that has
+been an irritant of variable intensity, depending on what I felt like listening
+at any given time, is that the symlinks aren't written for directories that
+already exist on the target filesystem.</p>
+
+<p>In order that I am able to play some music if I forget the USB drive, each of
+the laptops has a subset of albums on it, depending on the size of their
+respective hard drives. If I add a new album to the USB drive, then that change won't
+get written to either of the laptops when the drive is plugged in. Not entirely
+satisfactory. I had tinkered around with
+<a href="http://mywiki.wooledge.org/glob" title="Wooledge wiki entry">globbing</a>, or with
+having <a href="http://mywiki.wooledge.org/UsingFind" title="Wooledge again, because it is so great…"><code>find(1)</code></a>
+scan deeper into the tree, or even a loop to check for the presence of directories in an array…</p>
+
+<p>It just got too hard. My rudimentary scripting skills and the spectre of recursion,
+I am sorry to admit, conspired to undermine my resolve. So, rather than concede
+unconditional surrender, I
+<a href="http://unix.stackexchange.com/q/179397/6761%20'Question%20on%20Unix%20&amp;%20Linux%20SE">asked for help</a>.
+As is almost always the case in these situations, this proved to be a particularly
+wise move; the response I received was neither what I expected, nor was it anything I
+was even remotely familiar with: so in addition to an excellent solution (one far
+better suited to what I was trying to achieve), I learned something new.</p>
+
+<p>The first comment on my question proved singularly insightful.</p>
+
+<p><blockquote><p>Care to use union mounts, for example via overlayfs?</p><footer><strong>muru on U&amp;L</strong> <cite><a href='https://unix.stackexchange.com/questions/179397/create-symlink-tree-in-existing-directories#comment298386_179397'>unix.stackexchange.com/179397/&hellip;</a></cite></footer></blockquote></p>
+
+<p>A union mount, something until now I was blissfully unaware of, is according to Wikipedia,</p>
+
+<p><blockquote><p>a mount that allows several filesystems to be mounted at one time, appearing to be one filesystem.</p></blockquote></p>
+
+<p>Union mounting has a long and storied history on Unix, beginning in 1993 with the
+<a href="http://icapeople.epfl.ch/almesber/ifs.html" title="IFS page">Inheriting File System (IFS)</a>.
+The genealogy of these mounts has been well covered in this 2010 LWN
+<a href="http://lwn.net/Articles/396020/" title="LWN.net">article by Valerie Aurora</a>. However, it is only
+in the current kernel, 3.18, that a union mount has been accepted into the kernel tree.</p>
+
+<p>After reading the
+<a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/overlayfs.txt" title="Kernel docs">documentation for overlayfs</a>, it seemed this was <em>exactly</em> what I
+was looking for. Essentially, an overlay mount would allow me to “merge"
+the underlying tree (the Music directory on the USB drive) with an “upper”
+one, <span class="file">$HOME/Music</span> on the laptop, <em>completely
+seamlessly</em>.</p>
+
+<p><blockquote><p>Then whenever a lookup is requested in such a merged directory, the lookup is performed in each actual directory and the combined result is cached in the dentry belonging to the overlay filesystem.</p></blockquote></p>
+
+<p>It was the just a matter of adapting my script to use <code>overlayfs</code>, which was
+trivial:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;union mount Music when Apollo plugged in&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;low<span class="o">=</span>/media/Apollo/Music
+</span><span class='line'><span class="nv">upp</span><span class="o">=</span>/home/jason/Music
+</span><span class='line'><span class="nv">wod</span><span class="o">=</span>/home/jason/.local/tmp
+</span><span class='line'><span class="nb">export </span><span class="nv">DISPLAY</span><span class="o">=</span>:0
+</span><span class='line'><span class="nb">export </span><span class="nv">XAUTHORITY</span><span class="o">=</span>/home/jason/.Xauthority&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;overlayfs mount&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mount -t overlay -o <span class="nv">lowerdir</span><span class="o">=</span><span class="s2">&quot;$low&quot;</span>,upperdir<span class="o">=</span><span class="s2">&quot;$upp&quot;</span>,workdir<span class="o">=</span><span class="s2">&quot;$wod&quot;</span> overlay <span class="s2">&quot;$upp&quot;</span>
+</span><span class='line'><span class="nv">status1</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mpc update &amp;amp;&gt;/dev/null
+</span><span class='line'><span class="nv">status2</span><span class="o">=</span><span class="nv">$?</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="s2">&quot;$status1&quot;</span> -eq 0 &amp;amp;&amp;amp; <span class="s2">&quot;$status2&quot;</span> -eq 0 <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;^fg(#BF85CC)%s\n&quot;</span> <span class="s2">&quot;Music directory updated&quot;</span> | dzen2 -p 3
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>And now, when I plug in the USB drive, the contents of the drive are merged
+with my local music directory, and I can access whichever album I feel inclined
+to listen to. I can also copy files across to the local machines, knowing if I
+update the portable drive, it will no longer mean I have to forego listening to
+any newer additions by that artist in the future (without manually intervening,
+anyway).</p>
+
+<p>Overall, this is a lightweight union mount. There is neither a lot of functionality,
+nor complexity. As the
+<a href="https://github.com/torvalds/linux/commit/e9be9d5e76e34872f0c37d72e25bc27fe9e2c54c" title="Git commit">commit note</a>
+makes clear, this “simplifies the implementation and allows native performance
+in these cases.” Just note the warning about attempting to write to a mounted
+underlying filesystem, where the behaviour is described as “undefined”.</p>
+
+<h4>Notes</h4>
+
+<p>Creative Commons image, <a href="https://flic.kr/p/5RRRXP">mulitlayered jello</a> by Frank Farm.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pruning Tarsnap Archives]]></title>
+    <link href="http://jasonwryan.com/blog/2014/10/25/snapclean/"/>
+    <updated>2014-10-25T09:38:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2014/10/25/snapclean</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/tarsnap-logo.png" title="Tarsnsap Logo" >
+I started using <a href="http://www.tarsnap.com/" title="Tarsnap website">Tarsnap</a> about
+<a href="http://jasonwryan.com/blog/2011/09/08/tarsnap/" title="Post on Tarsnap">three years ago</a>
+and I have been nothing but impressed with it since. It is simple to use,
+<em>extremely</em> cost effective and, more than once, it has saved me from myself;
+making it easy to retrieve copies of files that I have inadvertently
+overwritten or otherwise done stupid things with<sup>1</sup>.  When I
+<a href="http://jasonwryan.com/blog/2011/09/08/tarsnap/" title="Post on Tarsnap">first posted about it</a>,
+I included a
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snap" title="In Bitbucket repo">simple wrapper script</a>,
+which has held up pretty well over that time.</p>
+
+<p>What became apparent over the last couple of months, as I began to consciously
+make more regular backups, was that pruning the archives was a relatively
+tedious business. Given that Tarsnap
+<a href="http://www.tarsnap.com/efficiency.html" title="Tarsnap efficiency page">de-duplicates data</a>,
+there isn't much mileage in keeping around older archives because, if you do
+have to retrieve a file, you don't want to have to search through a large
+number of archives to find it; so there is a balance between making use of
+Tarsnap's efficient functionality, and not creating a rod for your back if your
+use case is occasionally retrieving single—or small groups of—files, rather
+than large dumps.</p>
+
+<p>I have settled on keeping five to seven archives, depending on the frequency of
+my backups, which is somewhere around two to three times a week. Pruning these
+archives was becoming tedious, so I wrote a simple script to make it less
+onerous. Essentially, it writes a list of all the archives to a
+<span class="file">tmpfile</span>, runs
+<a href="http://linux.die.net/man/1/sort" title="sort man page">sort(1)</a>
+to order them from oldest to newest, and then deletes the oldest minus whatever
+the number to keep is set to.</p>
+
+<p>The bulk of the code is simple enough:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>snapclean </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;generate list&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;tarsnap --list-archives &gt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;sort by descending date, format is: host-ddmmyy_hh:mm&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">{</span>
+</span><span class='line'>  rm <span class="s2">&quot;$tmpfile&quot;</span> &amp;amp;&amp;amp; sort -k 1.11,1.10 -k 1.8,1.9 -k 1.7,1.6 &gt; <span class="s2">&quot;$tmpfile&quot;</span>
+</span><span class='line'><span class="o">}</span> &amp;lt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;populate the list&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;mapfile -t archives &amp;lt; <span class="s2">&quot;$tmpfile&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;print the full list&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;printf <span class="s2">&quot;%s\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Current archives${end}:&quot;</span> <span class="s2">&quot;${archives[@]#*-}&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;identify oldest archives&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;remove<span class="o">=</span><span class="k">$((</span> <span class="k">${#</span><span class="nv">archives</span><span class="p">[@]</span><span class="k">}</span> <span class="o">-</span> keep <span class="k">))</span>
+</span><span class='line'><span class="nv">targets</span><span class="o">=(</span> <span class="k">$(</span>head -n <span class="s2">&quot;$remove&quot;</span> <span class="s2">&quot;$tmpfile&quot;</span><span class="k">)</span> <span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;if there is at least one to remove&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">((</span> <span class="k">${#</span><span class="nv">targets</span><span class="p">[@]</span><span class="k">}</span> &gt;<span class="o">=</span> 1 <span class="o">))</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${red}Archives to delete${end}:&quot;</span>
+</span><span class='line'>  <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${targets[@]#*-}&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="nb">read</span> -p <span class="s2">&quot;Proceed with deletion? [${red}Y${end}/N] &quot;</span> YN&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$YN</span> <span class="o">==</span> Y <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;for archive in <span class="s2">&quot;${targets[@]}&quot;</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span>tarsnap -d --no-print-stats -f <span class="s2">&quot;$archive&quot;</span>
+</span><span class='line'><span class="k">done</span> &amp;amp;&amp;amp; <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Archives successfully deleted...${end}&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;${cyn}Remaining archives:${end}&quot;</span>
+</span><span class='line'>tarsnap --list-archives
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;${yel}Operation aborted${end}&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">  </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Nothing to do&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>0
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>You can see the rest of the script in
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/snapclean" title="snapclean in bitbucket">my bitbucket repo</a>.  It even comes <a href="/images/post_images/snapclean.png" title="Screenshot of snapclean">with colour</a>.</p>
+
+<p>Once every couple of weeks, I run the script, review the archives marked for
+deletion and then blow them away. Easy. If you aren't using Tarsnap, you
+really should check it out; it is an excellent service and—for the almost
+ridiculously small investment—you get rock solid, encrypted peace of
+mind. Why would you not do that?</p>
+
+<h3>Coda</h3>
+
+<p>This is the <em>one hundredth</em> post on this blog: a milestone that I never
+envisaged getting anywhere near. Looking back through the posts, nearly 60,000
+words worth, there are a couple there that continue to draw traffic and are
+obviously seen at some level as helpful.  There are also quite a few that
+qualify as “filler”, but blogging is a discipline like any other and sometimes
+you just have to push something up to keep the rhythm going. In any event, this
+is a roundabout way of saying that, for a variety of reasons both personal and
+professional, I am no longer able to fulfil my own expectations of regularly
+pushing these posts out.</p>
+
+<p>I will endeavour to, from time to time when I find something that I genuinely
+think is worth sharing, make an effort to write about it, but I can't see that
+happening all that often.  I'd like to thank all the people that have read
+these posts; especially those of you that have commented. With every post, I
+always looked forward to people telling me where I got something wrong or how I
+could have approached a problem differently or more effectively<sup>2</sup>; I
+learned a lot from these pointers and I am grateful to the people that were
+generous enough to share them.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The frequency with which this happens is, admittedly, low; but not
+low enough to confidently abandon a service like this…</li>
+<li>Leaving a complimentary note is just as welcome, don't get me wrong…</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[pass{,word} manager]]></title>
+    <link href="http://jasonwryan.com/blog/2014/08/02/password/"/>
+    <updated>2014-08-02T09:28:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/08/02/password</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/key-board.jpg" title="Creative Commons image on Flickr" >
+After posting last week about
+<a href="http://jasonwryan.com/blog/2014/07/25/keepass/" title="Redundant blog post">KeePassC as a password manager</a>,
+a couple of people immediately commented about a utility billed as “the
+standard Unix password manager.” This is definitely one of the reasons I
+continue to write up my experiences with free and open source software: as soon
+as you think that you have learned something, someone will either offer a
+correction or encourage you to explore something else that is similar, related
+or interesting for some other tangential reason.</p>
+
+<p>So, I was off down that path… Called simply <a href="http://www.passwordstore.org/" title="Homepage">pass</a>,
+it is a 600 line bash script that uses
+<a href="http://en.wikipedia.org/wiki/GNU_Privacy_Guard" title="Wikpedia entry">GPG encryption</a>
+and some other standard tools and scripts to organize and manage your password
+files. I had never heard of it but, based on Cayetano and Bigby's
+recommendations, I thought it would be worth a look.</p>
+
+<p>On of the reasons that I had not come across it before was that, after using
+<a href="http://www.keepassx.org/" title="KeePassX homepage">KeePassX</a> for so long, I had
+assumed that I would need to continue to use that database format; so when I
+was looking for an alternative,
+<a href="http://raymontag.github.io/keepassc/" title="KeePassC homepage">KeePassC</a>
+was a natural fit (and a fine application). The question of migrating my data
+hadn't even occurred to me…</p>
+
+<p>It turns out that the migration process to pass is extraordinarily well catered
+for: there are
+<a href="http://git.zx2c4.com/password-store/tree/contrib/importers" title="pass git repo">10 migration scripts</a>
+for a range of different formats, including
+<a href="http://git.zx2c4.com/password-store/tree/contrib/importers/keepassx2pass.py" title="Said script…">keepassx2pass.py</a>,
+which takes the exported <acronym title="Extensible Markup Language">XML</acronym>
+KeePassX database file and creates your pass files,ordered by the schema you
+had used in that application.  You just need to make sure you amend the shebang
+to <code>python2</code> before running the script, otherwise it will fail with an
+unhelpful error message.</p>
+
+<p>After using KeePassX to dump my database, before I could use the script to
+create my pass directories, I had to export the <code>PASSWORD_STORE_DIR</code>
+environment variable to place the top level pass directory in an alternate
+location. This way, instead of initializing a git repository, I could have the
+store synced by
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="My post on Syncthing">Syncthing</a>.
+The git idea is a good one, but I'm not particularly interested in version
+controlling these directories, and I have no intention, encrypted or not, of
+pushing them to someone else's server.</p>
+
+<p>That constitutes the basic setup. It took a grand total of five minutes. The
+real strength of pass, however, is in its integration with two other fantastic
+tools:
+<a href="http://www.funtoo.org/Keychain" title="Keychain homepage">keychain</a> and
+<a href="http://tools.suckless.org/dmenu/" title="Another quality Suckless product">dmenu</a>.
+Together with pass, these constitute a secure, convenient and effortless
+workflow for managing your passwords. With your GPG key loaded into keychain,
+you are only prompted for your master passphrase once<sup>1</sup> and with
+Chris Down's excellent
+<a href="http://git.zx2c4.com/password-store/tree/contrib/dmenu/passmenu" title="In the pass repo">passmenu script</a>,
+you can use dmenu to sort through your password files, <kbd>Tab</kbd> complete
+the one you are looking for and have it copied to your clipboard with a couple
+of keystrokes.</p>
+
+<p>After using Chris' script for a couple of days, I made a few alterations to
+suit my setup: removed the <code>xdotool</code> stuff (as I don't need it), included dmenu
+formatting options to match my
+<a href="https://bitbucket.org/jasonwryan/shiv/src/tip/Scripts/dwm-status" title="In my bitbucket repo">dwm statusbar</a>
+and, most significantly, changed the way that the files are printed in dmenu to
+remove the visual clutter of the parent directories, ie., print <span class="file">archwiki</span>
+as opposed to <span class="file">internet/archwiki</span>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>dpass </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;based on: https://github.com/cdown/passmenu&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;shopt -s nullglob globstar&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;nb<span class="o">=</span><span class="s1">&#39;#121212&#39;</span>
+</span><span class='line'><span class="nv">nf</span><span class="o">=</span><span class="s1">&#39;#696969&#39;</span>
+</span><span class='line'><span class="nv">sb</span><span class="o">=</span><span class="s1">&#39;#121212&#39;</span>
+</span><span class='line'><span class="nv">sf</span><span class="o">=</span><span class="s1">&#39;#914E89&#39;</span>
+</span><span class='line'><span class="nv">font</span><span class="o">=</span><span class="s2">&quot;Dejavu Sans Mono:medium:size=7.5&quot;</span>
+</span><span class='line'><span class="nv">dmenucmd</span><span class="o">=(</span> dmenu -i -fn <span class="s2">&quot;$font&quot;</span> -nb <span class="s2">&quot;$nb&quot;</span> -nf <span class="s2">&quot;$nf&quot;</span> -sb <span class="s2">&quot;$sb&quot;</span> -sf <span class="s2">&quot;$sf&quot;</span> <span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;prefix<span class="o">=</span><span class="k">${</span><span class="nv">PASSWORD_STORE_DIR</span><span class="k">:-</span><span class="p">~/.password-store</span><span class="k">}</span>
+</span><span class='line'><span class="nv">files</span><span class="o">=(</span> <span class="s2">&quot;$prefix&quot;</span>/&lt;em&gt;&lt;em&gt;/&lt;/em&gt;.gpg <span class="o">)</span>
+</span><span class='line'><span class="nv">files</span><span class="o">=(</span> <span class="s2">&quot;${files[@]#&quot;</span><span class="nv">$prefix</span><span class="s2">&quot;/}&quot;</span> <span class="o">)</span>
+</span><span class='line'><span class="nv">files</span><span class="o">=(</span> <span class="s2">&quot;${files[@]%.gpg}&quot;</span> <span class="o">)</span>
+</span><span class='line'><span class="nv">fbase</span><span class="o">=(</span> <span class="s2">&quot;${files[@]##&lt;/em&gt;/}&quot;</span> <span class="o">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;word<span class="o">=</span><span class="k">$(</span><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;${fbase[@]}&quot;</span> | <span class="s2">&quot;${dmenucmd[@]}&quot;</span> <span class="s2">&quot;$@&quot;</span><span class="k">)</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> -n <span class="nv">$word</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">  for </span>match in <span class="s2">&quot;${files[@]}&quot;</span>; <span class="k">do</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;if <span class="o">[[</span> <span class="nv">$word</span> <span class="o">==</span> <span class="k">${</span><span class="nv">match</span><span class="p">#*/</span><span class="k">}</span> <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'>  /usr/bin/pass show -c <span class="s2">&quot;$match&quot;</span> 2&amp;gt;/dev/null
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">done</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>It does introduce some more complexity into the script, but it makes it a lot
+easier for me to identify the desired password when reading it in dmenu.</p>
+
+<p>Now, when I need a to enter a password, I hit my dmenu hotkey, type <code>dpass</code>
+<kbd>Enter</kbd> and the first couple of letters of the desired password
+filename, <kbd>Tab</kbd><kbd>Enter</kbd> and the password is loaded and ready
+to go. There are also
+<a href="http://git.zx2c4.com/password-store/tree/src/completion" title="Git repo">completion scripts</a>
+for the main shells, and even one for
+<a href="http://fishshell.com/" title="Fish homepage">fish</a><sup>2</sup> for the iconoclasts…</p>
+
+<p>While I have no complaints at all with KeePassC, I have found this pass setup to
+be a lot less intrusive to use, it seamlessly integrates with my workflow,
+and the passwords themselves are much simpler to manage. Short of someone else
+popping up in the comments with another compelling proposition, I'm content
+with the way this has worked out. Many thanks to Cayetano Santos and Bigby
+James for the push.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>There is a very annoying <a href="https://bugs.funtoo.org/browse/FL-69">bug open for keychain</a>
+that means if, as I do, you start keychain from your <span class="file">$HOME/.profile</span>
+or <span class="file">$ZDOTDIR/.zprofile</span> you <em>will</em> need to enter the same
+passphrase to unlock a sub-key before you can use pass (the same thing applies
+to Mutt).  This gets really ugly if you attempt to use dmenu before unlocking
+your key…</li>
+<li><q>Finally, a command line shell for the 90s…</q> Indeed.</li>
+</ol>
+
+
+<p>Creative Commons image by <a href="http://www.flickr.com/photos/54450095@N05/8229504229/">Intel Free Press</a> on Flickr.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Browser tunnels]]></title>
+    <link href="http://jasonwryan.com/blog/2014/05/30/tunnels/"/>
+    <updated>2014-05-30T09:32:00+12:00</updated>
+    <id>http://jasonwryan.com/blog/2014/05/30/tunnels</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/tunnel.jpg" title="Creative Commons image" >
+Using a
+<a href="http://en.wikipedia.org/wiki/SOCKS" title="Wikipedia article">Socks proxy</a> over an
+<a href="http://en.wikipedia.org/wiki/Tunneling_protocol#Secure_shell_tunneling" title="Wikipedia entry">SSH tunnel</a>
+is a well documented and simple if much less flexible stand in for a full-blown
+<a href="http://en.wikipedia.org/wiki/Virtual_private_network%20'VPN%20on%20Wikipedia">VPN</a>. It
+can provide a degree of comfort when accessing private or sensitive information
+over a public Internet connection, or you might use it to get around the
+terminally Canutian<sup>1</sup> construct that is known as geo-blocking; that
+asinine practice of pretending that the Internet observes political boundaries…</p>
+
+<p>By way of a digression, it occurred to me at some point while I was wrestling
+with setting this up that, over the last seven or so years, much of the
+“entertainment” provided by corporate content distributors has been in the form
+of encouraging me to spend hundreds? thousands? of hours researching and
+implementing ways to circumvent their litany of failed and defective
+technological restrictions: region codes,
+<a href="http://www.defectivebydesign.org/what_is_drm_digital_restrictions_management" title="Defective by Design">DRM</a>
+and the like. It is worth noting that, in the vast majority of cases, I was
+just seeking access to content that I already owned (in another format), or was
+prepared to pay for.</p>
+
+<p>My move to GNU/Linux in 2007 was in large part motivated by the awful
+realisation that the music I had bought in iTunes was stuck in there. The
+combined intellectual effort globally expended trying to legitimately route
+around broken copyright law would have comfortably powered another golden age
+of the sciences; it's not entirely implausible to think that the only reason we
+still have to deal with cancer is the malignant legacy of
+<a href="https://en.wikipedia.org/wiki/Sonny_Bono_Copyright_Term_Extension_Act" title="Sonny's gift…">Sonny Bono</a><sup>2</sup>.</p>
+
+<p>Now, back to our regular programming… One of my approaches to get around this
+sort of economic and policy rigor mortis has been to use a basic script to
+create a proxy tunnel to my home server. It assumes that you have
+<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" title="Wikipedia, again">public key</a>
+authentication set up and your passphrase loaded in
+<a href="https://wiki.archlinux.org/index.php/SSH_Keys#Keychain" title="Arch wiki, for a change">keychain</a>,
+or something similar.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/usr/bin/env bash&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;SSH_HOST<span class="o">=</span><span class="s2">&quot;jason@XXX.XXX.XXX.XXX -p XXX -i $HOME/.ssh/box1&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;up<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;ssh -f -N -D 8080 -M -S /tmp/ssh_tunnel_%h.sock -o <span class="nv">ExitOnForwardFailure</span><span class="o">=</span>yes <span class="nv">$SSH_HOST</span> &amp;amp;&amp;amp; <span class="se">\</span>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel started successfully&quot;</span> <span class="o">||</span> <span class="se">\</span>
+</span><span class='line'><span class="nb">printf</span> <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;ssh tunnel failed to start&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;down<span class="o">(){</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;ssh -S /tmp/ssh_tunnel_%h.sock -O <span class="nb">exit</span> <span class="nv">$SSH_HOST</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">}</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;if <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> up <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;up &amp;amp;&amp;amp; chromium --proxy-server<span class="o">=</span><span class="s2">&quot;socks://127.0.0.1:8080&quot;</span> &amp;amp;
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;elif <span class="o">[[</span> <span class="nv">$1</span> <span class="o">=</span> down <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;down
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;else&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;printf <span class="s1">&#39;%s\n&#39;</span> <span class="s2">&quot;Fail…&quot;</span>
+</span><span class='line'><span class="nb">exit </span>1
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;fi
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>Over the last couple of weeks, though, while I have been setting up and
+<a href="http://jasonwryan.com/blog/2014/05/10/syncthing/" title="Post on Syncthing">playing with Syncthing</a>,
+I found this script wanting. With six nodes and, depending if I was on the
+<acronym title="Local Area Network">LAN</acronym> or not, as many as four of those
+hosts only accessible via SSH, then having the ability to quickly and painlessly
+open a browser on any one of the nodes <em>without having to edit the script</em>
+suddenly seemed like quite a good idea.</p>
+
+<p>Accordingly I went to work on the script, including a test to determine if I
+was on my home network and passing the name of the desired host as an
+argument. With this approach, I simply type <code>tunnel $host</code> and chromium
+opens tunneled to that host, where I can the happily open
+<strike>Hulu</strike> the Syncthing GUI.</p>
+
+<p>The updated script is posted as
+<a href="https://gist.github.com/jasonwryan/715a4f3fcb55e995de0d" title="On Github">a gist</a>,
+and as you can see, still needs some work to make it a little more generic.
+You will need, for example, to hand edit in the hosts and ports in
+<code>get_host()</code>. It is also the first time I have played with
+<a href="http://mywiki.wooledge.org/BashGuide/InputAndOutput#Pipes" title="Wooledge wiki">named pipes</a>
+and I am not convinced that my use of <code>mkfifo</code> here is either the correct
+approach or implementation; but it works. Comments enlightening me would
+be gratefully received.</p>
+
+<h4>Notes</h4>
+
+<ol>
+<li>The good king was, appropriately enough, actually called Cnut the Great…</li>
+<li>And, no, I am not referring to his musical corpus, which is as carcinogenic as his
+political career was as a Myrmidon for Big Content.</li>
+</ol>
+
+
+<p>Flickr Creative Commons image, <a href="https://www.flickr.com/photos/lawrence_evil/113733779/">The Tunnel</a>,
+by Lawrence Whitmore.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Autotext Function]]></title>
+    <link href="http://jasonwryan.com/blog/2014/03/22/autotext/"/>
+    <updated>2014-03-22T09:20:00+13:00</updated>
+    <id>http://jasonwryan.com/blog/2014/03/22/autotext</id>
+    <content type="html"><![CDATA[<p><img class="left" src="/images/post_images/cans.jpg" title="Flickr CC image" ></p>
+
+<p>Once you have your environment set up; your
+<a href="http://dwm.suckless.org" title="dwm site">window manager</a>
+patched
+<a href="http://jasonwryan.com/blog/2012/07/24/queues/" title="Post on mercurial queues"><em>exactly</em> the way you want</a>,
+same for
+<a href="http://jasonwryan.com/blog/2013/03/29/vim/" title="Post on building Vim">your editor</a>
+and even
+<a href="http://jasonwryan.com/blog/2013/08/24/automating-kernels/" title="Yet another post…">your kernel builds automated</a>,
+then you either start from scratch and learn a whole lot more, or you start to
+focus on the really small details. The endless polishing that is bred of a
+mania for automation and customisation and the liberating freedom of using
+software that allows, and even encourages, this approach.</p>
+
+<p>Since I started using a couple of basic functions for managing my
+<a href="http://jasonwryan.com/blog/2012/09/01/notes-updated/" title="Post on the updated functions">note taking</a>,
+I have been conscious of the way I can use this tool to make my workflow a
+little less onerous.</p>
+
+<p>One of the things I find myself doing <em>a lot</em> is reusing the same snippets of
+text; either prose in work documents, or links to relevant articles on the
+Arch Wiki and Forums. It is simple enough to add this material to my
+<span class="file">~/.notes</span>, but retrieval has always been&mdash;for the
+text I reuse frequently&mdash;unwieldy.</p>
+
+<p>How many times do you really want to open the file, search for the relevant
+excerpt, highlight it and then copy it to the system clipboard before closing
+the file and pasting it into your email or a web form? I must have logged
+several thousand before I finally decided to do something about it.</p>
+
+<p>I now have a couple of different files in <span class="file">~/.notes/</span>
+depending upon the context; the example I'll use is the one for the Arch Forums
+kept, naturally enough, at
+<span class="file">$HOME/Sync/notes/arch</span> (I symlink to
+<span class="file">~/.notes</span> so that the directory is synched using
+<a href="http://jasonwryan.com/blog/2013/03/16/sync/" title="Post on using Sync">BitTorrent Sync</a>).</p>
+
+<p>This is just a simple text file with all of the links, guidance and wisdom that
+I generously share with those people, mostly new to the community, who have yet
+to embrace the opportunity to commit the
+<a href="https://wiki.archlinux.org/index.php/Forum_Etiquette" title="On the Wiki">Forum Etiquette</a>
+to memory. The format of each file is the same and is pretty basic:</p>
+
+<p><blockquote><p></p></p><p><h1>rules sticky</h1></p><p><p>https://bbs.archlinux.org/viewtopic.php?id=130309</p></p><p><h1>smart questions</h1></p><p><p>[url=http://www.catb.org/esr/faqs/smart-questions.html]How To Ask Questions The Smart Way[/url]</p></p><p><h1>arch only</h1></p><p><p>https://wiki.archlinux.org/index.php/Forum_Etiquette#Arch_Linux_Distribution_Support_ONLY</p></blockquote></p>
+
+<p>I use the commented title to identify the desired piece of text and then just
+copy it to the clipboard, ready to pasted into a post that will undoubtedly
+be gratefully received by the infractor:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>$HOME/.bashrc </span></figcaption>
+ <div class="highlight"><pre><code class='sh'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;board snippets&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;bbs<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;$HOME/.notes/arch&quot;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">((</span> <span class="nv">$# </span><span class="o">==</span> 1 <span class="o">))</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;local <span class="nv">opt</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span>
+</span><span class='line'>awk -v <span class="nv">line</span><span class="o">=</span><span class="s2">&quot;$opt&quot;</span> <span class="s1">&#39;index($0, line) { getline; print }&#39;</span> <span class="s2">&quot;$file&quot;</span> | xsel -b
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">else</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;awk <span class="s1">&#39;/^# /&#39;</span> <span class="s2">&quot;$file&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></div></figure></notextile></div></p>
+
+<p>So, on the rare occasion that I need to remind someone that on the Arch boards
+we only support Arch Linux (I know, quite the revelation…), I just open
+<a href="https://bitbucket.org/jasonwryan/dwm-patchset/src/tip/base.config.customizations#cl-76" title="Config in Bitbucket">a scratchpad</a>
+and enter <code>bbs only</code> and then <kbd>Shift</kbd>+<kbd>Insert</kbd> the
+text into the post and I am done. Not passing an argument just prints the
+commented titles in the file in the event that I forget what the damn thing
+is called.</p>
+
+<p>I have a similar setup for work, with a couple of files that feature longer
+pieces of text that I find myself reusing for proposals, email responses
+and other administrivia. It's a simple enough approach, but it works well and
+does lend a certain satisfaction to the otherwise tedious business of writing
+boilerplate.</p>
+
+<h4>Notes</h4>
+
+<p>Flickr Creative Commons image
+<a href="http://www.flickr.com/photos/shrapnel1/134674051/">how many cans</a> by shrapnel1</p>
+]]></content>
+  </entry>
+  
+</feed>
