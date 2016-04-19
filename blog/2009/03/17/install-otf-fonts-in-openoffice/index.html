@@ -260,12 +260,12 @@ in order to use them in that suite.</p>
 </script>
 
 
-<section class="lastfm">
+<section class="librefm">
 <h1>Recently Scrobbled</h1>
 <style type="text/css">
-  #lastfmList li{ text-align: left; }
+  #librefmList li{ text-align: left; }
 </style>
-<ul id="lastfmList">
+<ul id="librefmList">
   <li class="loading">Updating tracks...</li>
 </ul>
 <p><a href="http://alpha.libre.fm/user/jasonwryan">My tunes on Libre.fm &raquo;</a></p>
@@ -298,23 +298,23 @@ in order to use them in that suite.</p>
     }
 </script>
 <script lang="Javascript">
-    function showLastfmFeed(json){
+    function showLibrefmFeed(json){
         if(json.recenttracks == 'undefined'){
             return
         }
 
-        var tracklist = document.getElementById('lastfmList'),
+        var tracklist = document.getElementById('librefmList'),
             content = '';
 
         $.each(json.recenttracks.track, function(i, track){
             var interval = prettyDate(track.date['uts']);
-            content += '<li id="lastfmItem_'+i+'"><a href="'+ track.url + '">' + track.name +'</a> by '+ track.artist['#text'] + '<span class="date"> ' + interval  + ( interval == 'just now' ? '' :' ago') + '</span></li>';
+            content += '<li id="librefmItem_'+i+'"> + track.name +' by '+ track.artist['#text'] + '<span class="date"> ' + interval  + ( interval == 'just now' ? '' :' ago') + '</span></li>';
         });
 
         tracklist.innerHTML = content;
     }
 </script>
-<script lang="Javascript" src="http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=jasonwryan&limit=5&api_key=3a19a6604d742024a1331bebb7a68d33&format=json&callback=showLastfmFeed"></script>
+<script lang="Javascript" src="https://libre.fm/2.0/?method=user.getrecenttracks&user=jasonwryan&page=1&limit=5&format=json"></script>
 </section>
 
 <section>
