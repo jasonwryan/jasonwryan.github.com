@@ -269,7 +269,7 @@ ingesting…</li>
 
 
 <section class="librefm">
-<h1>Recently Scrobbled</h1>
+<h1>Listening to</h1>
 <style type="text/css">
   #librefmList li{ text-align: left; }
 </style>
@@ -316,13 +316,14 @@ ingesting…</li>
 
         $.each(json.recenttracks.track, function(i, track){
             var interval = prettyDate(track.date['uts']);
-            content += '<li id="librefmItem_'+i+'"> + track.name +' by '+ track.artist['#text'] + '<span class="date"> ' + interval  + ( interval == 'just now' ? '' :' ago') + '</span></li>';
+            content += '<li id="librefmItem_'+i+'"><a href="'+ track.url + '">' + track.name +'</a> by '+ track.artist['#text'] + '<span class="date"> ' + interval  + ( interval == 'just now' ? '' :' ago') + '</span></li>';
         });
 
         tracklist.innerHTML = content;
     }
 </script>
-<script lang="Javascript" src="https://libre.fm/2.0/?method=user.getrecenttracks&user=jasonwryan&page=1&limit=5&format=json"></script>
+<script lang="Javascript" src="https://libre.fm/2.0/?method=user.getrecenttracks&user=jasonwryan&page=1&limit=5&format=json&callback=showLibrefmFeed""></script>
+
 </section>
 
 <section>
