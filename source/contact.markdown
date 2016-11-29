@@ -12,8 +12,8 @@ You can email me at this domain using **mail@**...
 #### GPG
 If you'd like to send me encrypted mail, you can use:
 
-* [my personal GPG Key](jwr.asc)
-* or [my work key](http://dl.dropbox.com/u/261312/catalyst.asc) for <jason@catalyst.net.nz>
+* [my personal GPG Key](http://miromiro.com/jwr/jwr.asc)
+* or [my work key](http://miromiro.com/jwr/catalyst.asc) for <jason@catalyst.net.nz>
 
 ## Other venues ##
 You will find me in a couple of other places around the web:
