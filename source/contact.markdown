@@ -19,7 +19,7 @@ If you'd like to send me encrypted mail, you can use:
 You will find me in a couple of other places around the web:
 
 ### FOSS ###
-* [Arch Linux](https://bbs.archlinux.org/profile.php?id=25579) (requires login)
+* [Arch Linux](https://.archlinux.org/people/support-staff/#jasonwryan)
 * [My Github projects](http://github.com/jasonwryan)
 * [Bitbucket repositories](http://bitbucket.jasonwryan.com/)
 * [Unix &amp; Linux StackExchange](http://unix.stackexchange.com/users/6761/jasonwryan)
