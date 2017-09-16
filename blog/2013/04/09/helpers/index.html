@@ -182,16 +182,16 @@ a partial wrapper for <code>cower</code>:</p>
 </span><span class='line'>
 </span><span class='line'><span class="nb">cd</span> <span class="nv">$HOME</span>/Build <span class="o">&amp;&amp;</span> cower -d <span class="s2">&quot;$1&quot;</span>
 </span><span class='line'><span class="nv">builddir</span><span class="o">=</span><span class="s2">&quot;$_&quot;</span>
-</span><span class='line'><span class="nb">cd</span> <span class="s2">&quot;$builddir&quot;</span> <span class="o">&amp;&amp;</span> <span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> PKGBUILD
+</span><span class='line'><span class="nb">cd</span> <span class="s2">&quot;$builddir&quot;</span> <span class="o">&amp;&amp;</span> <span class="k">${</span><span class="nv">EDITOR</span><span class="k">:-</span><span class="nv">vi</span><span class="k">}</span> PKGBUILD <span class="o">||</span> <span class="nb">exit</span>
 </span><span class='line'>
-</span><span class='line'>makepkg -si <span class="o">&amp;&amp;</span> <span class="nb">cd</span> - &amp;&gt;/dev/null
+</span><span class='line'>makepkg -si <span class="o">&amp;&amp;</span> <span class="nb">cd</span> - <span class="p">&amp;</span>&gt;/dev/null
 </span><span class='line'>
 </span><span class='line'><span class="nb">read</span> -p <span class="s2">&quot;Remove Build directory? [Y/n]? &quot;</span> yn
-</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$yn&quot;</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span> <span class="o">]</span>; <span class="k">then</span>
-</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;Removing build directory...&quot;</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$yn&quot;</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="s2">&quot;\n%s\n&quot;</span> <span class="s2">&quot;Removing build directory...&quot;</span>
 </span><span class='line'>    rm -rf <span class="s2">&quot;$builddir&quot;</span>
 </span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="k">    </span><span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Build completed.&quot;</span>
+</span><span class='line'>    <span class="nb">printf</span> <span class="s2">&quot;%s\n&quot;</span> <span class="s2">&quot;Build completed.&quot;</span>
 </span><span class='line'><span class="k">fi</span>
 </span></code></pre></td></tr></table></div></figure>
 
