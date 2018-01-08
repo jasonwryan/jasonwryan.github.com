@@ -13,10 +13,9 @@ You can email me at this domain using **mail@**...
 If you'd like to send me encrypted mail, you can use:
 
 * [my personal GPG Key](http://miromiro.com/jwr/jwr.asc)
-* or [my work key](http://miromiro.com/jwr/catalyst.asc) for <jason@catalyst.net.nz>
 
 ### Gopher
-My gopherspace: [gopher://gopher.jasonwryan.com](gopher://gopher.jasonwryan.com:70)
+My gopher hole: [gopher://gopher.jasonwryan.com](gopher://gopher.jasonwryan.com:70)
 
 ## Other venues ##
 You will find me in a couple of other places around the web:
