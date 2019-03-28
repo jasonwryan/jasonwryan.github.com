@@ -22,15 +22,15 @@ You will find me in a couple of other places around the web:
 
 ### FOSS ###
 * [Arch Linux](https://www.archlinux.org/people/support-staff/#jasonwryan)
-* [My Github projects](http://github.com/jasonwryan)
-* [Bitbucket repositories](http://bitbucket.jasonwryan.com/)
-* [Unix &amp; Linux StackExchange](http://unix.stackexchange.com/users/6761/jasonwryan)
+* [My Github projects](https://github.com/jasonwryan)
+* [Bitbucket repositories](https://bitbucket.org/jasonwryan/)
+* [Unix &amp; Linux StackExchange](https://unix.stackexchange.com/users/6761/jasonwryan)
 
 or find me on IRC in #freenode
 
 ### Media ###
-* [My Photos](http://flickr.jasonwryan.com/) on Flickr
-* [Music I listen to](http://music.jasonwryan.com/) on Libre.fm
+* [My Photos](https://www.flickr.com/photos/jasonwryan/) on Flickr
+* [Music I listen to](https://libre.fm/user/jasonwryan) on Libre.fm
 * [Books I read](http://www.goodreads.com/review/list/3687231) on Goodreads
 * [Professional connections](http://www.linkedin.com/in/jasonwryan) on LinkedIn
 
