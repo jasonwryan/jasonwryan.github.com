@@ -23,10 +23,10 @@ You will find me in a couple of other places around the web:
 ### FOSS ###
 * [Arch Linux](https://www.archlinux.org/people/support-staff/#jasonwryan)
 * [My Github projects](https://github.com/jasonwryan)
-* [Bitbucket repositories](https://bitbucket.org/jasonwryan/)
+* [Mercurial repositories](https://hg.sr.ht/~jasonwryan/)
 * [Unix &amp; Linux StackExchange](https://unix.stackexchange.com/users/6761/jasonwryan)
 
-or find me on IRC in #freenode
+or find me on IRC on libera.chat (#archlinux-{testing,wiki} or #surfraw)
 
 ### Media ###
 * [My Photos](https://www.flickr.com/photos/jasonwryan/) on Flickr
